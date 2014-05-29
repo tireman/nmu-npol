@@ -93,7 +93,7 @@ G4VPhysicalVolume* DetectorConstruction::Construct()
   // World
   //------------------------------ 
   
-  G4Box*  solidWorld= new G4Box("World",2.0*m,2.5*m, 2.5*m);
+  G4VSolid*  solidWorld= new G4Box("World",2.0*m,2.5*m, 2.5*m);
   G4LogicalVolume* logicWorld= new G4LogicalVolume( solidWorld, Vac, "World", 0, 0, 0);
   
   //  Must place the World Physical volume unrotated at (0,0,0).
@@ -115,8 +115,8 @@ G4VPhysicalVolume* DetectorConstruction::Construct()
   //---------------------------
 
 
- G4Box* TopDet = new G4Box("TopDet",0.80*m,0.0508*m,0.0508*m);
- G4LogicalVolume* TopDetLV = new G4LogicalVolume(TopDet,Scint,"TopDetLV",0,0,0);
+ G4VSolid* TopDet = new G4Box("TopDet",0.80*m,0.0508*m,0.0508*m);
+ G4LogicalVolume* TopDetLV = new G4LogicalVolume(TopDet,Scint,"TopDet",0,0,0);
  G4AssemblyVolume* TopArray = new G4AssemblyVolume();
   
   // Translation and rotation of plate inside assembly
@@ -168,7 +168,7 @@ G4VPhysicalVolume* DetectorConstruction::Construct()
   //----------------------------
 
    G4Box* TopVeto = new G4Box("TopVeto",0.80*m,0.0050*m,0.0508*m);
-   G4LogicalVolume* TopVetoLV = new G4LogicalVolume(TopVeto,Scint,"TopVetoLV",0,0,0);
+   G4LogicalVolume* TopVetoLV = new G4LogicalVolume(TopVeto,Scint,"TopVeto",0,0,0);
    G4AssemblyVolume* TopVetoArray = new G4AssemblyVolume();
 
   // Create the Plate with this loop
@@ -193,7 +193,7 @@ G4VPhysicalVolume* DetectorConstruction::Construct()
   //------------------------------
   
    G4Box* BottomDet = new G4Box("BottomDet",0.80*m,0.0508*m,0.0508*m);
-   G4LogicalVolume* BottomDetLV = new G4LogicalVolume(BottomDet,Scint,"BottomDetLV",0,0,0);
+   G4LogicalVolume* BottomDetLV = new G4LogicalVolume(BottomDet,Scint,"BottomDet",0,0,0);
    G4AssemblyVolume* BottomArray = new G4AssemblyVolume();
 
   // Create the Plate with this loop
@@ -225,7 +225,7 @@ G4VPhysicalVolume* DetectorConstruction::Construct()
   //-----------------------------
 
   G4Box* BottomVeto = new G4Box("BottomVeto",0.80*m,0.0050*m,0.0508*m);
-  G4LogicalVolume* BottomVetoLV = new G4LogicalVolume(BottomVeto,Scint,"BottomVetoLV",0,0,0);
+  G4LogicalVolume* BottomVetoLV = new G4LogicalVolume(BottomVeto,Scint,"BottomVeto",0,0,0);
   G4AssemblyVolume* BottomVetoArray = new G4AssemblyVolume();
   
   // Create the Plate with this loop
@@ -255,7 +255,7 @@ G4VPhysicalVolume* DetectorConstruction::Construct()
   // Front Array construction using G4AssemblyVolume helper routine
 
   G4Box* FrontDet = new G4Box("FrontDet",0.50*m,0.0508*m,0.0508*m);
-  G4LogicalVolume* FrontDetLV = new G4LogicalVolume(FrontDet,Scint,"FrontDetLV",0,0,0);
+  G4LogicalVolume* FrontDetLV = new G4LogicalVolume(FrontDet,Scint,"FrontDet",0,0,0);
   G4AssemblyVolume* FrontArray1 = new G4AssemblyVolume();
   G4AssemblyVolume* FrontArray2 = new G4AssemblyVolume();
   //  G4AssemblyVolume* FrontArray3 = new G4AssemblyVolume();
@@ -295,7 +295,7 @@ G4VPhysicalVolume* DetectorConstruction::Construct()
 // Front taggers construction using G4AssemblyVolume helper routine
 
   G4Box* FrontTag = new G4Box("FrontTag",0.50*m,0.0508*m,0.00508*m);
-  G4LogicalVolume* FrontTagLV = new G4LogicalVolume(FrontTag,Scint,"FrontTagLV",0,0,0);
+  G4LogicalVolume* FrontTagLV = new G4LogicalVolume(FrontTag,Scint,"FrontTag",0,0,0);
   G4AssemblyVolume* FrontTagger1 = new G4AssemblyVolume();
   G4AssemblyVolume* FrontTagger2 = new G4AssemblyVolume();
   //  G4AssemblyVolume* FrontArray3 = new G4AssemblyVolume();
