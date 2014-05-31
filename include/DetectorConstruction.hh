@@ -37,37 +37,36 @@
 
 #include "globals.hh"
 #include "G4VUserDetectorConstruction.hh"
-#include "NMUSensitiveDetector.hh"
-//class G4AssemblyVolume;
+
+class G4AssemblyVolume;
 class G4Box;
 class G4VSolid;
 class G4LogicalVolume;
 class G4VPhysicalVolume;
 class NMUSensitiveDetector;
-//class G4Material;
+class G4Material;
 
 class DetectorConstruction : public G4VUserDetectorConstruction
 {
-public:
-  
-  DetectorConstruction();
-  virtual ~DetectorConstruction();
+		public:
 
-public:
-  
-  virtual G4VPhysicalVolume* Construct();
-  
-  
-private:
-  
-  //G4Box*             solidWorld;
-  //G4LogicalVolume*   logicWorld;
-  //G4VPhysicalVolume* physiWorld;
-  
-  //G4VSolid  *TopDet, *TopVeto, *BottomDet, *BottomVeto, *FrontDet, *FrontTag;
-  //G4LogicalVolume *TopDetLV, *TopVetoLV, *BottomDetLV, *BottomVetoLV, *FrontDetLV, *FrontTagLV;
-  NMUSensitiveDetector *TopDetSD, *TopVetoSD, *BottomDetSD, *BottomVetoSD, *FrontDetSD, *FrontTagSD;
-  //G4AssemblyVolume *TopArray, *TopVetoArray, *BottomArray, *BottomVetoArray, *FrontArray1, *FrontArray2, *FrontTagger1, *FrontTagger2;
+				DetectorConstruction();
+				~DetectorConstruction();
+
+		public:
+
+				G4VPhysicalVolume* Construct();
+
+		private:
+
+				G4Box*             solidWorld;
+				G4LogicalVolume*   logicWorld;
+				G4VPhysicalVolume* physiWorld;
+
+				G4VSolid *TopDet, *TopVeto, *BottomDet, *BottomVeto, *FrontDet, *FrontTag;
+				G4LogicalVolume *TopDetLV, *TopVetoLV, *BottomDetLV, *BottomVetoLV, *FrontDetLV, *FrontTagLV;
+				NMUSensitiveDetector *TopDetSD, *TopVetoSD, *BottomDetSD, *BottomVetoSD, *FrontDetSD, *FrontTagSD;
+				G4AssemblyVolume *TopArray, *TopVetoArray, *BottomArray, *BottomVetoArray, *FrontArray1, *FrontArray2, *FrontTagger1, *FrontTagger2;
 
 };
 
