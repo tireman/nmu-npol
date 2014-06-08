@@ -8,15 +8,6 @@
 /run/verbose 2
 #/event/verbose 0
 
-
-/vis/open OGLSX 800x600-0+0
-/vis/viewer/set/viewpointThetaPhi 0 180 deg
-#/vis/viewer/set/viewpointThetaPhi 45 45 deg
-/vis/viewer/zoom 1.5
-/vis/drawVolume
-/vis/scene/endOfEventAction accumulate
-/vis/scene/add/trajectories smooth
-/vis/scene/add/axes
 /tracking/verbose 1
 /tracking/storeTrajectory 1
 
@@ -28,4 +19,4 @@
 
 /gun/energy 7000 MeV
 
-/run/beamOn 1
+/run/beamOn 10
