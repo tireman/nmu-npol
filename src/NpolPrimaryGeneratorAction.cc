@@ -23,38 +23,53 @@
 // * acceptance of all terms of the Geant4 Software license.          *
 // ********************************************************************
 //
+// $Id: PrimaryGeneratorAction.cc,v 1.5 2006/06/29 16:33:05 gunter Exp $
+// --------------------------------------------------------------
 //
-// $Id: SteppingVerbose.hh,v 1.8 2006/06/29 17:47:50 gunter Exp $
-// GEANT4 tag $Name: geant4-09-03-patch-01 $
-//
-//   This class manages the verbose outputs in G4SteppingManager. 
-//   It inherits from G4SteppingVerbose.
-//   It shows how to extract informations during the tracking of a particle.
-//
-//....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
-//....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
 
-class SteppingVerbose;
 
-#ifndef SteppingVerbose_h
-#define SteppingVerbose_h 1
+#include "G4SystemOfUnits.hh"
+#include "G4RunManager.hh"
+#include "G4ParticleGun.hh"
+#include "G4ParticleTable.hh"
+#include "G4ParticleDefinition.hh"
+#include "G4LogicalVolume.hh"
+#include "G4LogicalVolumeStore.hh"
+#include "G4Box.hh"
+#include "Randomize.hh"
 
-#include "G4SteppingVerbose.hh"
+#include "NpolPrimaryGeneratorAction.hh"
 
-//....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
-
-class SteppingVerbose : public G4SteppingVerbose 
+NpolPrimaryGeneratorAction::NpolPrimaryGeneratorAction()
+		: worldBox(NULL)
 {
- public:
-   
-  SteppingVerbose();
- ~SteppingVerbose();
+		G4int n_particle = 1;
+		particleGun  = new G4ParticleGun(n_particle);
 
-  void StepInfo();
-  void TrackingStarted();
+		// default particle kinematic
+		G4ParticleTable *particleTable = G4ParticleTable::GetParticleTable();
+		G4String particleName;
+		G4ParticleDefinition *particle = particleTable->FindParticle(particleName="neutron");
+		particleGun->SetParticleDefinition(particle);
+		particleGun->SetParticleMomentumDirection(G4ThreeVector(0.,0.,1.));
+		particleGun->SetParticleEnergy(7000.*MeV);
+}
 
-};
+NpolPrimaryGeneratorAction::~NpolPrimaryGeneratorAction()
+{
+		delete particleGun;
+}
 
-//....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
+// This function is called at the beginning of each event.
+void NpolPrimaryGeneratorAction::GeneratePrimaries(G4Event* anEvent)
+{
 
-#endif
+		G4double x0 = 0.50 * (2.0*G4UniformRand()-1)*m;
+		G4double y0 = 0.30 * (2.0*G4UniformRand()-1)*m;
+		G4double z0 = -2.0*m;
+
+		particleGun->SetParticlePosition(G4ThreeVector(x0,y0,z0));
+		particleGun->GeneratePrimaryVertex(anEvent);
+
+}
+

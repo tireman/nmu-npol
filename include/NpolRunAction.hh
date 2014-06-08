@@ -23,40 +23,31 @@
 // * acceptance of all terms of the Geant4 Software license.          *
 // ********************************************************************
 //
-// $Id: PrimaryGeneratorMessenger.hh,v 1.4 2006/06/29 16:31:37 gunter Exp $
-// --------------------------------------------------------------
 //
-#ifndef PrimaryGeneratorMessenger_h
-#define PrimaryGeneratorMessenger_h 1
+// $Id: RunAction.hh,v 1.8 2006/06/29 17:47:45 gunter Exp $
+// GEANT4 tag $Name: geant4-09-03-patch-01 $
+// 
+//....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
+//....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
 
-class PrimaryGeneratorAction;
-class G4UIcmdWithADoubleAndUnit;
-class G4UIcmdWithABool;
+#ifndef RunAction_h
+#define RunAction_h
 
-#include "G4UImessenger.hh"
+#include "G4UserRunAction.hh"
 #include "globals.hh"
 
-class PrimaryGeneratorMessenger: public G4UImessenger
+class G4Run;
+
+class NpolRunAction : public G4UserRunAction
 {
-  public:
-    PrimaryGeneratorMessenger(PrimaryGeneratorAction* mpga);
-    ~PrimaryGeneratorMessenger();
+		public:
+				NpolRunAction();
+				~NpolRunAction();
 
-  public:
-    void SetNewValue(G4UIcommand * command,G4String newValues);
-    G4String GetCurrentValue(G4UIcommand * command);
-
-  private:
-    PrimaryGeneratorAction * target;
-
-  private: //commands
-    G4UIcmdWithADoubleAndUnit*  momentumCmd;
-    G4UIcmdWithADoubleAndUnit*  sigmaMomCmd;
-    G4UIcmdWithADoubleAndUnit*  sigmaAngCmd;
-    G4UIcmdWithABool*           randomCmd;
-
+		public:
+				void BeginOfRunAction(const G4Run*);
+				void EndOfRunAction(const G4Run*);
 };
 
 #endif
-
 

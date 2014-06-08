@@ -23,47 +23,33 @@
 // * acceptance of all terms of the Geant4 Software license.          *
 // ********************************************************************
 //
-// $Id: EMPhysics.hh,v 1.7 2009/11/21 01:00:19 perl Exp $
+// $Id: PrimaryGeneratorAction.hh,v 1.4 2006/06/29 16:31:35 gunter Exp $
 // --------------------------------------------------------------
 //
-// 09-Oct-2003 Chhange gamma, electron, positorn process T. Koi
 
+#ifndef Npol_PrimaryGeneratorAction_h
+#define Npol_PrimaryGeneratorAction_h
 
-#ifndef EMPhysics_h
-#define EMPhysics_h 1
-
+#include "G4VUserPrimaryGeneratorAction.hh"
 #include "globals.hh"
-#include "G4ios.hh"
 
-#include "G4VPhysicsConstructor.hh"
+class G4ParticleGun;
+class G4Event;
+class G4Box;
 
-#include "G4PhotoElectricEffect.hh"
-#include "G4ComptonScattering.hh"
-#include "G4GammaConversion.hh"
-#include "G4eMultipleScattering.hh"
-#include "G4eIonisation.hh"
-#include "G4eBremsstrahlung.hh"
-#include "G4eplusAnnihilation.hh"
-
-class EMPhysics : public G4VPhysicsConstructor
+class NpolPrimaryGeneratorAction : public G4VUserPrimaryGeneratorAction
 {
-  public:
-    EMPhysics(const G4String& name ="EM");
-    virtual ~EMPhysics();
+		public:
+				NpolPrimaryGeneratorAction();
+				virtual ~NpolPrimaryGeneratorAction();
 
-  public:
-    // This method will be invoked in the Construct() method.
-    // each particle type will be instantiated
-    virtual void ConstructParticle(){;};
+				virtual void GeneratePrimaries(G4Event*);
 
-    // This method will be invoked in the Construct() method.
-    // each physics process will be instantiated and
-    // registered to the process manager of each particle type
-    virtual void ConstructProcess();
-
-  protected:
+		private:
+				G4ParticleGun *particleGun;
+				G4Box *worldBox;
 
 };
 
-
 #endif
+

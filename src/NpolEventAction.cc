@@ -30,41 +30,33 @@
 //....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
 //....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
 
-#include "EventAction.hh"
-#include "NMUHit.hh"
 
 #include "G4Event.hh"
 #include "G4EventManager.hh"
 #include "G4SDManager.hh"
 #include "G4HCofThisEvent.hh"
-#include "G4THitsCollection.hh"
-typedef G4THitsCollection<NMUHit> NMUHitsCollection;
 #include "G4ios.hh"
 #include "G4String.hh"
+#include "G4THitsCollection.hh"
 
-//....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
+#include "NpolEventAction.hh"
+#include "NpolHit.hh"
 
-EventAction::EventAction()
-{
-		fp=fopen("g4Npol7000.out","w");
-}
+typedef G4THitsCollection<NpolHit> NpolHitsCollection;
 
-//....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
-
-EventAction::~EventAction()
-{
-		fclose(fp);
-}
-
-//....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
-
-void EventAction::BeginOfEventAction(const G4Event* evt)
+NpolEventAction::NpolEventAction()
 {}
 
-//....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
+NpolEventAction::~NpolEventAction()
+{}
 
-void EventAction::EndOfEventAction(const G4Event* evt) {
+void NpolEventAction::BeginOfEventAction(const G4Event* evt)
+{}
 
+void NpolEventAction::EndOfEventAction(const G4Event* evt) {
+
+
+		const int numSensitiveDetectors = 6;
 		G4int event_id = evt->GetEventID();
 		G4SDManager *SDMan = G4SDManager::GetSDMpointer();
 		int i, n_hits = 0, CHCIDs[6] = { SDMan->GetCollectionID("TopDet/collection_name"),
@@ -75,7 +67,7 @@ void EventAction::EndOfEventAction(const G4Event* evt) {
 				SDMan->GetCollectionID("FrontTag/collection_name") };
 		G4HCofThisEvent *HCE = evt->GetHCofThisEvent();
 
-		for(i=0; i < 6; i++)
+		for(i=0; i < numSensitiveDetectors; i++)
 				n_hits += ProcessAndPrint(HCE,CHCIDs[i]);
 
 		// periodic printing
@@ -87,19 +79,20 @@ void EventAction::EndOfEventAction(const G4Event* evt) {
 }
 
 //This method is called in a for loop and is intended to run once per event for each sensitive detector.  Returns the total number of hits in the detector.
-int EventAction::ProcessAndPrint(G4HCofThisEvent *HCE, int CHCID) {
+int NpolEventAction::ProcessAndPrint(G4HCofThisEvent *HCE, int CHCID) {
 
-		NMUHitsCollection *hitsCollection = NULL;
+		NpolHitsCollection *hitsCollection = NULL;
 		int i, n_hits = 0;
 
 		if(HCE != NULL)
-				hitsCollection = (NMUHitsCollection *)(HCE->GetHC(CHCID)); //Cast to custom hits collection type
+				hitsCollection = (NpolHitsCollection *)(HCE->GetHC(CHCID)); //Cast to custom hits collection type
 
 		if(hitsCollection != NULL) {
 				n_hits = hitsCollection->entries();
 
 				for(i = 0; i < n_hits; i++) {
-						NMUHit *aHit = (*hitsCollection)[i];
+						NpolHit *aHit = (*hitsCollection)[i];
+						// ...
 						aHit->Print();
 						aHit->FilePrint();
 				}

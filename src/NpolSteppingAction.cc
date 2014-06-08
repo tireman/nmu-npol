@@ -23,31 +23,29 @@
 // * acceptance of all terms of the Geant4 Software license.          *
 // ********************************************************************
 //
-/// \file hadronic/Hadr03/include/PhysicsList.hh
-/// \brief Definition of the PhysicsList class
 //
-// $Id: PhysicsList.hh 66587 2012-12-21 11:06:44Z ihrivnac $
-//
-
-#ifndef PhysicsList_h
-#define PhysicsList_h 1
-
-#include "G4VModularPhysicsList.hh"
-#include "globals.hh"
-
+// $Id: SteppingAction.cc,v 1.9 2006/06/29 17:48:18 gunter Exp $
+// GEANT4 tag $Name: geant4-09-03-patch-01 $
+// 
+//....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
 //....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
 
-class PhysicsList: public G4VModularPhysicsList
-{
-public:
-  PhysicsList();
- ~PhysicsList();
+#include <cstdio>
+#include "NpolSteppingAction.hh"
+#include "G4SteppingManager.hh"
 
-public:
-  virtual void ConstructParticle();
-  virtual void SetCuts();
-};
+NpolSteppingAction::NpolSteppingAction() {
+}
 
-//....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
+void NpolSteppingAction::UserSteppingAction(const G4Step *aStep) {
 
-#endif
+	G4Track *aTrack = aStep->GetTrack();
+	FILE *out = fopen("stepout.out","w");
+	int trackID = aTrack->GetTrackID(), stepNum = aTrack->GetCurrentStepNumber();
+	double Edeposit = aStep->GetTotalEnergyDeposit();
+
+	fprintf(out,"Track ID: %d, Step ID: %d, Energy Deposition: %f\n",trackID,stepNum,Edeposit);
+
+	fclose(out);
+}
+

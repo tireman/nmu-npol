@@ -10,82 +10,83 @@
 // * include a list of copyright holders.                             *
 // ********************************************************************
 
+#ifdef G4MULTITHREADED
+ #include "G4MTRunManager.hh"
+#else
+ #include "G4RunManager.hh"
+#endif
 
-#include "G4RunManager.hh"
 #include "G4UImanager.hh"
 
 #include "QGSP_BERT.hh"
-#include "PrimaryGeneratorAction.hh"
 
-#include "DetectorConstruction.hh"
-#include "EventAction.hh"
-#include "TrackingAction.hh"
+#include "NpolActionInitialization.hh"
+#include "NpolDetectorConstruction.hh"
 
 #ifdef G4VIS_USE
-#include "G4VisExecutive.hh"
+ #include "G4VisExecutive.hh"
 #endif
 
 #ifdef G4UI_USE
-#include "G4UIExecutive.hh"
+ #include "G4UIExecutive.hh"
 #endif
 
-int main(int argc,char** argv)
+
+int main(int argc,char *argv[])
 {
+
 		// RunManager construction
-		G4RunManager* runManager = new G4RunManager;
+#ifdef G4MULTITHREADED
+		//G4MTRunManager *runManager = new G4MTRunManager; // TODO: fix multithreading
+		G4RunManager *runManager = new G4RunManager;
+#else
+		G4RunManager *runManager = new G4RunManager;
+#endif
+
 
 #ifdef G4VIS_USE
 		// Visualization manager construction
-		G4VisManager* visManager = new G4VisExecutive;
+		G4VisManager *visManager = new G4VisExecutive;
 		visManager->Initialize();
 #endif
 
 		// mandatory user initialization classes
-		DetectorConstruction* detector = new DetectorConstruction;
-		runManager->SetUserInitialization(detector);
-
-		G4VUserPhysicsList* physics = new QGSP_BERT;
-		runManager->SetUserInitialization(physics);
+		runManager->SetUserInitialization(new NpolDetectorConstruction);
+		runManager->SetUserInitialization(new QGSP_BERT);
+		runManager->SetUserInitialization(new NpolActionInitialization);
 
 		// initialize Geant4 kernel
 		runManager->Initialize();
 
-		// mandatory user action class
-		runManager->SetUserAction(new PrimaryGeneratorAction);
-		//  runManager->SetUserAction(new ExN02PrimaryGeneratorAction(detector));
+		// Get the pointer to the User Interface manager
+		G4UImanager *UImanager = G4UImanager::GetUIpointer();
 
+		if(argc != 1) {
+			// batch mode
+			G4String command = "/control/execute ";
+			G4String fileName = argv[1];
+			UImanager->ApplyCommand(command + fileName);
 
-		// optional user action classes
-		//  runManager->SetUserAction(new A01EventAction);
-		runManager->SetUserAction(new EventAction);
-
-
-		if(argc>1)
-				// execute an argument macro file if exist
-		{
-				G4UImanager* UImanager = G4UImanager::GetUIpointer();
-				G4String command = "/control/execute ";
-				G4String fileName = argv[1];
-				UImanager->ApplyCommand(command+fileName);
-		}
-		else
-				// start interactive session
-		{
-#ifdef G4UI_USE
-				G4UIExecutive* ui = new G4UIExecutive(argc, argv);
+			// Pause the program so I can look at the visual before it closes
+			G4cout << "Press Return to continue" << G4endl;
+			G4cin.get();
+		} else {
+			// interactive mode
+			#ifdef G4UI_USE
+				G4UIExecutive *ui = new G4UIExecutive(argc, argv);
+			 #ifdef G4VIS_USE
+				UImanager->ApplyCommand("/control/execute init_vis.mac");
+			 #else
+				UImanager->ApplyCommand("/control/execute init.mac");
+			 #endif
 				ui->SessionStart();
 				delete ui;
-#endif
+			#endif
 		}
-
-		// Pause the program so I can look at the visual before it closes
-		G4cout << "Press Return to continue" << G4endl;
-		G4cin.get();
 
 #ifdef G4VIS_USE
 		delete visManager;
 #endif
-
 		delete runManager;
 
 		return 0;

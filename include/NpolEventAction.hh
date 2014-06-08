@@ -23,43 +23,33 @@
 // * acceptance of all terms of the Geant4 Software license.          *
 // ********************************************************************
 //
-// $Id: GeneralPhysics.hh,v 1.5 2006/06/29 16:31:08 gunter Exp $
-// --------------------------------------------------------------
 //
+// $Id: EventAction.hh,v 1.8 2006/06/29 17:47:35 gunter Exp $
+// GEANT4 tag $Name: geant4-09-03-patch-01 $
+//
+//....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
+//....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
 
-#ifndef GeneralPhysics_h
-#define GeneralPhysics_h 1
+#ifndef Npol_EventAction_h
+#define Npol_EventAction_h
 
-#include "globals.hh"
-#include "G4ios.hh"
+#include "G4HCofThisEvent.hh"
+#include "G4UserEventAction.hh"
 
-#include "G4VPhysicsConstructor.hh"
+class G4Event;
 
-class GeneralPhysics : public G4VPhysicsConstructor
+class NpolEventAction : public G4UserEventAction
 {
-  public:
-    GeneralPhysics(const G4String& name = "general");
-    virtual ~GeneralPhysics();
+		public:
+				NpolEventAction();
+				~NpolEventAction();
+		public:
+				void BeginOfEventAction(const G4Event*);
+				void EndOfEventAction(const G4Event*);
 
-  public:
-    // This method will be invoked in the Construct() method.
-    // each particle type will be instantiated
-    virtual void ConstructParticle();
-
-    // This method will be invoked in the Construct() method.
-    // each physics process will be instantiated and
-    // registered to the process manager of each particle type
-    virtual void ConstructProcess();
-
+		public:
+				int ProcessAndPrint(G4HCofThisEvent *HCE, int CHCID);
 };
 
-
 #endif
-
-
-
-
-
-
-
 

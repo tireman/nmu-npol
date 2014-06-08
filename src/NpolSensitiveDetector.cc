@@ -2,9 +2,9 @@
 
 #include "G4SDManager.hh"
 
-#include "NMUSensitiveDetector.hh"
+#include "NpolSensitiveDetector.hh"
 
-NMUSensitiveDetector::NMUSensitiveDetector(G4String name)
+NpolSensitiveDetector::NpolSensitiveDetector(G4String name)
 		:G4VSensitiveDetector(name),
 		collectionID(-1) {
 				
@@ -14,24 +14,24 @@ NMUSensitiveDetector::NMUSensitiveDetector(G4String name)
 	SDMan->AddNewDetector(this);
 }
 
-NMUSensitiveDetector::~NMUSensitiveDetector() {}
+NpolSensitiveDetector::~NpolSensitiveDetector() {}
 
 //Initialize is invoked at the beginning of each event.
-void NMUSensitiveDetector::Initialize(G4HCofThisEvent *HCE) {
+void NpolSensitiveDetector::Initialize(G4HCofThisEvent *HCE) {
 
 	if(collectionID < 0) collectionID = GetCollectionID(0);
 
-	hitsCollection = new NMUHitsCollection(SensitiveDetectorName,collectionName[0]);
+	hitsCollection = new NpolHitsCollection(SensitiveDetectorName,collectionName[0]);
 	HCE->AddHitsCollection(collectionID,hitsCollection);
 }
 
 //EndOfEvent is invoked at the end of each event.
-void NMUSensitiveDetector::EndOfEvent(G4HCofThisEvent *HCE) {;}
+void NpolSensitiveDetector::EndOfEvent(G4HCofThisEvent *HCE) {;}
 
 //ProcessHits is invoked every time a step occurs in the sensitive volume.
-G4bool NMUSensitiveDetector::ProcessHits(G4Step *aStep, G4TouchableHistory *ROhist) {
+G4bool NpolSensitiveDetector::ProcessHits(G4Step *aStep, G4TouchableHistory *ROhist) {
 
-	NMUHit *aHit = new NMUHit(aStep);
+	NpolHit *aHit = new NpolHit(aStep);
 	//...
 
 	hitsCollection->insert(aHit);

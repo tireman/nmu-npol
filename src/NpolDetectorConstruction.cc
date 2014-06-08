@@ -30,7 +30,6 @@
 //....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo...... 
 //....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
 
-#include "DetectorConstruction.hh"
 
 #include "G4SystemOfUnits.hh"
 #include "G4PhysicalConstants.hh"
@@ -39,23 +38,22 @@
 #include "G4LogicalVolume.hh"
 #include "G4PVPlacement.hh"
 #include "G4AssemblyVolume.hh"
-
-#include "NMUSensitiveDetector.hh"
-
 #include "G4VisAttributes.hh"
 #include "G4Colour.hh"
-
 #include "G4ios.hh"
 
-DetectorConstruction::DetectorConstruction()
+#include "NpolDetectorConstruction.hh"
+#include "NpolSensitiveDetector.hh"
+
+NpolDetectorConstruction::NpolDetectorConstruction()
 {
 }
 
-DetectorConstruction::~DetectorConstruction()
+NpolDetectorConstruction::~NpolDetectorConstruction()
 {
 }
 
-G4VPhysicalVolume* DetectorConstruction::Construct()
+G4VPhysicalVolume* NpolDetectorConstruction::Construct()
 {
 		//--------- Material definition ---------
 
@@ -80,11 +78,6 @@ G4VPhysicalVolume* DetectorConstruction::Construct()
 		//------------------------------ 
 		// World
 		//------------------------------ 
-		//  fWorldLength = 8.0*m;
-		//G4GeometryManager::GetInstance()->SetWorldMaximumExtent(fWorldLength);
-		// G4cout << "Computed tolerance = "
-		//       << G4GeometryTolerance::GetInstance()->GetSurfaceTolerance()/mm
-		//       << " mm" << G4endl;
 
 		solidWorld= new G4Box("World",2.0*m,2.5*m, 2.5*m);
 		logicWorld= new G4LogicalVolume( solidWorld, Vac, "World", 0, 0, 0);
@@ -114,7 +107,7 @@ G4VPhysicalVolume* DetectorConstruction::Construct()
 
 		TopDet = new G4Box("TopDet",0.80*m,0.0508*m,0.0508*m);
 		TopDetLV = new G4LogicalVolume(TopDet,Scint,"TopDetLV",0,0,0);
-		TopDetSD = new NMUSensitiveDetector("TopDet");
+		TopDetSD = new NpolSensitiveDetector("TopDet");
 		TopDetLV->SetSensitiveDetector(TopDetSD);
 
 		TopArray = new G4AssemblyVolume();
@@ -159,7 +152,7 @@ G4VPhysicalVolume* DetectorConstruction::Construct()
 
 		TopVeto = new G4Box("TopVeto",0.80*m,0.0050*m,0.0508*m);
 		TopVetoLV = new G4LogicalVolume(TopVeto,Scint,"TopVetoLV",0,0,0);
-		TopVetoSD = new NMUSensitiveDetector("TopVeto");
+		TopVetoSD = new NpolSensitiveDetector("TopVeto");
 		TopVetoLV->SetSensitiveDetector(TopVetoSD);
 
 		TopVetoArray = new G4AssemblyVolume();
@@ -187,7 +180,7 @@ G4VPhysicalVolume* DetectorConstruction::Construct()
 
 		BottomDet = new G4Box("BottomDet",0.80*m,0.0508*m,0.0508*m);
 		BottomDetLV = new G4LogicalVolume(BottomDet,Scint,"BottomDetLV",0,0,0);
-		BottomDetSD = new NMUSensitiveDetector("BottomDet");
+		BottomDetSD = new NpolSensitiveDetector("BottomDet");
 		BottomDetLV->SetSensitiveDetector(BottomDetSD);
 
 		BottomArray = new G4AssemblyVolume();
@@ -222,7 +215,7 @@ G4VPhysicalVolume* DetectorConstruction::Construct()
 
 		BottomVeto = new G4Box("BottomVeto",0.80*m,0.0050*m,0.0508*m);
 		BottomVetoLV = new G4LogicalVolume(BottomVeto,Scint,"BottomVetoLV",0,0,0);
-		BottomVetoSD = new NMUSensitiveDetector("BottomVeto");
+		BottomVetoSD = new NpolSensitiveDetector("BottomVeto");
 		BottomVetoLV->SetSensitiveDetector(BottomVetoSD);
 
 		BottomVetoArray = new G4AssemblyVolume();
@@ -255,7 +248,7 @@ G4VPhysicalVolume* DetectorConstruction::Construct()
 
 		FrontDet = new G4Box("FrontDet",0.50*m,0.0508*m,0.0508*m);
 		FrontDetLV = new G4LogicalVolume(FrontDet,Scint,"FrontDetLV",0,0,0);
-		FrontDetSD = new NMUSensitiveDetector("FrontDet");
+		FrontDetSD = new NpolSensitiveDetector("FrontDet");
 		FrontDetLV->SetSensitiveDetector(FrontDetSD);
 
 		FrontArray1 = new G4AssemblyVolume();
@@ -297,7 +290,7 @@ G4VPhysicalVolume* DetectorConstruction::Construct()
 
 		FrontTag = new G4Box("FrontTag",0.50*m,0.0508*m,0.00508*m);
 		FrontTagLV = new G4LogicalVolume(FrontTag,Scint,"FrontTagLV",0,0,0);
-		FrontTagSD = new NMUSensitiveDetector("FrontTag");
+		FrontTagSD = new NpolSensitiveDetector("FrontTag");
 		FrontTagLV->SetSensitiveDetector(FrontTagSD);
 
 		FrontTagger1 = new G4AssemblyVolume();
@@ -332,10 +325,10 @@ G4VPhysicalVolume* DetectorConstruction::Construct()
 
 		//--------- Visualization attributes -------------------------------
 
-		G4VisAttributes* BoxVisAtt= new G4VisAttributes(G4Colour(1.0,1.0,1.0));
-		logicWorld  ->SetVisAttributes(BoxVisAtt);  
+		G4VisAttributes* WorldVisAtt= new G4VisAttributes(0);
+		logicWorld->SetVisAttributes(WorldVisAtt);
 		G4VisAttributes* FrontDetVisAtt= new G4VisAttributes(G4Colour(1.0,1.0,0.0));
-		FrontDetLV  ->SetVisAttributes(FrontDetVisAtt);
+		FrontDetLV->SetVisAttributes(FrontDetVisAtt);
 		G4VisAttributes* TopBotVisAtt= new G4VisAttributes(G4Colour(1.0,0.0,1.0));
 		TopDetLV->SetVisAttributes(TopBotVisAtt);
 		BottomDetLV->SetVisAttributes(TopBotVisAtt);

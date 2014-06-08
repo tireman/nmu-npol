@@ -1,12 +1,17 @@
 //Daniel Wilbern, dwilbern@nmu.edu
 
+#ifndef Npol_Hit_h
+#define Npol_Hit_h
+
 #include "G4VHit.hh"
 #include "G4Step.hh"
+#include "G4Point3D.hh"
 
-class NMUHit : public G4VHit {
+class NpolHit : public G4VHit {
 
 	private:	
 		G4double totalEnergyDeposit;
+		G4Point3D prepos, postpos;
 		//From pre-step point:
 		G4String volumeName;
 		G4String processName;
@@ -17,8 +22,8 @@ class NMUHit : public G4VHit {
 		G4String particleName;
 
 	public:
-		NMUHit(G4Step *aStep);
-		~NMUHit();
+		NpolHit(G4Step *aStep);
+		~NpolHit();
 		virtual void Draw();
 		virtual void Print();
 		void FilePrint();
@@ -32,5 +37,9 @@ class NMUHit : public G4VHit {
 		G4String GetVolumeName() {return volumeName;}
 		G4String GetProcessName() {return processName;}
 		G4String GetParticleName() {return particleName;}
+		G4Point3D GetPreStepPos() {return prepos;}
+		G4Point3D GetPostStepPos() {return postpos;}
 };
+
+#endif
 

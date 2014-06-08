@@ -1,3 +1,5 @@
+
+
 //
 // ********************************************************************
 // * License and Disclaimer                                           *
@@ -24,42 +26,49 @@
 // ********************************************************************
 //
 //
-// $Id: EventAction.hh,v 1.8 2006/06/29 17:47:35 gunter Exp $
+// $Id: DetectorConstruction.hh,v 1.10 2008/09/22 16:41:20 maire Exp $
 // GEANT4 tag $Name: geant4-09-03-patch-01 $
 //
 //....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
 //....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
 
-#ifndef EventAction_h
-#define EventAction_h 1
+#ifndef Npol_DetectorConstruction_h
+#define Npol_DetectorConstruction_h
 
-#include "G4HCofThisEvent.hh"
-#include "G4UserEventAction.hh"
-#include <stdio.h>
+#include "globals.hh"
+#include "G4VUserDetectorConstruction.hh"
 
-class G4Event;
+class G4AssemblyVolume;
+class G4Box;
+class G4VSolid;
+class G4LogicalVolume;
+class G4VPhysicalVolume;
+class NpolSensitiveDetector;
+class G4Material;
 
-//....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
-
-class EventAction : public G4UserEventAction
+class NpolDetectorConstruction : public G4VUserDetectorConstruction
 {
 		public:
-				EventAction();
-				~EventAction();
-				FILE *fp;
 
-
+				NpolDetectorConstruction();
+				~NpolDetectorConstruction();
 
 		public:
-				void BeginOfEventAction(const G4Event*);
-				void EndOfEventAction(const G4Event*);
 
-		public:
-				int ProcessAndPrint(G4HCofThisEvent *HCE, int CHCID);
+				G4VPhysicalVolume* Construct();
+
+		private:
+
+				G4Box             *solidWorld;
+				G4LogicalVolume   *logicWorld;
+				G4VPhysicalVolume *physiWorld;
+
+				G4VSolid *TopDet, *TopVeto, *BottomDet, *BottomVeto, *FrontDet, *FrontTag;
+				G4LogicalVolume *TopDetLV, *TopVetoLV, *BottomDetLV, *BottomVetoLV, *FrontDetLV, *FrontTagLV;
+				NpolSensitiveDetector *TopDetSD, *TopVetoSD, *BottomDetSD, *BottomVetoSD, *FrontDetSD, *FrontTagSD;
+				G4AssemblyVolume *TopArray, *TopVetoArray, *BottomArray, *BottomVetoArray, *FrontArray1, *FrontArray2, *FrontTagger1, *FrontTagger2;
+
 };
 
-//....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
-
 #endif
-
 

@@ -28,6 +28,9 @@ set(Npolapp_SCRIPTS
 #  Npolapp.in
 #  Npolapp.out
   npol.mac
+  init.mac
+  init_vis.mac
+  vis.mac
   )
 
 foreach(_script ${Npolapp_SCRIPTS})

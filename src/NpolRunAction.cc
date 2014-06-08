@@ -24,35 +24,27 @@
 // ********************************************************************
 //
 //
-// $Id: SteppingAction.cc,v 1.9 2006/06/29 17:48:18 gunter Exp $
+// $Id: RunAction.cc,v 1.9 2006/06/29 17:48:16 gunter Exp $
 // GEANT4 tag $Name: geant4-09-03-patch-01 $
 // 
 //....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
 //....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
 
-#include <cstdio>
-//#include "G4ios.hh"
-#include "SteppingAction.hh"
-#include "G4SteppingManager.hh"
+#include "NpolRunAction.hh"
 
-//....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
+#include "G4Run.hh"
 
-SteppingAction::SteppingAction() {
+NpolRunAction::NpolRunAction()
+{}
+
+NpolRunAction::~NpolRunAction()
+{}
+
+void NpolRunAction::BeginOfRunAction(const G4Run* aRun)
+{
+  G4cout << "### Run " << aRun->GetRunID() << " start." << G4endl;
 }
 
-//....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
-
-void SteppingAction::UserSteppingAction(const G4Step *aStep) {
-
-	G4Track *aTrack = aStep->GetTrack();
-	FILE *out = fopen("/tmp/stepout.out","w");
-	int trackID = aTrack->GetTrackID(), stepNum = aTrack->GetCurrentStepNumber();
-	double Edeposit = aStep->GetTotalEnergyDeposit();
-
-	fprintf(out,"Track ID: %d, Step ID: %d, Energy Deposition: %f\n",trackID,stepNum,Edeposit);
-
-	fclose(out);
-}
-
-//....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
+void NpolRunAction::EndOfRunAction(const G4Run*)
+{ }
 
