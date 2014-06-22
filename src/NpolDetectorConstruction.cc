@@ -46,12 +46,10 @@
 #include "NpolSensitiveDetector.hh"
 
 NpolDetectorConstruction::NpolDetectorConstruction()
-{
-}
+{}
 
 NpolDetectorConstruction::~NpolDetectorConstruction()
-{
-}
+{}
 
 G4VPhysicalVolume* NpolDetectorConstruction::Construct()
 {
@@ -79,12 +77,12 @@ G4VPhysicalVolume* NpolDetectorConstruction::Construct()
 		// World
 		//------------------------------ 
 
-		solidWorld= new G4Box("World",2.0*m,2.5*m, 2.5*m);
-		logicWorld= new G4LogicalVolume( solidWorld, Vac, "World", 0, 0, 0);
+		G4Box *solidWorld= new G4Box("World",2.0*m,2.5*m, 2.5*m);
+		G4LogicalVolume *logicWorld= new G4LogicalVolume( solidWorld, Vac, "World", 0, 0, 0);
 
 		//  Must place the World Physical volume unrotated at (0,0,0).
 		// 
-		physiWorld = new G4PVPlacement(0,               // no rotation
+		G4VPhysicalVolume *physiWorld = new G4PVPlacement(0,               // no rotation
 						G4ThreeVector(), // at (0,0,0)
 						logicWorld,      // its logical volume
 						"World",         // its name
@@ -100,6 +98,9 @@ G4VPhysicalVolume* NpolDetectorConstruction::Construct()
 		// TOPa/BOTTOMa are the dE arrays for particle ID (protons versus pions)
 		//---------------------------
 
+		G4VSolid *TopDet, *TopVeto, *BottomDet, *BottomVeto, *FrontDet, *FrontTag;
+		G4AssemblyVolume *TopArray, *TopVetoArray, *BottomArray, *BottomVetoArray, *FrontArray1, *FrontArray2, *FrontTagger1, *FrontTagger2;
+
 		//--------------------------
 		// Top E detectors
 		// Andrei's 2012 Plan B setup using 160 cm long detectors 10cm by 10cm
@@ -107,8 +108,6 @@ G4VPhysicalVolume* NpolDetectorConstruction::Construct()
 
 		TopDet = new G4Box("TopDet",0.80*m,0.0508*m,0.0508*m);
 		TopDetLV = new G4LogicalVolume(TopDet,Scint,"TopDetLV",0,0,0);
-		TopDetSD = new NpolSensitiveDetector("TopDet");
-		TopDetLV->SetSensitiveDetector(TopDetSD);
 
 		TopArray = new G4AssemblyVolume();
 
@@ -152,8 +151,6 @@ G4VPhysicalVolume* NpolDetectorConstruction::Construct()
 
 		TopVeto = new G4Box("TopVeto",0.80*m,0.0050*m,0.0508*m);
 		TopVetoLV = new G4LogicalVolume(TopVeto,Scint,"TopVetoLV",0,0,0);
-		TopVetoSD = new NpolSensitiveDetector("TopVeto");
-		TopVetoLV->SetSensitiveDetector(TopVetoSD);
 
 		TopVetoArray = new G4AssemblyVolume();
 
@@ -180,8 +177,6 @@ G4VPhysicalVolume* NpolDetectorConstruction::Construct()
 
 		BottomDet = new G4Box("BottomDet",0.80*m,0.0508*m,0.0508*m);
 		BottomDetLV = new G4LogicalVolume(BottomDet,Scint,"BottomDetLV",0,0,0);
-		BottomDetSD = new NpolSensitiveDetector("BottomDet");
-		BottomDetLV->SetSensitiveDetector(BottomDetSD);
 
 		BottomArray = new G4AssemblyVolume();
 
@@ -215,8 +210,6 @@ G4VPhysicalVolume* NpolDetectorConstruction::Construct()
 
 		BottomVeto = new G4Box("BottomVeto",0.80*m,0.0050*m,0.0508*m);
 		BottomVetoLV = new G4LogicalVolume(BottomVeto,Scint,"BottomVetoLV",0,0,0);
-		BottomVetoSD = new NpolSensitiveDetector("BottomVeto");
-		BottomVetoLV->SetSensitiveDetector(BottomVetoSD);
 
 		BottomVetoArray = new G4AssemblyVolume();
 
@@ -248,8 +241,6 @@ G4VPhysicalVolume* NpolDetectorConstruction::Construct()
 
 		FrontDet = new G4Box("FrontDet",0.50*m,0.0508*m,0.0508*m);
 		FrontDetLV = new G4LogicalVolume(FrontDet,Scint,"FrontDetLV",0,0,0);
-		FrontDetSD = new NpolSensitiveDetector("FrontDet");
-		FrontDetLV->SetSensitiveDetector(FrontDetSD);
 
 		FrontArray1 = new G4AssemblyVolume();
 		FrontArray2 = new G4AssemblyVolume();
@@ -290,8 +281,6 @@ G4VPhysicalVolume* NpolDetectorConstruction::Construct()
 
 		FrontTag = new G4Box("FrontTag",0.50*m,0.0508*m,0.00508*m);
 		FrontTagLV = new G4LogicalVolume(FrontTag,Scint,"FrontTagLV",0,0,0);
-		FrontTagSD = new NpolSensitiveDetector("FrontTag");
-		FrontTagLV->SetSensitiveDetector(FrontTagSD);
 
 		FrontTagger1 = new G4AssemblyVolume();
 		FrontTagger2 = new G4AssemblyVolume();
@@ -327,15 +316,41 @@ G4VPhysicalVolume* NpolDetectorConstruction::Construct()
 
 		G4VisAttributes* WorldVisAtt= new G4VisAttributes(0);
 		logicWorld->SetVisAttributes(WorldVisAtt);
+
 		G4VisAttributes* FrontDetVisAtt= new G4VisAttributes(G4Colour(1.0,1.0,0.0));
 		FrontDetLV->SetVisAttributes(FrontDetVisAtt);
+
 		G4VisAttributes* TopBotVisAtt= new G4VisAttributes(G4Colour(1.0,0.0,1.0));
 		TopDetLV->SetVisAttributes(TopBotVisAtt);
 		BottomDetLV->SetVisAttributes(TopBotVisAtt);
+
 		G4VisAttributes* TopBotaVisAtt= new G4VisAttributes(G4Colour(0.0,1.0,1.0));
 		TopVetoLV->SetVisAttributes(TopBotaVisAtt);
 		BottomVetoLV->SetVisAttributes(TopBotaVisAtt);
 
 		return physiWorld;
+}
+
+void NpolDetectorConstruction::ConstructSDandField() {
+
+		NpolSensitiveDetector *TopDetSD, *TopVetoSD, *BottomDetSD, *BottomVetoSD, *FrontDetSD, *FrontTagSD;
+
+		TopDetSD = new NpolSensitiveDetector("TopDet");
+		SetSensitiveDetector(TopDetLV,TopDetSD);
+
+		TopVetoSD = new NpolSensitiveDetector("TopVeto");
+		SetSensitiveDetector(TopVetoLV,TopVetoSD);
+
+		BottomDetSD = new NpolSensitiveDetector("BottomDet");
+		SetSensitiveDetector(BottomDetLV,BottomDetSD);
+
+		BottomVetoSD = new NpolSensitiveDetector("BottomVeto");
+		SetSensitiveDetector(BottomVetoLV,BottomVetoSD);
+
+		FrontDetSD = new NpolSensitiveDetector("FrontDet");
+		SetSensitiveDetector(FrontDetLV,FrontDetSD);
+
+		FrontTagSD = new NpolSensitiveDetector("FrontTag");
+		SetSensitiveDetector(FrontTagLV,FrontTagSD);
 }
 

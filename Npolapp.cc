@@ -12,6 +12,7 @@
 
 #ifdef G4MULTITHREADED
  #include "G4MTRunManager.hh"
+ #include "G4Threading.hh"
 #else
  #include "G4RunManager.hh"
 #endif
@@ -37,8 +38,8 @@ int main(int argc,char *argv[])
 
 		// RunManager construction
 #ifdef G4MULTITHREADED
-		//G4MTRunManager *runManager = new G4MTRunManager; // TODO: fix multithreading
-		G4RunManager *runManager = new G4RunManager;
+		G4MTRunManager *runManager = new G4MTRunManager;
+		runManager->SetNumberOfThreads(G4Threading::G4GetNumberOfCores());
 #else
 		G4RunManager *runManager = new G4RunManager;
 #endif

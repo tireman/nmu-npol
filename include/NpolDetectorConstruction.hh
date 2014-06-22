@@ -55,18 +55,12 @@ class NpolDetectorConstruction : public G4VUserDetectorConstruction
 
 		public:
 
-				G4VPhysicalVolume* Construct();
+				virtual G4VPhysicalVolume* Construct();
+				virtual void ConstructSDandField();
 
 		private:
 
-				G4Box             *solidWorld;
-				G4LogicalVolume   *logicWorld;
-				G4VPhysicalVolume *physiWorld;
-
-				G4VSolid *TopDet, *TopVeto, *BottomDet, *BottomVeto, *FrontDet, *FrontTag;
 				G4LogicalVolume *TopDetLV, *TopVetoLV, *BottomDetLV, *BottomVetoLV, *FrontDetLV, *FrontTagLV;
-				NpolSensitiveDetector *TopDetSD, *TopVetoSD, *BottomDetSD, *BottomVetoSD, *FrontDetSD, *FrontTagSD;
-				G4AssemblyVolume *TopArray, *TopVetoArray, *BottomArray, *BottomVetoArray, *FrontArray1, *FrontArray2, *FrontTagger1, *FrontTagger2;
 
 };
 
