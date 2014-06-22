@@ -40,15 +40,15 @@ class G4Event;
 
 class NpolEventAction : public G4UserEventAction
 {
-		public:
-				NpolEventAction();
-				~NpolEventAction();
-		public:
-				void BeginOfEventAction(const G4Event*);
-				void EndOfEventAction(const G4Event*);
+	public:
+		NpolEventAction();
+		~NpolEventAction();
+	public:
+		void BeginOfEventAction(const G4Event*);
+		void EndOfEventAction(const G4Event*);
 
-		public:
-				int ProcessAndPrint(G4HCofThisEvent *HCE, int CHCID);
+	public:
+		int ProcessAndPrint(G4HCofThisEvent *HCE, int CHCID);
 };
 
 #endif

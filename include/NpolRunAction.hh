@@ -40,13 +40,13 @@ class G4Run;
 
 class NpolRunAction : public G4UserRunAction
 {
-		public:
-				NpolRunAction();
-				~NpolRunAction();
+	public:
+		NpolRunAction();
+		~NpolRunAction();
 
-		public:
-				void BeginOfRunAction(const G4Run*);
-				void EndOfRunAction(const G4Run*);
+	public:
+		void BeginOfRunAction(const G4Run*);
+		void EndOfRunAction(const G4Run*);
 };
 
 #endif

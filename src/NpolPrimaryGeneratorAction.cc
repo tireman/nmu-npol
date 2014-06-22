@@ -40,36 +40,36 @@
 
 #include "NpolPrimaryGeneratorAction.hh"
 
-NpolPrimaryGeneratorAction::NpolPrimaryGeneratorAction()
-		: worldBox(NULL)
+	NpolPrimaryGeneratorAction::NpolPrimaryGeneratorAction()
+: worldBox(NULL)
 {
-		G4int n_particle = 1;
-		particleGun  = new G4ParticleGun(n_particle);
+	G4int n_particle = 1;
+	particleGun  = new G4ParticleGun(n_particle);
 
-		// default particle kinematic
-		G4ParticleTable *particleTable = G4ParticleTable::GetParticleTable();
-		G4String particleName;
-		G4ParticleDefinition *particle = particleTable->FindParticle(particleName="neutron");
-		particleGun->SetParticleDefinition(particle);
-		particleGun->SetParticleMomentumDirection(G4ThreeVector(0.,0.,1.));
-		particleGun->SetParticleEnergy(7000.*MeV);
+	// default particle kinematic
+	G4ParticleTable *particleTable = G4ParticleTable::GetParticleTable();
+	G4String particleName;
+	G4ParticleDefinition *particle = particleTable->FindParticle(particleName="neutron");
+	particleGun->SetParticleDefinition(particle);
+	particleGun->SetParticleMomentumDirection(G4ThreeVector(0.,0.,1.));
+	particleGun->SetParticleEnergy(7000.*MeV);
 }
 
 NpolPrimaryGeneratorAction::~NpolPrimaryGeneratorAction()
 {
-		delete particleGun;
+	delete particleGun;
 }
 
 // This function is called at the beginning of each event.
 void NpolPrimaryGeneratorAction::GeneratePrimaries(G4Event* anEvent)
 {
 
-		G4double x0 = 0.50 * (2.0*G4UniformRand()-1)*m;
-		G4double y0 = 0.30 * (2.0*G4UniformRand()-1)*m;
-		G4double z0 = -2.0*m;
+	G4double x0 = 0.50 * (2.0*G4UniformRand()-1)*m;
+	G4double y0 = 0.30 * (2.0*G4UniformRand()-1)*m;
+	G4double z0 = -2.0*m;
 
-		particleGun->SetParticlePosition(G4ThreeVector(x0,y0,z0));
-		particleGun->GeneratePrimaryVertex(anEvent);
+	particleGun->SetParticlePosition(G4ThreeVector(x0,y0,z0));
+	particleGun->GeneratePrimaryVertex(anEvent);
 
 }
 

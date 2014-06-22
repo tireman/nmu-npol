@@ -5,14 +5,14 @@
 #include "NpolSensitiveDetector.hh"
 
 NpolSensitiveDetector::NpolSensitiveDetector(G4String name)
-		:G4VSensitiveDetector(name),
-		collectionID(-1) {
-				
-	G4SDManager *SDMan = G4SDManager::GetSDMpointer();
-	
-	collectionName.insert("collection_name");
-	SDMan->AddNewDetector(this);
-}
+	:G4VSensitiveDetector(name),
+	collectionID(-1) {
+
+		G4SDManager *SDMan = G4SDManager::GetSDMpointer();
+
+		collectionName.insert("collection_name");
+		SDMan->AddNewDetector(this);
+	}
 
 NpolSensitiveDetector::~NpolSensitiveDetector() {}
 

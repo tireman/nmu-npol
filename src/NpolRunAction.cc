@@ -42,7 +42,7 @@ NpolRunAction::~NpolRunAction()
 
 void NpolRunAction::BeginOfRunAction(const G4Run* aRun)
 {
-  G4cout << "### Run " << aRun->GetRunID() << " start." << G4endl;
+	G4cout << "### Run " << aRun->GetRunID() << " start." << G4endl;
 }
 
 void NpolRunAction::EndOfRunAction(const G4Run*)

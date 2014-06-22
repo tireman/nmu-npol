@@ -48,19 +48,19 @@ class G4Material;
 
 class NpolDetectorConstruction : public G4VUserDetectorConstruction
 {
-		public:
+	public:
 
-				NpolDetectorConstruction();
-				~NpolDetectorConstruction();
+		NpolDetectorConstruction();
+		~NpolDetectorConstruction();
 
-		public:
+	public:
 
-				virtual G4VPhysicalVolume* Construct();
-				virtual void ConstructSDandField();
+		virtual G4VPhysicalVolume* Construct();
+		virtual void ConstructSDandField();
 
-		private:
+	private:
 
-				G4LogicalVolume *TopDetLV, *TopVetoLV, *BottomDetLV, *BottomVetoLV, *FrontDetLV, *FrontTagLV;
+		G4LogicalVolume *TopDetLV, *TopVetoLV, *BottomDetLV, *BottomVetoLV, *FrontDetLV, *FrontTagLV;
 
 };
 

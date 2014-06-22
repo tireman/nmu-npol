@@ -28,7 +28,7 @@ class NpolHit : public G4VHit {
 		virtual void Print();
 		void FilePrint();
 
-	//Get functions
+		//Get functions
 	public:
 		G4int GetTrackID() {return TrackID;}
 		G4int GetParentID() {return ParentID;}
