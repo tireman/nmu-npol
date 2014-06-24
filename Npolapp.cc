@@ -38,8 +38,9 @@ int main(int argc,char *argv[])
 
 	// RunManager construction
 #ifdef G4MULTITHREADED
-	G4MTRunManager *runManager = new G4MTRunManager;
-	runManager->SetNumberOfThreads(G4Threading::G4GetNumberOfCores());
+  //G4MTRunManager *runManager = new G4MTRunManager;
+	G4RunManager *runManager = new G4RunManager;
+	//	runManager->SetNumberOfThreads(G4Threading::G4GetNumberOfCores());
 #else
 	G4RunManager *runManager = new G4RunManager;
 #endif

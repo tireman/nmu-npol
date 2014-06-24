@@ -1,35 +1,23 @@
-//
-// ********************************************************************
-// * License and Disclaimer                                           *
-// *                                                                  *
-// * The  Geant4 software  is  copyright of the Copyright Holders  of *
-// * the Geant4 Collaboration.  It is provided  under  the terms  and *
-// * conditions of the Geant4 Software License,  included in the file *
-// * LICENSE and available at  http://cern.ch/geant4/license .  These *
-// * include a list of copyright holders.                             *
-// *                                                                  *
-// * Neither the authors of this software system, nor their employing *
-// * institutes,nor the agencies providing financial support for this *
-// * work  make  any representation or  warranty, express or implied, *
-// * regarding  this  software system or assume any liability for its *
-// * use.  Please see the license in the file  LICENSE  and URL above *
-// * for the full disclaimer and the limitation of liability.         *
-// *                                                                  *
-// * This  code  implementation is the result of  the  scientific and *
-// * technical work of the GEANT4 collaboration.                      *
-// * By using,  copying,  modifying or  distributing the software (or *
-// * any work based  on the software)  you  agree  to acknowledge its *
-// * use  in  resulting  scientific  publications,  and indicate your *
-// * acceptance of all terms of the Geant4 Software license.          *
-// ********************************************************************
-//
-//
-// $Id: EventAction.cc,v 1.11 2006/06/29 17:48:05 gunter Exp $
-// GEANT4 tag $Name: geant4-09-03-patch-01 $
-//
-//....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
-//....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
-
+   //********************************************************************
+   //* License and Disclaimer: From GEANT Collaboration                 *
+   //*                                                                  *
+   //* The  Geant4 software  is  copyright of the Copyright Holders  of *
+   //* the Geant4 Collaboration.  It is provided  under  the terms  and *
+   //* conditions of the Geant4 Software License,  included in the file *
+   //* LICENSE and available at  http://cern.ch/geant4/license .  These *
+   //* include a list of copyright holders.     		      	*
+   //********************************************************************
+   //* The Geant4 software is used by the Northern Michigan University  *
+   //* in accordance to the Geant4 software license specified above.    *
+   //* The NMU software is not to be distributed in whole or modified   *
+   //* form without including the Geant4 license.  Use of the NMU code  *
+   //* for development of other code is permitted as long as the work   *
+   //* is not a direct copy of the work being performed here. If it is  *
+   //* such then we ask that you give credit to our work out of  	*
+   //* professional courtesy and acknowledgment.  The NMU Collaboration *
+   //* gives no express or implied warranty and use of our code is at   *
+   //* the users discretion only.  		    			*
+   //********************************************************************
 
 #include "G4Event.hh"
 #include "G4EventManager.hh"
@@ -38,17 +26,22 @@
 #include "G4ios.hh"
 #include "G4String.hh"
 #include "G4THitsCollection.hh"
-
+#include "G4SystemOfUnits.hh"
+#include "G4PhysicalConstants.hh"
 #include "NpolEventAction.hh"
 #include "NpolHit.hh"
 
 typedef G4THitsCollection<NpolHit> NpolHitsCollection;
 
 NpolEventAction::NpolEventAction()
-{}
+{
+  fp=fopen("/data/tireman/simulation/nmunpol/output/g4Npol2000.out","w");
+}
 
 NpolEventAction::~NpolEventAction()
-{}
+{
+  fclose(fp);
+}
 
 void NpolEventAction::BeginOfEventAction(const G4Event* evt)
 {}
@@ -81,23 +74,56 @@ void NpolEventAction::EndOfEventAction(const G4Event* evt) {
 //This method is called in a for loop and is intended to run once per event for each sensitive detector.  Returns the total number of hits in the detector.
 int NpolEventAction::ProcessAndPrint(G4HCofThisEvent *HCE, int CHCID) {
 
-	NpolHitsCollection *hitsCollection = NULL;
-	int i, n_hits = 0;
+  NpolHitsCollection *hitsCollection = NULL;
+  int i, n_hits = 0;
+  
+  if(HCE != NULL)
+    hitsCollection = (NpolHitsCollection *)(HCE->GetHC(CHCID)); //Cast to custom hits collection type
+  
+  G4double TotalEnergy = 0.0;
+  G4int flag1 = 0;
+  G4String A, B;
+  
+  if(hitsCollection != NULL) {
+    n_hits = hitsCollection->entries();
+    fprintf(fp,"Total number of hits is %4u .\n", n_hits);
+    for(i = 0; i < n_hits; i++) {
+      NpolHit *aHit = (*hitsCollection)[i];
+      // ...
+      //     aHit->Print();
+      //aHit->FilePrint();
 
-	if(HCE != NULL)
-		hitsCollection = (NpolHitsCollection *)(HCE->GetHC(CHCID)); //Cast to custom hits collection type
 
-	if(hitsCollection != NULL) {
-		n_hits = hitsCollection->entries();
+ // Tireman new code for testing 6/13/2014
 
-		for(i = 0; i < n_hits; i++) {
-			NpolHit *aHit = (*hitsCollection)[i];
-			// ...
-			aHit->Print();
-			aHit->FilePrint();
-		}
+     
+      G4double Edeposit = (*hitsCollection)[i]->GetTotalEnergyDeposit()/MeV;
+      TotalEnergy = TotalEnergy + Edeposit;
+      G4int IDTrack = (*hitsCollection)[i]->GetTrackID();
+      G4int IDParent = (*hitsCollection)[i]->GetParentID();
+      G4ThreeVector PrePos = (*hitsCollection)[i]->GetPreStepPos()/cm;
+      G4ThreeVector PostPos = (*hitsCollection)[i]->GetPostStepPos()/cm;
+      G4String PartName = (*hitsCollection)[i]->GetParticleName();
+      G4String VolName = (*hitsCollection)[i]->GetVolumeName();
+      G4String ProcName = (*hitsCollection)[i]->GetProcessName();
+      //G4ThreeVector DeltaMom = (*hitsCollection)[i]->GetDeltaMomentum()/MeV;
+      
+      if(i == 0 && PartName == "neutron" && IDParent == 0 && IDTrack == 1 && ProcName == "hadElastic"){
+	flag1 =1;
+	for (int j=0; j< (int)VolName.length(); j++){ // Testing as part of a 
+	  A = A+VolName[j];
 	}
+      }
 
-	return n_hits;
+      if(flag1 == 1){
+	fprintf(fp,"%s %s %s %3i %3i %10.4f %5.2f %5.2f %5.2f %5.2f %5.2f %5.2f\n",PartName.c_str(), VolName.c_str(), ProcName.c_str(), IDParent, IDTrack, Edeposit, PrePos.x(),PrePos.y(),PrePos.z(),PostPos.x(),PostPos.y(),PostPos.z());
+      }
+
+      // end new code
+
+    }
+  }
+  
+  return n_hits;
 }
 
