@@ -5,5 +5,3 @@
 /control/verbose 2
 /control/saveHistory
 /run/verbose 2
-
-/control/execute npol.mac

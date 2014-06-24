@@ -4,7 +4,6 @@
 #include "NpolPrimaryGeneratorAction.hh"
 #include "NpolRunAction.hh"
 #include "NpolEventAction.hh"
-#include "NpolSteppingAction.hh"
 
 NpolActionInitialization::NpolActionInitialization()
 {}
@@ -21,6 +20,5 @@ void NpolActionInitialization::Build() const {
 	SetUserAction(new NpolPrimaryGeneratorAction);
 	SetUserAction(new NpolRunAction);
 	SetUserAction(new NpolEventAction);
-	SetUserAction(new NpolSteppingAction);
 }
 

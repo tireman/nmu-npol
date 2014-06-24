@@ -39,15 +39,15 @@ class G4Box;
 
 class NpolPrimaryGeneratorAction : public G4VUserPrimaryGeneratorAction
 {
-		public:
-				NpolPrimaryGeneratorAction();
-				virtual ~NpolPrimaryGeneratorAction();
+	public:
+		NpolPrimaryGeneratorAction();
+		virtual ~NpolPrimaryGeneratorAction();
 
-				virtual void GeneratePrimaries(G4Event*);
+		virtual void GeneratePrimaries(G4Event*);
 
-		private:
-				G4ParticleGun *particleGun;
-				G4Box *worldBox;
+	private:
+		G4ParticleGun *particleGun;
+		G4Box *worldBox;
 
 };
 
