@@ -4,11 +4,14 @@
 # can be run in batch, without graphic
 # or interactively: Idle> /control/execute npol.mac
 
+#/vis/viewer/set/viewpointThetaPhi 45 180 deg
+#/vis/viewer/zoom 1.5
+
 /run/initialize
-/run/verbose 2
+/run/verbose 0
 #/event/verbose 0
 
-/tracking/verbose 1
+/tracking/verbose 0
 /tracking/storeTrajectory 1
 
 #/gun/particle proton 
@@ -17,6 +20,7 @@
 #/gun/particle anti_proton 
 /gun/particle neutron 
 
-/gun/energy 7000 MeV
+/gun/energy 5500 MeV
 
-/run/beamOn 10
+/run/beamOn 1000000
+

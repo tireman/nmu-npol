@@ -9,15 +9,13 @@
    //********************************************************************
    //* The Geant4 software is used by the Northern Michigan University  *
    //* in accordance to the Geant4 software license specified above.    *
-   //* The NMU software is not to be distributed in whole or modified   *
-   //* form without including the Geant4 license.  Use of the NMU code  *
-   //* for development of other code is permitted as long as the work   *
-   //* is not a direct copy of the work being performed here. If it is  *
-   //* such then we ask that you give credit to our work out of  	*
-   //* professional courtesy and acknowledgment.  The NMU Collaboration *
+   //* The NMU Collaboration does not hold any rights to this software  *
+   //* and gives full permission for its use to others under the limits *
+   //* imposed by the GEANT4 Collaboration.  The NMU Collaboration      *
    //* gives no express or implied warranty and use of our code is at   *
    //* the users discretion only.  		    			*
    //********************************************************************
+
 
 #include "G4SystemOfUnits.hh"
 #include "G4PhysicalConstants.hh"
@@ -119,7 +117,7 @@ G4VPhysicalVolume* NpolDetectorConstruction::Construct()
 	Rm.rotateZ(+45.0*deg);  
 	// Place the Plates in the volume with this loop
 	for(unsigned int i=0; i<2;i++){
-		G4ThreeVector Tm(-0.615*m,(1.45+0.10*i)*m,(-1.10+1.30*i)*m);
+		G4ThreeVector Tm(-0.615*m,(0.95+0.10*i)*m,(-1.10+1.30*i)*m);
 		Tr = G4Transform3D(Rm,Tm);
 		TopArray->MakeImprint( logicWorld, Tr);
 	};
@@ -127,7 +125,7 @@ G4VPhysicalVolume* NpolDetectorConstruction::Construct()
 	Rm.rotateZ(-90.0*deg);  
 	// Place the Plates in the volume with this loop
 	for(unsigned int i=0; i<2;i++){
-		G4ThreeVector Tm(+0.615*m,(1.45+0.10*i)*m,(-1.10+1.30*i)*m);
+	  G4ThreeVector Tm(+0.615*m,(0.95+0.10*i)*m,(-1.10+1.30*i)*m);
 		Tr = G4Transform3D(Rm,Tm);
 		TopArray->MakeImprint( logicWorld, Tr);
 	};
@@ -153,7 +151,7 @@ G4VPhysicalVolume* NpolDetectorConstruction::Construct()
 
 	// Place the Plates in the volume with this loop
 	for(unsigned int i=0; i<2;i++){
-		G4ThreeVector Tm(0,(0.55+0.10*i)*m,(-1.10+1.30*i)*m);
+		G4ThreeVector Tm(0,(0.32+0.10*i)*m,(-1.15+1.30*i)*m);
 		Tr = G4Transform3D(Rm,Tm);
 		TopVetoArray->MakeImprint( logicWorld, Tr);
 	};
@@ -178,7 +176,7 @@ G4VPhysicalVolume* NpolDetectorConstruction::Construct()
 	Rm.rotateZ(-45*deg);
 	// Place the Plates in the volume with this loop
 	for(unsigned int i=0; i<2;i++){
-		G4ThreeVector Tm(-0.615*m,(-1.45-0.10*i)*m,(-1.10+1.30*i)*m);
+		G4ThreeVector Tm(-0.615*m,(-0.95-0.10*i)*m,(-1.10+1.30*i)*m);
 		Tr = G4Transform3D(Rm,Tm);
 		BottomArray->MakeImprint( logicWorld, Tr);
 	};
@@ -186,7 +184,7 @@ G4VPhysicalVolume* NpolDetectorConstruction::Construct()
 	Rm.rotateZ(+90*deg);
 	// Place the Plates in the volume with this loop
 	for(unsigned int i=0; i<2;i++){
-		G4ThreeVector Tm(+0.615*m,(-1.45-0.10*i)*m,(-1.10+1.30*i)*m);
+		G4ThreeVector Tm(+0.615*m,(-0.95-0.10*i)*m,(-1.10+1.30*i)*m);
 		Tr = G4Transform3D(Rm,Tm);
 		BottomArray->MakeImprint( logicWorld, Tr);
 	};
@@ -210,7 +208,7 @@ G4VPhysicalVolume* NpolDetectorConstruction::Construct()
 	Rm.rotateZ(-45.0*deg);
 	// Place the Plates in the volume with this loop
 	for(unsigned int i=0; i<2;i++){
-		G4ThreeVector Tm(0,(-0.55-0.10*i)*m,(-1.10+1.30*i)*m);
+		G4ThreeVector Tm(0,(-0.32-0.10*i)*m,(-1.15+1.30*i)*m);
 		Tr = G4Transform3D(Rm,Tm);
 		BottomVetoArray->MakeImprint( logicWorld, Tr);
 	};

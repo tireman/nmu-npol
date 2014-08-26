@@ -9,12 +9,9 @@
    //********************************************************************
    //* The Geant4 software is used by the Northern Michigan University  *
    //* in accordance to the Geant4 software license specified above.    *
-   //* The NMU software is not to be distributed in whole or modified   *
-   //* form without including the Geant4 license.  Use of the NMU code  *
-   //* for development of other code is permitted as long as the work   *
-   //* is not a direct copy of the work being performed here. If it is  *
-   //* such then we ask that you give credit to our work out of  	*
-   //* professional courtesy and acknowledgment.  The NMU Collaboration *
+   //* The NMU Collaboration does not hold any rights to this software  *
+   //* and gives full permission for its use to others under the limits *
+   //* imposed by the GEANT4 Collaboration.  The NMU Collaboration      *
    //* gives no express or implied warranty and use of our code is at   *
    //* the users discretion only.  		    			*
    //********************************************************************
@@ -35,7 +32,9 @@ typedef G4THitsCollection<NpolHit> NpolHitsCollection;
 
 NpolEventAction::NpolEventAction()
 {
-  fp=fopen("/data/tireman/simulation/nmunpol/output/g4Npol2000.out","w");
+  //G4double energy= GetParticleEnergy();
+  //G4cout << "Energy is " << energy ;
+  fp=fopen("/data/tireman/simulation/nmunpol/output/g4Npol1500.out","w");
 }
 
 NpolEventAction::~NpolEventAction()
@@ -96,7 +95,6 @@ int NpolEventAction::ProcessAndPrint(G4HCofThisEvent *HCE, int CHCID) {
 
  // Tireman new code for testing 6/13/2014
 
-     
       G4double Edeposit = (*hitsCollection)[i]->GetTotalEnergyDeposit()/MeV;
       TotalEnergy = TotalEnergy + Edeposit;
       G4int IDTrack = (*hitsCollection)[i]->GetTrackID();
@@ -106,17 +104,19 @@ int NpolEventAction::ProcessAndPrint(G4HCofThisEvent *HCE, int CHCID) {
       G4String PartName = (*hitsCollection)[i]->GetParticleName();
       G4String VolName = (*hitsCollection)[i]->GetVolumeName();
       G4String ProcName = (*hitsCollection)[i]->GetProcessName();
+      G4int StepNumber = (*hitsCollection)[i]->GetStepNumber();
+      G4ThreeVector particleMom = (*hitsCollection)[i]->GetParticleMomentum()/MeV;
       //G4ThreeVector DeltaMom = (*hitsCollection)[i]->GetDeltaMomentum()/MeV;
       
       if(i == 0 && PartName == "neutron" && IDParent == 0 && IDTrack == 1 && ProcName == "hadElastic"){
 	flag1 =1;
 	for (int j=0; j< (int)VolName.length(); j++){ // Testing as part of a 
-	  A = A+VolName[j];
+	  A = A+VolName[j];  // parsing routine for detector sorting.
 	}
       }
 
       if(flag1 == 1){
-	fprintf(fp,"%s %s %s %3i %3i %10.4f %5.2f %5.2f %5.2f %5.2f %5.2f %5.2f\n",PartName.c_str(), VolName.c_str(), ProcName.c_str(), IDParent, IDTrack, Edeposit, PrePos.x(),PrePos.y(),PrePos.z(),PostPos.x(),PostPos.y(),PostPos.z());
+	fprintf(fp,"%s %s %s %3i %3i %3i %10.4f %5.2f %5.2f %5.2f %5.2f %5.2f %5.2f %5.2f %5.2f %5.2f %7.2f\n",PartName.c_str(), VolName.c_str(), ProcName.c_str(), StepNumber, IDParent, IDTrack, Edeposit, PrePos.x(),PrePos.y(),PrePos.z(),PostPos.x(),PostPos.y(),PostPos.z(),particleMom.x(),particleMom.y(),particleMom.z(),TotalEnergy);
       }
 
       // end new code
