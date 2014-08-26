@@ -20,7 +20,7 @@
 #/gun/particle anti_proton 
 /gun/particle neutron 
 
-/gun/energy 5500 MeV
+/gun/energy 2000 MeV
 
-/run/beamOn 1000000
+/run/beamOn 5
 
