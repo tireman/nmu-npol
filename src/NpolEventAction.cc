@@ -34,7 +34,7 @@ NpolEventAction::NpolEventAction()
 {
   //G4double energy= GetParticleEnergy();
   //G4cout << "Energy is " << energy ;
-  fp=fopen("/data/tireman/simulation/nmunpol/output/g4Npol1500.out","w");
+  fp=fopen("/tmp/g4Npol1500.out","w");
 }
 
 NpolEventAction::~NpolEventAction()
