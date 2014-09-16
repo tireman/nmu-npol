@@ -47,6 +47,8 @@ void NpolRunAction::CreateHistograms() {
 	char title[34];
 	G4AnalysisManager *analysisManager = G4AnalysisManager::Instance();
 
+	analysisManager->SetFirstHistoId(1);
+
 	// TopArray1
 	for(i=0; i<26; i++) {
 
@@ -125,7 +127,7 @@ void NpolRunAction::CreateHistograms() {
 		sprintf(name,"FrontDet%02d",i);
 		sprintf(title,"Front Array %d: Detector %02d", i/6 + 1, i%6 + 1);
 	
-		analysisManager->CreateH1(name, title, 100, 0., 100*MeV);
+		analysisManager->CreateH1(name, title, 100, 0., 1*MeV);
 	}
 
 	// FrontArray2
@@ -134,7 +136,7 @@ void NpolRunAction::CreateHistograms() {
 		sprintf(name,"FrontDet%02d",26+i);
 		sprintf(title,"Front Array %d: Detector %02d", i/8 + 3, i%8 + 1);
 	
-		analysisManager->CreateH1(name, title, 100, 0., 100*MeV);
+		analysisManager->CreateH1(name, title, 100, 0., 1*MeV);
 	}
 
 	// FrontTagger1
