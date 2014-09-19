@@ -34,16 +34,15 @@
 
 typedef G4THitsCollection<NpolHit> NpolHitsCollection;
 
-NpolEventAction::NpolEventAction() {
-
-	memset(Edep, 0, sizeof(Edep));
-}
+NpolEventAction::NpolEventAction()
+{}
 
 NpolEventAction::~NpolEventAction()
 {}
 
-void NpolEventAction::BeginOfEventAction(const G4Event* evt)
-{}
+void NpolEventAction::BeginOfEventAction(const G4Event* evt) {
+	memset(Edep, 0, sizeof(Edep));
+}
 
 void NpolEventAction::EndOfEventAction(const G4Event* evt) {
 
