@@ -16,28 +16,11 @@
    //* the users discretion only.  		    			*
    //********************************************************************
 
+// Daniel Wilbern, dwilbern@nmu.edu
 
-#ifndef RunAction_h
-#define RunAction_h
+#ifndef NpolAnalysis_h
+#define NpolAnalysis_h 
 
-#include "G4UserRunAction.hh"
-#include "globals.hh"
-
-class G4Run;
-
-class NpolRunAction : public G4UserRunAction
-{
-	public:
-		NpolRunAction();
-		~NpolRunAction();
-
-	public:
-		void BeginOfRunAction(const G4Run*);
-		void EndOfRunAction(const G4Run*);
-
-	private:
-		void CreateHistograms();
-};
+#include "g4root.hh"
 
 #endif
-
