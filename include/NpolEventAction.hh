@@ -25,6 +25,7 @@
 #include "G4UserEventAction.hh"
 
 class G4Event;
+class NpolHit;
 
 class NpolEventAction : public G4UserEventAction
 {
@@ -36,17 +37,20 @@ class NpolEventAction : public G4UserEventAction
 		void BeginOfEventAction(const G4Event*);
 		void EndOfEventAction(const G4Event*);
 
-	public:
+	private:
 		void ProcessHitsInASensitiveDetector(G4HCofThisEvent *HCE, int CHCID);
-		int *ParseAssemblyVolumeName(const char *VolumeName);
+		int *ParseAssemblyVolumeName(const char *VolumeName, char **LV_name);
 		int GetOffsetFromAssemblyVolumeNumber(int avNumber);
 		int GetOffsetFromImprintNumber(int avNumber, int imprNumber);
+		void fillEdepArray(NpolHit *aHit, int *detectorInfo);
+		void filldEoverEArray(NpolHit *aHit, char *volname);
 
 	private:
 		// Edep array has one spot for each histogram created in RunAction's constructor
 		// and one extra because the histograms start at ID 1 and not 0.
 		// The number of histograms should be the same as the number of detectors in the setup.
 		double Edep[NUM_DETECTORS+1];
+		double EdepdEoverE[4];
 };
 
 #endif

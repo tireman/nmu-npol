@@ -156,6 +156,11 @@ void NpolRunAction::CreateHistograms() {
 	
 		analysisManager->CreateH1(name, title, 100, 0., 100*MeV);
 	}
+
+	// Create dE/E histograms
+	analysisManager->CreateH2("TopdEoverE", "Top Array dE/E", 100, 0., 100*MeV, 100, 0., 20*MeV);
+	analysisManager->CreateH2("BottomdEoverE", "Bottom Array dE/E", 100, 0., 100*MeV, 100, 0., 20*MeV);
+	analysisManager->CreateH2("CombineddEoverE", "Top and Bottom Arrays dE/E", 100, 0., 100*MeV, 100, 0., 20*MeV);
 }
 
 NpolRunAction::~NpolRunAction() {

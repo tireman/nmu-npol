@@ -42,6 +42,7 @@ NpolEventAction::~NpolEventAction()
 
 void NpolEventAction::BeginOfEventAction(const G4Event* evt) {
 	memset(Edep, 0, sizeof(Edep));
+	memset(EdepdEoverE, 0, sizeof(EdepdEoverE));
 }
 
 void NpolEventAction::EndOfEventAction(const G4Event* evt) {
@@ -62,9 +63,13 @@ void NpolEventAction::EndOfEventAction(const G4Event* evt) {
 	for(i=0; i < numSensitiveDetectors; i++)
 		ProcessHitsInASensitiveDetector(HCE, CHCIDs[i]);
 
-	for(i=1; i < NUM_DETECTORS+1; i++)
+	for(i=1; i <= NUM_DETECTORS; i++)
 		if(Edep[i] != 0.0)
 			analysisManager->FillH1(i,Edep[i]);
+
+	analysisManager->FillH2(1, EdepdEoverE[0], EdepdEoverE[1]);
+	analysisManager->FillH2(2, EdepdEoverE[2], EdepdEoverE[3]);
+	analysisManager->FillH2(3, EdepdEoverE[0] + EdepdEoverE[2], EdepdEoverE[1] + EdepdEoverE[3]);
 
 	// periodic printing
 	if (event_id < 100 || event_id%100 == 0)
@@ -87,20 +92,41 @@ void NpolEventAction::ProcessHitsInASensitiveDetector(G4HCofThisEvent *HCE, int 
 		n_hits = hitsCollection->entries();
 		for(i = 0; i < n_hits; i++) {
 			NpolHit *aHit = (*hitsCollection)[i];
+			char *volname = (char *)calloc(strlen("BottomVetoLV")+1,sizeof(char));
 
-			int *detectorInfo = ParseAssemblyVolumeName(aHit->GetVolumeName().data()); // have to cast from (const char *) to (char *)
+			int *detectorInfo = ParseAssemblyVolumeName(aHit->GetVolumeName().data(), &volname); // have to cast from (const char *) to (char *)
 
-			int histoID = GetOffsetFromAssemblyVolumeNumber(detectorInfo[0]) + GetOffsetFromImprintNumber(detectorInfo[0], detectorInfo[1]) + detectorInfo[2];
-
-			Edep[histoID] += aHit->GetTotalEnergyDeposit();
-
+			fillEdepArray(aHit, detectorInfo);
+			filldEoverEArray(aHit, volname);
+			free(volname);
 		}
 	}
 }
 
+// Get the correct historgram ID from a parsed assembly volume name and add the energy deposited value from aHit to the Edep array.
+void NpolEventAction::fillEdepArray(NpolHit *aHit, int *detectorInfo) {
+
+	int histoID = GetOffsetFromAssemblyVolumeNumber(detectorInfo[0]) + GetOffsetFromImprintNumber(detectorInfo[0], detectorInfo[1]) + detectorInfo[2];
+	Edep[histoID] += aHit->GetTotalEnergyDeposit();
+}
+
+// Fill the correct spot in the dEoverE array depending on the logical volume name of the detector
+void NpolEventAction::filldEoverEArray(NpolHit *aHit, char *volname) {
+
+	if(strcmp(volname, "TopDetLV") == 0)
+		EdepdEoverE[0] += aHit->GetTotalEnergyDeposit();
+	else if(strcmp(volname, "TopVetoLV") == 0)
+		EdepdEoverE[1] += aHit->GetTotalEnergyDeposit();
+	else if(strcmp(volname, "BottomDetLV") == 0)
+		EdepdEoverE[2] += aHit->GetTotalEnergyDeposit();
+	else if(strcmp(volname,"BottomVetoLV") == 0)
+		EdepdEoverE[3] += aHit->GetTotalEnergyDeposit();
+}
+
 // Parse an assembly volume's name and return an array containing the assembly volume number, imprint number, and volume number.
-// Valid values for volname are C strings containing an assembly volume name created by Geant4
-int *NpolEventAction::ParseAssemblyVolumeName(const char *VolumeName) {
+// Valid values for VolumeName are C strings containing an assembly volume name created by Geant4
+// The string pointed to by LV_name is written to with the logical volume name of the detector, pass NULL if you aren't interested.
+int *NpolEventAction::ParseAssemblyVolumeName(const char *VolumeName, char **LV_name) {
 
 	static int detectorInfo[3];
 	char volname[strlen("av_00_impr_0_BottomDetLV_pv_0")+1];
@@ -114,7 +140,9 @@ int *NpolEventAction::ParseAssemblyVolumeName(const char *VolumeName) {
 	token = strtok(NULL,"_"); // throw out the third token (impr)		
 	token = strtok(NULL,"_");
 	detectorInfo[1] = atoi(token);
-	token = strtok(NULL,"_"); // throw out fifth token (LV name), we don't need this since we go by assembly volume number instead
+	token = strtok(NULL,"_");
+	if(LV_name != NULL)
+		strcpy(*LV_name, token);
 	token = strtok(NULL,"_"); // thow out sixth token (pv)
 	token = strtok(NULL,"_");
 	detectorInfo[2] = atoi(token);
