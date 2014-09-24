@@ -27,6 +27,8 @@
 #include "G4UImanager.hh"
 
 #include "QGSP_BERT.hh"
+#include "QGSP_BIC_HP.hh"
+#include "QGSP_BIC.hh"
 
 #include "NpolActionInitialization.hh"
 #include "NpolDetectorConstruction.hh"
@@ -62,7 +64,7 @@ int main(int argc,char *argv[])
 
 	// mandatory user initialization classes
 	runManager->SetUserInitialization(new NpolDetectorConstruction);
-	runManager->SetUserInitialization(new QGSP_BERT);
+	runManager->SetUserInitialization(new QGSP_BIC_HP);
 	runManager->SetUserInitialization(new NpolActionInitialization);
 
 	// initialize Geant4 kernel

@@ -52,7 +52,7 @@ void NpolEventAction::EndOfEventAction(const G4Event* evt) {
 	G4SDManager *SDMan = G4SDManager::GetSDMpointer();
 	G4HCofThisEvent *HCE = evt->GetHCofThisEvent();
 	const int numSensitiveDetectors = 6;
-	int i;
+	int i, dEoverEflag = 0;
 	int CHCIDs[6] = { SDMan->GetCollectionID("TopDet/collection_name"),
 		SDMan->GetCollectionID("TopVeto/collection_name"),
 		SDMan->GetCollectionID("BottomDet/collection_name"),
@@ -64,16 +64,24 @@ void NpolEventAction::EndOfEventAction(const G4Event* evt) {
 		ProcessHitsInASensitiveDetector(HCE, CHCIDs[i]);
 
 	for(i=1; i <= NUM_DETECTORS; i++)
-		if(Edep[i] != 0.0)
-			analysisManager->FillH1(i,Edep[i]);
+	  if(Edep[i] != 0.0)
+	    analysisManager->FillH1(i,Edep[i]);
+	
+	if(EdepdEoverE[0] >= 5.0 && EdepdEoverE[1] >= 1.0 && EdepdEoverE[4] >= 2.0 && EdepdEoverE[5] < 2.0) {
+	  dEoverEflag = 1;
+	  analysisManager->FillH2(1, EdepdEoverE[0], EdepdEoverE[1]);
+	}
+	if(EdepdEoverE[2] >= 5.0 && EdepdEoverE[3] >= 1.0 && EdepdEoverE[4] >= 2.0 && EdepdEoverE[5] < 2.0) {
+	  dEoverEflag = 1;
+	  analysisManager->FillH2(2, EdepdEoverE[2], EdepdEoverE[3]);
+	}
+	if(dEoverEflag == 1)
+	  analysisManager->FillH2(3, EdepdEoverE[0] + EdepdEoverE[2], EdepdEoverE[1] + EdepdEoverE[3]);
 
-	analysisManager->FillH2(1, EdepdEoverE[0], EdepdEoverE[1]);
-	analysisManager->FillH2(2, EdepdEoverE[2], EdepdEoverE[3]);
-	analysisManager->FillH2(3, EdepdEoverE[0] + EdepdEoverE[2], EdepdEoverE[1] + EdepdEoverE[3]);
-
+       
 	// periodic printing
 	if (event_id < 100 || event_id%100 == 0)
-		G4cerr << ">>> Event " << event_id << G4endl;
+	  G4cerr << ">>> Event " << event_id << G4endl;
 }
 
 // Given a pointer to the G4HCofThisEvent, HCE, and a hit collection ID, CHCID, process the hit objects stored the NpolHitsCollection identified by CHCID
@@ -121,6 +129,10 @@ void NpolEventAction::filldEoverEArray(NpolHit *aHit, char *volname) {
 		EdepdEoverE[2] += aHit->GetTotalEnergyDeposit();
 	else if(strcmp(volname,"BottomVetoLV") == 0)
 		EdepdEoverE[3] += aHit->GetTotalEnergyDeposit();
+	else if (strcmp(volname,"FrontDetLV") == 0)
+	  EdepdEoverE[4] += aHit->GetTotalEnergyDeposit();
+	else if (strcmp(volname,"FrontTagLV") == 0)
+	  EdepdEoverE[5] += aHit->GetTotalEnergyDeposit();
 }
 
 // Parse an assembly volume's name and return an array containing the assembly volume number, imprint number, and volume number.

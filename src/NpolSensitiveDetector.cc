@@ -55,8 +55,8 @@ G4bool NpolSensitiveDetector::ProcessHits(G4Step *aStep, G4TouchableHistory *ROh
 //	if(aHit->GetParticleName() == "neutron" && aHit->GetParentID() == 0 && aHit->GetTrackID() == 1 && aHit->GetProcessName() == "hadElastic")
 //	if(aHit->GetParticleName() == "proton" && aHit->GetParentID() == 1)
 		hitsCollection->insert(aHit);
-//	else
-//		delete aHit;
+		//	else
+		//	  delete aHit;
 
 	return true;  //G4bool return value is currently unused.
 }

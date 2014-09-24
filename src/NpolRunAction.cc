@@ -55,7 +55,7 @@ void NpolRunAction::CreateHistograms() {
 		sprintf(name,"TopDet%02d",i);
 		sprintf(title,"Top Array %d: Detector %02d", i/13 + 1, i%13 + 1);
 
-		analysisManager->CreateH1(name, title, 100, 0., 100*MeV);
+		analysisManager->CreateH1(name, title, 100, 0., 120*MeV);
 	}
 
 	// TopArray2
@@ -64,7 +64,7 @@ void NpolRunAction::CreateHistograms() {
 		sprintf(name,"TopDet%02d",26+i);
 		sprintf(title,"Top Array %d: Detector %02d", i/14 + 3, i%14 + 1);
 	
-		analysisManager->CreateH1(name, title, 100, 0., 100*MeV);
+		analysisManager->CreateH1(name, title, 100, 0., 120*MeV);
 	}
 
 	// TopVetoArray1
@@ -73,7 +73,7 @@ void NpolRunAction::CreateHistograms() {
 		sprintf(name,"TopVeto%02d",i);
 		sprintf(title,"Top Veto Array %d: Detector %02d", 1, i%13 + 1);
 	
-		analysisManager->CreateH1(name, title, 100, 0., 100*MeV);
+		analysisManager->CreateH1(name, title, 100, 0., 120*MeV);
 	}
 
 	// TopVetoArray2
@@ -82,7 +82,7 @@ void NpolRunAction::CreateHistograms() {
 		sprintf(name,"TopVeto%02d",13+i);
 		sprintf(title,"Top Veto Array %d: Detector %02d", 2, i%14 + 1);
 	
-		analysisManager->CreateH1(name, title, 100, 0., 100*MeV);
+		analysisManager->CreateH1(name, title, 100, 0., 120*MeV);
 	}
 	
 	// BottomArray1
@@ -91,7 +91,7 @@ void NpolRunAction::CreateHistograms() {
 		sprintf(name,"BottomDet%02d",i);
 		sprintf(title,"Bottom Array %d: Detector %02d", i/13 + 1, i%13 + 1);
 	
-		analysisManager->CreateH1(name, title, 100, 0., 100*MeV);
+		analysisManager->CreateH1(name, title, 100, 0., 120*MeV);
 	}
 	
 	// BottomArray2
@@ -100,7 +100,7 @@ void NpolRunAction::CreateHistograms() {
 		sprintf(name,"BottomDet%02d",26+i);
 		sprintf(title,"Bottom Array %d: Detector %02d", i/14 + 3, i%14 + 1);
 	
-		analysisManager->CreateH1(name, title, 100, 0., 100*MeV);
+		analysisManager->CreateH1(name, title, 100, 0., 120*MeV);
 	}
 
 	// BottomVetoArray1
@@ -109,7 +109,7 @@ void NpolRunAction::CreateHistograms() {
 		sprintf(name,"BottomVeto%02d",i);
 		sprintf(title,"Bottom Veto Array %d: Detector %02d", 1, i%13 + 1);
 	
-		analysisManager->CreateH1(name, title, 100, 0., 100*MeV);
+		analysisManager->CreateH1(name, title, 100, 0., 120*MeV);
 	}
 
 	// BottomVetoArray2
@@ -118,7 +118,7 @@ void NpolRunAction::CreateHistograms() {
 		sprintf(name,"BottomVeto%02d",13+i);
 		sprintf(title,"Bottom Veto Array %d: Detector %02d", 2, i%14 + 1);
 	
-		analysisManager->CreateH1(name, title, 100, 0., 100*MeV);
+		analysisManager->CreateH1(name, title, 100, 0., 120*MeV);
 	}
 
 	// FrontArray1
@@ -127,7 +127,7 @@ void NpolRunAction::CreateHistograms() {
 		sprintf(name,"FrontDet%02d",i);
 		sprintf(title,"Front Array %d: Detector %02d", i/6 + 1, i%6 + 1);
 	
-		analysisManager->CreateH1(name, title, 100, 0., 1*MeV);
+		analysisManager->CreateH1(name, title, 100, 0., 120*MeV);
 	}
 
 	// FrontArray2
@@ -136,7 +136,7 @@ void NpolRunAction::CreateHistograms() {
 		sprintf(name,"FrontDet%02d",26+i);
 		sprintf(title,"Front Array %d: Detector %02d", i/8 + 3, i%8 + 1);
 	
-		analysisManager->CreateH1(name, title, 100, 0., 1*MeV);
+		analysisManager->CreateH1(name, title, 100, 0., 120*MeV);
 	}
 
 	// FrontTagger1
@@ -158,9 +158,9 @@ void NpolRunAction::CreateHistograms() {
 	}
 
 	// Create dE/E histograms
-	analysisManager->CreateH2("TopdEoverE", "Top Array dE/E", 100, 0., 100*MeV, 100, 0., 20*MeV);
-	analysisManager->CreateH2("BottomdEoverE", "Bottom Array dE/E", 100, 0., 100*MeV, 100, 0., 20*MeV);
-	analysisManager->CreateH2("CombineddEoverE", "Top and Bottom Arrays dE/E", 100, 0., 100*MeV, 100, 0., 20*MeV);
+	analysisManager->CreateH2("TopdEoverE", "Top Array dE/E", 480, 0., 120.*MeV, 80, 0., 20.*MeV);
+	analysisManager->CreateH2("BottomdEoverE", "Bottom Array dE/E", 480, 0., 120.*MeV, 80, 0., 20.*MeV);
+	analysisManager->CreateH2("CombineddEoverE", "Top and Bottom Arrays dE/E", 480, 0., 120.*MeV, 80, 0., 20.*MeV);
 }
 
 NpolRunAction::~NpolRunAction() {

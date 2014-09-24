@@ -50,7 +50,7 @@ class NpolEventAction : public G4UserEventAction
 		// and one extra because the histograms start at ID 1 and not 0.
 		// The number of histograms should be the same as the number of detectors in the setup.
 		double Edep[NUM_DETECTORS+1];
-		double EdepdEoverE[4];
+		double EdepdEoverE[6];
 };
 
 #endif
