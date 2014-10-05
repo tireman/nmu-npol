@@ -27,12 +27,15 @@
 #include "G4THitsCollection.hh"
 #include "G4SystemOfUnits.hh"
 #include "G4PhysicalConstants.hh"
+#include "G4AutoLock.hh"
 
 #include "NpolEventAction.hh"
 #include "NpolHit.hh"
 #include "NpolAnalysis.hh"
 
 typedef G4THitsCollection<NpolHit> NpolHitsCollection;
+
+G4Mutex aMutex = G4MUTEX_INITIALIZER; // Have to use a mutex for calls to strtok()
 
 NpolEventAction::NpolEventAction()
 {}
@@ -145,6 +148,8 @@ int *NpolEventAction::ParseAssemblyVolumeName(const char *VolumeName, char **LV_
 
 	memcpy(volname,VolumeName,sizeof(char)*strlen(VolumeName)); // Copy argument into disposable local string variable since strtok modifies the string it works on
 
+	G4AutoLock l(&aMutex);
+
 	// A typical name is av_10_impr_2_FrontDetLV_pv_5
 	char *token = strtok(volname, "_"); // throw out the first token (av)
 	token = strtok(NULL,"_");
@@ -157,6 +162,7 @@ int *NpolEventAction::ParseAssemblyVolumeName(const char *VolumeName, char **LV_
 		strcpy(*LV_name, token);
 	token = strtok(NULL,"_"); // thow out sixth token (pv)
 	token = strtok(NULL,"_");
+	l.unlock();
 	detectorInfo[2] = atoi(token);
 
 	return detectorInfo;
