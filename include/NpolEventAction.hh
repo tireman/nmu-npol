@@ -35,7 +35,7 @@ class NpolEventAction : public G4UserEventAction
 
 	public:
 		void BeginOfEventAction(const G4Event*);
-		void EndOfEventAction(const G4Event*);
+  void EndOfEventAction(const G4Event*);
 
 	private:
 		void ProcessHitsInASensitiveDetector(G4HCofThisEvent *HCE, int CHCID);

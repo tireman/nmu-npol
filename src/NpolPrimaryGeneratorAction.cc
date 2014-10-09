@@ -41,7 +41,20 @@ NpolPrimaryGeneratorAction::NpolPrimaryGeneratorAction()
   G4ParticleDefinition *particle = particleTable->FindParticle(particleName="neutron");
  
   particleGun->SetParticleDefinition(particle);
-  particleGun->SetParticleMomentumDirection(G4ThreeVector(0.,0.,1.));
+
+  // insert code to calculate a momentum vector from a point source and
+  // restricted in theta and phi
+
+  G4double thmax = 1.4995; //(atan(0.1*25/6950))*deg;
+  G4double phimax = 0.042831;  // atan((0.1*50/6950))*deg;
+  G4double theta = acos(cos(thmax)*(2*G4UniformRand()-1));
+  G4double phi = phimax * (2*G4UniformRand()-1);
+  
+  G4double pox = -cos(theta);
+  G4double poy = sin(theta)*sin(phi);
+  G4double poz = sin(theta)*cos(phi);
+
+  particleGun->SetParticleMomentumDirection(G4ThreeVector(pox,poy,poz));
   particleGun->SetParticleEnergy(2000.*MeV);
 }
 
@@ -54,10 +67,14 @@ NpolPrimaryGeneratorAction::~NpolPrimaryGeneratorAction()
 void NpolPrimaryGeneratorAction::GeneratePrimaries(G4Event* anEvent)
 {
   
-  G4double x0 = 0.50 * (2.0*G4UniformRand()-1)*m;
-  G4double y0 = 0.30 * (2.0*G4UniformRand()-1)*m;
-  G4double z0 = -2.0*m;
+//G4double x0 = 0.50 * (2.0*G4UniformRand()-1)*m;
+// G4double y0 = 0.30 * (2.0*G4UniformRand()-1)*m;
+//G4double z0 = -2.0*m;
   
+G4double x0 = 0.0*m;
+G4double y0 = 0.0*m;
+G4double z0 = -8.7*m;
+
   particleGun->SetParticlePosition(G4ThreeVector(x0,y0,z0));
   particleGun->GeneratePrimaryVertex(anEvent);
   

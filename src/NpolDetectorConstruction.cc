@@ -71,7 +71,7 @@ G4VPhysicalVolume* NpolDetectorConstruction::Construct()
   // World
   //------------------------------ 
   
-  G4Box *solidWorld= new G4Box("World",2.0*m,2.5*m, 2.5*m);
+  G4Box *solidWorld= new G4Box("World",2.50*m, 3.0*m, 10.0*m);
   G4LogicalVolume *logicWorld= new G4LogicalVolume( solidWorld, Air, "World", 0, 0, 0);
   
   //  Must place the World Physical volume unrotated at (0,0,0).

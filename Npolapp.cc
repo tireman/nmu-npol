@@ -29,6 +29,7 @@
 #include "QGSP_BERT.hh"
 #include "QGSP_BIC_HP.hh"
 #include "QGSP_BIC.hh"
+#include "FTFP_BERT.hh"
 
 #include "NpolActionInitialization.hh"
 #include "NpolDetectorConstruction.hh"
@@ -44,13 +45,12 @@
 
 int main(int argc,char *argv[])
 {
-
-	// RunManager construction
+ 	// RunManager construction
 #ifdef G4MULTITHREADED
   G4MTRunManager *runManager = new G4MTRunManager;
   //G4RunManager *runManager = new G4RunManager;
-  // runManager->SetNumberOfThreads(2);
-   runManager->SetNumberOfThreads(G4Threading::G4GetNumberOfCores());
+  runManager->SetNumberOfThreads(10);
+   // runManager->SetNumberOfThreads(G4Threading::G4GetNumberOfCores());
 #else
 	G4RunManager *runManager = new G4RunManager;
 #endif
@@ -64,7 +64,7 @@ int main(int argc,char *argv[])
 
 	// mandatory user initialization classes
 	runManager->SetUserInitialization(new NpolDetectorConstruction);
-	runManager->SetUserInitialization(new QGSP_BIC_HP);
+	runManager->SetUserInitialization(new FTFP_BERT);
 	runManager->SetUserInitialization(new NpolActionInitialization);
 
 	// initialize Geant4 kernel
