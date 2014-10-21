@@ -27,7 +27,7 @@
 #include "G4VisAttributes.hh"
 #include "G4Colour.hh"
 #include "G4ios.hh"
-
+#include "G4SDManager.hh"
 #include "NpolDetectorConstruction.hh"
 #include "NpolSensitiveDetector.hh"
 
@@ -372,23 +372,31 @@ G4VPhysicalVolume* NpolDetectorConstruction::Construct()
 void NpolDetectorConstruction::ConstructSDandField() {
   
   NpolSensitiveDetector *TopDetSD, *TopVetoSD, *BottomDetSD, *BottomVetoSD, *FrontDetSD, *FrontTagSD;
-  
+  //G4SDManager* SDman = G4SDManager::GetSDMpointer();
+
   TopDetSD = new NpolSensitiveDetector("TopDet");
+  //SDman->AddNewDetector(TopDetSD);
   SetSensitiveDetector(TopDetLV,TopDetSD);
-  
+
+
   TopVetoSD = new NpolSensitiveDetector("TopVeto");
+  //SDman->AddNewDetector(TopVetoSD);
   SetSensitiveDetector(TopVetoLV,TopVetoSD);
   
   BottomDetSD = new NpolSensitiveDetector("BottomDet");
+  //SDman->AddNewDetector(BottomDetSD);
   SetSensitiveDetector(BottomDetLV,BottomDetSD);
   
   BottomVetoSD = new NpolSensitiveDetector("BottomVeto");
+  //SDman->AddNewDetector(BottomVetoSD);
   SetSensitiveDetector(BottomVetoLV,BottomVetoSD);
   
   FrontDetSD = new NpolSensitiveDetector("FrontDet");
+  //SDman->AddNewDetector(FrontDetSD);
   SetSensitiveDetector(FrontDetLV,FrontDetSD);
   
   FrontTagSD = new NpolSensitiveDetector("FrontTag");
+  //SDman->AddNewDetector(FrontTagSD);
   SetSensitiveDetector(FrontTagLV,FrontTagSD);
 }
 

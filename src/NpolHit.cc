@@ -34,6 +34,8 @@
 
 #include "NpolHit.hh"
 
+G4ThreadLocal G4Allocator<NpolHit>* NpolHitAllocator;
+
 NpolHit::NpolHit(G4Step *aStep) {
 
 	G4Track *aTrack = aStep->GetTrack();

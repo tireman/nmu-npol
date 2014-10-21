@@ -19,8 +19,8 @@
 #/gun/particle mu- 
 #/gun/particle anti_proton 
 /gun/particle neutron 
+/gun/energy 2500 MeV
+/analysis/setFileName npolduel
 
-/gun/energy 2000 MeV
-
-/run/beamOn 5
+/run/beamOn 100000
 

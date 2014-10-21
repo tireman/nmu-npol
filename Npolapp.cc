@@ -52,50 +52,52 @@ int main(int argc,char *argv[])
   runManager->SetNumberOfThreads(10);
    // runManager->SetNumberOfThreads(G4Threading::G4GetNumberOfCores());
 #else
-	G4RunManager *runManager = new G4RunManager;
+  G4RunManager *runManager = new G4RunManager;
 #endif
-
-
+  
+  
 #ifdef G4VIS_USE
-	// Visualization manager construction
-	G4VisManager *visManager = new G4VisExecutive;
-	visManager->Initialize();
+  // Visualization manager construction
+  G4VisManager *visManager = new G4VisExecutive;
+  visManager->Initialize();
 #endif
-
-	// mandatory user initialization classes
-	runManager->SetUserInitialization(new NpolDetectorConstruction);
-	runManager->SetUserInitialization(new FTFP_BERT);
-	runManager->SetUserInitialization(new NpolActionInitialization);
-
-	// initialize Geant4 kernel
-	runManager->Initialize();
-
-	// Get the pointer to the User Interface manager
-	G4UImanager *UImanager = G4UImanager::GetUIpointer();
-
-	if(argc != 1) {
-		// batch mode
-		G4String command = "/control/execute ";
-		G4String fileName = argv[1];
-		UImanager->ApplyCommand(command + fileName);
-
-		// Pause the program so I can look at the visual before it closes
-		G4cout << "Press Return to continue" << G4endl;
-		G4cin.get();
-	} else {
-		// interactive mode
+  
+  // mandatory user initialization classes
+  runManager->SetUserInitialization(new NpolDetectorConstruction);
+  runManager->SetUserInitialization(new FTFP_BERT);
+  runManager->SetUserInitialization(new NpolActionInitialization);
+  
+  // initialize Geant4 kernel
+  runManager->Initialize();
+  
+  // Get the pointer to the User Interface manager
+  G4UImanager *UImanager = G4UImanager::GetUIpointer();
+  //UImanager->ApplyCommand("/control/cout/useBuffer true");
+  UImanager->ApplyCommand("control/cout/prefixString G4WT");
+  
+  if(argc != 1) {
+    // batch mode
+    G4String command = "/control/execute ";
+    G4String fileName = argv[1];
+    UImanager->ApplyCommand(command + fileName);
+    
+    // Pause the program so I can look at the visual before it closes
+    G4cout << "Press Return to continue" << G4endl;
+    G4cin.get();
+  } else {
+    // interactive mode
 #ifdef G4UI_USE
-		G4UIExecutive *ui = new G4UIExecutive(argc, argv);
+    G4UIExecutive *ui = new G4UIExecutive(argc, argv);
 #ifdef G4VIS_USE
-		UImanager->ApplyCommand("/control/execute init_vis.mac");
+    UImanager->ApplyCommand("/control/execute init_vis.mac");
 #else
-		UImanager->ApplyCommand("/control/execute init.mac");
+    UImanager->ApplyCommand("/control/execute init.mac");
 #endif
-		ui->SessionStart();
-		delete ui;
+    ui->SessionStart();
+    delete ui;
 #endif
-	}
-
+  }
+  
 #ifdef G4VIS_USE
 	delete visManager;
 #endif
