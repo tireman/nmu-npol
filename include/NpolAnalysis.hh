@@ -1,4 +1,3 @@
-
    //********************************************************************
    //* License and Disclaimer: From GEANT Collaboration                 *
    //*                                                                  *
@@ -17,38 +16,11 @@
    //* the users discretion only.  		    			*
    //********************************************************************
 
+// Daniel Wilbern, dwilbern@nmu.edu
 
-#ifndef Npol_DetectorConstruction_h
-#define Npol_DetectorConstruction_h
+#ifndef NpolAnalysis_h
+#define NpolAnalysis_h 
 
-#include "globals.hh"
-#include "G4VUserDetectorConstruction.hh"
-
-class G4AssemblyVolume;
-class G4Box;
-class G4VSolid;
-class G4LogicalVolume;
-class G4VPhysicalVolume;
-class NpolSensitiveDetector;
-class G4Material;
-
-class NpolDetectorConstruction : public G4VUserDetectorConstruction
-{
-public:
-  
-  NpolDetectorConstruction();
-  ~NpolDetectorConstruction();
-  
-public:
-  
-  virtual G4VPhysicalVolume* Construct();
-  virtual void ConstructSDandField();
-  
-private:
-  void DefineMaterials();
-  G4LogicalVolume *TopDetLV, *TopVetoLV, *BottomDetLV, *BottomVetoLV, *FrontDetLV, *FrontTagLV;
-  
-};
+#include "g4root.hh"
 
 #endif
-

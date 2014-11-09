@@ -27,316 +27,390 @@
 #include "G4VisAttributes.hh"
 #include "G4Colour.hh"
 #include "G4ios.hh"
-
+#include "G4SDManager.hh"
 #include "NpolDetectorConstruction.hh"
 #include "NpolSensitiveDetector.hh"
 
+G4Material *Air, *Scint, *Concrete, *Vac, *Iron;
 NpolDetectorConstruction::NpolDetectorConstruction()
 {}
 
 NpolDetectorConstruction::~NpolDetectorConstruction()
 {}
 
-G4VPhysicalVolume* NpolDetectorConstruction::Construct()
+void NpolDetectorConstruction::DefineMaterials() 
 {
-	//--------- Material definition ---------
+  //--------- Material definition ---------
+  // Elements
+  G4Element* H = new G4Element("Hydrogen", "H", 1., 1.008*g/mole);
+  G4Element* C = new G4Element("Carbon"  , "C", 6., 12.011*g/mole);
+  G4Element* N = new G4Element("Nitrogen", "N", 7., 14.01*g/mole);
+  G4Element* O = new G4Element("Oxygen"  , "O", 8., 16.00*g/mole);
+  G4Element* Si = new G4Element("Silicon", "Si", 14., 28.0855*g/mole);
+  G4Element* Ca = new G4Element("Calcium", "Ca", 20., 40.078*g/mole);
+  G4Element* Al = new G4Element("Aluminium", "Al", 13., 26.98154*g/mole);
+  G4Element* Fe = new G4Element("Iron", "Fe", 26., 55.854*g/mole);
+  
+  // Scint for NPOL
+    
+  Scint = new G4Material("Scint", 1.02*g/cm3, 2);
+  Scint->AddElement(H, 8.451*perCent);
+  Scint->AddElement(C, 91.549*perCent);
+  
+  //Air
+  Air = new G4Material("Air", 1.29*mg/cm3, 2);
+  Air->AddElement(N, 70*perCent);
+  Air->AddElement(O, 30*perCent);
+    
+  // Concrete
+  Concrete = new G4Material("Concrete", 3.15*g/cm3, 6);
+  Concrete->AddElement(O, 137);
+  Concrete->AddElement(Si, 21);
+  Concrete->AddElement(Al, 10);
+  Concrete->AddElement(Fe, 6);
+  Concrete->AddElement(Ca, 62);
+  Concrete->AddElement(H, 18);
+  
+  // Iron 
+  Iron = new G4Material("Iron", 7.874*g/cm3,1);
+  Iron->AddElement(Fe, 1);
+ 
+  // Vacuum
+  Vac= new G4Material("Vacuum", 1.0, 1.01*g/mole, universe_mean_density,kStateGas, 2.73*kelvin, 3.e-18*pascal);
+  
+  // Print all the materials defined.
+  //
+  G4cout << G4endl << "The materials defined are : " << G4endl << G4endl;
+  G4cout << *(G4Material::GetMaterialTable()) << G4endl;
+}
 
-	// Scint for NPOL
-	G4Element* H = new G4Element("Hydrogen", "H", 1., 1.008*g/mole);
-	G4Element* C = new G4Element("Carbon"  , "C", 6., 12.011*g/mole);
+ G4VPhysicalVolume* NpolDetectorConstruction::Construct()
+ {
 
-	G4Material* Scint = new G4Material("Scint", 1.02*g/cm3, 2);
-	Scint->AddElement(H, 8.451*perCent);
-	Scint->AddElement(C, 91.549*perCent);
+  DefineMaterials();
 
-	G4Material* Vac= new G4Material("Vacuum", 1.0, 1.01*g/mole, universe_mean_density,kStateGas, 2.73*kelvin, 3.e-18*pascal);
+  //--------- Definitions of Solids, Logical Volumes, Physical Volumes ---------
+  
+  //------------------------------ 
+  // World
+  //------------------------------ 
+  
+  G4Box *solidWorld= new G4Box("World",2.50*m, 3.0*m, 10.0*m);
+  G4LogicalVolume *logicWorld= new G4LogicalVolume( solidWorld, Air, "World", 0, 0, 0);
+  
+  //  Must place the World Physical volume unrotated at (0,0,0).
+  // 
+  G4VPhysicalVolume *physiWorld = new G4PVPlacement(0, G4ThreeVector(), logicWorld, "World", 0, false, 0);
+
+  //---------------------------
+  // TOP/BOTTOM are the E arrays for proton total energy
+  // TOPa/BOTTOMa are the dE arrays for particle ID (protons versus pions)
+  //---------------------------
+  
+  G4VSolid *TopDet, *TopVeto, *BottomDet, *BottomVeto, *FrontDet, *FrontTag;
+  G4AssemblyVolume *TopArray1, *TopArray2, *TopVetoArray1, *TopVetoArray2, *BottomArray1, *BottomArray2, *BottomVetoArray1, *BottomVetoArray2, *FrontArray1, *FrontArray2, *FrontTagger1, *FrontTagger2;
+  
+  //-------------------------------
+  // NEW Analyzer ---- NPOL front scintillator array (2/21/2012)
+  // update: 2/24/2012 G4AssemblyVolume ... helper method.
+  //-------------------------------
+  // Top E detectors
+  // Andrei's 2012 Plan B setup using 160 cm long detectors 10cm by 10cm
+  //---------------------------
+  
+  TopDet = new G4Box("TopDet",0.80*m,0.0508*m,0.0508*m);
+  TopDetLV = new G4LogicalVolume(TopDet,Scint,"TopDetLV",0,0,0);
+  
+  TopArray1 = new G4AssemblyVolume();
+  TopArray2 = new G4AssemblyVolume();
+
+  // Translation and rotation of plate inside assembly
+  G4RotationMatrix Ra; 
+  G4ThreeVector Ta, Tm;
+  G4Transform3D Tr;
+
+  
+  // Rotation of assembly inside the world
+  G4RotationMatrix Rm; 
+  Rm.rotateX(0.0*deg);
+  Rm.rotateY(0.0*deg);
+  
+  // Create the Top, Front E array (called TopArray1) Plate with this loop 
+  // with 13 detectors
+  for(unsigned int i=0; i<13; i++){
+    Ta.setX(0.0*m);   Ta.setY(0.0*m);   Ta.setZ((0.60-.10*i)*m);
+    Tr = G4Transform3D(Ra,Ta);
+    TopArray1->AddPlacedVolume( TopDetLV, Tr);
+  };
+  
+  Rm.rotateZ(-45.0*deg);  
+  // Place the Plate on the left side of the package
+  Tm.setX(+0.615*m); Tm.setY(0.70*m); Tm.setZ(-1.10*m);
+  Tr = G4Transform3D(Rm,Tm);
+  TopArray1->MakeImprint( logicWorld, Tr);
+  
+  Rm.rotateZ(+90.0*deg);  
+  // Place the Plates on the right side of the package
+  Tm.setX(-0.615*m); Tm.setY(0.70*m); Tm.setZ(-1.10*m);
+  Tr = G4Transform3D(Rm,Tm);
+  TopArray1->MakeImprint( logicWorld, Tr);
+  
+  // Create the Top, Back E array (called TopArray2) Plate with this loop 
+  // with 14 detectors
+  for(unsigned int i=0; i<14; i++){
+    Ta.setX(0.0*m);   Ta.setY(0.0*m);   Ta.setZ((0.60-.10*i)*m);
+    Tr = G4Transform3D(Ra,Ta);
+    TopArray2->AddPlacedVolume( TopDetLV, Tr);
+  };
+
+  // Place the Plate on the left side of the package
+  Rm.rotateZ(-90.0*deg);
+  Tm.setX(+0.615*m); Tm.setY(0.80*m); Tm.setZ(+0.30*m);
+  Tr = G4Transform3D(Rm,Tm);
+  TopArray2->MakeImprint( logicWorld, Tr);
+  
+  Rm.rotateZ(+90.0*deg);  
+  // Place the Plates on the right side of the package
+  Tm.setX(-0.615*m); Tm.setY(0.80*m); Tm.setZ(+0.30*m);
+  Tr = G4Transform3D(Rm,Tm);
+  TopArray2->MakeImprint( logicWorld, Tr);
 
 
-	// Print all the materials defined.
-	//
-	G4cout << G4endl << "The materials defined are : " << G4endl << G4endl;
-	G4cout << *(G4Material::GetMaterialTable()) << G4endl;
+  //----------------------------
+  // Top dE detectors
+  // Andrei's 2012 Plan B 160 cm long "taggers" in a horizontal orientation
+  //----------------------------
+  
+  TopVeto = new G4Box("TopVeto",0.80*m,0.0050*m,0.0508*m);
+  TopVetoLV = new G4LogicalVolume(TopVeto,Scint,"TopVetoLV",0,0,0);
+  
+  TopVetoArray1 = new G4AssemblyVolume();
+  TopVetoArray2 = new G4AssemblyVolume();
 
-	//--------- Definitions of Solids, Logical Volumes, Physical Volumes ---------
+  // Create the Plate for TopVetoArray1 with this loop (13 Detectors)
+  for(unsigned int i=0; i<13; i++){
+    Ta.setX(0.0*m);   Ta.setY(0.0*m);   Ta.setZ((0.60-.10*i)*m);
+    Tr = G4Transform3D(Ra,Ta);
+    TopVetoArray1->AddPlacedVolume( TopVetoLV, Tr);
+  };
 
-	//------------------------------ 
-	// World
-	//------------------------------ 
+  // Create the Plate for TopVetoArray2 with this loop (14 Detectors)
+  for(unsigned int i=0; i<14; i++){
+    Ta.setX(0.0*m);   Ta.setY(0.0*m);   Ta.setZ((0.60-.10*i)*m);
+    Tr = G4Transform3D(Ra,Ta);
+    TopVetoArray2->AddPlacedVolume( TopVetoLV, Tr);
+  };
+  
+  Rm.rotateZ(-45.0*deg);
+  
+  // Place the Plates in the volume
+  Tm.setX(0); Tm.setY(0.32*m); Tm.setZ(-1.15*m);
+  Tr = G4Transform3D(Rm,Tm);
+  TopVetoArray1->MakeImprint( logicWorld, Tr);
+  
+  Tm.setX(0); Tm.setY(0.42*m); Tm.setZ(+0.30*m);
+  Tr = G4Transform3D(Rm,Tm);
+  TopVetoArray2->MakeImprint( logicWorld, Tr);
+  
+  //------------------------------
+  // Bottom E detectors
+  // Andrei's 2012 Plan B setup using 160 cm long 10cm by 10cm detectors
+  //------------------------------
+  
+  BottomDet = new G4Box("BottomDet",0.80*m,0.0508*m,0.0508*m);
+  BottomDetLV = new G4LogicalVolume(BottomDet,Scint,"BottomDetLV",0,0,0);
+  
+  BottomArray1 = new G4AssemblyVolume();
+  BottomArray2 = new G4AssemblyVolume();
 
-	G4Box *solidWorld= new G4Box("World",2.0*m,2.5*m, 2.5*m);
-	G4LogicalVolume *logicWorld= new G4LogicalVolume( solidWorld, Vac, "World", 0, 0, 0);
+// Create the Bottom, Front E array (called BottomArray1) Plate with this loop 
+  // with 13 detectors
+  for(unsigned int i=0; i<13; i++){
+    Ta.setX(0.0*m);   Ta.setY(0.0*m);   Ta.setZ((0.60-.10*i)*m);
+    Tr = G4Transform3D(Ra,Ta);
+    BottomArray1->AddPlacedVolume( BottomDetLV, Tr);
+  };
+  
+  Rm.rotateZ(+45.0*deg);  
+  // Place the Plate on the left side of the package
+  Tm.setX(+0.615*m); Tm.setY(-0.70*m); Tm.setZ(-1.10*m);
+  Tr = G4Transform3D(Rm,Tm);
+  BottomArray1->MakeImprint( logicWorld, Tr);
+  
+  Rm.rotateZ(+90.0*deg);  
+  // Place the Plates on the right side of the package
+  Tm.setX(-0.615*m); Tm.setY(-0.70*m); Tm.setZ(-1.10*m);
+  Tr = G4Transform3D(Rm,Tm);
+  BottomArray1->MakeImprint( logicWorld, Tr);
+  
+  // Create the Top, Back E array (called TopArray2) Plate with this loop 
+  // with 14 detectors
+  for(unsigned int i=0; i<14; i++){
+    Ta.setX(0.0*m);   Ta.setY(0.0*m);   Ta.setZ((0.60-.10*i)*m);
+    Tr = G4Transform3D(Ra,Ta);
+    BottomArray2->AddPlacedVolume( BottomDetLV, Tr);
+  };
 
-	//  Must place the World Physical volume unrotated at (0,0,0).
-	// 
-	G4VPhysicalVolume *physiWorld = new G4PVPlacement(0, // no rotation
-			G4ThreeVector(), // at (0,0,0)
-			logicWorld,      // its logical volume
-			"World",         // its name
-			0,               // its mother  volume
-			false,           // no boolean operations
-			0);              // copy number
+  // Place the Plate on the left side of the package
+  Rm.rotateZ(-90.0*deg);
+  Tm.setX(+0.615*m); Tm.setY(-0.80*m); Tm.setZ(+0.30*m);
+  Tr = G4Transform3D(Rm,Tm);
+  BottomArray2->MakeImprint( logicWorld, Tr);
+  
+  Rm.rotateZ(+90.0*deg);  
+  // Place the Plates on the right side of the package
+  Tm.setX(-0.615*m); Tm.setY(-0.80*m); Tm.setZ(+0.30*m);
+  Tr = G4Transform3D(Rm,Tm);
+  BottomArray2->MakeImprint( logicWorld, Tr);
+  
+  
+  //-----------------------------
+  // BOTTOMa dE detectors
+  // Andrei's 2012 Plan B setup using 160 cm long "tagger" detectors 1cm thick
+  //-----------------------------
+  
+  BottomVeto = new G4Box("BottomVeto",0.80*m,0.0050*m,0.0508*m);
+  BottomVetoLV = new G4LogicalVolume(BottomVeto,Scint,"BottomVetoLV",0,0,0);
+  
+  BottomVetoArray1 = new G4AssemblyVolume();
+  BottomVetoArray2 = new G4AssemblyVolume();
 
-	//---------------------------
-	// This is just stupid.  It must be cleaned up; if for nothing
-	// but my sanity.  W.T. (2012)
-	//
-	// TOP/BOTTOM are the E arrays for proton total energy
-	// TOPa/BOTTOMa are the dE arrays for particle ID (protons versus pions)
-	//---------------------------
+  // Create the Plate for the Bottom Front plate with this loop
+  for(unsigned int i=0; i<13; i++){
+    Ta.setX(0.0*m);   Ta.setY(0.0*m);   Ta.setZ((0.60-.10*i)*m);
+    Tr = G4Transform3D(Ra,Ta);
+    BottomVetoArray1->AddPlacedVolume( BottomVetoLV, Tr);
+  };
 
-	G4VSolid *TopDet, *TopVeto, *BottomDet, *BottomVeto, *FrontDet, *FrontTag;
-	G4AssemblyVolume *TopArray, *TopVetoArray, *BottomArray, *BottomVetoArray, *FrontArray1, *FrontArray2, *FrontTagger1, *FrontTagger2;
+ // Create the Plate for the Bottom back plate with this loop
+  for(unsigned int i=0; i<13; i++){
+    Ta.setX(0.0*m);   Ta.setY(0.0*m);   Ta.setZ((0.60-.10*i)*m);
+    Tr = G4Transform3D(Ra,Ta);
+    BottomVetoArray2->AddPlacedVolume( BottomVetoLV, Tr);
+  };
 
-	//--------------------------
-	// Top E detectors
-	// Andrei's 2012 Plan B setup using 160 cm long detectors 10cm by 10cm
-	//---------------------------
+  Rm.rotateZ(+45.0*deg);
+  // Place the Plates in the volume
+  Tm.setX(0); Tm.setY(-0.32*m); Tm.setZ(-1.15*m);
+  Tr = G4Transform3D(Rm,Tm);
+  BottomVetoArray1->MakeImprint( logicWorld, Tr);
+  
+  Tm.setX(0); Tm.setY(-0.42*m); Tm.setZ(+0.30*m);
+  Tr = G4Transform3D(Rm,Tm);
+  BottomVetoArray2->MakeImprint( logicWorld, Tr);
 
-	TopDet = new G4Box("TopDet",0.80*m,0.0508*m,0.0508*m);
-	TopDetLV = new G4LogicalVolume(TopDet,Scint,"TopDetLV",0,0,0);
-
-	TopArray = new G4AssemblyVolume();
-
-	// Translation and rotation of plate inside assembly
-	G4RotationMatrix Ra; 
-	G4ThreeVector Ta;
-	G4Transform3D Tr;
-
-	// Rotation of assembly inside the world
-	G4RotationMatrix Rm; 
-	Rm.rotateX(0.0*deg);
-	Rm.rotateY(0.0*deg);
-
-	// Create the Plate with this loop
-	for(unsigned int i=0; i<13; i++){
-		Ta.setX(0.0*m);   Ta.setY(0.0*m);   Ta.setZ((0.60-.10*i)*m);
-		Tr = G4Transform3D(Ra,Ta);
-		TopArray->AddPlacedVolume( TopDetLV, Tr);
-	};
-
-	Rm.rotateZ(+45.0*deg);  
-	// Place the Plates in the volume with this loop
-	for(unsigned int i=0; i<2;i++){
-		G4ThreeVector Tm(-0.615*m,(0.70+0.10*i)*m,(-1.10+1.30*i)*m);
-		Tr = G4Transform3D(Rm,Tm);
-		TopArray->MakeImprint( logicWorld, Tr);
-	};
-
-	Rm.rotateZ(-90.0*deg);  
-	// Place the Plates in the volume with this loop
-	for(unsigned int i=0; i<2;i++){
-	  G4ThreeVector Tm(+0.615*m,(0.70+0.10*i)*m,(-1.10+1.30*i)*m);
-		Tr = G4Transform3D(Rm,Tm);
-		TopArray->MakeImprint( logicWorld, Tr);
-	};
-
-	//----------------------------
-	// Top dE detectors
-	// Andrei's 2012 Plan B 160 cm long "taggers" in a horizontal orientation
-	//----------------------------
-
-	TopVeto = new G4Box("TopVeto",0.80*m,0.0050*m,0.0508*m);
-	TopVetoLV = new G4LogicalVolume(TopVeto,Scint,"TopVetoLV",0,0,0);
-
-	TopVetoArray = new G4AssemblyVolume();
-
-	// Create the Plate with this loop
-	for(unsigned int i=0; i<13; i++){
-		Ta.setX(0.0*m);   Ta.setY(0.0*m);   Ta.setZ((0.60-.10*i)*m);
-		Tr = G4Transform3D(Ra,Ta);
-		TopVetoArray->AddPlacedVolume( TopVetoLV, Tr);
-	};
-
-	Rm.rotateZ(+45.0*deg);
-
-	// Place the Plates in the volume with this loop
-	for(unsigned int i=0; i<2;i++){
-		G4ThreeVector Tm(0,(0.32+0.10*i)*m,(-1.15+1.30*i)*m);
-		Tr = G4Transform3D(Rm,Tm);
-		TopVetoArray->MakeImprint( logicWorld, Tr);
-	};
-
-	//------------------------------
-	// Bottom E detectors
-	// Andrei's 2012 Plan B setup using 160 cm long 10cm by 10cm detectors
-	//------------------------------
-
-	BottomDet = new G4Box("BottomDet",0.80*m,0.0508*m,0.0508*m);
-	BottomDetLV = new G4LogicalVolume(BottomDet,Scint,"BottomDetLV",0,0,0);
-
-	BottomArray = new G4AssemblyVolume();
-
-	// Create the Plate with this loop
-	for(unsigned int i=0; i<13; i++){
-		Ta.setX(0.0*m);   Ta.setY(0.0*m);   Ta.setZ((0.60-.10*i)*m);
-		Tr = G4Transform3D(Ra,Ta);
-		BottomArray->AddPlacedVolume( BottomDetLV, Tr);
-	};
-
-	Rm.rotateZ(-45*deg);
-	// Place the Plates in the volume with this loop
-	for(unsigned int i=0; i<2;i++){
-		G4ThreeVector Tm(-0.615*m,(-0.70-0.10*i)*m,(-1.10+1.30*i)*m);
-		Tr = G4Transform3D(Rm,Tm);
-		BottomArray->MakeImprint( logicWorld, Tr);
-	};
-
-	Rm.rotateZ(+90*deg);
-	// Place the Plates in the volume with this loop
-	for(unsigned int i=0; i<2;i++){
-		G4ThreeVector Tm(+0.615*m,(-0.70-0.10*i)*m,(-1.10+1.30*i)*m);
-		Tr = G4Transform3D(Rm,Tm);
-		BottomArray->MakeImprint( logicWorld, Tr);
-	};
-
-	//-----------------------------
-	// BOTTOMa dE detectors
-	// Andrei's 2012 Plan B setup using 160 cm long "tagger" detectors 1cm thick
-	//-----------------------------
-
-	BottomVeto = new G4Box("BottomVeto",0.80*m,0.0050*m,0.0508*m);
-	BottomVetoLV = new G4LogicalVolume(BottomVeto,Scint,"BottomVetoLV",0,0,0);
-
-	BottomVetoArray = new G4AssemblyVolume();
-
-	// Create the Plate with this loop
-	for(unsigned int i=0; i<13; i++){
-		Ta.setX(0.0*m);   Ta.setY(0.0*m);   Ta.setZ((0.60-.10*i)*m);
-		Tr = G4Transform3D(Ra,Ta);
-		BottomVetoArray->AddPlacedVolume( BottomVetoLV, Tr);
-	};
-	Rm.rotateZ(-45.0*deg);
-	// Place the Plates in the volume with this loop
-	for(unsigned int i=0; i<2;i++){
-		G4ThreeVector Tm(0,(-0.32-0.10*i)*m,(-1.15+1.30*i)*m);
-		Tr = G4Transform3D(Rm,Tm);
-		BottomVetoArray->MakeImprint( logicWorld, Tr);
-	};
-
-	//-------------------------------
-	// NEW Analyzer ---- NPOL front scintillator array (2/21/2012)
-	// What is this? ... seriously! chambers? Trackers? Really?
-	// Doesn't work well when different sections have different sizes
-	// and differnt numbers of detectors.  I have to admit that the idea of
-	// coding 140 individual detectors and 90+ vetos is not pleasant.  
-	// Perhaps there is another way. --- update: 2/24/2012 ... there is
-	// G4AssemblyVolume ... helper method.
-	//-------------------------------
-
-	// Front Array construction using G4AssemblyVolume helper routine
-
-	FrontDet = new G4Box("FrontDet",0.50*m,0.0508*m,0.0508*m);
-	FrontDetLV = new G4LogicalVolume(FrontDet,Scint,"FrontDetLV",0,0,0);
-
-	FrontArray1 = new G4AssemblyVolume();
-	FrontArray2 = new G4AssemblyVolume();
-
-	// Front 2 sections have 6 detectors each
-	for(unsigned int i=0; i<6; i++){
-		Ta.setX(0.0*m);   Ta.setY((0.25-0.10*i)*m);   Ta.setZ(0.0*m);
-		Tr = G4Transform3D(Ra,Ta);
-		FrontArray1->AddPlacedVolume( FrontDetLV, Tr);
-	};
-
-	for(unsigned int i=0; i<2;i++){
-		G4ThreeVector Tm(0,0,(-1.6992+.65*i)*m);
-		Tr = G4Transform3D(Rm,Tm);
-		FrontArray1->MakeImprint( logicWorld, Tr);
-	};
-
-	// Back 2 sections have 8 detectors each 
-
-	for(unsigned int i=0; i<8; i++){
-		Ta.setX(0.0*m);   Ta.setY((0.35-0.10*i)*m);   Ta.setZ(0.0*m);
-		Tr = G4Transform3D(Ra,Ta);
-		FrontArray2->AddPlacedVolume( FrontDetLV, Tr);
-	};
-
-	for(unsigned int i=2; i<4;i++){
-		G4ThreeVector Tm(0,0,(-1.6992+.65*i)*m);
-		Tr = G4Transform3D(Rm,Tm);
-		FrontArray2->MakeImprint( logicWorld, Tr);
-	};
-
-	//---------------------------------------------------------------------
-	// Taggers for analyzer layers
-	// 1.0 cm by 10.0 cm by 100.0 cm
-	//----------------------------------------------------------------------
-
-	// Front taggers construction using G4AssemblyVolume helper routine
-
-	FrontTag = new G4Box("FrontTag",0.50*m,0.0508*m,0.00508*m);
-	FrontTagLV = new G4LogicalVolume(FrontTag,Scint,"FrontTagLV",0,0,0);
-
-	FrontTagger1 = new G4AssemblyVolume();
-	FrontTagger2 = new G4AssemblyVolume();
-
-	// Front 2 sections of taggers have 6 detectors each
-	for(unsigned int i=0; i<6; i++){
-		Ta.setX(0.0*m);   Ta.setY((0.25-0.10*i)*m);   Ta.setZ(0.0*m);
-		Tr = G4Transform3D(Ra,Ta);
-		FrontTagger1->AddPlacedVolume( FrontTagLV, Tr);
-	};
-
-	for(unsigned int i=0; i<2;i++){
-		G4ThreeVector Tm(0,0,(-1.7692+.65*i)*m);
-		Tr = G4Transform3D(Rm,Tm);
-		FrontTagger1->MakeImprint( logicWorld, Tr);
-	};
-
-	// Back 2 sections of taggers have 8 detectors each 
-
-	for(unsigned int i=0; i<8; i++){
-		Ta.setX(0.0*m);   Ta.setY((0.35-0.10*i)*m);   Ta.setZ(0.0*m);
-		Tr = G4Transform3D(Ra,Ta);
-		FrontTagger2->AddPlacedVolume( FrontTagLV, Tr);
-	};
-
-	for(unsigned int i=2; i<4;i++){
-		G4ThreeVector Tm(0,0,(-1.7692+.65*i)*m);
-		Tr = G4Transform3D(Rm,Tm);
-		FrontTagger2->MakeImprint( logicWorld, Tr);
-	};
-
-	//--------- Visualization attributes -------------------------------
-
-	G4VisAttributes* WorldVisAtt= new G4VisAttributes(0);
-	logicWorld->SetVisAttributes(WorldVisAtt);
-
-	G4VisAttributes* FrontDetVisAtt= new G4VisAttributes(G4Colour(1.0,1.0,0.0));
-	FrontDetLV->SetVisAttributes(FrontDetVisAtt);
-
-	G4VisAttributes* TopBotVisAtt= new G4VisAttributes(G4Colour(1.0,0.0,1.0));
-	TopDetLV->SetVisAttributes(TopBotVisAtt);
-	BottomDetLV->SetVisAttributes(TopBotVisAtt);
-
-	G4VisAttributes* TopBotaVisAtt= new G4VisAttributes(G4Colour(0.0,1.0,1.0));
-	TopVetoLV->SetVisAttributes(TopBotaVisAtt);
-	BottomVetoLV->SetVisAttributes(TopBotaVisAtt);
-
-	return physiWorld;
+  // Front Array construction using G4AssemblyVolume helper routine
+  
+  FrontDet = new G4Box("FrontDet",0.50*m,0.0508*m,0.0508*m);
+  FrontDetLV = new G4LogicalVolume(FrontDet,Scint,"FrontDetLV",0,0,0);
+  
+  FrontArray1 = new G4AssemblyVolume();
+  FrontArray2 = new G4AssemblyVolume();
+  
+  // Front 2 sections have 6 detectors each
+  for(unsigned int i=0; i<6; i++){
+    Ta.setX(0.0*m);   Ta.setY((0.25-0.10*i)*m);   Ta.setZ(0.0*m);
+    Tr = G4Transform3D(Ra,Ta);
+    FrontArray1->AddPlacedVolume( FrontDetLV, Tr);
+  };
+  
+  for(unsigned int i=0; i<2;i++){
+    Tm.setX(0); Tm.setY(0); Tm.setZ((-1.6992+.65*i)*m);
+    Tr = G4Transform3D(Rm,Tm);
+    FrontArray1->MakeImprint( logicWorld, Tr);
+  };
+  
+  // Back 2 sections have 8 detectors each 
+  
+  for(unsigned int i=0; i<8; i++){
+    Ta.setX(0.0*m);   Ta.setY((0.35-0.10*i)*m);   Ta.setZ(0.0*m);
+    Tr = G4Transform3D(Ra,Ta);
+    FrontArray2->AddPlacedVolume( FrontDetLV, Tr);
+  };
+  
+  for(unsigned int i=2; i<4;i++){
+    Tm.setX(0); Tm.setY(0); Tm.setZ((-1.6992+.65*i)*m);
+    Tr = G4Transform3D(Rm,Tm);
+    FrontArray2->MakeImprint( logicWorld, Tr);
+  };
+  
+  //---------------------------------------------------------------------
+  // Taggers for analyzer layers
+  // 1.0 cm by 10.0 cm by 100.0 cm
+  //----------------------------------------------------------------------
+  
+  // Front taggers construction using G4AssemblyVolume helper routine
+  
+  FrontTag = new G4Box("FrontTag",0.50*m,0.0508*m,0.00508*m);
+  FrontTagLV = new G4LogicalVolume(FrontTag,Scint,"FrontTagLV",0,0,0);
+  
+  FrontTagger1 = new G4AssemblyVolume();
+  FrontTagger2 = new G4AssemblyVolume();
+  
+  // Front 2 sections of taggers have 6 detectors each
+  for(unsigned int i=0; i<6; i++){
+    Ta.setX(0.0*m);   Ta.setY((0.25-0.10*i)*m);   Ta.setZ(0.0*m);
+    Tr = G4Transform3D(Ra,Ta);
+    FrontTagger1->AddPlacedVolume( FrontTagLV, Tr);
+  };
+  
+  for(unsigned int i=0; i<2;i++){
+    Tm.setX(0); Tm.setY(0); Tm.setZ((-1.7692+.65*i)*m);
+    Tr = G4Transform3D(Rm,Tm);
+    FrontTagger1->MakeImprint( logicWorld, Tr);
+  };
+  
+  // Back 2 sections of taggers have 8 detectors each 
+  
+  for(unsigned int i=0; i<8; i++){
+    Ta.setX(0.0*m);   Ta.setY((0.35-0.10*i)*m);   Ta.setZ(0.0*m);
+    Tr = G4Transform3D(Ra,Ta);
+    FrontTagger2->AddPlacedVolume( FrontTagLV, Tr);
+  };
+  
+  for(unsigned int i=2; i<4;i++){
+    Tm.setX(0); Tm.setY(0); Tm.setZ((-1.7692+.65*i)*m);
+    Tr = G4Transform3D(Rm,Tm);
+    FrontTagger2->MakeImprint( logicWorld, Tr);
+  };
+  
+  //--------- Visualization attributes -------------------------------
+  
+  G4VisAttributes* WorldVisAtt= new G4VisAttributes(0);
+  logicWorld->SetVisAttributes(WorldVisAtt);
+  
+  G4VisAttributes* FrontDetVisAtt= new G4VisAttributes(G4Colour(1.0,1.0,0.0));
+  FrontDetLV->SetVisAttributes(FrontDetVisAtt);
+  
+  G4VisAttributes* TopBotVisAtt= new G4VisAttributes(G4Colour(1.0,0.0,1.0));
+  TopDetLV->SetVisAttributes(TopBotVisAtt);
+  BottomDetLV->SetVisAttributes(TopBotVisAtt);
+  
+  G4VisAttributes* TopBotaVisAtt= new G4VisAttributes(G4Colour(0.0,1.0,1.0));
+  TopVetoLV->SetVisAttributes(TopBotaVisAtt);
+  BottomVetoLV->SetVisAttributes(TopBotaVisAtt);
+  
+  return physiWorld;
 }
 
 void NpolDetectorConstruction::ConstructSDandField() {
+  
+  NpolSensitiveDetector* TopDetSD = new NpolSensitiveDetector("TopDet"); 
+  SetSensitiveDetector(TopDetLV,TopDetSD);
 
-	NpolSensitiveDetector *TopDetSD, *TopVetoSD, *BottomDetSD, *BottomVetoSD, *FrontDetSD, *FrontTagSD;
-
-	TopDetSD = new NpolSensitiveDetector("TopDet");
-	SetSensitiveDetector(TopDetLV,TopDetSD);
-
-	TopVetoSD = new NpolSensitiveDetector("TopVeto");
-	SetSensitiveDetector(TopVetoLV,TopVetoSD);
-
-	BottomDetSD = new NpolSensitiveDetector("BottomDet");
-	SetSensitiveDetector(BottomDetLV,BottomDetSD);
-
-	BottomVetoSD = new NpolSensitiveDetector("BottomVeto");
-	SetSensitiveDetector(BottomVetoLV,BottomVetoSD);
-
-	FrontDetSD = new NpolSensitiveDetector("FrontDet");
-	SetSensitiveDetector(FrontDetLV,FrontDetSD);
-
-	FrontTagSD = new NpolSensitiveDetector("FrontTag");
-	SetSensitiveDetector(FrontTagLV,FrontTagSD);
+  NpolSensitiveDetector* TopVetoSD = new NpolSensitiveDetector("TopVeto");
+  SetSensitiveDetector(TopVetoLV,TopVetoSD);
+  
+  NpolSensitiveDetector* BottomDetSD = new NpolSensitiveDetector("BottomDet");
+  SetSensitiveDetector(BottomDetLV,BottomDetSD);
+  
+  NpolSensitiveDetector* BottomVetoSD = new NpolSensitiveDetector("BottomVeto");
+  SetSensitiveDetector(BottomVetoLV,BottomVetoSD);
+  
+  NpolSensitiveDetector* FrontDetSD = new NpolSensitiveDetector("FrontDet");
+  SetSensitiveDetector(FrontDetLV,FrontDetSD);
+  
+   NpolSensitiveDetector* FrontTagSD = new NpolSensitiveDetector("FrontTag");
+   SetSensitiveDetector(FrontTagLV,FrontTagSD);
 }
 
