@@ -46,8 +46,8 @@ private:
 public:
   NpolHit(G4Step *aStep);
   ~NpolHit();
-  inline void *operator new(size_t);
-  inline void operator delete(void *aHit);
+  // RM 10/24 WT inline void *operator new(size_t);
+  // RM 10/24 WT inline void operator delete(void *aHit);
 
   virtual void Draw();
   virtual void Print();
@@ -67,7 +67,7 @@ public:
   G4ThreeVector GetParticleMomentum() {return ParticleMomentum;}
 };
 
-typedef G4THitsCollection<NpolHit> NpolHitsCollection;
+/* RM 10/24 WT typedef G4THitsCollection<NpolHit> NpolHitsCollection;
 extern G4ThreadLocal G4Allocator<NpolHit>* NpolHitAllocator;
 
 inline void* NpolHit::operator new(size_t)
@@ -76,9 +76,10 @@ inline void* NpolHit::operator new(size_t)
   return (void *) NpolHitAllocator->MallocSingle();
 }
 
-inline void NpolHit::operator delete(void *hit)
+inline void NpolHit::operator delete(void *ahit)
 {
-  NpolHitAllocator->FreeSingle((NpolHit*) hit);
-} 
+  NpolHitAllocator->FreeSingle((NpolHit*) ahit);
+  } */
+ 
 #endif
 

@@ -70,11 +70,11 @@ void NpolEventAction::EndOfEventAction(const G4Event* evt) {
     if(Edep[i] != 0.0)
       analysisManager->FillH1(i,Edep[i]);
   
-  if(EdepdEoverE[0] >= 2.0 && EdepdEoverE[1] >= 1.0 && EdepdEoverE[4] >= 1.0 && EdepdEoverE[5] < 1.0) {
+  if(EdepdEoverE[0] >= 10.0 && EdepdEoverE[1] >= 1.0 && EdepdEoverE[4] >= 1.0 && EdepdEoverE[5] < 1.0) {
     dEoverEflag = 1;
     analysisManager->FillH2(1, EdepdEoverE[0], EdepdEoverE[1]);
   }
-  if(EdepdEoverE[2] >= 2.0 && EdepdEoverE[3] >= 1.0 && EdepdEoverE[4] >= 1.0 && EdepdEoverE[5] < 1.0) {
+  if(EdepdEoverE[2] >= 10.0 && EdepdEoverE[3] >= 1.0 && EdepdEoverE[4] >= 1.0 && EdepdEoverE[5] < 1.0) {
     dEoverEflag = 1;
     analysisManager->FillH2(2, EdepdEoverE[2], EdepdEoverE[3]);
   }

@@ -27,6 +27,7 @@
 #include "G4Box.hh"
 #include "Randomize.hh"
 
+
 #include "NpolPrimaryGeneratorAction.hh"
 
 NpolPrimaryGeneratorAction::NpolPrimaryGeneratorAction()
@@ -47,6 +48,8 @@ NpolPrimaryGeneratorAction::NpolPrimaryGeneratorAction()
 
   G4double thmax = 1.4995; //(atan(0.1*25/6950))*deg;
   G4double phimax = 0.042831;  // atan((0.1*50/6950))*deg;
+//G4double theta = acos(cos(thmax)*(2*G4MTRandFlat()-1));
+//G4double phi = phimax * (2*G4MTRandFlat()-1);
   G4double theta = acos(cos(thmax)*(2*G4UniformRand()-1));
   G4double phi = phimax * (2*G4UniformRand()-1);
   

@@ -34,7 +34,7 @@
 
 #include "NpolHit.hh"
 
-G4ThreadLocal G4Allocator<NpolHit>* NpolHitAllocator;
+// RM 10/24 WT G4ThreadLocal G4Allocator<NpolHit>* NpolHitAllocator = 0;
 
 NpolHit::NpolHit(G4Step *aStep) {
 

@@ -31,40 +31,64 @@
 #include "NpolDetectorConstruction.hh"
 #include "NpolSensitiveDetector.hh"
 
+G4Material *Air, *Scint, *Concrete, *Vac, *Iron;
 NpolDetectorConstruction::NpolDetectorConstruction()
 {}
 
 NpolDetectorConstruction::~NpolDetectorConstruction()
 {}
 
-G4VPhysicalVolume* NpolDetectorConstruction::Construct()
+void NpolDetectorConstruction::DefineMaterials() 
 {
   //--------- Material definition ---------
-
-  // Scint for NPOL
+  // Elements
   G4Element* H = new G4Element("Hydrogen", "H", 1., 1.008*g/mole);
   G4Element* C = new G4Element("Carbon"  , "C", 6., 12.011*g/mole);
+  G4Element* N = new G4Element("Nitrogen", "N", 7., 14.01*g/mole);
+  G4Element* O = new G4Element("Oxygen"  , "O", 8., 16.00*g/mole);
+  G4Element* Si = new G4Element("Silicon", "Si", 14., 28.0855*g/mole);
+  G4Element* Ca = new G4Element("Calcium", "Ca", 20., 40.078*g/mole);
+  G4Element* Al = new G4Element("Aluminium", "Al", 13., 26.98154*g/mole);
+  G4Element* Fe = new G4Element("Iron", "Fe", 26., 55.854*g/mole);
   
-  G4Material* Scint = new G4Material("Scint", 1.02*g/cm3, 2);
+  // Scint for NPOL
+    
+  Scint = new G4Material("Scint", 1.02*g/cm3, 2);
   Scint->AddElement(H, 8.451*perCent);
   Scint->AddElement(C, 91.549*perCent);
   
   //Air
-  G4Element* N = new G4Element("Nitrogen", "N", 7., 14.01*g/mole);
-  G4Element* O = new G4Element("Oxygen"  , "O", 8., 16.00*g/mole);
-  
-  G4Material* Air = new G4Material("Air", 1.29*mg/cm3, 2);
+  Air = new G4Material("Air", 1.29*mg/cm3, 2);
   Air->AddElement(N, 70*perCent);
   Air->AddElement(O, 30*perCent);
-
-  //G4Material* Vac= new G4Material("Vacuum", 1.0, 1.01*g/mole, universe_mean_density,kStateGas, 2.73*kelvin, 3.e-18*pascal);
+    
+  // Concrete
+  Concrete = new G4Material("Concrete", 3.15*g/cm3, 6);
+  Concrete->AddElement(O, 137);
+  Concrete->AddElement(Si, 21);
+  Concrete->AddElement(Al, 10);
+  Concrete->AddElement(Fe, 6);
+  Concrete->AddElement(Ca, 62);
+  Concrete->AddElement(H, 18);
   
+  // Iron 
+  Iron = new G4Material("Iron", 7.874*g/cm3,1);
+  Iron->AddElement(Fe, 1);
+ 
+  // Vacuum
+  Vac= new G4Material("Vacuum", 1.0, 1.01*g/mole, universe_mean_density,kStateGas, 2.73*kelvin, 3.e-18*pascal);
   
   // Print all the materials defined.
   //
   G4cout << G4endl << "The materials defined are : " << G4endl << G4endl;
   G4cout << *(G4Material::GetMaterialTable()) << G4endl;
-  
+}
+
+ G4VPhysicalVolume* NpolDetectorConstruction::Construct()
+ {
+
+  DefineMaterials();
+
   //--------- Definitions of Solids, Logical Volumes, Physical Volumes ---------
   
   //------------------------------ 
@@ -371,32 +395,22 @@ G4VPhysicalVolume* NpolDetectorConstruction::Construct()
 
 void NpolDetectorConstruction::ConstructSDandField() {
   
-  NpolSensitiveDetector *TopDetSD, *TopVetoSD, *BottomDetSD, *BottomVetoSD, *FrontDetSD, *FrontTagSD;
-  //G4SDManager* SDman = G4SDManager::GetSDMpointer();
-
-  TopDetSD = new NpolSensitiveDetector("TopDet");
-  //SDman->AddNewDetector(TopDetSD);
+  NpolSensitiveDetector* TopDetSD = new NpolSensitiveDetector("TopDet"); 
   SetSensitiveDetector(TopDetLV,TopDetSD);
 
-
-  TopVetoSD = new NpolSensitiveDetector("TopVeto");
-  //SDman->AddNewDetector(TopVetoSD);
+  NpolSensitiveDetector* TopVetoSD = new NpolSensitiveDetector("TopVeto");
   SetSensitiveDetector(TopVetoLV,TopVetoSD);
   
-  BottomDetSD = new NpolSensitiveDetector("BottomDet");
-  //SDman->AddNewDetector(BottomDetSD);
+  NpolSensitiveDetector* BottomDetSD = new NpolSensitiveDetector("BottomDet");
   SetSensitiveDetector(BottomDetLV,BottomDetSD);
   
-  BottomVetoSD = new NpolSensitiveDetector("BottomVeto");
-  //SDman->AddNewDetector(BottomVetoSD);
+  NpolSensitiveDetector* BottomVetoSD = new NpolSensitiveDetector("BottomVeto");
   SetSensitiveDetector(BottomVetoLV,BottomVetoSD);
   
-  FrontDetSD = new NpolSensitiveDetector("FrontDet");
-  //SDman->AddNewDetector(FrontDetSD);
+  NpolSensitiveDetector* FrontDetSD = new NpolSensitiveDetector("FrontDet");
   SetSensitiveDetector(FrontDetLV,FrontDetSD);
   
-  FrontTagSD = new NpolSensitiveDetector("FrontTag");
-  //SDman->AddNewDetector(FrontTagSD);
-  SetSensitiveDetector(FrontTagLV,FrontTagSD);
+   NpolSensitiveDetector* FrontTagSD = new NpolSensitiveDetector("FrontTag");
+   SetSensitiveDetector(FrontTagLV,FrontTagSD);
 }
 
