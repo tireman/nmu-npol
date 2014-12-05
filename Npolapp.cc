@@ -1,34 +1,32 @@
-   //********************************************************************
-   //* License and Disclaimer: From GEANT Collaboration                 *
-   //*                                                                  *
-   //* The  Geant4 software  is  copyright of the Copyright Holders  of *
-   //* the Geant4 Collaboration.  It is provided  under  the terms  and *
-   //* conditions of the Geant4 Software License,  included in the file *
-   //* LICENSE and available at  http://cern.ch/geant4/license .  These *
-   //* include a list of copyright holders.     		      	*
-   //********************************************************************
-   //* The Geant4 software is used by the Northern Michigan University  *
-   //* in accordance to the Geant4 software license specified above.    *
-   //* The NMU Collaboration does not hold any rights to this software  *
-   //* and gives full permission for its use to others under the limits *
-   //* imposed by the GEANT4 Collaboration.  The NMU Collaboration      *
-   //* gives no express or implied warranty and use of our code is at   *
-   //* the users discretion only.  		    			*
-   //********************************************************************
+//********************************************************************
+//* License and Disclaimer: From GEANT Collaboration                 *
+//*                                                                  *
+//* The  Geant4 software  is  copyright of the Copyright Holders  of *
+//* the Geant4 Collaboration.  It is provided  under  the terms  and *
+//* conditions of the Geant4 Software License,  included in the file *
+//* LICENSE and available at  http://cern.ch/geant4/license .  These *
+//* include a list of copyright holders.     		      	*
+//********************************************************************
+//* The Geant4 software is used by the Northern Michigan University  *
+//* in accordance to the Geant4 software license specified above.    *
+//* The NMU Collaboration does not hold any rights to this software  *
+//* and gives full permission for its use to others under the limits *
+//* imposed by the GEANT4 Collaboration.  The NMU Collaboration      *
+//* gives no express or implied warranty and use of our code is at   *
+//* the users discretion only.  		    			*
+//********************************************************************
 
 
 #ifdef G4MULTITHREADED
  #include "G4MTRunManager.hh"
  #include "G4Threading.hh"
 #else
-#include "G4RunManager.hh"
- #endif
+ #include "G4RunManager.hh"
+#endif
 
 #include "G4UImanager.hh"
+#include "Randomize.hh"
 
-#include "QGSP_BERT.hh"
-#include "QGSP_BIC_HP.hh"
-#include "QGSP_BIC.hh"
 #include "FTFP_BERT.hh"
 
 #include "NpolActionInitialization.hh"
@@ -43,14 +41,15 @@
 #endif
 
 
-int main(int argc,char *argv[])
-{
- 	// RunManager construction
+int main(int argc,char *argv[]) {
+
+	// Choose the Random engine
+	CLHEP::HepRandom::setTheEngine(new CLHEP::RanecuEngine);
+
+	// RunManager construction
 #ifdef G4MULTITHREADED
-  G4MTRunManager *runManager = new G4MTRunManager;
-  //G4RunManager *runManager = new G4RunManager;
-  runManager->SetNumberOfThreads(10);
-   // runManager->SetNumberOfThreads(G4Threading::G4GetNumberOfCores());
+	G4MTRunManager *runManager = new G4MTRunManager;
+	runManager->SetNumberOfThreads(10);
 #else
 	G4RunManager *runManager = new G4RunManager;
 #endif
@@ -86,11 +85,11 @@ int main(int argc,char *argv[])
 		// interactive mode
 #ifdef G4UI_USE
 		G4UIExecutive *ui = new G4UIExecutive(argc, argv);
-#ifdef G4VIS_USE
+ #ifdef G4VIS_USE
 		UImanager->ApplyCommand("/control/execute init_vis.mac");
-#else
+ #else
 		UImanager->ApplyCommand("/control/execute init.mac");
-#endif
+ #endif
 		ui->SessionStart();
 		delete ui;
 #endif
