@@ -28,6 +28,11 @@
 #include "Randomize.hh"
 
 #include "FTFP_BERT.hh"
+#include "FTFP_BERT_HP.hh"
+#include "QGSP_BERT.hh"
+#include "QGSP_BIC_HP.hh"
+#include "QGSP_BIC.hh"
+#include "FTFP_BERT.hh"
 
 #include "NpolActionInitialization.hh"
 #include "NpolDetectorConstruction.hh"
