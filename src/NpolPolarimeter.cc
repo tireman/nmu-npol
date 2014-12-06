@@ -45,8 +45,13 @@ G4AssemblyVolume *MakePlate(G4LogicalVolume *detLV, G4int numDets,
 
 	// Translation and rotation of plate inside assembly
 	G4RotationMatrix Ra; 
-	G4ThreeVector Ta, Tm;
+	G4ThreeVector Tm;
 	G4Transform3D Tr;
+	
+	// Rotation of assembly inside the world 
+	Ra.rotateX(0.0*deg);
+	Ra.rotateY(0.0*deg);
+	Ra.rotateZ(0.0*deg);
 
 	int i;
 	for(i=0; i<numDets; i++) {
@@ -81,18 +86,21 @@ void NpolPolarimeter::ConstructTopDetArray(G4LogicalVolume *motherLV) {
 
 	// Place the Plate on the left side of the package
 	Tm.setX(+0.615*m); Tm.setY(0.70*m); Tm.setZ(-1.10*m);
+	//Tm.setX(-3.4694*m); Tm.setY(0.70*m); Tm.setZ(+6.582*m);
 	Tr = G4Transform3D(Rm,Tm);
 	TopArray1->MakeImprint(motherLV, Tr);
 
 	Rm.rotateZ(+90.0*deg);  
 	// Place the Plates on the right side of the package
 	Tm.setX(-0.615*m); Tm.setY(0.70*m); Tm.setZ(-1.10*m);
+	//Tm.setX(-3.4694*m); Tm.setY(0.70*m); Tm.setZ(+6.582*m);
 	Tr = G4Transform3D(Rm,Tm);
 	TopArray1->MakeImprint(motherLV, Tr);
 
 	// Place the Plate on the left side of the package
 	Rm.rotateZ(-90.0*deg);
 	Tm.setX(+0.615*m); Tm.setY(0.80*m); Tm.setZ(+0.30*m);
+	//Tm.setX(-4.6994*m); Tm.setY(0.70*m); Tm.setZ(+7.982*m);
 	Tr = G4Transform3D(Rm,Tm);
 	TopArray2->MakeImprint(motherLV, Tr);
 

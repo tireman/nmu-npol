@@ -35,7 +35,7 @@ NpolWorld::~NpolWorld() {
 
 void NpolWorld::Construct(G4LogicalVolume *motherLV) {
 
-	G4Box *expHall = new G4Box("ExpHall", 2.50*m, 3.0*m, 10.0*m);
+	G4Box *expHall = new G4Box("ExpHall", 10.0*m, 15.0*m, 15.0*m);
 	
 	expHallLV = new G4LogicalVolume(expHall, 
 		NpolMaterials::GetInstance()->GetAir(), "ExpHallLV", 0, 0, 0);

@@ -25,8 +25,6 @@
 #include "NpolMaterials.hh"
 
 NpolMaterials *pInstance = NULL;
-G4double z=0., a=0., density=0., abundance =0.;
-G4int iz=0, in=0, ncomponents=0, natoms=0;
 
 NpolMaterials::NpolMaterials() {
 	nistMan = G4NistManager::Instance();
@@ -45,6 +43,7 @@ NpolMaterials::~NpolMaterials() {
 	delete LH2;
 	delete LD2;
 	delete Concrete;
+	delete Fe;
 }
 
 NpolMaterials *NpolMaterials::GetInstance() {
@@ -77,6 +76,7 @@ void NpolMaterials::CreateMaterials() {
 	LH2 = CreateLH2();
 	LD2 = CreateLD2();
 	Concrete = CreateConcrete();
+	Fe = CreateFe();
 }
 
 G4Material *NpolMaterials::CreateVaccum() {
@@ -105,7 +105,7 @@ G4Material *NpolMaterials::CreateScint() {
 
 G4Material *NpolMaterials::CreateLH2() {
   
-  G4Isotope* isoH1 = new G4Isotope("isoH1", iz=1, in=1, a=1.00794*g/mole);
+  G4Isotope* isoH1 = new G4Isotope("isoH1", 1, 1, 1.00794*g/mole);
   G4Element* eleH1 = new G4Element("eleH1", "H1", 1);
   eleH1->AddIsotope(isoH1, 1);
   LH2 = new G4Material("LH2", 0.07085*g/cm3, 1);
@@ -116,7 +116,7 @@ G4Material *NpolMaterials::CreateLH2() {
 
 G4Material *NpolMaterials::CreateLD2() {
   
-  G4Isotope* isoD2 = new G4Isotope("isoD2", iz=1, in=2, a=2.0141018*g/mole);
+  G4Isotope* isoD2 = new G4Isotope("isoD2", 1, 2, 2.0141018*g/mole);
   G4Element* eleD2 = new G4Element("eleD2", "D2", 1);
   eleD2->AddIsotope(isoD2, 1);
   LD2 = new G4Material("LD2", 0.169*g/cm3, 1);
@@ -128,4 +128,9 @@ G4Material *NpolMaterials::CreateLD2() {
 G4Material *NpolMaterials::CreateConcrete() {
 
   return nistMan->FindOrBuildMaterial("G4_CONCRETE");
+}
+
+G4Material *NpolMaterials::CreateFe() {
+  
+  return nistMan->FindOrBuildMaterial("G4_Fe");
 }
