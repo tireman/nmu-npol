@@ -56,7 +56,7 @@ void NpolPrimaryGeneratorAction::GeneratePrimaries(G4Event* anEvent)
   
   G4double x0 = 0.0*m;
   G4double y0 = 0.0*m;
-  G4double z0 = -9.0*m;
+  G4double z0 = -22.0*m;
 
   particleGun->SetParticlePosition(G4ThreeVector(x0,y0,z0));
   particleGun->GeneratePrimaryVertex(anEvent);

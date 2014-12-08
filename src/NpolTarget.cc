@@ -53,7 +53,7 @@ void NpolTarget::ConstructTargetCan(G4LogicalVolume *motherLV) {
 void NpolTarget::ConstructTargetFluid(G4LogicalVolume *motherLV) {
 
 	G4Tubs *TargetFluid = new G4Tubs("TargetFluid",0.0*cm, 2.0*cm, 10.0*cm, 0.0*deg, 360.*deg);
-	G4LogicalVolume *TargetFluidLV = new G4LogicalVolume(TargetFluid,NpolMaterials::GetInstance()->GetLD2(),"TargetFluidLV",0,0,0);
+	TargetFluidLV = new G4LogicalVolume(TargetFluid,NpolMaterials::GetInstance()->GetLD2(),"TargetFluidLV",0,0,0);
 	new G4PVPlacement(0, G4ThreeVector(0.0, 0.0, 0.0*m), TargetFluidLV,"TargetFluid", motherLV, false, 0);
 	G4VisAttributes *TopVisAtt= new G4VisAttributes(G4Colour(0.0,1.0,0.0));
 	TargetFluidLV->SetVisAttributes(TopVisAtt);

@@ -37,7 +37,8 @@ public:
   virtual void Construct(G4LogicalVolume *motherLV);
  
 private: 
-	G4LogicalVolume *TargetCanLV;
+  G4LogicalVolume *TargetCanLV;
+  G4LogicalVolume *TargetFluidLV;
 };
 
 #endif

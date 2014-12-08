@@ -35,6 +35,7 @@ public:
   G4Material *GetLD2() {return LD2;};
   G4Material *GetConcrete() {return Concrete;};
   G4Material *GetFe() {return Fe;};
+  G4Material *GetSSteel() {return SSteel;};
 
 private:
   NpolMaterials();
@@ -53,6 +54,7 @@ private:
   G4Material *CreateLD2();
   G4Material *CreateConcrete();
   G4Material *CreateFe();
+  G4Material *CreateSSteel();
 
 private:
   G4NistManager *nistMan;
@@ -65,6 +67,7 @@ private:
   G4Material *LD2;
   G4Material *Concrete;
   G4Material *Fe;
+  G4Material *SSteel;
 };
 
 #endif

@@ -35,12 +35,16 @@
 #include "NpolWorld.hh"
 #include "NpolPolarimeter.hh"
 #include "NpolTarget.hh"
+#include "NpolHallShell.hh"
+#include "NpolBeamline.hh"
 
 NpolDetectorConstruction::NpolDetectorConstruction() {
 
 	world = new NpolWorld();
 	activeDetectors["Polarimeter"] = new NpolPolarimeter();
 	activeDetectors["Target"] = new NpolTarget(); 
+	activeDetectors["NpolHallShell"] = new NpolHallShell();
+	activeDetectors["Beamline"] = new NpolBeamline();
 }
 
 NpolDetectorConstruction::~NpolDetectorConstruction() {

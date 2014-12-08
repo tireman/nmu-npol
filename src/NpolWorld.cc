@@ -35,14 +35,13 @@ NpolWorld::~NpolWorld() {
 }
 
 void NpolWorld::Construct(G4LogicalVolume *motherLV) {
- 
-  G4Box *expHall = new G4Box("ExpHall", 10.0*m, 15.0*m, 15.0*m);
-  expHallLV = new G4LogicalVolume(expHall, 
-	    NpolMaterials::GetInstance()->GetConcrete(), "expHallLV", 0, 0, 0);
-  expHallPV = new G4PVPlacement(0 , G4ThreeVector(), expHallLV, 
-				"ExpHall", 0, false, 0);
 
-  expHallLV->SetVisAttributes(G4VisAttributes::GetInvisible());
+  G4Box *expHall = new G4Box("ExpHall", 25.0*m, 25.0*m, 27.0*m);
+  expHallLV = new G4LogicalVolume(expHall, 
+	    NpolMaterials::GetInstance()->GetAir(), "expHallLV", 0, 0, 0);
+  expHallPV = new G4PVPlacement(0 , G4ThreeVector(), expHallLV, 
+  				"ExpHall", 0, false, 0);
+    expHallLV->SetVisAttributes(G4VisAttributes::GetInvisible());
 }
 
 G4VPhysicalVolume *NpolWorld::GetWorldPV() {

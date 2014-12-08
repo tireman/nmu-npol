@@ -20,6 +20,7 @@
 
 #include "G4Event.hh"
 #include "G4EventManager.hh"
+#include "G4RunManager.hh"
 #include "G4SDManager.hh"
 #include "G4HCofThisEvent.hh"
 #include "G4ios.hh"
@@ -38,7 +39,10 @@ typedef G4THitsCollection<NpolHit> NpolHitsCollection;
 G4Mutex aMutex = G4MUTEX_INITIALIZER; // Have to use a mutex for calls to strtok()
 
 NpolEventAction::NpolEventAction()
-{}
+{
+  // set printing per each 10 events
+  G4RunManager::GetRunManager()->SetPrintProgress(10);     
+}
 
 NpolEventAction::~NpolEventAction()
 {}
@@ -50,8 +54,8 @@ void NpolEventAction::BeginOfEventAction(const G4Event* evt) {
 
 void NpolEventAction::EndOfEventAction(const G4Event* evt) {
 
-	  G4int event_id = evt->GetEventID();
-/*		G4AnalysisManager *analysisManager = G4AnalysisManager::Instance();
+  /*	  G4int event_id = evt->GetEventID();
+		G4AnalysisManager *analysisManager = G4AnalysisManager::Instance();
 		G4SDManager *SDMan = G4SDManager::GetSDMpointer();
 		G4HCofThisEvent *HCE = evt->GetHCofThisEvent();
 		int i, dEoverEflag = 0;
@@ -75,9 +79,6 @@ void NpolEventAction::EndOfEventAction(const G4Event* evt) {
 		analysisManager->FillH2(3, EdepdEoverE[0] + EdepdEoverE[2], EdepdEoverE[1] + EdepdEoverE[3]);
 
 	 */  
-	// periodic printing
-	if (event_id < 1000 || event_id%1000 == 0)
-		G4cerr << ">>> Event " << event_id << G4endl;
 }
 
 // Given a pointer to the G4HCofThisEvent, HCE, and a hit collection ID, CHCID, process the hit objects stored the NpolHitsCollection identified by CHCID

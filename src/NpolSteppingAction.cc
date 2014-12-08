@@ -27,6 +27,6 @@ NpolSteppingAction::~NpolSteppingAction() {}
 
 void NpolSteppingAction::UserSteppingAction(const G4Step *aStep) {
 
-	G4cout << "stepped" << G4endl;
+  //G4cout << "stepped" << G4endl;
 }
 
