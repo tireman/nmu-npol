@@ -1,0 +1,26 @@
+# $Id: npol.mac,v1.1 For running with or without visualization
+# on the nmuNpol simulation 12/4/2013 $
+# 
+# can be run in batch, without graphic
+# or interactively: Idle> /control/execute npol.mac
+
+#/vis/viewer/set/viewpointThetaPhi 45 180 deg
+#/vis/viewer/zoom 1.5
+
+/run/initialize
+/run/verbose 0
+#/event/verbose 0
+
+/tracking/verbose 0
+/tracking/storeTrajectory 1
+
+#/gun/particle proton 
+#/gun/particle pi0 
+#/gun/particle mu- 
+#/gun/particle anti_proton 
+/gun/particle neutron 
+
+/gun/energy 2000 MeV
+
+/run/beamOn 5
+
