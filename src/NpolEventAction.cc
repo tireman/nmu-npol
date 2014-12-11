@@ -1,20 +1,8 @@
-//********************************************************************
-//* License and Disclaimer: From GEANT Collaboration                 *
-//*                                                                  *
-//* The  Geant4 software  is  copyright of the Copyright Holders  of *
-//* the Geant4 Collaboration.  It is provided  under  the terms  and *
-//* conditions of the Geant4 Software License,  included in the file *
-//* LICENSE and available at  http://cern.ch/geant4/license .  These *
-//* include a list of copyright holders.     		      	*
-//********************************************************************
-//* The Geant4 software is used by the Northern Michigan University  *
-//* in accordance to the Geant4 software license specified above.    *
-//* The NMU Collaboration does not hold any rights to this software  *
-//* and gives full permission for its use to others under the limits *
-//* imposed by the GEANT4 Collaboration.  The NMU Collaboration      *
-//* gives no express or implied warranty and use of our code is at   *
-//* the users discretion only.  		    			*
-//********************************************************************
+//%% NpolEventAction.cc %% 
+
+// This is were the event level actions are placed
+// Created: Daniel Wilber November 2014
+// Modified: William Tireman December 2014
 
 #include <cstring>
 
@@ -103,9 +91,11 @@ void NpolEventAction::ProcessHitsInASensitiveDetector(G4HCofThisEvent *HCE, int 
 
 			fillEdepArray(aHit, detectorInfo);
 			filldEoverEArray(aHit, volname);
-			free(volname);
+			free(volname);	
+			
 		}
 	}
+
 }
 
 // Get the correct historgram ID from a parsed assembly volume name and add the energy deposited value from aHit to the Edep array.

@@ -22,5 +22,5 @@
 /gun/particle e-
 /gun/energy 3000 MeV
 
-/run/beamOn 5
+/run/beamOn 60
 

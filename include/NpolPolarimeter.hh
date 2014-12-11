@@ -45,7 +45,7 @@ class NpolPolarimeter : public NpolSubDetector {
 
 G4AssemblyVolume *MakePlate(G4LogicalVolume *detLV, G4int numDets, 
 		G4double TmX, G4double TmY, G4double TmZ,
-		G4double TmdX, G4double TmdY, G4double TmdZ);
+			    G4double TmdX, G4double TmdY, G4double TmdZ);
 
 #endif
 

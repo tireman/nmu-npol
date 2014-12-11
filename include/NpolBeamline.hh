@@ -32,11 +32,16 @@ public:
   ~NpolBeamline();
   
   void ConstructBeamlineUpper(G4LogicalVolume *motherLV);
+  void ConstructBeamlineDown(G4LogicalVolume *motherLV);
+  void ConstructBeamlineUpperInner(G4LogicalVolume *motherLV);
+  void ConstructBeamlineDownInner(G4LogicalVolume *motherLV);
   virtual void Construct(G4LogicalVolume *motherLV);
  
 private: 
   G4LogicalVolume *BeamlineUpperLV;
-
+  G4LogicalVolume *BeamlineDownLV;
+  G4LogicalVolume *BeamlineUpperInnerLV;
+  G4LogicalVolume *BeamlineDownInnerLV;
 };
 
 #endif
