@@ -16,36 +16,31 @@
 //* the users discretion only.  		    			*
 //********************************************************************
 
-#ifndef Npol_Polarimeter_h
-#define Npol_Polarimeter_h
+#ifndef Npol_HallShell_h
+#define Npol_HallShell_h
 
 #include "G4SystemOfUnits.hh"
-
 #include "NpolSubDetector.hh"
 
 class G4LogicalVolume;
 class G4AssemblyVolume;
 
-class NpolPolarimeter : public NpolSubDetector {
-
-	public:
-		NpolPolarimeter();
-		~NpolPolarimeter();
-
-		void ConstructTopDetArray(G4LogicalVolume *motherLV);
-		void ConstructTopVetoArray(G4LogicalVolume *motherLV);
-		void ConstructBottomDetArray(G4LogicalVolume *motherLV);
-		void ConstructBottomVetoArray(G4LogicalVolume *motherLV);
-		void ConstructFrontDetArray(G4LogicalVolume *motherLV);
-		void ConstructFrontTagArray(G4LogicalVolume *motherLV);
-
-		virtual void Construct(G4LogicalVolume *motherLV);
-
+class NpolHallShell : public NpolSubDetector {
+  
+public:
+  NpolHallShell();
+  ~NpolHallShell();
+  
+  void ConstructHallShellWall(G4LogicalVolume *motherLV);
+  void ConstructHallShellFloor(G4LogicalVolume *motherLV);
+  void ConstructHallShellRoof(G4LogicalVolume *motherLV);
+  virtual void Construct(G4LogicalVolume *motherLV);
+ 
+private: 
+  G4LogicalVolume *HallShellWallLV;
+  G4LogicalVolume *HallShellFloorLV;
+  G4LogicalVolume *HallShellRoofLV;
 };
-
-G4AssemblyVolume *MakePlate(G4LogicalVolume *detLV, G4int numDets, 
-		G4double TmX, G4double TmY, G4double TmZ,
-			    G4double TmdX, G4double TmdY, G4double TmdZ);
 
 #endif
 

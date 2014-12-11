@@ -16,36 +16,33 @@
 //* the users discretion only.  		    			*
 //********************************************************************
 
-#ifndef Npol_Polarimeter_h
-#define Npol_Polarimeter_h
+#ifndef Npol_Beamline_h
+#define Npol_Beamline_h
 
 #include "G4SystemOfUnits.hh"
-
 #include "NpolSubDetector.hh"
 
 class G4LogicalVolume;
 class G4AssemblyVolume;
 
-class NpolPolarimeter : public NpolSubDetector {
-
-	public:
-		NpolPolarimeter();
-		~NpolPolarimeter();
-
-		void ConstructTopDetArray(G4LogicalVolume *motherLV);
-		void ConstructTopVetoArray(G4LogicalVolume *motherLV);
-		void ConstructBottomDetArray(G4LogicalVolume *motherLV);
-		void ConstructBottomVetoArray(G4LogicalVolume *motherLV);
-		void ConstructFrontDetArray(G4LogicalVolume *motherLV);
-		void ConstructFrontTagArray(G4LogicalVolume *motherLV);
-
-		virtual void Construct(G4LogicalVolume *motherLV);
-
+class NpolBeamline : public NpolSubDetector {
+  
+public:
+  NpolBeamline();
+  ~NpolBeamline();
+  
+  void ConstructBeamlineUpper(G4LogicalVolume *motherLV);
+  void ConstructBeamlineDown(G4LogicalVolume *motherLV);
+  void ConstructBeamlineUpperInner(G4LogicalVolume *motherLV);
+  void ConstructBeamlineDownInner(G4LogicalVolume *motherLV);
+  virtual void Construct(G4LogicalVolume *motherLV);
+ 
+private: 
+  G4LogicalVolume *BeamlineUpperLV;
+  G4LogicalVolume *BeamlineDownLV;
+  G4LogicalVolume *BeamlineUpperInnerLV;
+  G4LogicalVolume *BeamlineDownInnerLV;
 };
-
-G4AssemblyVolume *MakePlate(G4LogicalVolume *detLV, G4int numDets, 
-		G4double TmX, G4double TmY, G4double TmZ,
-			    G4double TmdX, G4double TmdY, G4double TmdZ);
 
 #endif
 

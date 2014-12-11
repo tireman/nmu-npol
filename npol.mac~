@@ -18,9 +18,9 @@
 #/gun/particle pi0 
 #/gun/particle mu- 
 #/gun/particle anti_proton 
-#/gun/particle neutron 
-/gun/particle e-
-/gun/energy 3000 MeV
+/gun/particle neutron 
 
-/run/beamOn 60
+/gun/energy 2000 MeV
+
+/run/beamOn 5
 

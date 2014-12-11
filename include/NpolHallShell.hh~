@@ -16,8 +16,8 @@
 //* the users discretion only.  		    			*
 //********************************************************************
 
-#ifndef Npol_Polarimeter_h
-#define Npol_Polarimeter_h
+#ifndef Npol_Target_h
+#define Npol_Target_h
 
 #include "G4SystemOfUnits.hh"
 
@@ -26,26 +26,19 @@
 class G4LogicalVolume;
 class G4AssemblyVolume;
 
-class NpolPolarimeter : public NpolSubDetector {
-
-	public:
-		NpolPolarimeter();
-		~NpolPolarimeter();
-
-		void ConstructTopDetArray(G4LogicalVolume *motherLV);
-		void ConstructTopVetoArray(G4LogicalVolume *motherLV);
-		void ConstructBottomDetArray(G4LogicalVolume *motherLV);
-		void ConstructBottomVetoArray(G4LogicalVolume *motherLV);
-		void ConstructFrontDetArray(G4LogicalVolume *motherLV);
-		void ConstructFrontTagArray(G4LogicalVolume *motherLV);
-
-		virtual void Construct(G4LogicalVolume *motherLV);
-
+class NpolTarget : public NpolSubDetector {
+  
+public:
+  NpolTarget();
+  ~NpolTarget();
+  
+  void ConstructTargetCan(G4LogicalVolume *motherLV);
+  void ConstructTargetFluid(G4LogicalVolume *motherLV);
+  virtual void Construct(G4LogicalVolume *motherLV);
+ 
+private: 
+	G4LogicalVolume *TargetCanLV;
 };
-
-G4AssemblyVolume *MakePlate(G4LogicalVolume *detLV, G4int numDets, 
-		G4double TmX, G4double TmY, G4double TmZ,
-			    G4double TmdX, G4double TmdY, G4double TmdZ);
 
 #endif
 

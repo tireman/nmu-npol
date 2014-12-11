@@ -27,13 +27,15 @@ class NpolMaterials {
 public:
   static NpolMaterials *GetInstance();
   
-  G4Material *GetVaccum() {return Vaccum;};
+  G4Material *GetVacuum() {return Vacuum;};
   G4Material *GetAir() {return Air;};
   G4Material *GetScint() {return Scint;};
   G4Material *GetAl() {return Al;};
   G4Material *GetLH2() {return LH2;};
   G4Material *GetLD2() {return LD2;};
   G4Material *GetConcrete() {return Concrete;};
+  G4Material *GetFe() {return Fe;};
+  G4Material *GetSSteel() {return SSteel;};
 
 private:
   NpolMaterials();
@@ -44,24 +46,28 @@ private:
   void CreateMaterials();
   G4Material *GetMaterial(const G4String material);
   
-  G4Material *CreateVaccum();
+  G4Material *CreateVacuum();
   G4Material *CreateAir();
   G4Material *CreateScint();
   G4Material *CreateAl();
   G4Material *CreateLH2();
   G4Material *CreateLD2();
   G4Material *CreateConcrete();
+  G4Material *CreateFe();
+  G4Material *CreateSSteel();
 
 private:
   G4NistManager *nistMan;
   
-  G4Material *Vaccum;
+  G4Material *Vacuum;
   G4Material *Air;
   G4Material *Scint;
   G4Material *Al;
   G4Material *LH2;
   G4Material *LD2;
   G4Material *Concrete;
+  G4Material *Fe;
+  G4Material *SSteel;
 };
 
 #endif
