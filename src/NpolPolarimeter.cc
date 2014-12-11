@@ -265,9 +265,9 @@ void NpolPolarimeter::ConstructFrontDetArray(G4LogicalVolume *motherLV) {
          NpolMaterials::GetInstance()->GetScint(),"FrontDetLV",0,0,0);
   
   G4AssemblyVolume *FrontDetArray1 = MakePlate(FrontDetLV, 6, 0.0*m, 
-	 -0.25*m, 0.0*m, 0.0*m, -0.10*m, 0.0*m);
+	 0.25*m, 0.0*m, 0.0*m, 0.10*m, 0.0*m);
   G4AssemblyVolume *FrontDetArray2 = MakePlate(FrontDetLV, 8, 0.0*m, 
-         -0.35*m, 0.0*m, 0.0*m, -0.10*m, 0.0*m);
+         0.35*m, 0.0*m, 0.0*m, 0.10*m, 0.0*m);
   
   // Rotation of assembly inside the world
   G4RotationMatrix Rm; 
@@ -313,7 +313,7 @@ void NpolPolarimeter::ConstructFrontTagArray(G4LogicalVolume *motherLV) {
   Rm.rotateY(-28.0*deg);
   
   for(unsigned int i=0; i<4;i++){
-    Tm.setX(((-8.7-0.65*i)*sin(28.0*deg))*m); Tm.setY(0); 
+    Tm.setX(((-8.7+0.06-0.65*i)*sin(28.0*deg))*m); Tm.setY(0); 
     Tm.setZ(((8.7-0.06+0.65*i)*cos(28.0*deg))*m);
     Tr = G4Transform3D(Rm,Tm);
     if(i<2){
