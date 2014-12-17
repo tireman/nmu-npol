@@ -199,7 +199,7 @@ G4VPhysicalVolume *NpolPolarimeter::Construct(G4LogicalVolume *motherLV) {
 	// TODO: make this box as small as possible
 	G4VSolid *PolarimeterBox = new G4Box("PolarimeterBox",10*m,10*m,10*m);
 	PolarimeterLV = new G4LogicalVolume(PolarimeterBox,
-			NpolMaterials::GetInstance()->GetScint(), "PolarimeterLV",0,0,0);
+			NpolMaterials::GetInstance()->GetAir(), "PolarimeterLV",0,0,0);
 	PolarimeterLV->SetVisAttributes(G4VisAttributes::GetInvisible());
 
 	ConstructTopDetArray(PolarimeterLV);
