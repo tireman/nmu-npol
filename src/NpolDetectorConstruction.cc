@@ -9,15 +9,11 @@
 
 #include "G4SystemOfUnits.hh"
 #include "G4PhysicalConstants.hh"
-#include "G4Material.hh"
-#include "G4Box.hh"
 #include "G4LogicalVolume.hh"
 #include "G4PVPlacement.hh"
-#include "G4AssemblyVolume.hh"
 #include "G4VisAttributes.hh"
 #include "G4Colour.hh"
 #include "G4ios.hh"
-#include "G4String.hh"
 
 #include "NpolDetectorConstruction.hh"
 #include "NpolSubDetector.hh"
@@ -26,6 +22,7 @@
 #include "NpolTarget.hh"
 #include "NpolHallShell.hh"
 #include "NpolBeamline.hh"
+#include "NpolThing.hh"
 
 NpolDetectorConstruction::NpolDetectorConstruction() {
   
@@ -34,6 +31,7 @@ NpolDetectorConstruction::NpolDetectorConstruction() {
   activeDetectors["Target"] = new NpolTarget(); 
   activeDetectors["NpolHallShell"] = new NpolHallShell();
   activeDetectors["Beamline"] = new NpolBeamline();
+  activeDetectors["Thing"] = new NpolThing();
 }
 
 NpolDetectorConstruction::~NpolDetectorConstruction() {

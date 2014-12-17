@@ -19,10 +19,11 @@
 #include "G4AutoLock.hh"
 
 #include "NpolEventAction.hh"
-#include "NpolHit.hh"
 #include "NpolAnalysis.hh"
 
 typedef G4THitsCollection<NpolHit> NpolHitsCollection;
+
+class NpolHit {};
 
 G4Mutex aMutex = G4MUTEX_INITIALIZER; // Have to use a mutex for calls to strtok()
 
@@ -71,7 +72,7 @@ void NpolEventAction::EndOfEventAction(const G4Event* evt) {
 
 // Given a pointer to the G4HCofThisEvent, HCE, and a hit collection ID, CHCID, process the hit objects stored the NpolHitsCollection identified by CHCID
 void NpolEventAction::ProcessHitsInASensitiveDetector(G4HCofThisEvent *HCE, int CHCID) {
-
+/*
 	NpolHitsCollection *hitsCollection = NULL;
 	int i;
 	int n_hits = 0;
@@ -95,19 +96,20 @@ void NpolEventAction::ProcessHitsInASensitiveDetector(G4HCofThisEvent *HCE, int 
 			
 		}
 	}
-
+*/
 }
 
 // Get the correct historgram ID from a parsed assembly volume name and add the energy deposited value from aHit to the Edep array.
 void NpolEventAction::fillEdepArray(NpolHit *aHit, int *detectorInfo) {
-
+/*
 	int histoID = GetOffsetFromAssemblyVolumeNumber(detectorInfo[0]) + GetOffsetFromImprintNumber(detectorInfo[0], detectorInfo[1]) + detectorInfo[2];
 	Edep[histoID] += aHit->GetTotalEnergyDeposit();
+	*/
 }
 
 // Fill the correct spot in the dEoverE array depending on the logical volume name of the detector
 void NpolEventAction::filldEoverEArray(NpolHit *aHit, char *volname) {
-
+/*
 	if(strcmp(volname, "TopDetLV") == 0)
 		EdepdEoverE[0] += aHit->GetTotalEnergyDeposit();
 	else if(strcmp(volname, "TopVetoLV") == 0)
@@ -120,6 +122,7 @@ void NpolEventAction::filldEoverEArray(NpolHit *aHit, char *volname) {
 		EdepdEoverE[4] += aHit->GetTotalEnergyDeposit();
 	else if (strcmp(volname,"FrontTagLV") == 0)
 		EdepdEoverE[5] += aHit->GetTotalEnergyDeposit();
+		*/
 }
 
 // Parse an assembly volume's name and return an array containing the assembly volume number, imprint number, and volume number.
