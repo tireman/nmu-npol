@@ -25,6 +25,7 @@
 
 class G4LogicalVolume;
 class G4AssemblyVolume;
+class G4VPhysicalVolume;
 
 class NpolTarget : public NpolSubDetector {
   
@@ -32,9 +33,9 @@ public:
   NpolTarget();
   ~NpolTarget();
   
-  void ConstructTargetCan(G4LogicalVolume *motherLV);
-  void ConstructTargetFluid(G4LogicalVolume *motherLV);
-  virtual void Construct(G4LogicalVolume *motherLV);
+  void ConstructTargetCan();
+  void ConstructTargetFluid();
+  virtual G4VPhysicalVolume *Construct(G4LogicalVolume *motherLV);
  
 private: 
   G4LogicalVolume *TargetCanLV;

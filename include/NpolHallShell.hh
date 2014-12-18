@@ -24,6 +24,7 @@
 
 class G4LogicalVolume;
 class G4AssemblyVolume;
+class G4VPhsycialVolume;
 
 class NpolHallShell : public NpolSubDetector {
   
@@ -31,10 +32,10 @@ public:
   NpolHallShell();
   ~NpolHallShell();
   
-  void ConstructHallShellWall(G4LogicalVolume *motherLV);
-  void ConstructHallShellFloor(G4LogicalVolume *motherLV);
-  void ConstructHallShellRoof(G4LogicalVolume *motherLV);
-  virtual void Construct(G4LogicalVolume *motherLV);
+  void ConstructHallShellWall();
+  void ConstructHallShellFloor();
+  void ConstructHallShellRoof();
+  virtual G4VPhysicalVolume *Construct(G4LogicalVolume *motherLV);
  
 private: 
   G4LogicalVolume *HallShellWallLV;

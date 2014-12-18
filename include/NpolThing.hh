@@ -16,30 +16,27 @@
 //* the users discretion only.  		    			*
 //********************************************************************
 
-#ifndef Npol_HallShell_h
-#define Npol_HallShell_h
+#ifndef Npol_Thing_h
+#define Npol_Thing_h
 
 #include "G4SystemOfUnits.hh"
+
 #include "NpolSubDetector.hh"
 
 class G4LogicalVolume;
 class G4AssemblyVolume;
+class G4VPhysicalVolume;
 
-class NpolHallShell : public NpolSubDetector {
+class NpolThing : public NpolSubDetector {
   
 public:
-  NpolHallShell();
-  ~NpolHallShell();
+  NpolThing();
+  ~NpolThing();
   
-  void ConstructHallShellWall(G4LogicalVolume *motherLV);
-  void ConstructHallShellFloor(G4LogicalVolume *motherLV);
-  void ConstructHallShellRoof(G4LogicalVolume *motherLV);
-  virtual void Construct(G4LogicalVolume *motherLV);
+  virtual G4VPhysicalVolume *Construct(G4LogicalVolume *motherLV);
  
 private: 
-  G4LogicalVolume *HallShellWallLV;
-  G4LogicalVolume *HallShellFloorLV;
-  G4LogicalVolume *HallShellRoofLV;
+  G4LogicalVolume *ThingLV;
 };
 
 #endif
