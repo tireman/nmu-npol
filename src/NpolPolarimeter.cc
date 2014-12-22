@@ -187,32 +187,34 @@ void NpolPolarimeter::ConstructFrontTagArray(G4LogicalVolume *motherLV) {
   G4ThreeVector Tm;
   G4Transform3D Tr; 
 
-	G4VSolid *FrontTag = new G4Box("FrontTag",0.50*m,0.0508*m,0.00508*m);
-	G4LogicalVolume *FrontTagLV = new G4LogicalVolume(FrontTag,
-			NpolMaterials::GetInstance()->GetScint(), "FrontTagLV",0,0,0);
-
-	G4AssemblyVolume *FrontTaggerArray1 = MakePlate(FrontTagLV,
-			6, 0.0*m, 0.25*m, 0.0*m, 0.0*m, 0.10*m, 0.0*m);
-	G4AssemblyVolume *FrontTaggerArray2 = MakePlate(FrontTagLV,
-			8, 0.0*m, 0.35*m, 0.0*m, 0.0*m, 0.10*m, 0.0*m);
-
-	for(unsigned int i=0; i<2; i++)
-		ImprintPlate(FrontTaggerArray1, motherLV, 0.0*m, 0.0*m, (-1.7692+0.65*i)*m, 0.0*deg);
-	for(unsigned int i=2; i<4; i++)
-		ImprintPlate(FrontTaggerArray2, motherLV, 0.0*m, 0.0*m, (-1.7692+0.65*i)*m, 0.0*deg);
-	G4VisAttributes* FrontTagVisAtt= new G4VisAttributes(G4Colour(1.0,1.0,1.0));
-	FrontTagLV->SetVisAttributes(FrontTagVisAtt);
+  G4VSolid *FrontTag = new G4Box("FrontTag",0.50*m,0.0508*m,0.00508*m);
+  G4LogicalVolume *FrontTagLV = new G4LogicalVolume(FrontTag,
+      NpolMaterials::GetInstance()->GetScint(), "FrontTagLV",0,0,0);
+  
+  G4AssemblyVolume *FrontTaggerArray1 = MakePlate(FrontTagLV,
+      6, 0.0*m, 0.25*m, 0.0*m, 0.0*m, 0.10*m, 0.0*m);
+  G4AssemblyVolume *FrontTaggerArray2 = MakePlate(FrontTagLV,
+      8, 0.0*m, 0.35*m, 0.0*m, 0.0*m, 0.10*m, 0.0*m);
+  
+  for(unsigned int i=0; i<2; i++)
+    ImprintPlate(FrontTaggerArray1, motherLV, 0.0*m, 0.0*m, 
+		 (-1.7692+0.65*i)*m, 0.0*deg);
+  for(unsigned int i=2; i<4; i++)
+    ImprintPlate(FrontTaggerArray2, motherLV, 0.0*m, 0.0*m, 
+		 (-1.7692+0.65*i)*m, 0.0*deg);
+  G4VisAttributes* FrontTagVisAtt= new G4VisAttributes(G4Colour(1.0,1.0,1.0));
+  FrontTagLV->SetVisAttributes(FrontTagVisAtt);
 }
 
 G4VPhysicalVolume *NpolPolarimeter::Construct(G4LogicalVolume *motherLV) {
 
 	// TODO: make this box as small as possible
-	G4VSolid *PolarimeterBox = new G4Box("PolarimeterBox",2*m,2.5*m,2.5*m);
+	G4VSolid *PolarimeterBox = new G4Box("PolarimeterBox",1.30*m,1.45*m,1.85*m);
 	PolarimeterLV = new G4LogicalVolume(PolarimeterBox,
 	      NpolMaterials::GetInstance()->GetAir(), "PolarimeterLV",0,0,0);
-	G4VisAttributes* PolarimeterVisAtt= new G4VisAttributes(G4Colour(1.0,1.0,0.0));
-	PolarimeterLV->SetVisAttributes(PolarimeterVisAtt);
-	//PolarimeterLV->SetVisAttributes(G4VisAttributes::GetInvisible());
+	//G4VisAttributes* PolarimeterVisAtt= new G4VisAttributes(G4Colour(1.0,1.0,0.0));
+	//PolarimeterLV->SetVisAttributes(PolarimeterVisAtt);
+	PolarimeterLV->SetVisAttributes(G4VisAttributes::GetInvisible());
 
 	ConstructTopDetArray(PolarimeterLV);
 	ConstructTopVetoArray(PolarimeterLV);

@@ -1,7 +1,7 @@
 //%% NpolDetectorConstruction.cc %% **
 
 // This setups the class and calls all the classes to build the setup 
-// Created: Daniel Wilber November 2014
+// Created: Daniel Wilbern November 2014
 // Modified: William Tireman December 2014
 
 
@@ -31,7 +31,7 @@ NpolDetectorConstruction::NpolDetectorConstruction() {
   activeDetectors["Target"] = new NpolTarget(); 
   activeDetectors["NpolHallShell"] = new NpolHallShell();
   activeDetectors["Beamline"] = new NpolBeamline();
-  activeDetectors["Thing"] = new NpolThing();
+  //activeDetectors["Thing"] = new NpolThing();
 }
 
 NpolDetectorConstruction::~NpolDetectorConstruction() {

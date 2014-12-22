@@ -39,7 +39,7 @@ void NpolBeamline::ConstructBeamlineUpper() {
 void NpolBeamline::ConstructBeamlineUpperInner() {
 
   G4Tubs *BeamlineUpperInner = new G4Tubs("BeamlineUpperInner",0.0*cm, 7.0*cm, 
-	   11.1*m, 0.0*deg, 360.*deg);
+	   11.0*m, 0.0*deg, 360.*deg);
   BeamlineUpperInnerLV = new G4LogicalVolume(BeamlineUpperInner,
            NpolMaterials::GetInstance()->GetVacuum(),"BeamlineUpperInnerLV",0,0,0);
   BeamlineUpperInnerLV->SetVisAttributes(G4VisAttributes::GetInvisible());
@@ -60,7 +60,7 @@ void NpolBeamline::ConstructBeamlineDown() {
 void NpolBeamline::ConstructBeamlineDownInner() {
 
   G4Cons *BeamlineDownInner = new G4Cons("BeamlineDownInner", 
-	0.0*cm, 7.0*cm, 0.0*cm, 25.0*cm, 11.1*m, 0.0*deg, 360.*deg);
+	0.0*cm, 7.0*cm, 0.0*cm, 25.0*cm, 11.0*m, 0.0*deg, 360.*deg);
   BeamlineDownInnerLV = new G4LogicalVolume(BeamlineDownInner,
 	 NpolMaterials::GetInstance()->GetVacuum(),"BeamlineDownInnerLV",0,0,0);
   BeamlineDownInnerLV->SetVisAttributes(G4VisAttributes::GetInvisible());
