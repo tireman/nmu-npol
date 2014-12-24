@@ -61,7 +61,8 @@
 #/vis/viewer/set/style surface
 /vis/viewer/set/hiddenMarker true
 /vis/viewer/set/hiddenEdge true
-/vis/viewer/set/viewpointThetaPhi 120 150
+/vis/viewer/set/viewpointThetaPhi 152 10
+/vis/viewer/zoom 6
 #
 # Re-establish auto refreshing and verbosity:
 /vis/viewer/set/autoRefresh true

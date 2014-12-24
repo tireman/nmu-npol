@@ -4,7 +4,7 @@
 # can be run in batch, without graphic
 # or interactively: Idle> /control/execute npol.mac
 
-#/vis/viewer/set/viewpointThetaPhi 45 180 deg
+#/vis/viewer/set/viewpointThetaPhi -45 180 deg
 #/vis/viewer/zoom 1.5
 
 /run/initialize
@@ -20,7 +20,7 @@
 #/gun/particle anti_proton 
 #/gun/particle neutron 
 /gun/particle e-
-/gun/energy 3000 MeV
+/gun/energy 4400 MeV
 
-/run/beamOn 60
+/run/beamOn 1
 

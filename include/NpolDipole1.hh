@@ -1,10 +1,10 @@
-// && NpoleTarget Header file %% //
+// && NpoleDipole1 Header file %% //
 
 // Created: William Tireman - December 2014
 
 
-#ifndef Npol_Target_h
-#define Npol_Target_h
+#ifndef Npol_Dipole1_h
+#define Npol_Dipole1_h
 
 #include "G4SystemOfUnits.hh"
 
@@ -14,19 +14,18 @@ class G4LogicalVolume;
 class G4AssemblyVolume;
 class G4VPhysicalVolume;
 
-class NpolTarget : public NpolSubDetector {
+class NpolDipole1 : public NpolSubDetector {
   
 public:
-  NpolTarget();
-  ~NpolTarget();
+  NpolDipole1();
+  ~NpolDipole1();
   
-  void ConstructTargetCan();
-  void ConstructTargetFluid();
+  void ConstructDipole1Yoke();
+  //void ConstructDipole1Fluid();
   virtual G4VPhysicalVolume *Construct(G4LogicalVolume *motherLV);
  
 private: 
-  G4LogicalVolume *TargetCanLV;
-  G4LogicalVolume *TargetFluidLV;
+  G4LogicalVolume *Dipole1YokeLV;
 };
 
 #endif

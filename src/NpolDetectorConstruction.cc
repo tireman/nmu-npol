@@ -22,6 +22,7 @@
 #include "NpolTarget.hh"
 #include "NpolHallShell.hh"
 #include "NpolBeamline.hh"
+#include "NpolDipole1.hh"
 #include "NpolThing.hh"
 
 NpolDetectorConstruction::NpolDetectorConstruction() {
@@ -31,6 +32,7 @@ NpolDetectorConstruction::NpolDetectorConstruction() {
   activeDetectors["Target"] = new NpolTarget(); 
   activeDetectors["NpolHallShell"] = new NpolHallShell();
   activeDetectors["Beamline"] = new NpolBeamline();
+  activeDetectors["Dipole 1"] = new NpolDipole1();
   //activeDetectors["Thing"] = new NpolThing();
 }
 
