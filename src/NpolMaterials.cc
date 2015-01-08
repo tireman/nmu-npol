@@ -33,6 +33,7 @@ NpolMaterials::~NpolMaterials() {
 	delete Concrete;
 	delete Fe;
 	delete SSteel;
+	delete Cu;
 }
 
 NpolMaterials *NpolMaterials::GetInstance() {
@@ -67,6 +68,7 @@ void NpolMaterials::CreateMaterials() {
 	Concrete = CreateConcrete();
 	Fe = CreateFe();
 	SSteel = CreateSSteel();
+	Cu = CreateCu();
 }
 
 G4Material *NpolMaterials::CreateVacuum() {
@@ -128,4 +130,9 @@ G4Material *NpolMaterials::CreateFe() {
 G4Material *NpolMaterials::CreateSSteel() {
 
   return nistMan->FindOrBuildMaterial("G4_STAINLESS-STEEL");
+}
+
+G4Material *NpolMaterials::CreateCu() {
+ 
+  return nistMan->FindOrBuildMaterial("G4_Cu");
 }

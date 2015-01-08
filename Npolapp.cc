@@ -52,12 +52,12 @@ int main(int argc,char *argv[]) {
   CLHEP::HepRandom::setTheEngine(new CLHEP::RanecuEngine);
   
   // RunManager construction
-#ifdef G4MULTITHREADED
-  G4MTRunManager *runManager = new G4MTRunManager;
-  runManager->SetNumberOfThreads(G4Threading::G4GetNumberOfCores()-6);
-#else
+  //#ifdef G4MULTITHREADED
+  //G4MTRunManager *runManager = new G4MTRunManager;
+  //runManager->SetNumberOfThreads(G4Threading::G4GetNumberOfCores()-6);
+  //#else
   G4RunManager *runManager = new G4RunManager;
-#endif
+  //#endif
   
   
 #ifdef G4VIS_USE

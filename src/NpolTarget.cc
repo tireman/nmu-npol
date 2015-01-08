@@ -51,8 +51,8 @@ G4VPhysicalVolume *NpolTarget::Construct(G4LogicalVolume *motherLV) {
   
   ConstructTargetCan();
   ConstructTargetFluid();
-
-  PlaceRectangular(TargetFluidLV, TargetCanLV, "TargetFluid", 0,0,0);
-  return PlaceCylindrical(TargetCanLV, motherLV, "TargetCan", 0,0,0);
+  
+  PlaceCylindrical(TargetCanLV, motherLV, "TargetCan", 0,0,0);
+  return PlaceRectangular(TargetFluidLV, TargetCanLV, "TargetFluid", 0,0,0); 
 }
 
