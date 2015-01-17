@@ -26,7 +26,7 @@ NpolBeamline::~NpolBeamline() {
 
 // Construct the Up stream portion of beamline in the world
 void NpolBeamline::ConstructBeamlineUpper() {
-  G4double len= 11.0*m, inDia = 4.0*cm, outDia = 5.0*cm;
+  G4double len= 11.0*m, inDia = 0.0*cm, outDia = 5.0*cm;
   G4Tubs *BeamlineUpper = new G4Tubs("BeamlineUpper", inDia, outDia, 
 	   len, 0.0*deg, 360.*deg);
   BeamlineUpperLV = new G4LogicalVolume(BeamlineUpper,
@@ -48,7 +48,7 @@ void NpolBeamline::ConstructBeamlineUpperInner() {
 // Construct the Down stream portion of beamline in the world
 void NpolBeamline::ConstructBeamlineDown() {
 
-  G4double len= 8.28*m, inDia = 4.0*cm, outDia = 5.0*cm;
+  G4double len= 8.28*m, inDia = 0.0*cm, outDia = 5.0*cm;
   G4Cons *BeamlineDown = new G4Cons("BeamlineDown", inDia, outDia, inDia+11.0*cm, 
 	   outDia+11.0*cm, len, 0.0*deg, 360.*deg);
   BeamlineDownLV = new G4LogicalVolume(BeamlineDown,
@@ -71,7 +71,7 @@ void NpolBeamline::ConstructBeamlineDownInner() {
 // Target Chamber exit beamline; it is a non-tappered piece of stainless steel
 void NpolBeamline::ConstructBeamlineExit() {
 
-  G4double len= 2.72*m, inDia = 4.0*cm, outDia = 5.0*cm;
+  G4double len= 2.72*m, inDia = 0.0*cm, outDia = 5.0*cm;
   G4Tubs *BeamlineExit = new G4Tubs("BeamlineExit", inDia, outDia, len, 
 	0.0*deg, 360.*deg);
   BeamlineExitLV = new G4LogicalVolume(BeamlineExit, 
