@@ -30,9 +30,9 @@
 #include "FTFP_BERT.hh"
 #include "FTFP_BERT_HP.hh"
 #include "QGSP_BERT.hh"
+#include "QGSP_BERT_HP.hh"
 #include "QGSP_BIC_HP.hh"
 #include "QGSP_BIC.hh"
-#include "FTFP_BERT.hh"
 
 #include "NpolActionInitialization.hh"
 #include "NpolDetectorConstruction.hh"
@@ -47,9 +47,11 @@
 
 
 int main(int argc,char *argv[]) {
-
+// Choose the Random engine
+  //
+  G4Random::setTheEngine(new CLHEP::RanecuEngine);
   // Choose the Random engine
-  CLHEP::HepRandom::setTheEngine(new CLHEP::RanecuEngine);
+  // CLHEP::HepRandom::setTheEngine(new CLHEP::RanecuEngine);
   
   // RunManager construction
   //#ifdef G4MULTITHREADED

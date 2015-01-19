@@ -9,7 +9,6 @@
 #include "G4Isotope.hh"
 #include "G4Material.hh"
 #include "G4ios.hh"
-
 #include "NpolMaterials.hh"
 
 NpolMaterials *pInstance = NULL;
@@ -18,7 +17,6 @@ NpolMaterials::NpolMaterials() {
 	nistMan = G4NistManager::Instance();
 
 	CreateMaterials();
-
 	G4cout << G4endl << "The materials defined are: " << G4endl << G4endl;
 	G4cout << *(G4Material::GetMaterialTable()) << G4endl;
 }
@@ -85,7 +83,7 @@ G4Material *NpolMaterials::CreateAl(){
 
 G4Material *NpolMaterials::CreateScint() {
 
-	G4Element* H = new G4Element("Hydrogen", "H", 1., 1.008*g/mole);
+	G4Element* H = new G4Element("Hydrogen", "H", 1., 1.00794*g/mole);
 	G4Element* C = new G4Element("Carbon"  , "C", 6., 12.011*g/mole);
 
 	G4Material* scint = new G4Material("Scint", 1.02*g/cm3, 2);
@@ -97,23 +95,33 @@ G4Material *NpolMaterials::CreateScint() {
 
 G4Material *NpolMaterials::CreateLH2() {
   
-  G4Isotope* isoH1 = new G4Isotope("isoH1", 1, 1, 1.00794*g/mole);
-  G4Element* eleH1 = new G4Element("eleH1", "H1", 1);
-  eleH1->AddIsotope(isoH1, 1);
-  LH2 = new G4Material("LH2", 0.07085*g/cm3, 1);
-  LH2->AddElement(eleH1, 2);
-  // new G4Material ("LH2", z=1., a=1.00794*g/mole, density = 0.07085*g/cm3);
+  // liquid hydrogen
+  
+  // Hydrogen element
+  G4Element* H = new G4Element("Hydrogen", "H", 1., 1.00794*g/mole);
+  
+  // Liquid Hydrogen
+  LH2 = new G4Material("LH2", 0.07085*g/cm3, 1, kStateLiquid, 15.0*kelvin);
+  LH2->AddElement(H, 2);
+
   return LH2;
 }
 
 G4Material *NpolMaterials::CreateLD2() {
-  
-  G4Isotope* isoD2 = new G4Isotope("isoD2", 1, 2, 2.0141018*g/mole);
-  G4Element* eleD2 = new G4Element("eleD2", "D2", 1);
-  eleD2->AddIsotope(isoD2, 1);
-  LD2 = new G4Material("LD2", 0.169*g/cm3, 1);
-  LD2->AddElement(eleD2, 2);
-  //  new G4Material ("LD2", z=1., a=2.014*g/mole, density = 0.1624*g/cm3);
+// liquid deuterium
+  G4int Z, N;
+  G4double a;
+  // Deuteron isotope
+  G4Isotope* deuteron = new G4Isotope("deuteron", Z=1, N=2, a=2.0141018*g/mole);
+ 
+  // Deuterium element
+  G4Element* deuterium = new G4Element("deuterium", "deuterium", 1);
+  deuterium->AddIsotope(deuteron, 1);
+ 
+  // Liquid Deuterium
+  LD2 = new G4Material("LD2", 0.169*g/cm3, 1, kStateLiquid, 22.0*kelvin);
+  LD2->AddElement(deuterium, 2);
+
   return LD2;
 }
 
