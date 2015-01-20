@@ -16,8 +16,8 @@
 #include "NpolMaterials.hh"
 #include "NpolHallShell.hh"
 
-G4double inDia = 22.860*m, outDia = 24.7744*m, shellHeight = 7.0*m, creteThick=2.0*m;
-G4double roofDia = 42.0*m;
+G4double inDia = 22.860*m, outDia = 24.7744*m, shellHeight = 7.0*m;
+G4double roofDia = 42.0*m, creteThick=2.0*m;
 
 NpolHallShell::NpolHallShell() {
 
