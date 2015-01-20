@@ -26,12 +26,12 @@ NpolTarget::~NpolTarget() {
 // Construct the target can in which we place the fluid
 void NpolTarget::ConstructTargetCan() {
   
-  G4Tubs *TargetCan = new G4Tubs("TargetCan",0.0*cm, 2.2*cm, 10.2*cm,
+  G4Tubs *TargetCan = new G4Tubs("TargetCan",0.0*cm, 2.2*cm, 10.1*cm,
 	     0.0*deg, 360.*deg);
   TargetCanLV = new G4LogicalVolume(TargetCan,
 	     NpolMaterials::GetInstance()->GetAl(),"TargetCanLV",0,0,0);
   
-  G4VisAttributes *TopVisAtt= new G4VisAttributes(G4Colour(1.0,1.0,0.50));
+  G4VisAttributes *TopVisAtt= new G4VisAttributes(G4Colour(1.0,0.0,0.0));
   TargetCanLV->SetVisAttributes(TopVisAtt);
 }
 

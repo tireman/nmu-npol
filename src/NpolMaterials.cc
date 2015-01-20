@@ -70,7 +70,8 @@ void NpolMaterials::CreateMaterials() {
 }
 
 G4Material *NpolMaterials::CreateVacuum() {
-	return nistMan->FindOrBuildMaterial("G4_Galactic");
+
+return nistMan->FindOrBuildMaterial("G4_Galactic");
 }
 
 G4Material *NpolMaterials::CreateAir() {

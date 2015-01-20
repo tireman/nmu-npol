@@ -23,8 +23,6 @@ public:
   void ConstructBeamlineDown();
   void ConstructBeamlineUpperInner();
   void ConstructBeamlineDownInner();
-  void ConstructBeamlineExit();
-  void ConstructBeamlineExitInner();
   virtual G4VPhysicalVolume *Construct(G4LogicalVolume *motherLV);
  
 private: 
@@ -32,8 +30,6 @@ private:
   G4LogicalVolume *BeamlineDownLV;
   G4LogicalVolume *BeamlineUpperInnerLV;
   G4LogicalVolume *BeamlineDownInnerLV;
-  G4LogicalVolume *BeamlineExitLV;
-  G4LogicalVolume *BeamlineExitInnerLV;
 };
 
 #endif

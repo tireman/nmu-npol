@@ -50,9 +50,7 @@ int main(int argc,char *argv[]) {
 // Choose the Random engine
   //
   G4Random::setTheEngine(new CLHEP::RanecuEngine);
-  // Choose the Random engine
-  // CLHEP::HepRandom::setTheEngine(new CLHEP::RanecuEngine);
-  
+    
   // RunManager construction
   //#ifdef G4MULTITHREADED
   //G4MTRunManager *runManager = new G4MTRunManager;
