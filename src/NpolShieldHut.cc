@@ -69,8 +69,8 @@ void NpolShieldHut::ConstructHutBackWall() {
   HutBackWallLV->SetVisAttributes(BackWallVisAtt);
 }
 
-// Construct the side walls (one construct, two placements) for the shield hut out
-// of concrete.
+// Construct the side walls (one construct, two placements) for the shield 
+// hut out of concrete.
 void NpolShieldHut::ConstructHutSideWall() {
   G4double xlen = 0.9144*m, ylen = 7.3152*m, zlen = 5.50*m-xlen;
 
@@ -81,8 +81,9 @@ void NpolShieldHut::ConstructHutSideWall() {
   HutSideWallLV->SetVisAttributes(SideWallVisAtt);
 }
 
-// Construct the roof.  The concrete blocks are, if memory serves right, 18 inches
-// in thickness.  In E93-038 we used two layers.  So, we will start with 36 inches
+// Construct the roof.  The concrete blocks are, if memory serves right, 18 
+// inches in thickness.  In E93-038 we used two layers.  So, we will start
+// with 36 inches
 
 void NpolShieldHut::ConstructHutRoof() {
 

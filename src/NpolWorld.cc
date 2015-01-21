@@ -22,7 +22,7 @@ NpolWorld::~NpolWorld() {
 
 G4VPhysicalVolume *NpolWorld::Construct(G4LogicalVolume *motherLV) {
 
-  G4Box *expHall = new G4Box("ExpHall", 25.0*m, 25.0*m, 27.0*m);
+  G4Box *expHall = new G4Box("ExpHall", 30.0*m, 30.0*m, 32.0*m);
   expHallLV = new G4LogicalVolume(expHall, 
 	    NpolMaterials::GetInstance()->GetAir(), "expHallLV", 0, 0, 0);
   expHallLV->SetVisAttributes(G4VisAttributes::GetInvisible());

@@ -3,6 +3,7 @@
 // Hall C outer wall, floor, and dome ceiling constructor
 // Created: William Tireman - December 2014
 // Modified: Daniel Wilbern - December 2014
+// Updated: W. Tireman - January 2015 
 
 #include "G4PhysicalConstants.hh"
 #include "G4Material.hh"
@@ -16,6 +17,9 @@
 #include "NpolMaterials.hh"
 #include "NpolHallShell.hh"
 
+// inside diameter and outside diameter of the hall; hall height; concrete
+// is set to 2.0m thick (guess 1/1/15) and I used a roof diamter of 42m 
+// to get a curve that from a sphere will cover the shell roof.  Estimated.
 G4double inDia = 22.860*m, outDia = 24.7744*m, shellHeight = 7.0*m;
 G4double roofDia = 42.0*m, creteThick=2.0*m;
 
@@ -28,7 +32,7 @@ NpolHallShell::~NpolHallShell() {
   G4cout << "Deleting Hall Shell: Wall, floor, roof" << G4endl;
 }
 
-// Construct the Hall Wall in the world
+// Construct the Hall Wall in the world; cylinder of concrete
 void NpolHallShell::ConstructHallShellWall() {
   
   G4Tubs *HallShellWall = new G4Tubs("HallShellWall", inDia, outDia, 

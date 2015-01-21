@@ -2,7 +2,7 @@
 
 // Npol materials are created in here
 // Created: Daniel Wilbern - November 2014
-// Modified: William Tireman - December 2014
+// Modified: William Tireman - December 2014-January 2015
 
 #include "G4SystemOfUnits.hh"
 #include "G4NistManager.hh"
@@ -70,8 +70,13 @@ void NpolMaterials::CreateMaterials() {
 }
 
 G4Material *NpolMaterials::CreateVacuum() {
+// Define Vacuum: New version; use Air and just make it very low density
+  G4double fractionmass, density;
+  G4int ncomponents;
+  Vacuum = new G4Material("Vacuum", density= 1.e-25*g/cm3, ncomponents=1, kStateGas, 253*kelvin, 1.e-8*atmosphere);
+  Vacuum->AddMaterial(nistMan->FindOrBuildMaterial("G4_Al"), fractionmass=1.);
 
-return nistMan->FindOrBuildMaterial("G4_Galactic");
+  return Vacuum;
 }
 
 G4Material *NpolMaterials::CreateAir() {
@@ -97,7 +102,6 @@ G4Material *NpolMaterials::CreateScint() {
 G4Material *NpolMaterials::CreateLH2() {
   
   // liquid hydrogen
-  
   // Hydrogen element
   G4Element* H = new G4Element("Hydrogen", "H", 1., 1.00794*g/mole);
   

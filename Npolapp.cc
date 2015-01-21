@@ -23,7 +23,7 @@
 #else
  #include "G4RunManager.hh"
 #endif
-
+#include <time.h>
 #include "G4UImanager.hh"
 #include "Randomize.hh"
 
@@ -47,17 +47,22 @@
 
 
 int main(int argc,char *argv[]) {
-// Choose the Random engine
+
+  clock_t clk1;  // Let us check how long it takes to run
+  clock_t clk2;
+  clk1 = clock(); // Standard clock
+
+  // Choose the Random engine
   //
   G4Random::setTheEngine(new CLHEP::RanecuEngine);
     
   // RunManager construction
-  //#ifdef G4MULTITHREADED
-  //G4MTRunManager *runManager = new G4MTRunManager;
-  //runManager->SetNumberOfThreads(G4Threading::G4GetNumberOfCores()-6);
-  //#else
+#ifdef G4MULTITHREADED
+  G4MTRunManager *runManager = new G4MTRunManager;
+  runManager->SetNumberOfThreads(G4Threading::G4GetNumberOfCores()-6);
+#else
   G4RunManager *runManager = new G4RunManager;
-  //#endif
+#endif
   
   
 #ifdef G4VIS_USE
@@ -68,7 +73,7 @@ int main(int argc,char *argv[]) {
   
   // mandatory user initialization classes
   runManager->SetUserInitialization(new NpolDetectorConstruction);
-  runManager->SetUserInitialization(new FTFP_BERT);
+  runManager->SetUserInitialization(new QGSP_BERT);
   runManager->SetUserInitialization(new NpolActionInitialization);
   
   // initialize Geant4 kernel
@@ -84,8 +89,8 @@ int main(int argc,char *argv[]) {
     UImanager->ApplyCommand(command + fileName);
     
     // Pause the program so I can look at the visual before it closes
-    G4cout << "Press Return to continue" << G4endl;
-    G4cin.get();
+    //G4cout << "Press Return to continue" << G4endl;
+    //G4cin.get();
   } else {
     // interactive mode
 #ifdef G4UI_USE
@@ -104,6 +109,9 @@ int main(int argc,char *argv[]) {
   delete visManager;
 #endif
   delete runManager;
+  
+  clk2 =clock();   // Print out that clock time; how long to run program
+  G4cout << ("time= ", (float)(clk2 - clk1)/CLOCKS_PER_SEC)<< G4endl;
   
   return 0;
 }

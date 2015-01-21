@@ -50,27 +50,6 @@ void NpolDipole2::ConstructDipole2Yoke() {
 
 void NpolDipole2::ConstructDipole2Coil(){
 
-  std::vector<G4TwoVector> poligon(8);
-  poligon[0] = G4TwoVector(-0.30*m,0);
-  poligon[1] = G4TwoVector(-0.212*m,0.212*m);
-  poligon[2] = G4TwoVector(0,0.30*m);
-  poligon[3] = G4TwoVector(0.212*m,0.212*m);
-  poligon[4] = G4TwoVector(0.30*m,0);
-  poligon[5] = G4TwoVector(0.212*m,-0.212*m);
-  poligon[6] = G4TwoVector(0,-0.30*m);
-  poligon[7] = G4TwoVector(-0.212*m,-0.212*m);
-  
-  std::vector<G4ExtrudedSolid::ZSection> zsections;
-  zsections.push_back(G4ExtrudedSolid::ZSection(0*cm,0*cm,1.0));
-  zsections.push_back(G4ExtrudedSolid::ZSection(50*cm,(0*cm,30*cm),2.0));
-  zsections.push_back(G4ExtrudedSolid::ZSection(100*cm,(30*cm,0*cm),0.50));
- 
-  G4ExtrudedSolid *Coil = new G4ExtrudedSolid("Coil", poligon,zsections);
-  CoilLV = new G4LogicalVolume(Coil,NpolMaterials::GetInstance()->GetFe(),
-    "CoilLV",0,0,0);
-  G4VisAttributes *CoilVisAtt= 
-    new G4VisAttributes(G4Colour(0.0,0.0,1.00));
-  CoilLV->SetVisAttributes(CoilVisAtt);
 }
 
 
@@ -78,8 +57,6 @@ G4VPhysicalVolume *NpolDipole2::Construct(G4LogicalVolume *motherLV) {
   G4double PosD2 = 4.6866*m, NpolAng = 28.0*deg;
 
   ConstructDipole2Yoke();
-  //ConstructDipole2Coil();
-  //PlaceCylindrical(CoilLV, motherLV, "Coil", 4.0*m, +28.0*deg, 0.0*m);
   PlaceCylindrical(Dipole2YokeLV, motherLV, "Dipole2", 
 	PosD2,-NpolAng,+0.0*cm);
   return PlaceRectangular(Dipole2YokeLV, motherLV, "Dipole2", 

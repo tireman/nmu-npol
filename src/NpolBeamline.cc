@@ -3,6 +3,7 @@
 // Beam line construction file
 // Created: William Tireman - December 2014
 // Modified: Daniel Wilbern - December 2014
+// Updated: W. Tireman - Januray 2015
 
 #include "G4PhysicalConstants.hh"
 #include "G4Material.hh"
@@ -25,45 +26,63 @@ NpolBeamline::~NpolBeamline() {
   G4cout << "Deleting Beamline: Up-stream and Down-Stream" << G4endl;
 }
 
+// This downstream beamline is a extruded solid consisting of 60 facets for
+// circular portion constructed in polygon and two sections in z-axis. 
+//  First section is a fixed length and diameter while the section section 
+// is scaled by using the scaling in zsections for the last section.  This 
+// yields a tappered section that can be adjusted later. 
 void NpolBeamline::ConstructBeamlineDown(){
-  G4double dia = 2.5*cm;
-  G4int gnum = 60;
+  G4double dia = 2.5*cm, zlen1 = +5.44*m, zlen2 = 26.78*m, tScale = 5.0;
+  G4int gnum = 60; // # of facets to circle for polygon
   
   std::vector<G4TwoVector> polygon(gnum);
   for (int i = 0; i< gnum-1; i++) {
-    polygon[i] = G4TwoVector(dia*cos(360.0*deg/gnum*i),dia*sin(360.0*deg/gnum*i));
+    polygon[i] = G4TwoVector(dia*cos(360.0*deg/gnum*i),
+		 dia*sin(360.0*deg/gnum*i));
   }
- 
-  std::vector<G4ExtrudedSolid::ZSection> zsections;
-  zsections.push_back(G4ExtrudedSolid::ZSection(0.0*m,(0*cm,0*cm),1.0));
-  zsections.push_back(G4ExtrudedSolid::ZSection(+5.44*m,(0*cm,0*cm),1.0));
-  zsections.push_back(G4ExtrudedSolid::ZSection(+26.88*m,(0*cm,0*cm),2.0));
 
-  G4ExtrudedSolid *BeamlineDown = new G4ExtrudedSolid("BeamlineDown",polygon,zsections); 
-  BeamlineDownLV = new G4LogicalVolume(BeamlineDown,NpolMaterials::GetInstance()->GetSSteel(), "BeamlineDownLV", 0,0,0);
+  std::vector<G4ExtrudedSolid::ZSection> zsections;
+  zsections.push_back(G4ExtrudedSolid::ZSection(0.0*m,
+     G4TwoVector(0.0*cm,0.0*cm),1.0));
+  zsections.push_back(G4ExtrudedSolid::ZSection(zlen1,
+     G4TwoVector(0*cm,0*cm),1.0));
+  zsections.push_back(G4ExtrudedSolid::ZSection(zlen2,
+     G4TwoVector(0*cm,0*cm),tScale));
+
+  G4ExtrudedSolid *BeamlineDown = new G4ExtrudedSolid("BeamlineDown",polygon,
+      zsections); 
+  BeamlineDownLV = new G4LogicalVolume(BeamlineDown,NpolMaterials::GetInstance()
+      ->GetSSteel(), "BeamlineDownLV", 0,0,0);
   G4VisAttributes *BeamlineVisAtt= new G4VisAttributes(G4Colour(1.0,1.5,0.5));
   BeamlineDownLV->SetVisAttributes(BeamlineVisAtt);
 }
 
+// This downstream inner part of the beam line is just a vacuum filler for 
+// the downstream portion made in the previous method. 
 void NpolBeamline::ConstructBeamlineDownInner(){
-G4double dia = 1.75*cm;
- G4int gnum =60;
+G4double dia = 1.75*cm, zlen1 = +5.44*m, zlen2 = 26.78*m, tScale = 5.0;
+ G4int gnum =60;  // # of facets to cirle for polygon
   std::vector<G4TwoVector> polygon(gnum);
   for (int i = 0; i < gnum-1; i++) {
-    polygon[i] = G4TwoVector(dia*cos(360.0*deg/gnum*i),dia*sin(360.0*deg/gnum*i));
+    polygon[i] = G4TwoVector(dia*cos(360.0*deg/gnum*i),
+            dia*sin(360.0*deg/gnum*i));
   }
 
   std::vector<G4ExtrudedSolid::ZSection> zsections;
-  zsections.push_back(G4ExtrudedSolid::ZSection(0.0*m,(0*cm,0*cm),1.0));
-  zsections.push_back(G4ExtrudedSolid::ZSection(+5.44*m,(0*cm,0*cm),1.0));
-  zsections.push_back(G4ExtrudedSolid::ZSection(+26.88*m,(0*cm,0*cm),2.0));
-  G4ExtrudedSolid *BeamlineDownInner = new G4ExtrudedSolid("BeamlineDownInner",polygon,zsections); 
-  BeamlineDownInnerLV = new G4LogicalVolume(BeamlineDownInner,NpolMaterials::GetInstance()->GetVacuum(), "BeamlineDownInnerLV", 0,0,0);
-  G4VisAttributes *BeamlineVisAtt= new G4VisAttributes(G4Colour(1.0,0.0,0.0));
+  zsections.push_back(G4ExtrudedSolid::ZSection(0.0*m,
+     G4TwoVector(0*cm,0*cm),1.0));
+  zsections.push_back(G4ExtrudedSolid::ZSection(zlen1,
+     G4TwoVector(0*cm,0*cm),1.0));
+  zsections.push_back(G4ExtrudedSolid::ZSection(zlen2,
+     G4TwoVector(0*cm,0*cm),tScale));
+
+  G4ExtrudedSolid *BeamlineDownInner = new G4ExtrudedSolid("BeamlineDownInner",
+     polygon,zsections); 
+  BeamlineDownInnerLV = new G4LogicalVolume(BeamlineDownInner,
+     NpolMaterials::GetInstance()->GetVacuum(), "BeamlineDownInnerLV", 0,0,0);
+  G4VisAttributes *BeamlineVisAtt= new G4VisAttributes(G4Colour(100,0.0,1.0));
   BeamlineDownInnerLV->SetVisAttributes(BeamlineVisAtt);  
   }
-
-
 
 // Construct the Up stream portion of beamline in the world
 void NpolBeamline::ConstructBeamlineUpper() {
@@ -86,51 +105,6 @@ void NpolBeamline::ConstructBeamlineUpperInner() {
   BeamlineUpperInnerLV->SetVisAttributes(G4VisAttributes::GetInvisible());
 }
 
-/*// Construct the Down stream portion of beamline in the world
-void NpolBeamline::ConstructBeamlineDown() {
-
-  G4double len= 10.750*m, inDia = 0.0*cm, outDia = 4.0*cm;
-  G4Cons *BeamlineDown = new G4Cons("BeamlineDown",inDia,outDia,inDia+11.0*cm,
-         outDia+11.0*cm, len, 0.0*deg, 360.*deg);
-  BeamlineDownLV = new G4LogicalVolume(BeamlineDown,
-         NpolMaterials::GetInstance()->GetSSteel(),"BeamlineDownLV",0,0,0);
-  G4VisAttributes *DownVisAtt= new G4VisAttributes(G4Colour(1.0,1.5,0.5));
-  BeamlineDownLV->SetVisAttributes(DownVisAtt);
-}
-
-// Fill the Down-stream with a vacuum
-void NpolBeamline::ConstructBeamlineDownInner() {
-
-  G4double len= 10.750*m, inDia = 0.0*cm, outDia = 3.0*cm;
-  G4Cons *BeamlineDownInner = new G4Cons("BeamlineDownInner", 
-	inDia, outDia, inDia, outDia+11.0*cm, len, 0.0*deg, 360.*deg);
-  BeamlineDownInnerLV = new G4LogicalVolume(BeamlineDownInner,
-	NpolMaterials::GetInstance()->GetVacuum(),"BeamlineDownInnerLV",0,0,0);
-  BeamlineDownInnerLV->SetVisAttributes(G4VisAttributes::GetInvisible());
-  }
-
-// Target Chamber exit beamline; it is a non-tappered piece of stainless steel
-void NpolBeamline::ConstructBeamlineExit() {
-
-  G4double len= 2.72*m, inDia = 0.0*cm, outDia = 4.0*cm;
-  G4Tubs *BeamlineExit = new G4Tubs("BeamlineExit", inDia, outDia, len, 
-	0.0*deg, 360.*deg);
-  BeamlineExitLV = new G4LogicalVolume(BeamlineExit, 
-        NpolMaterials::GetInstance()->GetSSteel(), "BeamlineExitLV", 0,0,0);
-  G4VisAttributes *ExitVisAtt= new G4VisAttributes(G4Colour(1.0,1.5,0.5));
-  BeamlineExitLV->SetVisAttributes(ExitVisAtt);
-}
-// Target Chamber ext beamline vacuum inner portion: it is a non-tappered piece.
-void NpolBeamline::ConstructBeamlineExitInner() {
-
-  G4double len= 2.72*m, inDia = 0.0*cm, outDia = 3.0*cm;
-  G4Tubs *BeamlineExitInner = new G4Tubs("BeamlineExitInner", inDia, outDia, 
-      len,0.0*deg, 360.*deg);
-  BeamlineExitInnerLV = new G4LogicalVolume(BeamlineExitInner, 
-      NpolMaterials::GetInstance()->GetVacuum(), "BeamlineExitInnerLV", 0,0,0);
-  BeamlineExitInnerLV->SetVisAttributes(G4VisAttributes::GetInvisible());
-  }*/
-
 G4VPhysicalVolume *NpolBeamline::Construct(G4LogicalVolume *motherLV) {
   
   ConstructBeamlineUpper();
@@ -140,7 +114,7 @@ G4VPhysicalVolume *NpolBeamline::Construct(G4LogicalVolume *motherLV) {
   PlaceCylindrical(BeamlineUpperLV, motherLV, "BeamLineUpper", -9.125*m,0,0);
   PlaceCylindrical(BeamlineUpperInnerLV, BeamlineUpperLV, "BeamLineUpperInner",
       0,0,0);
-  return PlaceCylindrical(BeamlineDownLV, motherLV, "BeamLineDown", +0.103*m,0,0);
+  PlaceCylindrical(BeamlineDownLV, motherLV, "BeamLineDown", +0.103*m,0,0);
   return PlaceCylindrical(BeamlineDownInnerLV,BeamlineDownLV,"BeamLineDownInner", 0,0,0);
 }
 

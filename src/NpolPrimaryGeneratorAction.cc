@@ -25,7 +25,7 @@ NpolPrimaryGeneratorAction::NpolPrimaryGeneratorAction()
   // default particle kinematic
   G4ParticleTable *particleTable = G4ParticleTable::GetParticleTable();
   G4String particleName;
-  G4ParticleDefinition *particle = particleTable->FindParticle(particleName="neutron");
+  G4ParticleDefinition *particle = particleTable->FindParticle(particleName="e-");
  
   particleGun->SetParticleDefinition(particle);
   particleGun->SetParticleMomentumDirection(G4ThreeVector(0., 0., 1.));
@@ -43,7 +43,7 @@ void NpolPrimaryGeneratorAction::GeneratePrimaries(G4Event* anEvent)
   
   G4double x0 = 0.0*m;
   G4double y0 = 0.0*m;
-  G4double z0 = -5.0*m;
+  G4double z0 = -17.0*m;
 
   particleGun->SetParticlePosition(G4ThreeVector(x0,y0,z0));
   particleGun->GeneratePrimaryVertex(anEvent);
