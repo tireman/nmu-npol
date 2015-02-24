@@ -51,6 +51,8 @@ class NpolPolarimeter : public NpolSubDetector {
 		void ImprintPlate(G4AssemblyVolume *plate, G4LogicalVolume *motherLV,
 				G4double TmX, G4double TmY, G4double TmZ, G4double RmZ);
 
+		void ActivateImprintedPVs(G4AssemblyVolume *AV, int arrayNo);
+
 	private:
 		G4LogicalVolume *PolarimeterLV;
 };

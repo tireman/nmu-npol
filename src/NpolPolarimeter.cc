@@ -3,6 +3,8 @@
 // Polarimeter construction file
 // Modified: Daniel Wilbern - December 2014
 
+#include <vector>
+
 #include "G4PhysicalConstants.hh"
 #include "G4Material.hh"
 #include "G4Box.hh"
@@ -14,9 +16,26 @@
 
 #include "NpolMaterials.hh"
 #include "NpolPolarimeter.hh"
+#include "NpolHistogramManager.hh"
+#include "NpolAnalysis.hh"
 
 NpolPolarimeter::NpolPolarimeter() {
 	G4cout << "Initializing Polarimeter" << G4endl;
+	// TODO: make this box as small as possible
+	G4VSolid *PolarimeterBox = new G4Box("PolarimeterBox",1.30*m,1.45*m,1.85*m);
+	PolarimeterLV = new G4LogicalVolume(PolarimeterBox,
+	      NpolMaterials::GetInstance()->GetAir(), "PolarimeterLV",0,0,0);
+	//G4VisAttributes* PolarimeterVisAtt= new G4VisAttributes(G4Colour(1.0,1.0,0.0));
+	//PolarimeterLV->SetVisAttributes(PolarimeterVisAtt);
+	PolarimeterLV->SetVisAttributes(G4VisAttributes::GetInvisible());
+
+	ConstructTopDetArray(PolarimeterLV);
+	ConstructTopVetoArray(PolarimeterLV);
+	ConstructBottomDetArray(PolarimeterLV);
+	ConstructBottomVetoArray(PolarimeterLV);
+	ConstructFrontDetArray(PolarimeterLV);
+	ConstructFrontTagArray(PolarimeterLV);
+
 }
 
 NpolPolarimeter::~NpolPolarimeter() {
@@ -61,6 +80,63 @@ void NpolPolarimeter::ImprintPlate(G4AssemblyVolume *plate,
   plate->MakeImprint(motherLV,Tr);
 }
 
+void NpolPolarimeter::ActivateImprintedPVs(G4AssemblyVolume *AV, int arrayNo = 0) {
+
+	NpolHistogramManager *histoManager = NpolHistogramManager::GetInstance();
+	std::vector<G4VPhysicalVolume *>::iterator AVit = AV->GetVolumesIterator();
+	G4int numImprinted = AV->TotalImprintedVolumes();
+	G4String LVName = (*AVit)->GetLogicalVolume()->GetName();
+	G4String histoName;
+	G4String histoTitle;
+	char num[5];
+	int i;
+
+	if(LVName == "TopDetLV") {
+		for(i = 0; i < numImprinted; i++) {
+			sprintf(num,"%02d%02d",arrayNo,i+1);
+			histoName = G4String("TopDet") + num;
+			histoTitle = G4String("Top Array ") + arrayNo + G4String(": Detector ") + num;
+			histoManager->RegisterActiveDetector(*(AVit++), histoName, histoTitle, 100, 0., 120*MeV);
+		}
+	} else if(LVName == "TopVetoLV") {
+		for(i = 0; i < numImprinted; i++) {
+			sprintf(num,"%02d%02d",arrayNo,i+1);
+			histoName = G4String("TopVeto") + num;
+			histoTitle = G4String("Top Veto Array ") + arrayNo + G4String(": Detector ") + num;
+			histoManager->RegisterActiveDetector(*(AVit++), histoName, histoTitle, 100, 0., 120*MeV);
+		}
+	} else if(LVName == "BottomDetLV") {
+		for(i = 0; i < numImprinted; i++) {
+			sprintf(num,"%02d%02d",arrayNo,i+1);
+			histoName = G4String("BottomDet") + num;
+			histoTitle = G4String("Bottom Array ") + arrayNo + G4String(": Detector ") + num;
+			histoManager->RegisterActiveDetector(*(AVit++), histoName, histoTitle, 100, 0., 120*MeV);
+		}
+	} else if(LVName == "BottomVetoLV") {
+		for(i = 0; i < numImprinted; i++) {
+			sprintf(num,"%02d%02d",arrayNo,i+1);
+			histoName = G4String("BottomVeto") + num;
+			histoTitle = G4String("Bottom Veto Array ") + arrayNo + G4String(": Detector ") + num;
+			histoManager->RegisterActiveDetector(*(AVit++), histoName, histoTitle, 100, 0., 120*MeV);
+		}
+	} else if(LVName == "FrontDetLV") {
+		for(i = 0; i < numImprinted; i++) {
+			sprintf(num,"%02d%02d",arrayNo,i+1);
+			histoName = G4String("FrontDet") + num;
+			histoTitle = G4String("Front Array ") + arrayNo + G4String(": Detector ") + num;
+			histoManager->RegisterActiveDetector(*(AVit++), histoName, histoTitle, 100, 0., 120*MeV);
+		}
+	} else if(LVName == "FrontTagLV") {
+		for(i = 0; i < numImprinted; i++) {
+			sprintf(num,"%02d%02d",arrayNo,i+1);
+			histoName = G4String("FrontTag") + num;
+			histoTitle = G4String("Front Tagger Array ") + arrayNo + G4String(": Detector ") + num;
+			histoManager->RegisterActiveDetector(*(AVit++), histoName, histoTitle, 100, 0., 100*MeV);
+		}
+	}
+	
+}
+
 //---------------------------
 // Top E detectors
 // Andrei's 2012 Plan B setup using 160 cm long detectors 10cm by 10cm
@@ -78,6 +154,9 @@ void NpolPolarimeter::ConstructTopDetArray(G4LogicalVolume *motherLV) {
   ImprintPlate(TopDetArray1, motherLV, -0.615*m, 0.70*m, -1.10*m, 45.0*deg);
   ImprintPlate(TopDetArray2, motherLV, 0.615*m, 0.80*m, 0.30*m, -45.0*deg);
   ImprintPlate(TopDetArray2, motherLV, -0.615*m, 0.80*m, 0.30*m, 45.0*deg);
+
+  ActivateImprintedPVs(TopDetArray1, 1);
+  ActivateImprintedPVs(TopDetArray2, 2);
   
   G4VisAttributes *TopVisAtt= new G4VisAttributes(G4Colour(1.0,0.0,1.0));
   TopDetLV->SetVisAttributes(TopVisAtt);
@@ -98,6 +177,9 @@ void NpolPolarimeter::ConstructTopVetoArray(G4LogicalVolume *motherLV) {
   
   ImprintPlate(TopVetoArray1, motherLV, 0.0*m, 0.32*m, -1.15*m, 0.0*deg);
   ImprintPlate(TopVetoArray2, motherLV, 0.0*m, 0.42*m, 0.30*m, 0.0*deg);
+  
+  ActivateImprintedPVs(TopVetoArray1, 1);
+  ActivateImprintedPVs(TopVetoArray2, 2);
   
   G4VisAttributes* TopaVisAtt= new G4VisAttributes(G4Colour(0.0,1.0,1.0));
   TopVetoLV->SetVisAttributes(TopaVisAtt);
@@ -124,6 +206,9 @@ void NpolPolarimeter::ConstructBottomDetArray(G4LogicalVolume *motherLV) {
   ImprintPlate(BottomDetArray2, motherLV, 0.615*m, -0.80*m, 0.30*m, 45.0*deg);
   ImprintPlate(BottomDetArray2, motherLV, -0.615*m, -0.80*m, 0.30*m, 135.0*deg);
   
+  ActivateImprintedPVs(BottomDetArray1, 1);
+  ActivateImprintedPVs(BottomDetArray2, 2);
+
   G4VisAttributes *BotVisAtt= new G4VisAttributes(G4Colour(1.0,0.0,1.0));
   BottomDetLV->SetVisAttributes(BotVisAtt);
 }
@@ -146,6 +231,9 @@ void NpolPolarimeter::ConstructBottomVetoArray(G4LogicalVolume *motherLV) {
   ImprintPlate(BottomVetoArray1, motherLV, 0.0*m, -0.32*m, -1.15*m, 0.0*deg);
   ImprintPlate(BottomVetoArray2, motherLV, 0.0*m, -0.42*m, 0.30*m, 0.0*deg);
   
+  ActivateImprintedPVs(BottomVetoArray1, 1);
+  ActivateImprintedPVs(BottomVetoArray2, 2);
+
   G4VisAttributes* BotaVisAtt= new G4VisAttributes(G4Colour(0.0,1.0,1.0));
   BottomVetoLV->SetVisAttributes(BotaVisAtt);
 }
@@ -162,7 +250,6 @@ void NpolPolarimeter::ConstructFrontDetArray(G4LogicalVolume *motherLV) {
   G4AssemblyVolume *FrontDetArray1 = MakePlate(FrontDetLV, 6, 0.0*m, 0.25*m, 0.0*m, 0.0*m, 0.10*m, 0.0*m);
   G4AssemblyVolume *FrontDetArray2 = MakePlate(FrontDetLV, 8, 0.0*m, 0.35*m, 0.0*m, 0.0*m, 0.10*m, 0.0*m);
 
-  
   // Rotation of assembly inside the world
   G4RotationMatrix Rm; 
   Rm.rotateX(0.0*deg);
@@ -173,6 +260,9 @@ void NpolPolarimeter::ConstructFrontDetArray(G4LogicalVolume *motherLV) {
   for(unsigned int i=2; i<4; i++)
     ImprintPlate(FrontDetArray2, motherLV, 0.0*m, 0.0*m, (-1.6992+0.65*i)*m, 0.0*deg);
   
+   ActivateImprintedPVs(FrontDetArray1, 1);
+   ActivateImprintedPVs(FrontDetArray2, 2);
+
   G4VisAttributes* FrontDetVisAtt= new G4VisAttributes(G4Colour(1.0,1.0,0.0));
   FrontDetLV->SetVisAttributes(FrontDetVisAtt);
 }
@@ -202,26 +292,15 @@ void NpolPolarimeter::ConstructFrontTagArray(G4LogicalVolume *motherLV) {
   for(unsigned int i=2; i<4; i++)
     ImprintPlate(FrontTaggerArray2, motherLV, 0.0*m, 0.0*m, 
 		 (-1.7692+0.65*i)*m, 0.0*deg);
+  
+  ActivateImprintedPVs(FrontTaggerArray1, 1);
+  ActivateImprintedPVs(FrontTaggerArray2, 2);
+
   G4VisAttributes* FrontTagVisAtt= new G4VisAttributes(G4Colour(1.0,1.0,1.0));
   FrontTagLV->SetVisAttributes(FrontTagVisAtt);
 }
 
 G4VPhysicalVolume *NpolPolarimeter::Construct(G4LogicalVolume *motherLV) {
-
-	// TODO: make this box as small as possible
-	G4VSolid *PolarimeterBox = new G4Box("PolarimeterBox",1.30*m,1.45*m,1.85*m);
-	PolarimeterLV = new G4LogicalVolume(PolarimeterBox,
-	      NpolMaterials::GetInstance()->GetAir(), "PolarimeterLV",0,0,0);
-	//G4VisAttributes* PolarimeterVisAtt= new G4VisAttributes(G4Colour(1.0,1.0,0.0));
-	//PolarimeterLV->SetVisAttributes(PolarimeterVisAtt);
-	PolarimeterLV->SetVisAttributes(G4VisAttributes::GetInvisible());
-
-	ConstructTopDetArray(PolarimeterLV);
-	ConstructTopVetoArray(PolarimeterLV);
-	ConstructBottomDetArray(PolarimeterLV);
-	ConstructBottomVetoArray(PolarimeterLV);
-	ConstructFrontDetArray(PolarimeterLV);
-	ConstructFrontTagArray(PolarimeterLV);
 
 	return PlaceCylindrical(PolarimeterLV,motherLV,"Polarimeter",8.7*m,-28.0*deg,0.0*m);
 }

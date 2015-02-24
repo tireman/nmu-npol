@@ -9,18 +9,23 @@
 #include "G4SystemOfUnits.hh"
 
 #include "NpolRunAction.hh"
+#include "NpolHistogramManager.hh"
 #include "NpolAnalysis.hh"
 
 NpolRunAction::NpolRunAction() {
 
 	G4AnalysisManager *analysisManager = G4AnalysisManager::Instance();
+	NpolHistogramManager *histoManager = NpolHistogramManager::GetInstance();
 
 	G4cout << "Using " << analysisManager->GetType() << " Analysis Manager." << G4endl;
 
 	analysisManager->SetHistoDirectoryName("histograms");
 	analysisManager->SetVerboseLevel(1);
+	analysisManager->SetFirstHistoId(1);
 
-	CreateHistograms();
+	histoManager->CreateHistograms();
+
+//	CreateHistograms();
 }
 
 
