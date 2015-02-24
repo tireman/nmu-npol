@@ -28,7 +28,8 @@ NpolPrimaryGeneratorAction::NpolPrimaryGeneratorAction()
   G4ParticleDefinition *particle = particleTable->FindParticle(particleName="e-");
  
   particleGun->SetParticleDefinition(particle);
-  particleGun->SetParticleMomentumDirection(G4ThreeVector(0., 0., 1.));
+  particleGun->SetParticleMomentumDirection(G4ThreeVector(sin(-28*deg), 0., cos(-28*deg)));
+//  particleGun->SetParticleMomentumDirection(G4ThreeVector(0., 0., 1.));
   particleGun->SetParticleEnergy(3000.*MeV);
 }
 
@@ -43,7 +44,8 @@ void NpolPrimaryGeneratorAction::GeneratePrimaries(G4Event* anEvent)
   
   G4double x0 = 0.0*m;
   G4double y0 = 0.0*m;
-  G4double z0 = -17.0*m;
+  G4double z0 = 0.0*m;
+//  G4double z0 = -17.0*m;
 
   particleGun->SetParticlePosition(G4ThreeVector(x0,y0,z0));
   particleGun->GeneratePrimaryVertex(anEvent);

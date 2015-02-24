@@ -36,6 +36,7 @@
 
 #include "NpolActionInitialization.hh"
 #include "NpolDetectorConstruction.hh"
+#include "NpolHistogramManager.hh"
 
 #ifdef G4VIS_USE
  #include "G4VisExecutive.hh"
@@ -48,6 +49,8 @@
 
 int main(int argc,char *argv[]) {
 
+	NpolHistogramManager *histoManager = NpolHistogramManager::GetInstance();
+
   clock_t clk1;  // Let us check how long it takes to run
   clock_t clk2;
   clk1 = clock(); // Standard clock
@@ -58,8 +61,9 @@ int main(int argc,char *argv[]) {
     
   // RunManager construction
 #ifdef G4MULTITHREADED
-  G4MTRunManager *runManager = new G4MTRunManager;
-  runManager->SetNumberOfThreads(G4Threading::G4GetNumberOfCores()-6);
+  G4RunManager *runManager = new G4RunManager;
+//  G4MTRunManager *runManager = new G4MTRunManager;
+//  runManager->SetNumberOfThreads(G4Threading::G4GetNumberOfCores()-6);
 #else
   G4RunManager *runManager = new G4RunManager;
 #endif
@@ -73,7 +77,7 @@ int main(int argc,char *argv[]) {
   
   // mandatory user initialization classes
   runManager->SetUserInitialization(new NpolDetectorConstruction);
-  runManager->SetUserInitialization(new QGSP_BERT);
+  runManager->SetUserInitialization(new FTFP_BERT);
   runManager->SetUserInitialization(new NpolActionInitialization);
   
   // initialize Geant4 kernel
