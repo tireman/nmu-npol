@@ -34,12 +34,12 @@ NpolDetectorConstruction::NpolDetectorConstruction() {
 	NpolHistogramManager *hm = NpolHistogramManager::GetInstance();
   world = new NpolWorld();
   activeDetectors["Polarimeter"] = new NpolPolarimeter();
-//  activeDetectors["Target"] = new NpolTarget(); 
-//  activeDetectors["NpolHallShell"] = new NpolHallShell();
-//  activeDetectors["Beamline"] = new NpolBeamline();
-//  activeDetectors["Dipole 1"] = new NpolDipole1();
-//  activeDetectors["Dipole 2"] = new NpolDipole2();
-//  activeDetectors["Shield Hut"] = new NpolShieldHut();
+  activeDetectors["Target"] = new NpolTarget(); 
+  activeDetectors["NpolHallShell"] = new NpolHallShell();
+  activeDetectors["Beamline"] = new NpolBeamline();
+  activeDetectors["Dipole 1"] = new NpolDipole1();
+  activeDetectors["Dipole 2"] = new NpolDipole2();
+  activeDetectors["Shield Hut"] = new NpolShieldHut();
   //activeDetectors["Thing"] = new NpolThing();
 }
 

@@ -21,11 +21,15 @@ public:
   ~NpolDipole1();
   
   void ConstructDipole1Yoke();
-  void ConstructDipole1Coil();
+  void ConstructDipole1CuBar();
+  void ConstructDipole1CuEnd();
+  void ConstructDipole1FieldClamp1();
+  void ConstructDipole1FieldClamp2();
   virtual G4VPhysicalVolume *Construct(G4LogicalVolume *motherLV);
  
 private: 
-  G4LogicalVolume *Dipole1YokeLV, *CoilLV;
+  G4LogicalVolume *Dipole1YokeLV, *Dipole1CuBarLV, *Dipole1CuEndLV;
+  G4LogicalVolume *FieldClamp1LV, *FieldClamp2LV;
 };
 
 #endif

@@ -40,9 +40,9 @@ void NpolHallShell::ConstructHallShellWall() {
   HallShellWallLV = new G4LogicalVolume(HallShellWall,
 	NpolMaterials::GetInstance()->GetConcrete(),"HallShellWallLV",0,0,0);
   
-  G4VisAttributes *TopVisAtt= new G4VisAttributes(G4Colour(2.0,1.0,0.0));
-  HallShellWallLV->SetVisAttributes(TopVisAtt);
-  //HallShellWallLV->SetVisAttributes(G4VisAttributes::GetInvisible());
+  //G4VisAttributes *TopVisAtt= new G4VisAttributes(G4Colour(2.0,1.0,0.0));
+  //HallShellWallLV->SetVisAttributes(TopVisAtt);
+  HallShellWallLV->SetVisAttributes(G4VisAttributes::GetInvisible());
 }
 
 // Construct the Hall Floor in the world
@@ -53,9 +53,9 @@ void NpolHallShell::ConstructHallShellFloor() {
   HallShellFloorLV = new G4LogicalVolume(HallShellFloor,
 	 NpolMaterials::GetInstance()->GetConcrete(),"HallShellFloorLV",0,0,0);
   
-  G4VisAttributes *TopVisAtt= new G4VisAttributes(G4Colour(1.0,1.0,1.0));
-  HallShellFloorLV->SetVisAttributes(TopVisAtt);
-  //HallShellFloorLV->SetVisAttributes(G4VisAttributes::GetInvisible());
+  //G4VisAttributes *TopVisAtt= new G4VisAttributes(G4Colour(1.0,1.0,1.0));
+  //HallShellFloorLV->SetVisAttributes(TopVisAtt);
+  HallShellFloorLV->SetVisAttributes(G4VisAttributes::GetInvisible());
 }
 
 // Construct the Hall Roof in the world
