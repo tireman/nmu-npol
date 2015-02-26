@@ -3,6 +3,8 @@
 
 #include "NpolActionInitialization.hh"
 #include "NpolPrimaryGeneratorAction.hh"
+#include "NpolPrimaryGeneratorActionPS.hh"
+#include "NpolPrimaryGeneratorActionFS.hh"
 #include "NpolRunAction.hh"
 #include "NpolEventAction.hh"
 #include "NpolSteppingAction.hh"
@@ -19,7 +21,16 @@ void NpolActionInitialization::BuildForMaster() const {
 
 void NpolActionInitialization::Build() const {
 
-	SetUserAction(new NpolPrimaryGeneratorAction);
+  // Three sources to choose from. First is just a beam down the beamline
+  // Second (*ActionPS) is an attempt at a points source with spherical 
+  //distribution of momentum vectors
+  // Third (*ActionFS) is a flat source that generates a random point 
+  //in the xz plane and rotates it and then fires the particle at a 
+  //vector relative to z-axis (NpolAng) all parallel.
+
+  	SetUserAction(new NpolPrimaryGeneratorAction);
+  //	SetUserAction(new NpolPrimaryGeneratorActionPS);
+  //	SetUserAction(new NpolPrimaryGeneratorActionFS);
 	SetUserAction(new NpolRunAction);
 	SetUserAction(new NpolEventAction);
 	SetUserAction(new NpolSteppingAction);

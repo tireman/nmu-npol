@@ -30,8 +30,8 @@
 
 NpolDetectorConstruction::NpolDetectorConstruction() {
   
-
-	NpolHistogramManager *hm = NpolHistogramManager::GetInstance();
+  
+  NpolHistogramManager *hm = NpolHistogramManager::GetInstance();
   world = new NpolWorld();
   activeDetectors["Polarimeter"] = new NpolPolarimeter();
   activeDetectors["Target"] = new NpolTarget(); 

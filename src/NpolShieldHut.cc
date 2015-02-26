@@ -7,6 +7,7 @@
 #include "G4Material.hh"
 #include "G4Box.hh"
 #include "G4Trd.hh"
+#include "G4SubtractionSolid.hh"
 #include "G4LogicalVolume.hh"
 #include "G4VisAttributes.hh"
 #include "G4Colour.hh"
@@ -34,27 +35,27 @@ NpolShieldHut::~NpolShieldHut() {
 // Construct the front wall of the shield hut from 4 ft by 4 ft by 3 ft blocks
 // will simplfy here to a 3 foot deep wall that is 16 feet wide and 15 feet high
 void NpolShieldHut::ConstructHutFrontWall() {
+  // constants for sizing and positioning
   G4double xlen = 4.8768*m, ylen = 7.3152*m, zlen = 0.9144*m;
+  G4double xlen1 = 0.66854*m, xlen2 = 0.82618*m;
+  G4double ylen1 = 0.4012*m, ylen2 = 0.49574*m, VertOffSet = 0.3424*m;
 
-  G4Box *HutFrontWall = new G4Box("HutFrontWall",xlen/2, ylen/2, zlen/2);
-  HutFrontWallLV = new G4LogicalVolume(HutFrontWall,
-           NpolMaterials::GetInstance()->GetFe(),"HutFrontWallLV",0,0,0);
+  // Create the necessary solids
+  G4Box *Sheet = new G4Box("Sheet",xlen/2, ylen/2, zlen/2);
+  G4Trd *Collimator = new G4Trd("Collimator",xlen1/2, xlen2/2, ylen1/2, ylen2/2, (zlen+0.10*m)/2);
+
+  // Rotation and translation information for the hole for the beam line
+  G4RotationMatrix *yRot = new G4RotationMatrix;
+  G4ThreeVector xTrans(+0.0*m, VertOffSet, 0.0*m);
+
+  // Create the solid using SubtractionSolid
+  G4SubtractionSolid *HutFrontWall = new G4SubtractionSolid("HutFrontWall", Sheet, Collimator, yRot, xTrans);
+
+  // Generate the logical volume
+  HutFrontWallLV = new G4LogicalVolume(HutFrontWall,NpolMaterials::GetInstance()->GetSSteel(),"HutFrontWallLV",0,0,0);
+  
   G4VisAttributes *FrontWallVisAtt= new G4VisAttributes(G4Colour(0.0,1.5,0.0));
   HutFrontWallLV->SetVisAttributes(FrontWallVisAtt);
-}
-
-// Construct the collimator opening in the front shield wall and fill with air
-void NpolShieldHut::ConstructHutCollimator() {
-  // Define xlen1, xlen2, ylen1, ylen2, and zlen has the half lengths
-  G4double xlen1 = 0.33427*m, xlen2 = 0.41309*m;
-  G4double ylen1 = 0.2006*m, ylen2 = 0.24787*m, zlen = 0.4572*m;
-  
-  G4Trd *HutCollimator = new G4Trd("HutCollimator",xlen1, xlen2, ylen1, ylen2, zlen);  
-  HutCollimatorLV = new G4LogicalVolume(HutCollimator, NpolMaterials::GetInstance()->GetAir(),
-	"HutCollimatorLV",0,0,0);
-  G4VisAttributes *CollimatorVisAtt= new G4VisAttributes(G4Colour(1.0,1.0,1.0));
-  HutCollimatorLV->SetVisAttributes(CollimatorVisAtt);
-  //HutCollimatorLV->SetVisAttributes(G4VisAttributes::GetInvisible());
 }
 
 // Construct the back wall of the shield hut from concrete blocks here we
@@ -64,7 +65,7 @@ void NpolShieldHut::ConstructHutBackWall() {
 
   G4Box *HutBackWall = new G4Box("HutBackWall",xlen/2, ylen/2, zlen/2);
   HutBackWallLV = new G4LogicalVolume(HutBackWall,
-           NpolMaterials::GetInstance()->GetFe(),"HutBackWallLV",0,0,0);
+           NpolMaterials::GetInstance()->GetSSteel(),"HutBackWallLV",0,0,0);
   G4VisAttributes *BackWallVisAtt= new G4VisAttributes(G4Colour(0.0,1.5,0.0));
   HutBackWallLV->SetVisAttributes(BackWallVisAtt);
 }
@@ -81,16 +82,15 @@ void NpolShieldHut::ConstructHutSideWall() {
   HutSideWallLV->SetVisAttributes(SideWallVisAtt);
 }
 
-// Construct the roof.  The concrete blocks are, if memory serves right, 18 
-// inches in thickness.  In E93-038 we used two layers.  So, we will start
-// with 36 inches
+// Construct the roof.  The concrete blocks are, if memory serves right, 
+// 18 inches in thickness.  In E93-038 we used two layers.  So, we will
+// start with 36 inches
 
 void NpolShieldHut::ConstructHutRoof() {
 
   G4double xlen = 4.8768*m, ylen = 0.9144*m, zlen = 6.25*m;
   G4Box *HutRoof = new G4Box("HutRoof", xlen/2, ylen/2, zlen/2);
-  HutRoofLV = new G4LogicalVolume(HutRoof,NpolMaterials::GetInstance()->GetConcrete(),
-       "HutRoofLV",0,0,0);
+  HutRoofLV = new G4LogicalVolume(HutRoof,NpolMaterials::GetInstance()->GetConcrete(), "HutRoofLV",0,0,0);
   G4VisAttributes *RoofVisAtt= new G4VisAttributes(G4Colour(1.0,1.0,1.0));
   HutRoofLV->SetVisAttributes(RoofVisAtt);
 }
@@ -99,14 +99,13 @@ G4VPhysicalVolume *NpolShieldHut::Construct(G4LogicalVolume *motherLV) {
   
   G4double NpolAng = 28.0*deg, PosSide = 9.3025*m, AngSide = 14.0*deg, VertOffSet = 0.3424*m;
   G4double PosFront = 6.2739*m, PosBack = 11.7739*m, PosRoof = 9.0239*m, OffSetRoof = 3.7776*m;
+
   ConstructHutFrontWall();
-  ConstructHutCollimator();
   ConstructHutBackWall();
   ConstructHutSideWall();
   ConstructHutRoof();
 
   PlaceCylindrical(HutFrontWallLV, motherLV, "HutFrontWall", PosFront,-NpolAng,-VertOffSet);
-  PlaceCylindrical(HutCollimatorLV, HutFrontWallLV, "HutCollimator", 0,0,+VertOffSet);
   PlaceCylindrical(HutBackWallLV, motherLV, "HutBackWall", PosBack,-NpolAng,-VertOffSet);
   PlaceRectangular(HutSideWallLV, motherLV, "HutSideWall", -PosSide*sin(AngSide+NpolAng), -VertOffSet, PosSide*cos(AngSide+NpolAng), 0*deg, -NpolAng, 0*deg);
   PlaceRectangular(HutSideWallLV, motherLV, "HutSideWall", -PosSide*sin(AngSide), -VertOffSet, PosSide*cos(AngSide), 0*deg, -NpolAng, 0);

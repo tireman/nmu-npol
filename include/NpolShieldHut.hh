@@ -22,7 +22,7 @@ public:
   void ConstructHutFrontWall();
   void ConstructHutBackWall();
   void ConstructHutRoof();
-  void ConstructHutCollimator();
+  
   virtual G4VPhysicalVolume *Construct(G4LogicalVolume *motherLV);
  
 private: 
@@ -30,7 +30,6 @@ private:
   G4LogicalVolume *HutFrontWallLV;
   G4LogicalVolume *HutBackWallLV;
   G4LogicalVolume *HutRoofLV;
-  G4LogicalVolume *HutCollimatorLV;
 };
 
 #endif
