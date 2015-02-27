@@ -7,6 +7,7 @@
 
 #include "G4Run.hh"
 #include "G4SystemOfUnits.hh"
+#include "G4Timer.hh"
 
 #include "NpolRunAction.hh"
 #include "NpolHistogramManager.hh"
@@ -25,7 +26,8 @@ NpolRunAction::NpolRunAction() {
 
 	histoManager->CreateHistograms();
 
-//	CreateHistograms();
+	// Setup the run timer
+	runTimer = new G4Timer();
 }
 
 
@@ -161,7 +163,8 @@ void NpolRunAction::BeginOfRunAction(const G4Run* aRun) {
 
 	G4AnalysisManager *analysisManager = G4AnalysisManager::Instance();
 
-	analysisManager->OpenFile("npol");
+	analysisManager->OpenFile("npol_test");
+	runTimer->Start(); //Start the timer
 
 	G4cout << "### Run " << aRun->GetRunID() << " start." << G4endl;
 }
@@ -173,5 +176,7 @@ void NpolRunAction::EndOfRunAction(const G4Run*) {
 	analysisManager->Write();
 	analysisManager->CloseFile();
 
+	runTimer->Stop(); // Stop the timer
+	G4cout << "Run Time: " << *(runTimer) << G4endl;
 }
 

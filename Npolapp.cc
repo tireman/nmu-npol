@@ -49,11 +49,7 @@
 
 int main(int argc,char *argv[]) {
 
-	NpolHistogramManager *histoManager = NpolHistogramManager::GetInstance();
-
-  clock_t clk1;  // Let us check how long it takes to run
-  clock_t clk2;
-  clk1 = clock(); // Standard clock
+  NpolHistogramManager *histoManager = NpolHistogramManager::GetInstance();
 
   // Choose the Random engine
   //
@@ -61,9 +57,9 @@ int main(int argc,char *argv[]) {
     
   // RunManager construction
 #ifdef G4MULTITHREADED
-  G4RunManager *runManager = new G4RunManager;
-//  G4MTRunManager *runManager = new G4MTRunManager;
-//  runManager->SetNumberOfThreads(G4Threading::G4GetNumberOfCores()-6);
+  //G4RunManager *runManager = new G4RunManager;
+  G4MTRunManager *runManager = new G4MTRunManager;
+  runManager->SetNumberOfThreads(G4Threading::G4GetNumberOfCores()-6);
 #else
   G4RunManager *runManager = new G4RunManager;
 #endif
@@ -113,9 +109,6 @@ int main(int argc,char *argv[]) {
   delete visManager;
 #endif
   delete runManager;
-  
-  clk2 =clock();   // Print out that clock time; how long to run program
-  G4cout << ("time= ", (float)(clk2 - clk1)/CLOCKS_PER_SEC)<< G4endl;
   
   return 0;
 }

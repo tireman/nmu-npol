@@ -21,6 +21,7 @@
 #define RunAction_h
 
 #include "G4UserRunAction.hh"
+#include "G4Timer.hh"
 #include "globals.hh"
 
 class G4Run;
@@ -37,7 +38,9 @@ class NpolRunAction : public G4UserRunAction
 
 	private:
 		void CreateHistograms();
+  G4Timer* runTimer;
 };
+  
 
 #endif
 

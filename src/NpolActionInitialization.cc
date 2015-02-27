@@ -16,7 +16,7 @@ NpolActionInitialization::~NpolActionInitialization()
 {}
 
 void NpolActionInitialization::BuildForMaster() const {
-	SetUserAction(new NpolRunAction);
+  SetUserAction(new NpolRunAction);
 }
 
 void NpolActionInitialization::Build() const {
@@ -28,11 +28,11 @@ void NpolActionInitialization::Build() const {
   //in the xz plane and rotates it and then fires the particle at a 
   //vector relative to z-axis (NpolAng) all parallel.
 
-  	SetUserAction(new NpolPrimaryGeneratorAction);
-  //	SetUserAction(new NpolPrimaryGeneratorActionPS);
-  //	SetUserAction(new NpolPrimaryGeneratorActionFS);
-	SetUserAction(new NpolRunAction);
-	SetUserAction(new NpolEventAction);
-	SetUserAction(new NpolSteppingAction);
+  SetUserAction(new NpolPrimaryGeneratorAction);
+  //SetUserAction(new NpolPrimaryGeneratorActionPS);
+  //SetUserAction(new NpolPrimaryGeneratorActionFS);
+  SetUserAction(new NpolRunAction);
+  SetUserAction(new NpolEventAction);
+  SetUserAction(new NpolSteppingAction);
 }
 
