@@ -1,4 +1,4 @@
-// && NpoleDipole1 Header file %% //
+// && NpoleDipole2 Header file BNL 48D48 dipole magnet
 
 // Created: William Tireman - January 2015
 
@@ -22,10 +22,14 @@ public:
   
   void ConstructDipole2Yoke();
   void ConstructDipole2Coil();
+  void ConstructDipole2CuBar();
+  void ConstructDipole2CuEnd();
+  void ConstructDipole2FieldClamp();
   virtual G4VPhysicalVolume *Construct(G4LogicalVolume *motherLV);
  
 private: 
-  G4LogicalVolume *Dipole2YokeLV, *CoilLV;
+  G4LogicalVolume *Dipole2YokeLV, *Dipole2CuBarLV, *Dipole2CuEndLV;
+  G4LogicalVolume *FieldClampLV;
 };
 
 #endif

@@ -1,4 +1,4 @@
-// && NpoleDipole1 Header file %% //
+// && NpoleDipole1 Header file -- Charybdis Magnet
 
 // Created: William Tireman - December 2014
 

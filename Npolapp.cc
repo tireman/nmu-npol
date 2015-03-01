@@ -57,9 +57,9 @@ int main(int argc,char *argv[]) {
     
   // RunManager construction
 #ifdef G4MULTITHREADED
-  //G4RunManager *runManager = new G4RunManager;
-  G4MTRunManager *runManager = new G4MTRunManager;
-  runManager->SetNumberOfThreads(G4Threading::G4GetNumberOfCores()-6);
+  G4RunManager *runManager = new G4RunManager;
+  //G4MTRunManager *runManager = new G4MTRunManager;
+  //runManager->SetNumberOfThreads(G4Threading::G4GetNumberOfCores()-6);
 #else
   G4RunManager *runManager = new G4RunManager;
 #endif
@@ -73,7 +73,7 @@ int main(int argc,char *argv[]) {
   
   // mandatory user initialization classes
   runManager->SetUserInitialization(new NpolDetectorConstruction);
-  runManager->SetUserInitialization(new FTFP_BERT);
+  runManager->SetUserInitialization(new QGSP_BERT_HP);
   runManager->SetUserInitialization(new NpolActionInitialization);
   
   // initialize Geant4 kernel
