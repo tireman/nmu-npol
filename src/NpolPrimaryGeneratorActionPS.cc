@@ -38,24 +38,28 @@ NpolPrimaryGeneratorActionPS::~NpolPrimaryGeneratorActionPS()
 // This function is called at the beginning of each event.
 void NpolPrimaryGeneratorActionPS::GeneratePrimaries(G4Event* anEvent)
 {
-  
-G4double x0 = 0.0*m;
-G4double y0 = 0.0*m;
-G4double z0 = 0.0*m;
-
+  // Set the initial position.  For this it is at the center of the 
+  // coordinate system (target).
+  G4double x0 = 0.0*m, y0 = 0.0*m, z0 = 0.0*m;
 
   // insert code to calculate a momentum vector from a point source and
   // restricted in theta and phi
   // Theta is the azimulthal angle and phi is the rotation angle 
-
- G4double theta = -(28.0+3.975*(2*G4UniformRand()-1))*deg;
-  G4double phi = (3.975*(2*G4UniformRand()-1))*deg;
   
+  // Generate random angles between maximum and minimum angles
+  G4double NpolAng = 28.0, dTheta = 3.975, dPhi = 3.975;
+
+  G4double theta = -(NpolAng+dTheta*(2*G4UniformRand()-1))*deg;
+  G4double phi = (dPhi*(2*G4UniformRand()-1))*deg;
+  
+  // Generate the momentum three vector and set the particle momentum
+  // direction and energy (energy can be changed from macro file).
   G4ThreeVector momDirection;
   momDirection.setRThetaPhi(1., theta, phi);
   particleGun->SetParticleMomentumDirection(momDirection);
   particleGun->SetParticleEnergy(2000.*MeV);
-  
+
+  // Initialize the particle and generate the event.
   particleGun->SetParticlePosition(G4ThreeVector(x0,y0,z0));
   particleGun->GeneratePrimaryVertex(anEvent);
   
