@@ -74,7 +74,7 @@ G4Material *NpolMaterials::CreateVacuum() {
   G4double fractionmass, density;
   G4int ncomponents;
   Vacuum = new G4Material("Vacuum", density= 1.e-25*g/cm3, ncomponents=1, kStateGas, 253*kelvin, 1.e-8*atmosphere);
-  Vacuum->AddMaterial(nistMan->FindOrBuildMaterial("G4_Al"), fractionmass=1.);
+  Vacuum->AddMaterial(nistMan->FindOrBuildMaterial("G4_AIR"), fractionmass=1.);
 
   return Vacuum;
 }
@@ -89,22 +89,21 @@ G4Material *NpolMaterials::CreateAl(){
 
 G4Material *NpolMaterials::CreateScint() {
 
-	G4Element* H = new G4Element("Hydrogen", "H", 1., 1.00794*g/mole);
-	G4Element* C = new G4Element("Carbon"  , "C", 6., 12.011*g/mole);
-
-	G4Material* scint = new G4Material("Scint", 1.02*g/cm3, 2);
-	scint->AddElement(H, 8.451*perCent);
-	scint->AddElement(C, 91.549*perCent);
-
-	return scint;
+  G4Element* H = nistMan->FindOrBuildElement("H");
+  G4Element* C = nistMan->FindOrBuildElement("C");
+  G4Material* scint = new G4Material("Scint", 1.02*g/cm3, 2);
+  scint->AddElement(H, 8.451*perCent);
+  scint->AddElement(C, 91.549*perCent);
+  
+  return scint;
 }
 
 G4Material *NpolMaterials::CreateLH2() {
   
   // liquid hydrogen
-  // Hydrogen element
-  G4Element* H = new G4Element("Hydrogen", "H", 1., 1.00794*g/mole);
-  
+  // Hydrogen element  
+  G4Element* H = nistMan->FindOrBuildElement("H");
+   
   // Liquid Hydrogen
   LH2 = new G4Material("LH2", 0.07085*g/cm3, 1, kStateLiquid, 15.0*kelvin);
   LH2->AddElement(H, 2);
