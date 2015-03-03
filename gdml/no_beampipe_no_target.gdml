@@ -1,0 +1,509 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<gdml xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="/data1/cdaq/geant4.tmp/geant4.9.6-p2/geant4.9.6.p02/source/persistency/gdml/schema/gdml.xsd">
+
+<define>
+ 	<constant name="PI" value="1.*pi"/>
+	<variable name="target_to_hbbore_center" value="176"/>
+	<constant name="fBoreRot" value="1.5"/>
+	<constant name="fHBLHeThick" value="0.5"/>
+
+	<constant name="fWorldXfp" value="60"/>
+	<constant name="fWorldXfn" value="-100"/>
+	<constant name="fWorldXbp" value="60"/>
+	<constant name="fWorldXbn" value="-1500"/>
+	<constant name="fWorldY" value="130"/>
+	<constant name="fWorldZ" value="11000"/>
+
+	<constant name="fBpipeThick" value="0.3"/>
+	<constant name="fBpipeRMax1" value="2.54"/>
+	<constant name="fBpipeRMin1" value="-fBpipeThick+fBpipeRMax1"/>
+	<constant name="fBpipeRMax2" value="30.48"/>
+	<constant name="fBpipeRMin2" value="-fBpipeThick+fBpipeRMax2"/>
+	<constant name="fBpipeDz" value="3287.36"/>
+	<constant name="fHBBpipeCenterX" value="-cos(8.5*pi/180)*sin(5.5*pi/180)*target_to_hbbore_center+2"/>
+	<constant name="fHBBpipeCenterY" value="0"/>
+	<constant name="fHBBpipeCenterZ" value="-sin(8.5*pi/180)*sin(5.5*pi/180)*target_to_hbbore_center+2"/>
+
+	<constant name="fBDumpFaceDiameter" value="60.96"/>
+	<constant name="fBDumpFaceRMax" value="(fBDumpFaceDiameter/2) + 20"/>
+	<constant name="fBDumpFaceDz" value="1.0"/>
+	<constant name="fBDumpFaceCentralR" value="5.08"/>
+	<constant name="fBDumpFaceCentralDz" value="0.4"/>
+	<constant name="fBDumpFaceCenterX" value="-756.44"/>
+	<constant name="fBDumpFaceCenterY" value="0.0"/>
+	<constant name="fBDumpFaceCenterZ" value="4947.34"/>
+
+	<constant name="fBDumpWindowRMax" value="fBDumpFaceRMax"/>
+	<constant name="fBDumpWindowDz" value="0.1"/>
+	<constant name="fBDumpWindowCenterX" value="-479.65"/>
+	<constant name="fBDumpWindowCenterY" value="0.0"/>
+	<constant name="fBDumpWindowCenterZ" value="3095.27"/>
+
+	<constant name="fBDumpHeliumVesselDz" value="1871.96"/>
+	<constant name="fBDumpHeliumVesseThickness" value="0.1"/>
+	<constant name="fBDumpHeVesselCenterX" value="-618.02"/>
+	<constant name="fBDumpHeVesselCenterY" value="0.0"/>
+	<constant name="fBDumpHeVesselCenterZ" value="4021.02"/>
+
+	<constant name="fShieldRMax1" value="60"/>
+	<constant name="fShieldRMin1" value="59"/>
+	<constant name="fShieldRMax2" value="60"/>
+	<constant name="fShieldRMin2" value="59"/>
+	<constant name="fShieldDz" value="2000"/>
+
+	<constant name="fBDumpHeliumFillCentralDz" value="(-fBDumpFaceCentralDz+fBDumpFaceDz)*0.5+fBDumpHeliumVesselDz"/>
+
+	<constant name="fHBBoreXfp" value="11.75"/>
+	<constant name="fHBBoreXfn" value="-4.13"/>
+	<constant name="fHBBoreXbp" value="11.70"/>
+	<constant name="fHBBoreXbn" value="-11.71"/>
+	<constant name="fHBBoreY" value="20.75"/>
+	<constant name="fHBBoreZ" value="115.22"/>
+	<constant name="fHBBoreCenterX" value="0"/>
+	<constant name="fHBBoreCenterY" value="0"/>
+	<constant name="fHBBoreCenterZ" value="0"/>
+
+	<constant name="fTargetD" value="6.28"/>	
+	<constant name="fTargetZ" value="20"/>	
+	<constant name="fTargetCenterX" value="sin(3*pi/180)*target_to_hbbore_center"/>
+	<constant name="fTargetCenterY" value="0"/>
+	<constant name="fTargetCenterZ" value="-cos(3*pi/180)*target_to_hbbore_center"/>
+
+	<constant name="fHBCoilThick" value="1.38"/>
+	<constant name="fHBCoilWidth" value="13"/>
+	<constant name="fHBCoilZ" value="94"/>
+	<constant name="fHBCoilY" value="28.05"/>
+	<constant name="fHBCoilIntZ" value="67"/>
+	<constant name="fHBCoilLeftBoreXOffset" value="15"/>
+
+	<constant name="fHBCoilBoxXfn" value="-fHBCoilThick-1.5+fHBBoreXfn"/>
+	<constant name="fHBCoilBoxXfp" value="1+fHBCoilThick+fHBBoreXfp"/>
+	<constant name="fHBCoilBoxXbp" value="1+fHBCoilThick+fHBBoreXbp"/>
+	<constant name="fHBCoilBoxXbn" value="-fHBCoilThick-1.5+fHBBoreXbn"/>
+	<constant name="fHBCoilBoxY" value="fHBCoilY*2"/>
+	<constant name="fHBCoilBoxZ" value="fHBCoilZ"/>
+
+	<constant name="fHBCoilBoxCutXfn" value="fHBCoilThick+fHBCoilBoxXfn"/>
+	<constant name="fHBCoilBoxCutXfp" value="-fHBCoilThick+fHBCoilBoxXfp"/>
+	<constant name="fHBCoilBoxCutXbp" value="-fHBCoilThick+fHBCoilBoxXbp"/>
+	<constant name="fHBCoilBoxCutXbn" value="fHBCoilThick+fHBCoilBoxXbn"/>
+	<constant name="fHBCoilBoxCutY" value="(-fHBCoilThick+fHBCoilY)*2"/>
+	<constant name="fHBCoilBoxCutZ" value="fHBCoilThick+fHBCoilZ"/>
+
+	<constant name="fHBCoilBoxTopCutXfn" value="-2+fHBCoilBoxXfn"/>
+	<constant name="fHBCoilBoxTopCutXfp" value="2+fHBCoilBoxXfp"/>
+	<constant name="fHBCoilBoxTopCutXbp" value="2+fHBCoilBoxXbp"/>
+	<constant name="fHBCoilBoxTopCutXbn" value="-2+fHBCoilBoxXbn"/>
+	<constant name="fHBCoilBoxTopCutY" value="3+fHBCoilWidth"/>
+	<constant name="fHBCoilBoxTopCutZ" value="fHBCoilIntZ"/>
+
+	<constant name="fHBYorkFrontWidth" value="40.804"/>
+	<constant name="fHBYorkBackWidth" value="45"/>
+	<constant name="fHBYorkTopWidth" value="42.5"/>
+	<constant name="fHBYorkXfn" value="-6-fHBCoilThick+fHBBoreXfn"/>
+	<constant name="fHBYorkXfp" value="2+fHBBoreXfp+fHBYorkTopWidth+fHBCoilThick"/>
+	<constant name="fHBYorkXbp" value="2+fHBBoreXfp+fHBYorkTopWidth+fHBCoilThick"/>
+	<constant name="fHBYorkXbn" value="-5+fHBBoreXbn"/>
+	<constant name="fHBYorkY" value="120"/>
+	<constant name="fHBYorkZ" value="60"/>
+
+	<constant name="fHBCryoBoxXfn" value="-4+fHBCoilBoxXfn"/>
+	<constant name="fHBCryoBoxXfp" value="6+fHBCoilBoxXfp"/>
+	<constant name="fHBCryoBoxXbp" value="6+fHBCoilBoxXbp"/>
+	<constant name="fHBCryoBoxXbn" value="-5+fHBCoilBoxXbn"/>
+	<constant name="fHBCryoBoxY" value="4+fHBCoilBoxY"/>
+	<constant name="fHBCryoBoxZ" value="-0.1+fHBBoreZ"/>
+
+  	<position name="Origin" unit="cm" x="0" y="0" z="0" />
+  	<position name="pTarget" unit="cm" x="fTargetCenterX" y="fTargetCenterY" z="fTargetCenterZ" />
+  	<position name="pBPipe" unit="cm" x="fHBBpipeCenterX" y="fHBBpipeCenterY" z="fHBBpipeCenterX" />
+   	<position name="pYork" unit="cm" x="-6" y="0" z="0" />
+   	<position name="pSheild" unit="cm" x="0" y="0" z="(fHBBoreZ/2)+6" />
+	<position name="pDumpWindow" unit="cm" x="fBDumpWindowCenterX" y="fBDumpWindowCenterY" z="fBDumpWindowCenterZ" />
+	<position name="pDumpFace" unit="cm" x="fBDumpFaceCenterX" y="fBDumpFaceCenterY" z="fBDumpFaceCenterZ" />
+	<position name="pEndDump" unit="cm" x="fBDumpFaceCenterX+10" y="fBDumpFaceCenterY" z="fBDumpFaceCenterZ+120" />
+
+	<position name="pDumpHeVessel" unit="cm" x="fBDumpHeVesselCenterX" y="fBDumpHeVesselCenterY" z="fBDumpHeVesselCenterZ" />
+  	<position name="pHeliumFill" unit="cm" x="0" y="0" z="(-fBDumpFaceCentralDz+fBDumpFaceDz)*0.25" /> 
+	<position name="pHBCoilTopCut" unit="cm" x="0" y="fHBCoilWidth+fHBCoilBoxTopCutY/2" z="0" />
+  	<position name="pHBCoilBottomCut" unit="cm" x="0" y="-(fHBCoilWidth+fHBCoilBoxTopCutY/2)" z="0" />
+  	<position name="pBpipe" unit="cm" x="-236.65" y="0" z="1469.33" />
+  	<position name="pBpipeInCryo" unit="cm" x="-198.14" y="0" z="1475.34" />
+ 
+  	<rotation name="identity" x="0" y="0" z="0"/>
+	<rotation name="rHBRot" unit="deg" x="0" y="fBoreRot" z="0"/>
+	<rotation name="rHBCoilLeftRot" unit="deg" x="0" y="-3.0" z="0"/>
+	<rotation name="rHBCoilRightRot" unit="deg" x="0" y="-7.0" z="0"/>
+	<rotation name="rTarget" unit="deg" x="0" y="8.5" z="0" />
+	<rotation name="rBpipe" unit="deg" x="0" y="8.5" z="0" />
+	<rotation name="rBpipeInCryo" unit="deg" x="0" y="-7.0" z="0" />
+
+</define>
+
+<materials>
+	<element name="videRef" formula="VACUUM" Z="1">
+	<atom value="1"/>
+	</element>
+
+	<element Z="7" formula="N" name="Nitrogen" >
+   	<atom value="14.007" />
+  	</element>
+
+  	<element Z="8" formula="O" name="Oxygen" >
+   	<atom value="15.999" />
+  	</element>
+
+   	<material formula=" " name="Air" >
+   	<D value="0.00129" />
+   	<fraction n="0.7" ref="Nitrogen" />
+   	<fraction n="0.3" ref="Oxygen" />
+	</material>
+
+	<material name="Copper" Z="29">
+   	<D unit="g/cm3" value="8.96"/> <atom unit="g/mole" value="63.546"/>
+  	</material>
+
+	<material name="Al" Z="13.0">
+   	<D unit="g/cm3" value="2.70"/> <atom unit="g/mole"  value="26.98"/>
+  	</material>
+
+
+	<material name="Vacuum" formula="Vacuum">
+	<D unit="g/cm3" value ="1E-25"/>
+	<fraction n="1.0" ref="videRef"/>
+	</material>
+	
+	<material name="SSteel" Z="1.0">
+   	<D value="2.70"/> <atom value="26.98"/>
+  	</material>
+
+	<material name="Moria" Z="10">
+   	<D value="10"/> <atom value="10"/>
+  	</material>
+
+
+	<material name="He" Z="2">
+   	<D unit="g/cm3" value="0.0001785"/> <atom unit="g/mole"  value="4"/>
+  	</material>
+
+	<material name="C" Z="6">
+   	<D unit="g/cm3" value="2.2670"/> <atom unit="g/mole" value="12.0107"/>
+  	</material>
+
+
+	<material name="LH2" Z="1">   	
+	<D unit="g/cm3" value="0.07085"/> <atom unit="g/mole" value="1.00794"/>
+  	</material>
+
+
+	<material name="LH2-10" Z="1">
+   	<D unit="g/cm3" value="0.7085"/> <atom unit="g/mole" value="1.00794"/>
+  	</material>
+</materials>
+
+<solids>
+
+	<tube aunit="deg"  name="target" startphi="0" deltaphi="360" lunit="cm" rmin="0" rmax="fTargetD/2" z="fTargetZ"/>
+
+	<box lunit="cm" name="boxShield" x="(fWorldXfn+13)/2" y="fWorldY/2" z="2"/>
+	<box lunit="cm" name="endDump" x="300" y="100" z="100"/>
+
+	<cone name = "beamPipe" rmin1="fBpipeRMin1" rmax1="fBpipeRMax1" rmin2="fBpipeRMin2" rmax2="fBpipeRMax2" z="fBpipeDz" startphi="0" deltaphi="360" aunit="deg" lunit= "cm" />
+	<cone name = "beamPipeFull" rmin1="0" rmax1="fBpipeRMax1" rmin2="0" rmax2="fBpipeRMax2" z="fBpipeDz" startphi="0" deltaphi="360" aunit="deg" lunit= "cm" />
+	<cone name = "beamPipeVac" rmin1="0" rmax1="fBpipeRMin1" rmin2="0" rmax2="fBpipeRMin2" z="fBpipeDz" startphi="0" deltaphi="360" aunit="deg" lunit= "cm" />
+
+	<tube aunit="deg"  name="beamDumpFace" startphi="0" deltaphi="360" lunit="cm" rmin="fBDumpFaceCentralR" rmax="fBDumpFaceRMax" z="fBDumpFaceDz"/>
+	<tube aunit="deg"  name="beamDumpFaceCenter" startphi="0" deltaphi="360" lunit="cm" rmin="0" rmax="fBDumpFaceCentralR" z="fBDumpFaceCentralDz"/>
+	<tube aunit="deg"  name="beamDumpWindow" startphi="0" deltaphi="360" lunit="cm" rmin="0" rmax="fBDumpWindowRMax" z="fBDumpWindowDz"/>
+	<tube aunit="deg"  name="beamDumpHeliumVessel" startphi="0" deltaphi="360" lunit="cm" rmin="-fBDumpHeliumVesseThickness+fBDumpWindowRMax" rmax="fBDumpWindowRMax" z="fBDumpHeliumVesselDz"/>
+	<tube aunit="deg"  name="beamDumpHeliumFill" startphi="0" deltaphi="360" lunit="cm" rmin="fBDumpFaceCentralR" rmax="-fBDumpHeliumVesseThickness+fBDumpWindowRMax" z="fBDumpHeliumVesselDz"/>
+	<tube aunit="deg"  name="beamDumpHeliumFillCenter" startphi="0" deltaphi="360" lunit="cm" rmin="0" rmax="fBDumpFaceCentralR" z="fBDumpHeliumFillCentralDz"/>
+
+	<cone name = "dumpSheild" rmin1="fShieldRMin1" rmax1="fShieldRMax1" rmin2="fShieldRMin2" rmax2="fShieldRMax2" z="fShieldDz" startphi="0" deltaphi="360" aunit="deg" lunit= "cm" />
+
+	<arb8 lunit="cm" name="boxWorld" dz="fWorldZ/2" 
+		v1x="fWorldXfn" v1y="-fWorldY/2" 
+		v2x="fWorldXfn" v2y="fWorldY/2"
+             	v3x="fWorldXfp" v3y="fWorldY/2" 
+		v4x="fWorldXfp" v4y="-fWorldY/2" 
+		v5x="fWorldXbn" v5y="-fWorldY/2" 
+		v6x="fWorldXbn" v6y="fWorldY/2"
+             	v7x="fWorldXbp" v7y="fWorldY/2" 
+		v8x="fWorldXbp" v8y="-fWorldY/2"/>
+
+	<arb8 lunit="cm" name="hbBore" dz="fHBBoreZ/2" 
+		v1x="fHBBoreXfn" v1y="-fHBBoreY/2" 
+		v2x="fHBBoreXfn" v2y="fHBBoreY/2"
+             	v3x="fHBBoreXfp" v3y="fHBBoreY/2" 
+		v4x="fHBBoreXfp" v4y="-fHBBoreY/2" 
+		v5x="fHBBoreXbn" v5y="-fHBBoreY/2" 
+		v6x="fHBBoreXbn" v6y="fHBBoreY/2"
+             	v7x="fHBBoreXbp" v7y="fHBBoreY/2" 
+		v8x="fHBBoreXbp" v8y="-fHBBoreY/2"/>
+
+	<arb8 lunit="cm" name="hbYork" dz="fHBYorkZ/2" 
+		v1x="fHBYorkXfn" v1y="-fHBYorkY/2" 
+		v2x="fHBYorkXfn" v2y="fHBYorkY/2"
+             	v3x="fHBYorkXfp" v3y="fHBYorkY/2" 
+		v4x="fHBYorkXfp" v4y="-fHBYorkY/2" 
+		v5x="fHBYorkXbn" v5y="-fHBYorkY/2" 
+		v6x="fHBYorkXbn" v6y="fHBYorkY/2"
+             	v7x="fHBYorkXbp" v7y="fHBYorkY/2" 
+		v8x="fHBYorkXbp" v8y="-fHBYorkY/2"/>
+
+	<arb8 lunit="cm" name="hbCoilBox" dz="fHBCoilBoxZ/2" 
+		v1x="fHBCoilBoxXfn" v1y="-fHBCoilBoxY/2" 
+		v2x="fHBCoilBoxXfn" v2y="fHBCoilBoxY/2"
+             	v3x="fHBCoilBoxXfp" v3y="fHBCoilBoxY/2" 
+		v4x="fHBCoilBoxXfp" v4y="-fHBCoilBoxY/2" 
+		v5x="fHBCoilBoxXbn" v5y="-fHBCoilBoxY/2" 
+		v6x="fHBCoilBoxXbn" v6y="fHBCoilBoxY/2"
+             	v7x="fHBCoilBoxXbp" v7y="fHBCoilBoxY/2" 
+		v8x="fHBCoilBoxXbp" v8y="-fHBCoilBoxY/2"/>
+
+	<arb8 lunit="cm" name="hbCoilBoxCut" dz="fHBCoilBoxCutZ/2" 
+		v1x="fHBCoilBoxCutXfn" v1y="-fHBCoilBoxCutY/2" 
+		v2x="fHBCoilBoxCutXfn" v2y="fHBCoilBoxCutY/2"
+             	v3x="fHBCoilBoxCutXfp" v3y="fHBCoilBoxCutY/2" 
+		v4x="fHBCoilBoxCutXfp" v4y="-fHBCoilBoxCutY/2" 
+		v5x="fHBCoilBoxCutXbn" v5y="-fHBCoilBoxCutY/2" 
+		v6x="fHBCoilBoxCutXbn" v6y="fHBCoilBoxCutY/2"
+             	v7x="fHBCoilBoxCutXbp" v7y="fHBCoilBoxCutY/2" 
+		v8x="fHBCoilBoxCutXbp" v8y="-fHBCoilBoxCutY/2"/>
+
+	<arb8 lunit="cm" name="hbCoilBoxTopCut" dz="fHBCoilBoxTopCutZ/2" 
+		v1x="fHBCoilBoxTopCutXfn" v1y="-fHBCoilBoxTopCutY/2" 
+		v2x="fHBCoilBoxTopCutXfn" v2y="fHBCoilBoxTopCutY/2"
+             	v3x="fHBCoilBoxTopCutXfp" v3y="fHBCoilBoxTopCutY/2" 
+		v4x="fHBCoilBoxTopCutXfp" v4y="-fHBCoilBoxTopCutY/2" 
+		v5x="fHBCoilBoxTopCutXbn" v5y="-fHBCoilBoxTopCutY/2" 
+		v6x="fHBCoilBoxTopCutXbn" v6y="fHBCoilBoxTopCutY/2"
+             	v7x="fHBCoilBoxTopCutXbp" v7y="fHBCoilBoxTopCutY/2" 
+		v8x="fHBCoilBoxTopCutXbp" v8y="-fHBCoilBoxTopCutY/2"/>
+
+	<arb8 lunit="cm" name="hbCryoBoxFull" dz="fHBCryoBoxZ/2" 
+		v1x="fHBCryoBoxXfn" v1y="-fHBCryoBoxY/2" 
+		v2x="fHBCryoBoxXfn" v2y="fHBCryoBoxY/2"
+             	v3x="fHBCryoBoxXfp" v3y="fHBCryoBoxY/2" 
+		v4x="fHBCryoBoxXfp" v4y="-fHBCryoBoxY/2" 
+		v5x="fHBCryoBoxXbn" v5y="-fHBCryoBoxY/2" 
+		v6x="fHBCryoBoxXbn" v6y="fHBCryoBoxY/2"
+             	v7x="fHBCryoBoxXbp" v7y="fHBCryoBoxY/2" 
+		v8x="fHBCryoBoxXbp" v8y="-fHBCryoBoxY/2"/>
+
+	<arb8 lunit="cm" name="hbCryoBoxCut" dz="(-2+fHBCryoBoxZ)/2" 
+		v1x="0.5+fHBCoilBoxXfn" v1y="-(-2+fHBCryoBoxY)/2" 
+		v2x="0.5+fHBCoilBoxXfn" v2y="(-2+fHBCryoBoxY)/2"
+             	v3x="-1+fHBCryoBoxXfp" v3y="(-2+fHBCryoBoxY)/2" 
+		v4x="-1+fHBCryoBoxXfp" v4y="-(-2+fHBCryoBoxY)/2" 
+		v5x="1+fHBCryoBoxXbn" v5y="-(-2+fHBCryoBoxY)/2" 
+		v6x="1+fHBCryoBoxXbn" v6y="(-2+fHBCryoBoxY)/2"
+             	v7x="-1+fHBCryoBoxXbp" v7y="(-2+fHBCryoBoxY)/2" 
+		v8x="-1+fHBCryoBoxXbp" v8y="-(-2+fHBCryoBoxY)/2"/>
+
+	<subtraction name="hbCoilsCutMiddle">
+	<first ref="hbCoilBox"/>
+	<second ref="hbCoilBoxCut"/>
+	<positionref ref="Origin"/>
+	</subtraction>
+
+	<subtraction name="hbCoilsCutTop">
+	<first ref="hbCoilsCutMiddle"/>
+	<second ref="hbCoilBoxTopCut"/>
+	<positionref ref="pHBCoilTopCut"/>
+	</subtraction>
+
+	<subtraction name="hbCoilsCutBottom">
+	<first ref="hbCoilsCutTop"/>
+	<second ref="hbCoilBoxTopCut"/>
+	<positionref ref="pHBCoilBottomCut"/>
+	</subtraction>
+
+	<subtraction name="hbCoils">
+	<first ref="hbCoilsCutBottom"/>
+	<second ref="hbBore"/>
+	<positionref ref="Origin"/>
+	</subtraction>
+
+	<subtraction name="HBYorkSolid">
+	<first ref="hbYork"/>
+	<second ref="hbCryoBoxFull"/>
+	<positionref ref="Origin"/>
+	</subtraction>
+
+	<subtraction name="hbCryoBoxHollow">
+	<first ref="hbCryoBoxFull"/>
+	<second ref="hbCryoBoxCut"/>
+	<positionref ref="Origin"/>
+	</subtraction>
+
+	<subtraction name="hbCryoSolidWithPipeCut">
+	<first ref="hbCryoBoxHollow"/>
+	<second ref="beamPipeFull"/>
+	<positionref ref="pBpipeInCryo"/>
+	<rotationref ref="rBpipeInCryo"/>	
+	</subtraction>
+
+	<subtraction name="hbCryoMinusBore">
+	<first ref="hbCryoSolidWithPipeCut"/>
+	<second ref="hbBore"/>
+	<positionref ref="Origin"/>
+	</subtraction>
+
+	<union name="dumpFace">
+	<first ref="beamDumpFace"/>
+	<second ref="beamDumpFaceCenter"/>
+	<positionref ref="Origin"/>
+	</union>
+
+	<union name="dumpHeliumFill">
+	<first ref="beamDumpHeliumFill"/>
+	<second ref="beamDumpHeliumFillCenter"/>
+	<positionref ref="pHeliumFill"/>
+	</union>
+	
+</solids>
+
+<structure>
+	<volume name="TargetLogic">
+	<materialref ref="LH2"/>
+	<solidref ref="target"/>
+	<auxiliary auxtype="SensDet" auxvalue="Target"/>
+	</volume>
+
+	<volume name="BeamPipeVacLogic">
+	<materialref ref="Vacuum"/>
+	<solidref ref="beamPipeVac"/>
+	</volume>
+
+	<volume name="BeamPipeLogic">
+	<materialref ref="Al"/>
+	<solidref ref="beamPipe"/>
+	</volume>
+
+	<volume name="HBBoreLogic">
+	<materialref ref="Vacuum"/>
+	<solidref ref="hbBore"/>
+	</volume>
+
+	<volume name="HBCoilLogic">
+	<materialref ref="Copper"/>
+	<solidref ref="hbCoils"/>
+	<auxiliary auxtype="SensDet" auxvalue="HBCoil"/>
+	</volume>
+
+	<volume name="HBYorkLogic">
+	<materialref ref="SSteel"/>
+	<solidref ref="HBYorkSolid"/>
+	</volume>
+
+	<volume name="HBCryoBoxLogic">
+	<materialref ref="SSteel"/>
+	<solidref ref="hbCryoMinusBore"/>
+	<auxiliary auxtype="SensDet" auxvalue="HBCryoBox"/>
+	</volume>
+
+	<volume name="ShieldBoxLogic">
+	<materialref ref="Moria"/>
+	<solidref ref="boxShield"/>
+	</volume>
+
+	<volume name="BeamDumpWindowLogic">
+	<materialref ref="Al"/>
+	<solidref ref="beamDumpWindow"/>
+	<auxiliary auxtype="SensDet" auxvalue="DumpWindow"/>
+	</volume>
+
+	<volume name="HeliumFillLogic">
+	<materialref ref="He"/>
+	<solidref ref="dumpHeliumFill"/>
+	</volume>
+
+	<volume name="BeamDumpHeliumVesselLogic">
+	<materialref ref="Al"/>
+	<solidref ref="beamDumpHeliumVessel"/>
+	</volume>
+
+	<volume name="BeamDumpFaceLogic">
+	<materialref ref="Al"/>
+	<solidref ref="dumpFace"/>
+	<auxiliary auxtype="SensDet" auxvalue="DumpFace"/>
+	</volume>	
+
+	<volume name="DumpShieldLogic">
+	<materialref ref="Moria"/>
+	<solidref ref="dumpSheild"/>
+	</volume>
+
+	<volume name="EndDumpLogic">
+	<materialref ref="SSteel"/>
+	<solidref ref="endDump"/>
+	<auxiliary auxtype="SensDet" auxvalue="EndDump"/>
+	</volume>
+	
+	<volume name="World">
+	<materialref ref="Air"/> 
+	<solidref ref="boxWorld"/>
+
+		<physvol name="HBbore">
+		<volumeref ref="HBBoreLogic"/>
+		<positionref ref="Origin"/>
+		<rotationref ref="rHBRot"/>
+		</physvol>
+
+		<physvol name="HBCoil">
+		<volumeref ref="HBCoilLogic"/>
+		<positionref ref="Origin"/>
+		<rotationref ref="rHBRot"/>
+		</physvol>
+
+		<physvol name="HBYork">
+		<volumeref ref="HBYorkLogic"/>
+		<positionref ref="Origin"/>
+		<rotationref ref="rHBRot"/>
+		</physvol>
+
+		<physvol name="HBCryoBox">
+		<volumeref ref="HBCryoBoxLogic"/>
+		<positionref ref="Origin"/>
+		<rotationref ref="rHBRot"/>
+		</physvol>
+
+		<physvol name="BeamDumpWindow">
+		<volumeref ref="BeamDumpWindowLogic"/>
+		<positionref ref="pDumpWindow"/>
+		<rotationref ref="rTarget"/>
+		</physvol>
+
+		<physvol name="BeamDumpHeVessel">
+		<volumeref ref="BeamDumpHeliumVesselLogic"/>
+		<positionref ref="pDumpHeVessel"/>
+		<rotationref ref="rTarget"/>
+		</physvol>
+
+		<physvol name="BeamDumpHelium">
+		<volumeref ref="HeliumFillLogic"/>
+		<positionref ref="pDumpHeVessel"/>
+		<rotationref ref="rTarget"/>
+		</physvol>
+
+		<physvol name="BeamDumpFace">
+		<volumeref ref="BeamDumpFaceLogic"/>
+		<positionref ref="pDumpFace"/>
+		<rotationref ref="rTarget"/>
+		</physvol>
+
+		<physvol name="EndDump">
+		<volumeref ref="EndDumpLogic"/>
+		<positionref ref="pEndDump"/>
+		<rotationref ref="rTarget"/>
+		</physvol>
+ 	</volume>	
+
+</structure>
+
+<setup name="Default" version="1.0">
+<world ref="World"/>
+</setup>
+
+</gdml>
