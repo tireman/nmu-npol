@@ -8,6 +8,8 @@
 #include "G4PhysicalConstants.hh"
 #include "G4Material.hh"
 #include "G4Tubs.hh"
+#include "G4Box.hh"
+#include "G4SubtractionSolid.hh"
 #include "G4Sphere.hh"
 #include "G4LogicalVolume.hh"
 #include "G4VisAttributes.hh"
@@ -35,14 +37,20 @@ NpolHallShell::~NpolHallShell() {
 // Construct the Hall Wall in the world; cylinder of concrete
 void NpolHallShell::ConstructHallShellWall() {
   
-  G4Tubs *HallShellWall = new G4Tubs("HallShellWall", inDia, outDia, 
-        shellHeight, 0.0*deg, 360.*deg);
+  G4Tubs *Wall = new G4Tubs("Wall", inDia, outDia, shellHeight, 0.0*deg, 360.*deg);
+  G4Tubs *Hole = new G4Tubs("Hole", inDia-20.0*cm, outDia+20.0*cm, shellHeight/10, 76.0*deg, 5.*deg);
+  
+  G4RotationMatrix *Rot = new G4RotationMatrix;
+  G4ThreeVector zTrans(+0.0*m, 0.0*m, +3.0*m);
+
+  G4SubtractionSolid *HallShellWall = new G4SubtractionSolid("HallShellWall", Wall, Hole, Rot, zTrans);
+
   HallShellWallLV = new G4LogicalVolume(HallShellWall,
 	NpolMaterials::GetInstance()->GetConcrete(),"HallShellWallLV",0,0,0);
   
-  //G4VisAttributes *TopVisAtt= new G4VisAttributes(G4Colour(2.0,1.0,0.0));
-  //HallShellWallLV->SetVisAttributes(TopVisAtt);
-  HallShellWallLV->SetVisAttributes(G4VisAttributes::GetInvisible());
+  G4VisAttributes *TopVisAtt= new G4VisAttributes(G4Colour(2.0,1.0,0.0));
+  HallShellWallLV->SetVisAttributes(TopVisAtt);
+  //HallShellWallLV->SetVisAttributes(G4VisAttributes::GetInvisible());
 }
 
 // Construct the Hall Floor in the world

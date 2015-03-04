@@ -8,9 +8,9 @@
 	<constant name="fHBLHeThick" value="0.5"/>
 
 	<constant name="fWorldXfp" value="60"/>
-	<constant name="fWorldXfn" value="-100"/>
+	<constant name="fWorldXfn" value="100"/>
 	<constant name="fWorldXbp" value="60"/>
-	<constant name="fWorldXbn" value="-1500"/>
+	<constant name="fWorldXbn" value="1500"/>
 	<constant name="fWorldY" value="130"/>
 	<constant name="fWorldZ" value="11000"/>
 

@@ -1,9 +1,8 @@
 
-// %% NpolTarget.cc %%
+// %% NpolSHMS.cc %%
 
-// Target Constructor file.  Currently only as target and target can.
-// Created: William Tireman - December 2014
-// Modified: Daniel Wilbern - December 2014
+// Super HMS Constructor file.  Currently only as target and target can.
+// Created: Daniel Wilbern - March 2015
 
 #include "G4PhysicalConstants.hh"
 #include "G4Material.hh"

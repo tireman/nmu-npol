@@ -41,7 +41,7 @@ NpolDetectorConstruction::NpolDetectorConstruction() {
   activeDetectors["Dipole 1"] = new NpolDipole1();
   activeDetectors["Dipole 2"] = new NpolDipole2();
   activeDetectors["Shield Hut"] = new NpolShieldHut();
-  activeDetectors["SHMS"] = new NpolSHMS();
+  //activeDetectors["SHMS"] = new NpolSHMS();
   //activeDetectors["Thing"] = new NpolThing();
 }
 

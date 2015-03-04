@@ -25,13 +25,8 @@ target_link_libraries(Npolapp ${Geant4_LIBRARIES})
 
 # (6)
 set(Npolapp_SCRIPTS
-#  Npolapp.in
-#  Npolapp.out
-  npol.mac
-  init.mac
-  init_vis.mac
-  vis.mac
-  )
+  npol.mac init.mac init_vis.mac vis.mac gdml/no_beampipe_no_target.gdml
+)
 
 foreach(_script ${Npolapp_SCRIPTS})
   configure_file(
