@@ -27,7 +27,6 @@ class NpolRunAction : public G4UserRunAction
 		void EndOfRunAction(const G4Run*);
 
 	private:
-		void CreateHistograms();
 		G4Timer* runTimer;
 };
 

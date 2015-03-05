@@ -27,7 +27,6 @@
 
 #include "NpolActionInitialization.hh"
 #include "NpolDetectorConstruction.hh"
-#include "NpolHistogramManager.hh"
 
 #ifdef G4VIS_USE
 #include "G4VisExecutive.hh"

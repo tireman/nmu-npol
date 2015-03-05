@@ -28,7 +28,6 @@
 #include "G4PhysicalConstants.hh"
 #include "G4AutoLock.hh"
 
-#include "NpolHistogramManager.hh"
 #include "NpolDataStructure.hh"
 #include "NpolAnalysis.hh"
 #include "NpolEventAction.hh"

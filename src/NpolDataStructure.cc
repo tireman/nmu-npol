@@ -11,21 +11,31 @@
 // %% NpolDataStructure.cc %%
 // Daniel Wilbern, dwilbern@nmu.edu February 2015
 
+#include <cstdlib>
 #include <map>
 
 #include "G4ios.hh"
 #include "G4SystemOfUnits.hh"
 #include "G4VPhysicalVolume.hh"
 
-#include "NpolHistogramManager.hh"
 #include "NpolDataStructure.hh"
+#include "NpolAnalysis.hh"
 
 static NpolDataStructure *pInstance = NULL;
 
 NpolDataStructure::NpolDataStructure() {}
 
-NpolDataStructure::~NpolDataStructure() {}
+NpolDataStructure::~NpolDataStructure() {
 
+	std::map<G4VPhysicalVolume *, struct ActiveDetectorData>::iterator it;
+	for(it = detData.begin(); it != detData.end(); it++) {
+		if((it->second).histoData != NULL)
+			free((it->second).histoData);
+		(it->second).histoData = NULL;
+	}
+}
+
+// NpolDataStructure is a singleton.  This function will return a pointer to the singleton.
 NpolDataStructure *NpolDataStructure::GetInstance() {
 	if(pInstance == NULL)
 		pInstance = new NpolDataStructure();
@@ -33,27 +43,85 @@ NpolDataStructure *NpolDataStructure::GetInstance() {
 	return pInstance;
 }
 
-void NpolDataStructure::PrepareNewEvent() {
-	std::map<G4VPhysicalVolume *, G4double>::iterator it;
+void NpolDataStructure::RegisterActiveDetectorNTuple(G4VPhysicalVolume *PV) {
 
-	for(it = EDep.begin(); it != EDep.end(); it++)
-		it->second = 0.0;
+	if(!isVolumeActive(PV)) {
+		struct ActiveDetectorData ast = {0.0, NULL};
+		detData[PV] = ast;
+	}
+}
+
+void NpolDataStructure::RegisterActiveDetectorEDepHistogram(G4VPhysicalVolume *PV, G4String nname, G4String ttitle,
+		G4int nnbins, G4double xxmin, G4double xxmax) {
+
+	struct HistoData *hst = (struct HistoData *)calloc(1,sizeof(struct HistoData));
+
+	hst->histoID = -1;
+	hst->name = nname.data();
+	hst->title = ttitle.data();
+	hst->nbins = nnbins;
+	hst->xmin = xxmin;
+	hst->xmax = xxmax;
+
+	if(!isVolumeActive(PV)) {
+		struct ActiveDetectorData ast = {0.0, hst};
+		detData[PV] = ast;
+	} else
+		(detData[PV]).histoData = hst;
+}
+
+void NpolDataStructure::CreateHistograms() {
+
+	G4AnalysisManager *analysisManager = G4AnalysisManager::Instance();
+	std::map<G4VPhysicalVolume *, struct ActiveDetectorData>::iterator it;
+	struct HistoData *histEntry;	
+
+	for(it = detData.begin(); it != detData.end(); it++)
+		if(volumeHasEDepHistogram(it->first)) {
+			histEntry = (it->second).histoData;
+			histEntry->histoID = analysisManager->CreateH1(histEntry->name, histEntry->title,
+					histEntry->nbins, histEntry->xmin, histEntry->xmax);
+		}
+}
+
+void NpolDataStructure::PrepareNewEvent() {
+	std::map<G4VPhysicalVolume *, struct ActiveDetectorData>::iterator it;
+
+	for(it = detData.begin(); it != detData.end(); it++)
+		(it->second).EDep = 0.0;
 }
 
 void NpolDataStructure::AddEDep(G4VPhysicalVolume *PV, G4double dep) {
 
-	NpolHistogramManager *histoManager = NpolHistogramManager::GetInstance();
-
-	if(histoManager->CheckHistogramAssociation(PV))
-		EDep[PV] += dep;
+	if(isVolumeActive(PV))
+		(detData[PV]).EDep += dep;
 }
 
 void NpolDataStructure::FillHistograms() {
 
-	NpolHistogramManager *histoManager = NpolHistogramManager::GetInstance();
-	std::map<G4VPhysicalVolume *, G4double>::iterator it;
-
-	for(it = EDep.begin(); it != EDep.end(); it++)
-		histoManager->FillHistogram(it->first,it->second);
+	std::map<G4VPhysicalVolume *, struct ActiveDetectorData>::iterator it;
+	for(it = detData.begin(); it != detData.end(); it++)
+		if(volumeHasEDepHistogram(it->first))
+			FillAHistogram((it->second).histoData, (it->second).EDep);
 }
 
+/* *** private methods *** */
+
+void NpolDataStructure::FillAHistogram(struct HistoData *histoData, G4double dep) {
+
+	G4AnalysisManager *analysisManager = G4AnalysisManager::Instance();
+
+	if(dep >= 1.0*MeV)
+		analysisManager->FillH1(histoData->histoID, dep);
+}
+
+bool NpolDataStructure::isVolumeActive(G4VPhysicalVolume *PV) {
+	return (detData.find(PV) != detData.end());
+}
+
+bool NpolDataStructure::volumeHasEDepHistogram(G4VPhysicalVolume *PV) {
+	if(isVolumeActive(PV))
+		return ((detData[PV]).histoData != NULL);
+
+	return false;
+}

@@ -17,21 +17,45 @@
 
 #include "G4SystemOfUnits.hh"
 
+struct HistoData {
+	G4int histoID;
+	const char *name;
+	const char *title;
+	G4int nbins;
+	G4double xmin;
+	G4double xmax;
+};
+
+struct ActiveDetectorData {
+
+	G4double EDep;
+
+	struct HistoData *histoData;
+};
+
 class G4VPhysicalVolume;
 
 class NpolDataStructure {
 
 	public:
 		static NpolDataStructure *GetInstance();
+		void RegisterActiveDetectorNTuple(G4VPhysicalVolume *PV);
+		void RegisterActiveDetectorEDepHistogram(G4VPhysicalVolume *PV, G4String nname, G4String ttitle, G4int nnbins, G4double xxmin, G4double xxmax);
+		void CreateHistograms();
 		void PrepareNewEvent();
 		void AddEDep(G4VPhysicalVolume *PV, G4double dep);
 		void FillHistograms();
 
 	private:
+		void FillAHistogram(struct HistoData *histoData, G4double dep);
+		bool isVolumeActive(G4VPhysicalVolume *PV);
+		bool volumeHasEDepHistogram(G4VPhysicalVolume *PV);
+
+	private:
 		NpolDataStructure();
 		~NpolDataStructure();
 
-		std::map<G4VPhysicalVolume *, G4double> EDep;
+		std::map<G4VPhysicalVolume *, struct ActiveDetectorData> detData;
 };
 
 #endif

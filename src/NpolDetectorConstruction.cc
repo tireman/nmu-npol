@@ -26,11 +26,10 @@
 #include "NpolDipole2.hh"
 #include "NpolShieldHut.hh"
 #include "NpolHBender.hh"
-#include "NpolHistogramManager.hh"
+#include "NpolDataStructure.hh"
 
 NpolDetectorConstruction::NpolDetectorConstruction() {
 
-	NpolHistogramManager *hm = NpolHistogramManager::GetInstance();
 	world = new NpolWorld();
 	activeDetectors["Polarimeter"] = new NpolPolarimeter();
 	activeDetectors["Target"] = new NpolTarget(); 
@@ -39,7 +38,7 @@ NpolDetectorConstruction::NpolDetectorConstruction() {
 	activeDetectors["Dipole 1"] = new NpolDipole1();
 	activeDetectors["Dipole 2"] = new NpolDipole2();
 	activeDetectors["Shield Hut"] = new NpolShieldHut();
-	//activeDetectors["HBender"] = new NpolHBender();
+	activeDetectors["HBender"] = new NpolHBender();
 }
 
 NpolDetectorConstruction::~NpolDetectorConstruction() {
