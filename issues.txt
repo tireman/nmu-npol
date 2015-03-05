@@ -1,0 +1,26 @@
+%% issues.txt - used to track standing issues in the devlopment of Npol %%
+
+Data Out - Ntuple
+	Need to output:
+		Volume Name
+		Particle ID (refer to SHMS code)
+		Parent ID
+		Vertex Energy
+		Hit position x,y,z
+	each step or each event?
+		Step level has the advantage of not having to run the sim again when analysis methods are changed
+	
+	SteppingAction - set requirements for saving to ntuple (ParentID < 3, and certain particles (and maybe volumes))
+		Maybe kill tracks later
+
+Geometry
+	HBender (gdml) - place 4 volumes and not the "World" volume
+	Dump (gdml) - fix
+	Immediate Downstream Beamline (rings around one pipe section OR unions with pipe sections)
+	Scattering Chamber (subtract solid pipe and add hollow stubs after)
+	Consider: GDML or constructor files?
+	
+Mag Fields
+
+Multi-Threading
+
