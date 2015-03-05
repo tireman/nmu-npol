@@ -1,10 +1,10 @@
 
-// && NpolSHMSHeader file %% //
+// && NpolHBender Header file %% //
 
 // Created: Daniel Wilbern - March 2015
 
-#ifndef Npol_SHMS_h
-#define Npol_SHMS_h
+#ifndef Npol_HBender_h
+#define Npol_HBender_h
 
 #include "G4SystemOfUnits.hh"
 
@@ -14,11 +14,11 @@ class G4LogicalVolume;
 class G4AssemblyVolume;
 class G4VPhysicalVolume;
 
-class NpolSHMS : public NpolSubDetector {
+class NpolHBender : public NpolSubDetector {
   
 public:
-  NpolSHMS();
-  ~NpolSHMS();
+  NpolHBender();
+  ~NpolHBender();
   
   virtual G4VPhysicalVolume *Construct(G4LogicalVolume *motherLV);
  

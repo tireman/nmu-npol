@@ -25,7 +25,7 @@
 #include "NpolDipole1.hh"
 #include "NpolDipole2.hh"
 #include "NpolShieldHut.hh"
-#include "NpolSHMS.hh"
+#include "NpolHBender.hh"
 #include "NpolThing.hh"
 #include "NpolHistogramManager.hh"
 
@@ -41,7 +41,7 @@ NpolDetectorConstruction::NpolDetectorConstruction() {
   activeDetectors["Dipole 1"] = new NpolDipole1();
   activeDetectors["Dipole 2"] = new NpolDipole2();
   activeDetectors["Shield Hut"] = new NpolShieldHut();
-  //activeDetectors["SHMS"] = new NpolSHMS();
+  //activeDetectors["HBender"] = new NpolHBender();
   //activeDetectors["Thing"] = new NpolThing();
 }
 
