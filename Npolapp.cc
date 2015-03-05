@@ -7,15 +7,6 @@
 //* LICENSE and available at  http://cern.ch/geant4/license .  These *
 //* include a list of copyright holders.     		      	*
 //********************************************************************
-//* The Geant4 software is used by the Northern Michigan University  *
-//* in accordance to the Geant4 software license specified above.    *
-//* The NMU Collaboration does not hold any rights to this software  *
-//* and gives full permission for its use to others under the limits *
-//* imposed by the GEANT4 Collaboration.  The NMU Collaboration      *
-//* gives no express or implied warranty and use of our code is at   *
-//* the users discretion only.  		    			*
-//********************************************************************
-
 
 #ifdef G4MULTITHREADED
  #include "G4MTRunManager.hh"
@@ -88,9 +79,6 @@ int main(int argc,char *argv[]) {
     G4String fileName = argv[1];
     UImanager->ApplyCommand(command + fileName);
     
-    // Pause the program so I can look at the visual before it closes
-    //G4cout << "Press Return to continue" << G4endl;
-    //G4cin.get();
   } else {
     // interactive mode
 #ifdef G4UI_USE

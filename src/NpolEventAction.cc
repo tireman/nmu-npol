@@ -1,7 +1,17 @@
+//********************************************************************
+//* License and Disclaimer: From GEANT Collaboration                 *
+//*                                                                  *
+//* The  Geant4 software  is  copyright of the Copyright Holders  of *
+//* the Geant4 Collaboration.  It is provided  under  the terms  and *
+//* conditions of the Geant4 Software License,  included in the file *
+//* LICENSE and available at  http://cern.ch/geant4/license .  These *
+//* include a list of copyright holders.     		      	*
+//********************************************************************
+
 //%% NpolEventAction.cc %% 
 
 // This is were the event level actions are placed
-// Created: Daniel Wilber November 2014
+// Created: Daniel Wilbern November 2014
 // Modified: William Tireman December 2014
 
 #include <cstring>
@@ -31,8 +41,8 @@ G4Mutex aMutex = G4MUTEX_INITIALIZER; // Have to use a mutex for calls to strtok
 
 NpolEventAction::NpolEventAction()
 {
-  // set printing per each 10 events
-  G4RunManager::GetRunManager()->SetPrintProgress(10);     
+	// set printing per each 10 events
+	G4RunManager::GetRunManager()->SetPrintProgress(10);     
 }
 
 NpolEventAction::~NpolEventAction()
@@ -44,8 +54,8 @@ void NpolEventAction::BeginOfEventAction(const G4Event* evt) {
 
 	dataStructure->PrepareNewEvent();
 
-//	memset(Edep, 0, sizeof(Edep));
-//	memset(EdepdEoverE, 0, sizeof(EdepdEoverE));
+	//	memset(Edep, 0, sizeof(Edep));
+	//	memset(EdepdEoverE, 0, sizeof(EdepdEoverE));
 }
 
 void NpolEventAction::EndOfEventAction(const G4Event* evt) {
@@ -55,86 +65,86 @@ void NpolEventAction::EndOfEventAction(const G4Event* evt) {
 	dataStructure->FillHistograms();
 
 
-  /*	  G4int event_id = evt->GetEventID();
-		G4AnalysisManager *analysisManager = G4AnalysisManager::Instance();
-		G4SDManager *SDMan = G4SDManager::GetSDMpointer();
-		G4HCofThisEvent *HCE = evt->GetHCofThisEvent();
-		int i, dEoverEflag = 0;
+	/*	  G4int event_id = evt->GetEventID();
+		  G4AnalysisManager *analysisManager = G4AnalysisManager::Instance();
+		  G4SDManager *SDMan = G4SDManager::GetSDMpointer();
+		  G4HCofThisEvent *HCE = evt->GetHCofThisEvent();
+		  int i, dEoverEflag = 0;
 
-		for(i=0; i < numSensitiveDetectors; i++)
-		ProcessHitsInASensitiveDetector(HCE, CHCIDs[i]);
+		  for(i=0; i < numSensitiveDetectors; i++)
+		  ProcessHitsInASensitiveDetector(HCE, CHCIDs[i]);
 
-		for(i=1; i <= NUM_DETECTORS; i++)
-		if(Edep[i] != 0.0)
-		analysisManager->FillH1(i,Edep[i]);
+		  for(i=1; i <= NUM_DETECTORS; i++)
+		  if(Edep[i] != 0.0)
+		  analysisManager->FillH1(i,Edep[i]);
 
-		if(EdepdEoverE[0] >= 2.0 && EdepdEoverE[1] >= 1.0 && EdepdEoverE[4] >= 1.0 && EdepdEoverE[5] < 1.0) {
-		dEoverEflag = 1;
-		analysisManager->FillH2(1, EdepdEoverE[0], EdepdEoverE[1]);
-		}
-		if(EdepdEoverE[2] >= 2.0 && EdepdEoverE[3] >= 1.0 && EdepdEoverE[4] >= 1.0 && EdepdEoverE[5] < 1.0) {
-		dEoverEflag = 1;
-		analysisManager->FillH2(2, EdepdEoverE[2], EdepdEoverE[3]);
-		}
-		if(dEoverEflag == 1)
-		analysisManager->FillH2(3, EdepdEoverE[0] + EdepdEoverE[2], EdepdEoverE[1] + EdepdEoverE[3]);
+		  if(EdepdEoverE[0] >= 2.0 && EdepdEoverE[1] >= 1.0 && EdepdEoverE[4] >= 1.0 && EdepdEoverE[5] < 1.0) {
+		  dEoverEflag = 1;
+		  analysisManager->FillH2(1, EdepdEoverE[0], EdepdEoverE[1]);
+		  }
+		  if(EdepdEoverE[2] >= 2.0 && EdepdEoverE[3] >= 1.0 && EdepdEoverE[4] >= 1.0 && EdepdEoverE[5] < 1.0) {
+		  dEoverEflag = 1;
+		  analysisManager->FillH2(2, EdepdEoverE[2], EdepdEoverE[3]);
+		  }
+		  if(dEoverEflag == 1)
+		  analysisManager->FillH2(3, EdepdEoverE[0] + EdepdEoverE[2], EdepdEoverE[1] + EdepdEoverE[3]);
 
 	 */  
 }
 
 // Given a pointer to the G4HCofThisEvent, HCE, and a hit collection ID, CHCID, process the hit objects stored the NpolHitsCollection identified by CHCID
 void NpolEventAction::ProcessHitsInASensitiveDetector(G4HCofThisEvent *HCE, int CHCID) {
-/*
-	NpolHitsCollection *hitsCollection = NULL;
-	int i;
-	int n_hits = 0;
+	/*
+	   NpolHitsCollection *hitsCollection = NULL;
+	   int i;
+	   int n_hits = 0;
 
-	if(HCE != NULL) {
-		hitsCollection = (NpolHitsCollection *)(HCE->GetHC(CHCID)); // Cast to custom hits collection type
-	}
+	   if(HCE != NULL) {
+	   hitsCollection = (NpolHitsCollection *)(HCE->GetHC(CHCID)); // Cast to custom hits collection type
+	   }
 
-	if(hitsCollection != NULL) {
+	   if(hitsCollection != NULL) {
 
-		n_hits = hitsCollection->entries();
-		for(i = 0; i < n_hits; i++) {
-			NpolHit *aHit = (*hitsCollection)[i];
-			char *volname = (char *)calloc(strlen("BottomVetoLV")+1,sizeof(char));
+	   n_hits = hitsCollection->entries();
+	   for(i = 0; i < n_hits; i++) {
+	   NpolHit *aHit = (*hitsCollection)[i];
+	   char *volname = (char *)calloc(strlen("BottomVetoLV")+1,sizeof(char));
 
-			int *detectorInfo = ParseAssemblyVolumeName(aHit->GetVolumeName().data(), &volname); // have to cast from (const char *) to (char *)
+	   int *detectorInfo = ParseAssemblyVolumeName(aHit->GetVolumeName().data(), &volname); // have to cast from (const char *) to (char *)
 
-			fillEdepArray(aHit, detectorInfo);
-			filldEoverEArray(aHit, volname);
-			free(volname);	
-			
-		}
-	}
-*/
+	   fillEdepArray(aHit, detectorInfo);
+	   filldEoverEArray(aHit, volname);
+	   free(volname);	
+
+	   }
+	   }
+	 */
 }
 
 // Get the correct historgram ID from a parsed assembly volume name and add the energy deposited value from aHit to the Edep array.
 void NpolEventAction::fillEdepArray(NpolHit *aHit, int *detectorInfo) {
-/*
-	int histoID = GetOffsetFromAssemblyVolumeNumber(detectorInfo[0]) + GetOffsetFromImprintNumber(detectorInfo[0], detectorInfo[1]) + detectorInfo[2];
-	Edep[histoID] += aHit->GetTotalEnergyDeposit();
-	*/
+	/*
+	   int histoID = GetOffsetFromAssemblyVolumeNumber(detectorInfo[0]) + GetOffsetFromImprintNumber(detectorInfo[0], detectorInfo[1]) + detectorInfo[2];
+	   Edep[histoID] += aHit->GetTotalEnergyDeposit();
+	 */
 }
 
 // Fill the correct spot in the dEoverE array depending on the logical volume name of the detector
 void NpolEventAction::filldEoverEArray(NpolHit *aHit, char *volname) {
-/*
-	if(strcmp(volname, "TopDetLV") == 0)
-		EdepdEoverE[0] += aHit->GetTotalEnergyDeposit();
-	else if(strcmp(volname, "TopVetoLV") == 0)
-		EdepdEoverE[1] += aHit->GetTotalEnergyDeposit();
-	else if(strcmp(volname, "BottomDetLV") == 0)
-		EdepdEoverE[2] += aHit->GetTotalEnergyDeposit();
-	else if(strcmp(volname,"BottomVetoLV") == 0)
-		EdepdEoverE[3] += aHit->GetTotalEnergyDeposit();
-	else if (strcmp(volname,"FrontDetLV") == 0)
-		EdepdEoverE[4] += aHit->GetTotalEnergyDeposit();
-	else if (strcmp(volname,"FrontTagLV") == 0)
-		EdepdEoverE[5] += aHit->GetTotalEnergyDeposit();
-		*/
+	/*
+	   if(strcmp(volname, "TopDetLV") == 0)
+	   EdepdEoverE[0] += aHit->GetTotalEnergyDeposit();
+	   else if(strcmp(volname, "TopVetoLV") == 0)
+	   EdepdEoverE[1] += aHit->GetTotalEnergyDeposit();
+	   else if(strcmp(volname, "BottomDetLV") == 0)
+	   EdepdEoverE[2] += aHit->GetTotalEnergyDeposit();
+	   else if(strcmp(volname,"BottomVetoLV") == 0)
+	   EdepdEoverE[3] += aHit->GetTotalEnergyDeposit();
+	   else if (strcmp(volname,"FrontDetLV") == 0)
+	   EdepdEoverE[4] += aHit->GetTotalEnergyDeposit();
+	   else if (strcmp(volname,"FrontTagLV") == 0)
+	   EdepdEoverE[5] += aHit->GetTotalEnergyDeposit();
+	 */
 }
 
 // Parse an assembly volume's name and return an array containing the assembly volume number, imprint number, and volume number.

@@ -1,3 +1,13 @@
+//********************************************************************
+//* License and Disclaimer: From GEANT Collaboration                 *
+//*                                                                  *
+//* The  Geant4 software  is  copyright of the Copyright Holders  of *
+//* the Geant4 Collaboration.  It is provided  under  the terms  and *
+//* conditions of the Geant4 Software License,  included in the file *
+//* LICENSE and available at  http://cern.ch/geant4/license .  These *
+//* include a list of copyright holders.     		      	*
+//********************************************************************
+
 // %% NpolMaterials.cc  %%
 
 // Npol materials are created in here
@@ -70,13 +80,13 @@ void NpolMaterials::CreateMaterials() {
 }
 
 G4Material *NpolMaterials::CreateVacuum() {
-// Define Vacuum: New version; use Air and just make it very low density
-  G4double fractionmass, density;
-  G4int ncomponents;
-  Vacuum = new G4Material("Vacuum", density= 1.e-25*g/cm3, ncomponents=1, kStateGas, 253*kelvin, 1.e-8*atmosphere);
-  Vacuum->AddMaterial(nistMan->FindOrBuildMaterial("G4_AIR"), fractionmass=1.);
+	// Define Vacuum: New version; use Air and just make it very low density
+	G4double fractionmass, density;
+	G4int ncomponents;
+	Vacuum = new G4Material("Vacuum", density= 1.e-25*g/cm3, ncomponents=1, kStateGas, 253*kelvin, 1.e-8*atmosphere);
+	Vacuum->AddMaterial(nistMan->FindOrBuildMaterial("G4_AIR"), fractionmass=1.);
 
-  return Vacuum;
+	return Vacuum;
 }
 
 G4Material *NpolMaterials::CreateAir() {
@@ -84,67 +94,67 @@ G4Material *NpolMaterials::CreateAir() {
 }
 
 G4Material *NpolMaterials::CreateAl(){
-  return nistMan->FindOrBuildMaterial("G4_Al");
+	return nistMan->FindOrBuildMaterial("G4_Al");
 }
 
 G4Material *NpolMaterials::CreateScint() {
 
-  G4Element* H = nistMan->FindOrBuildElement("H");
-  G4Element* C = nistMan->FindOrBuildElement("C");
-  G4Material* scint = new G4Material("Scint", 1.02*g/cm3, 2);
-  scint->AddElement(H, 8.451*perCent);
-  scint->AddElement(C, 91.549*perCent);
-  
-  return scint;
+	G4Element* H = nistMan->FindOrBuildElement("H");
+	G4Element* C = nistMan->FindOrBuildElement("C");
+	G4Material* scint = new G4Material("Scint", 1.02*g/cm3, 2);
+	scint->AddElement(H, 8.451*perCent);
+	scint->AddElement(C, 91.549*perCent);
+
+	return scint;
 }
 
 G4Material *NpolMaterials::CreateLH2() {
-  
-  // liquid hydrogen
-  // Hydrogen element  
-  G4Element* H = nistMan->FindOrBuildElement("H");
-   
-  // Liquid Hydrogen
-  LH2 = new G4Material("LH2", 0.07085*g/cm3, 1, kStateLiquid, 15.0*kelvin);
-  LH2->AddElement(H, 2);
 
-  return LH2;
+	// liquid hydrogen
+	// Hydrogen element  
+	G4Element* H = nistMan->FindOrBuildElement("H");
+
+	// Liquid Hydrogen
+	LH2 = new G4Material("LH2", 0.07085*g/cm3, 1, kStateLiquid, 15.0*kelvin);
+	LH2->AddElement(H, 2);
+
+	return LH2;
 }
 
 G4Material *NpolMaterials::CreateLD2() {
-// liquid deuterium
-  G4int Z, N;
-  G4double a;
-  // Deuteron isotope
-  G4Isotope* deuteron = new G4Isotope("deuteron", Z=1, N=2, a=2.0141018*g/mole);
- 
-  // Deuterium element
-  G4Element* deuterium = new G4Element("deuterium", "deuterium", 1);
-  deuterium->AddIsotope(deuteron, 1);
- 
-  // Liquid Deuterium
-  LD2 = new G4Material("LD2", 0.169*g/cm3, 1, kStateLiquid, 22.0*kelvin);
-  LD2->AddElement(deuterium, 2);
+	// liquid deuterium
+	G4int Z, N;
+	G4double a;
+	// Deuteron isotope
+	G4Isotope* deuteron = new G4Isotope("deuteron", Z=1, N=2, a=2.0141018*g/mole);
 
-  return LD2;
+	// Deuterium element
+	G4Element* deuterium = new G4Element("deuterium", "deuterium", 1);
+	deuterium->AddIsotope(deuteron, 1);
+
+	// Liquid Deuterium
+	LD2 = new G4Material("LD2", 0.169*g/cm3, 1, kStateLiquid, 22.0*kelvin);
+	LD2->AddElement(deuterium, 2);
+
+	return LD2;
 }
 
 G4Material *NpolMaterials::CreateConcrete() {
 
-  return nistMan->FindOrBuildMaterial("G4_CONCRETE");
+	return nistMan->FindOrBuildMaterial("G4_CONCRETE");
 }
 
 G4Material *NpolMaterials::CreateFe() {
-  
-  return nistMan->FindOrBuildMaterial("G4_Fe");
+
+	return nistMan->FindOrBuildMaterial("G4_Fe");
 }
 
 G4Material *NpolMaterials::CreateSSteel() {
 
-  return nistMan->FindOrBuildMaterial("G4_STAINLESS-STEEL");
+	return nistMan->FindOrBuildMaterial("G4_STAINLESS-STEEL");
 }
 
 G4Material *NpolMaterials::CreateCu() {
- 
-  return nistMan->FindOrBuildMaterial("G4_Cu");
+
+	return nistMan->FindOrBuildMaterial("G4_Cu");
 }

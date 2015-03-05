@@ -1,3 +1,12 @@
+//********************************************************************
+//* License and Disclaimer: From GEANT Collaboration                 *
+//*                                                                  *
+//* The  Geant4 software  is  copyright of the Copyright Holders  of *
+//* the Geant4 Collaboration.  It is provided  under  the terms  and *
+//* conditions of the Geant4 Software License,  included in the file *
+//* LICENSE and available at  http://cern.ch/geant4/license .  These *
+//* include a list of copyright holders.     		      	*
+//********************************************************************
 
 // %% NpolHBender.cc %%
 
@@ -17,15 +26,15 @@
 #include "NpolHBender.hh"
 
 NpolHBender::NpolHBender() {
-  G4cout << "Initializing HBender" << G4endl;
+	G4cout << "Initializing HBender" << G4endl;
 }
 
 NpolHBender::~NpolHBender() {
-  G4cout << "Deleting HBender" << G4endl;
+	G4cout << "Deleting HBender" << G4endl;
 }
 
 G4VPhysicalVolume *NpolHBender::Construct(G4LogicalVolume *motherLV) {
-  
+
 	G4GDMLParser parser;
 
 	G4String gdmlFilename = "gdml/HBender.gdml";
@@ -33,6 +42,5 @@ G4VPhysicalVolume *NpolHBender::Construct(G4LogicalVolume *motherLV) {
 
 	G4LogicalVolume *HBenderLV = parser.GetVolume("HBender");
 	PlaceCylindrical(HBenderLV,motherLV,"HBender",0,0,0);
-	
 }
 

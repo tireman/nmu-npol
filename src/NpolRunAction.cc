@@ -1,3 +1,13 @@
+//********************************************************************
+//* License and Disclaimer: From GEANT Collaboration                 *
+//*                                                                  *
+//* The  Geant4 software  is  copyright of the Copyright Holders  of *
+//* the Geant4 Collaboration.  It is provided  under  the terms  and *
+//* conditions of the Geant4 Software License,  included in the file *
+//* LICENSE and available at  http://cern.ch/geant4/license .  These *
+//* include a list of copyright holders.     		      	*
+//******************************************************************
+
 // %% NpolRunAction.cc %%
 
 // Daniel Wilbern, dwilbern@nmu.edu  September 2014
@@ -155,7 +165,6 @@ void NpolRunAction::CreateHistograms() {
 }
 
 NpolRunAction::~NpolRunAction() {
-
 	delete G4AnalysisManager::Instance();
 }
 
@@ -164,7 +173,7 @@ void NpolRunAction::BeginOfRunAction(const G4Run* aRun) {
 	G4AnalysisManager *analysisManager = G4AnalysisManager::Instance();
 
 	analysisManager->OpenFile("npol");
-	runTimer->Start(); //Start the timer
+	runTimer->Start();
 
 	G4cout << "### Run " << aRun->GetRunID() << " start." << G4endl;
 }
@@ -176,7 +185,7 @@ void NpolRunAction::EndOfRunAction(const G4Run*) {
 	analysisManager->Write();
 	analysisManager->CloseFile();
 
-	runTimer->Stop(); // Stop the timer
+	runTimer->Stop();
 	G4cout << "Run Time: " << *(runTimer) << G4endl;
 }
 
