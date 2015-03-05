@@ -9,10 +9,10 @@
 //********************************************************************
 
 #ifdef G4MULTITHREADED
- #include "G4MTRunManager.hh"
- #include "G4Threading.hh"
+#include "G4MTRunManager.hh"
+#include "G4Threading.hh"
 #else
- #include "G4RunManager.hh"
+#include "G4RunManager.hh"
 #endif
 #include <time.h>
 #include "G4UImanager.hh"
@@ -30,74 +30,72 @@
 #include "NpolHistogramManager.hh"
 
 #ifdef G4VIS_USE
- #include "G4VisExecutive.hh"
+#include "G4VisExecutive.hh"
 #endif
 
 #ifdef G4UI_USE
- #include "G4UIExecutive.hh"
+#include "G4UIExecutive.hh"
 #endif
 
 
 int main(int argc,char *argv[]) {
 
-  NpolHistogramManager *histoManager = NpolHistogramManager::GetInstance();
+	// Choose the Random engine
+	//
+	G4Random::setTheEngine(new CLHEP::RanecuEngine);
 
-  // Choose the Random engine
-  //
-  G4Random::setTheEngine(new CLHEP::RanecuEngine);
-    
-  // RunManager construction
+	// RunManager construction
 #ifdef G4MULTITHREADED
-  G4RunManager *runManager = new G4RunManager;
-  //G4MTRunManager *runManager = new G4MTRunManager;
-  //runManager->SetNumberOfThreads(G4Threading::G4GetNumberOfCores()-6);
+	G4RunManager *runManager = new G4RunManager;
+	//G4MTRunManager *runManager = new G4MTRunManager;
+	//runManager->SetNumberOfThreads(G4Threading::G4GetNumberOfCores()-6);
 #else
-  G4RunManager *runManager = new G4RunManager;
+	G4RunManager *runManager = new G4RunManager;
 #endif
-  
-  
+
+
 #ifdef G4VIS_USE
-  // Visualization manager construction
-  G4VisManager *visManager = new G4VisExecutive;
-  visManager->Initialize();
+	// Visualization manager construction
+	G4VisManager *visManager = new G4VisExecutive;
+	visManager->Initialize();
 #endif
-  
-  // mandatory user initialization classes
-  runManager->SetUserInitialization(new NpolDetectorConstruction);
-  runManager->SetUserInitialization(new QGSP_BERT);
-  runManager->SetUserInitialization(new NpolActionInitialization);
-  
-  // initialize Geant4 kernel
-  runManager->Initialize();
-  
-  // Get the pointer to the User Interface manager
-  G4UImanager *UImanager = G4UImanager::GetUIpointer();
-  
-  if(argc != 1) {
-    // batch mode
-    G4String command = "/control/execute ";
-    G4String fileName = argv[1];
-    UImanager->ApplyCommand(command + fileName);
-    
-  } else {
-    // interactive mode
+
+	// mandatory user initialization classes
+	runManager->SetUserInitialization(new NpolDetectorConstruction);
+	runManager->SetUserInitialization(new QGSP_BERT);
+	runManager->SetUserInitialization(new NpolActionInitialization);
+
+	// initialize Geant4 kernel
+	runManager->Initialize();
+
+	// Get the pointer to the User Interface manager
+	G4UImanager *UImanager = G4UImanager::GetUIpointer();
+
+	if(argc != 1) {
+		// batch mode
+		G4String command = "/control/execute ";
+		G4String fileName = argv[1];
+		UImanager->ApplyCommand(command + fileName);
+
+	} else {
+		// interactive mode
 #ifdef G4UI_USE
-    G4UIExecutive *ui = new G4UIExecutive(argc, argv);
+		G4UIExecutive *ui = new G4UIExecutive(argc, argv);
 #ifdef G4VIS_USE
-    UImanager->ApplyCommand("/control/execute init_vis.mac");
+		UImanager->ApplyCommand("/control/execute init_vis.mac");
 #else
-    UImanager->ApplyCommand("/control/execute init.mac");
+		UImanager->ApplyCommand("/control/execute init.mac");
 #endif
-    ui->SessionStart();
-    delete ui;
+		ui->SessionStart();
+		delete ui;
 #endif
-  }
-  
+	}
+
 #ifdef G4VIS_USE
-  delete visManager;
+	delete visManager;
 #endif
-  delete runManager;
-  
-  return 0;
+	delete runManager;
+
+	return 0;
 }
 
