@@ -5,21 +5,13 @@
  	<constant name="PI" value="1.*pi"/>
 	<variable name="target_to_hbbore_center" value="176"/>
 	<constant name="fBoreRot" value="1.5"/>
-	<constant name="fHBLHeThick" value="0.5"/>
-
-	<constant name="fWorldXfp" value="60"/>
-	<constant name="fWorldXfn" value="100"/>
-	<constant name="fWorldXbp" value="60"/>
-	<constant name="fWorldXbn" value="1500"/>
-	<constant name="fWorldY" value="130"/>
-	<constant name="fWorldZ" value="11000"/>
 
 	<constant name="fBpipeThick" value="0.3"/>
 	<constant name="fBpipeRMax1" value="2.54"/>
 	<constant name="fBpipeRMin1" value="-fBpipeThick+fBpipeRMax1"/>
 	<constant name="fBpipeRMax2" value="30.48"/>
 	<constant name="fBpipeRMin2" value="-fBpipeThick+fBpipeRMax2"/>
-	<constant name="fBpipeDz" value="3287.36"/>
+	<constant name="fBpipeDz" value="115.5"/>
 	<constant name="fHBBpipeCenterX" value="-cos(8.5*pi/180)*sin(5.5*pi/180)*target_to_hbbore_center+2"/>
 	<constant name="fHBBpipeCenterY" value="0"/>
 	<constant name="fHBBpipeCenterZ" value="-sin(8.5*pi/180)*sin(5.5*pi/180)*target_to_hbbore_center+2"/>
@@ -132,19 +124,9 @@
 
 <solids>
 
-	<cone name = "beamPipe" rmin1="fBpipeRMin1" rmax1="fBpipeRMax1" rmin2="fBpipeRMin2" rmax2="fBpipeRMax2" z="fBpipeDz" startphi="0" deltaphi="360" aunit="deg" lunit= "cm" />
 	<cone name = "beamPipeFull" rmin1="0" rmax1="fBpipeRMax1" rmin2="0" rmax2="fBpipeRMax2" z="fBpipeDz" startphi="0" deltaphi="360" aunit="deg" lunit= "cm" />
 	<cone name = "beamPipeVac" rmin1="0" rmax1="fBpipeRMin1" rmin2="0" rmax2="fBpipeRMin2" z="fBpipeDz" startphi="0" deltaphi="360" aunit="deg" lunit= "cm" />
 
-	<arb8 lunit="cm" name="boxWorld" dz="fWorldZ/2" 
-		v1x="fWorldXfn" v1y="-fWorldY/2" 
-		v2x="fWorldXfn" v2y="fWorldY/2"
-             	v3x="fWorldXfp" v3y="fWorldY/2" 
-		v4x="fWorldXfp" v4y="-fWorldY/2" 
-		v5x="fWorldXbn" v5y="-fWorldY/2" 
-		v6x="fWorldXbn" v6y="fWorldY/2"
-             	v7x="fWorldXbp" v7y="fWorldY/2" 
-		v8x="fWorldXbp" v8y="-fWorldY/2"/>
 
 	<arb8 lunit="cm" name="hbBore" dz="fHBBoreZ/2" 
 		v1x="fHBBoreXfn" v1y="-fHBBoreY/2" 
@@ -291,37 +273,7 @@
 	<auxiliary auxtype="SensDet" auxvalue="HBCryoBox"/>
 	</volume>
 
-	<volume name="HBender">
-	<materialref ref="Air"/> 
-	<solidref ref="boxWorld"/>
-
-		<physvol name="HBbore">
-		<volumeref ref="HBBoreLogic"/>
-		<positionref ref="Origin"/>
-		<rotationref ref="rHBRot"/>
-		</physvol>
-
-		<physvol name="HBCoil">
-		<volumeref ref="HBCoilLogic"/>
-		<positionref ref="Origin"/>
-		<rotationref ref="rHBRot"/>
-		</physvol>
-
-		<physvol name="HBYork">
-		<volumeref ref="HBYorkLogic"/>
-		<positionref ref="Origin"/>
-		<rotationref ref="rHBRot"/>
-		</physvol>
-
-		<physvol name="HBCryoBox">
-		<volumeref ref="HBCryoBoxLogic"/>
-		<positionref ref="Origin"/>
-		<rotationref ref="rHBRot"/>
-		</physvol>
- 	</volume>	
-
 </structure>
-
 <setup name="Default" version="1.0">
 </setup>
 
