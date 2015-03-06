@@ -291,7 +291,7 @@
 	<auxiliary auxtype="SensDet" auxvalue="HBCryoBox"/>
 	</volume>
 
-	<volume name="World">
+	<volume name="HBender">
 	<materialref ref="Air"/> 
 	<solidref ref="boxWorld"/>
 
@@ -323,7 +323,6 @@
 </structure>
 
 <setup name="Default" version="1.0">
-<world ref="World"/>
 </setup>
 
 </gdml>
