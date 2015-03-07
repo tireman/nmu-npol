@@ -25,7 +25,7 @@ target_link_libraries(Npolapp ${Geant4_LIBRARIES})
 
 # (6)
 set(Npolapp_SCRIPTS
-  npol.mac init.mac init_vis.mac vis.mac gdml/HBender.gdml
+  npol.mac init.mac init_vis.mac vis.mac gdml/HBender.gdml gdml/BeamDump.gdml
 )
 
 foreach(_script ${Npolapp_SCRIPTS})

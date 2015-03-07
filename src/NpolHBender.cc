@@ -50,5 +50,5 @@ G4VPhysicalVolume *NpolHBender::Construct(G4LogicalVolume *motherLV) {
   PlaceCylindrical(HBCoilLV,motherLV,"HBCoil", PosHB, ShmsAng,0);
   PlaceCylindrical(HBYorkLV,motherLV,"HBYork", PosHB, ShmsAng,0);
   PlaceCylindrical(HBCryoBoxLV,motherLV,"HBCryoBox", PosHB, ShmsAng,0);
-}
+} 
 
