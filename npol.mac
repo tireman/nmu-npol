@@ -11,7 +11,7 @@
 /run/verbose 0
 #/event/verbose 0
 
-/tracking/verbose 1
+/tracking/verbose 0
 /tracking/storeTrajectory 1
 
 #/gun/particle proton 
@@ -22,6 +22,6 @@
 #/gun/energy 2.1 GeV
 /gun/particle e-
 /gun/energy 4400 MeV
-/run/printProgress 1
-/run/beamOn 1
+/run/printProgress 1000
+/run/beamOn 100000
 
