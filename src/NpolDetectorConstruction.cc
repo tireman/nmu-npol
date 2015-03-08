@@ -19,7 +19,7 @@
 #include "NpolSubDetector.hh"
 #include "NpolWorld.hh"
 #include "NpolPolarimeter.hh"
-#include "NpolTarget.hh"
+#include "NpolScatteringChamber.hh"
 #include "NpolHallShell.hh"
 #include "NpolBeamline.hh"
 #include "NpolDipole1.hh"
@@ -33,8 +33,8 @@ NpolDetectorConstruction::NpolDetectorConstruction() {
 
 	world = new NpolWorld();
 	activeDetectors["Polarimeter"] = new NpolPolarimeter();
-	activeDetectors["Target"] = new NpolTarget(); 
-	activeDetectors["NpolHallShell"] = new NpolHallShell();
+	activeDetectors["Scattering Chamber"] = new NpolScatteringChamber(); 
+	activeDetectors["Hall Shell"] = new NpolHallShell();
 	activeDetectors["Beamline"] = new NpolBeamline();
 	activeDetectors["Dipole 1"] = new NpolDipole1();
 	activeDetectors["Dipole 2"] = new NpolDipole2();
