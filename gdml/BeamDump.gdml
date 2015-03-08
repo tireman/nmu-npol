@@ -1,0 +1,181 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<gdml xmlns:gdml="http://cern.ch/2001/Schemas/GDML" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="http://service-spi.web.cern.ch/service-spi/app/releases/GDML/schema/gdml.xsd" >
+
+<define>
+ 	<constant name="PI" value="1.*pi"/>
+
+	<constant name="fBDumpFaceDiameter" value="60.96"/>
+	<constant name="fBDumpFaceRMax" value="(fBDumpFaceDiameter/2) + 20"/>
+	<constant name="fBDumpFaceDz" value="1.0"/>
+	<constant name="fBDumpFaceCentralR" value="5.08"/>
+	<constant name="fBDumpFaceCentralDz" value="0.4"/>
+	<constant name="fBDumpFaceCenterX" value="0.0"/>
+	<constant name="fBDumpFaceCenterY" value="0.0"/>
+	<constant name="fBDumpFaceCenterZ" value="1871.96/2"/>
+
+	<constant name="fBDumpWindowRMax" value="fBDumpFaceRMax"/>
+	<constant name="fBDumpWindowDz" value="0.1"/>
+	<constant name="fBDumpWindowCenterX" value="0.0"/>
+	<constant name="fBDumpWindowCenterY" value="0.0"/>
+	<constant name="fBDumpWindowCenterZ" value="-1871.96/2"/>
+
+	<constant name="fBDumpHeliumVesselDz" value="1871.96"/>
+	<constant name="fBDumpHeliumVesseThickness" value="0.1"/>
+	<constant name="fBDumpHeVesselCenterX" value="0.0"/>
+	<constant name="fBDumpHeVesselCenterY" value="0.0"/>
+	<constant name="fBDumpHeVesselCenterZ" value="fBDumpHeliumVesselDz"/>
+	<constant name="fBDumpHeliumFillCentralDz" value="(-fBDumpFaceCentralDz+fBDumpFaceDz)*0.5+fBDumpHeliumVesselDz"/>
+
+  	<position name="Origin" unit="cm" x="0.0" y="0.0" z="0.0" />
+	<position name="HeVesselPos" unit="cm" x="0" y="0" z="-50.0" />
+	<position name="pEndDump" unit="cm" x="0.0" y="0.0" z="fBDumpHeliumVesselDz/2" />
+	<position name="pDumpWindow" unit="cm" x="fBDumpWindowCenterX" y="fBDumpWindowCenterY" z="fBDumpWindowCenterZ" />
+	<position name="pDumpFace" unit="cm" x="fBDumpFaceCenterX" y="fBDumpFaceCenterY" z="fBDumpFaceCenterZ" />
+	<position name="pDumpHeVessel" unit="cm" x="fBDumpHeVesselCenterX" y="fBDumpHeVesselCenterY" z="fBDumpHeVesselCenterZ" />
+  	<position name="pHeliumFill" unit="cm" x="0" y="0" z="(-fBDumpFaceCentralDz+fBDumpFaceDz)*0.25" /> 
+ 
+  	<rotation name="identity" x="0" y="0" z="0"/>
+
+</define>
+
+<materials>
+	<element name="videRef" formula="VACUUM" Z="1">
+	<atom value="1"/>
+	</element>
+
+	<element Z="7" formula="N" name="Nitrogen" >
+   	<atom value="14.007" />
+  	</element>
+
+  	<element Z="8" formula="O" name="Oxygen" >
+   	<atom value="15.999" />
+  	</element>
+
+   	<material formula=" " name="Air" >
+   	<D value="0.00129" />
+   	<fraction n="0.7" ref="Nitrogen" />
+   	<fraction n="0.3" ref="Oxygen" />
+	</material>
+
+	<material name="Al" Z="13.0">
+   	<D unit="g/cm3" value="2.70"/> <atom unit="g/mole"  value="26.98"/>
+  	</material>
+
+	<material name="Vacuum" formula="Vacuum">
+	<D unit="g/cm3" value ="1E-25"/>
+	<fraction n="1.0" ref="videRef"/>
+	</material>
+	
+	<material name="SSteel" Z="1.0">
+   	<D value="2.70"/> <atom value="26.98"/>
+  	</material>
+
+	<material name="Moria" Z="10">
+   	<D value="10"/> <atom value="10"/>
+  	</material>
+
+	<material name="He" Z="2">
+   	<D unit="g/cm3" value="0.0001785"/> <atom unit="g/mole"  value="4"/>
+  	</material>
+
+</materials>
+
+<solids>
+
+	<box lunit="cm" name="endDump" x="300" y="100" z="100"/>
+	<tube aunit="deg"  name="beamDumpFace" startphi="0" deltaphi="360" lunit="cm" rmin="fBDumpFaceCentralR" rmax="fBDumpFaceRMax" z="fBDumpFaceDz"/>
+	<tube aunit="deg"  name="beamDumpFaceCenter" startphi="0" deltaphi="360" lunit="cm" rmin="0" rmax="fBDumpFaceCentralR" z="fBDumpFaceCentralDz"/>
+	<tube aunit="deg"  name="beamDumpWindow" startphi="0" deltaphi="360" lunit="cm" rmin="0" rmax="fBDumpWindowRMax" z="fBDumpWindowDz"/>
+	<tube aunit="deg"  name="beamDumpHeliumVessel" startphi="0" deltaphi="360" lunit="cm" rmin="-fBDumpHeliumVesseThickness+fBDumpWindowRMax" rmax="fBDumpWindowRMax" z="fBDumpHeliumVesselDz"/>
+	<tube aunit="deg"  name="beamDumpHeliumFill" startphi="0" deltaphi="360" lunit="cm" rmin="fBDumpFaceCentralR" rmax="-fBDumpHeliumVesseThickness+fBDumpWindowRMax" z="fBDumpHeliumVesselDz"/>
+	<tube aunit="deg"  name="beamDumpHeliumFillCenter" startphi="0" deltaphi="360" lunit="cm" rmin="0" rmax="fBDumpFaceCentralR" z="fBDumpHeliumFillCentralDz"/>
+
+	<arb8 lunit="cm" name="dumpTunnel" dz="2000/2" 
+		v1x="75.0" v1y="-75.0" 
+		v2x="-75.0" v2y="-75.0"
+             	v3x="-75.0" v3y="75.0" 
+		v4x="75.0" v4y="75.0" 
+		v5x="200.0" v5y="-200.0" 
+		v6x="-200.0" v6y="-200.0"
+             	v7x="-200.0" v7y="200.0" 
+		v8x="200.0" v8y="200.0"/>
+
+	<union name="dumpFace">
+	<first ref="beamDumpFace"/>
+	<second ref="beamDumpFaceCenter"/>
+	<positionref ref="Origin"/>
+	</union>
+
+	<union name="dumpHeliumFill">
+	<first ref="beamDumpHeliumFill"/>
+	<second ref="beamDumpHeliumFillCenter"/>
+	<positionref ref="pHeliumFill"/>
+	</union>
+	
+</solids>
+
+<structure>
+
+	<volume name="BeamDumpWindowLogic">
+	<materialref ref="Al"/>
+	<solidref ref="beamDumpWindow"/>
+	<auxiliary auxtype="SensDet" auxvalue="DumpWindow"/>
+	</volume>
+
+	<volume name="HeliumFillLogic">
+	<materialref ref="He"/>
+	<solidref ref="dumpHeliumFill"/>
+	</volume>
+
+	<volume name="BeamDumpHeliumVesselLogic">
+	<materialref ref="Al"/>
+	<solidref ref="beamDumpHeliumVessel"/>
+	</volume>
+
+	<volume name="BeamDumpFaceLogic">
+	<materialref ref="Al"/>
+	<solidref ref="dumpFace"/>
+	<auxiliary auxtype="SensDet" auxvalue="DumpFace"/>
+	</volume>	
+
+	<volume name="EndDumpLogic">
+	<materialref ref="SSteel"/>
+	<solidref ref="endDump"/>
+	<auxiliary auxtype="SensDet" auxvalue="EndDump"/>
+	</volume>
+
+	<volume name="BDump">
+	  <materialref ref="Air"/> 
+	  <solidref ref="dumpTunnel"/>
+	  
+	  <physvol name="BeamDumpWindow">
+	    <volumeref ref="BeamDumpWindowLogic"/>
+	    <positionref ref="pDumpWindow"/>
+	  </physvol>
+
+	  <physvol name="BeamDumpHeVessel">
+	    <volumeref ref="BeamDumpHeliumVesselLogic"/>
+	    <positionref ref="HeVesselPos"/>
+	  </physvol>
+	  
+	  <physvol name="BeamDumpHelium">
+	    <volumeref ref="HeliumFillLogic"/>
+	    <positionref ref="HeVesselPos"/>
+	  </physvol>
+	  
+	  <physvol name="BeamDumpFace">
+	    <volumeref ref="BeamDumpFaceLogic"/>
+	    <positionref ref="pDumpFace"/>
+	  </physvol>
+	  
+	  <physvol name="EndDump">
+	    <volumeref ref="EndDumpLogic"/>
+	    <positionref ref="pEndDump"/>
+	  </physvol>
+ 	</volume>	
+	
+</structure>
+<setup name="Default" version="1.0">
+<world ref="BDump" />
+</setup>
+</gdml>

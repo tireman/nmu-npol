@@ -34,13 +34,21 @@ NpolHBender::~NpolHBender() {
 }
 
 G4VPhysicalVolume *NpolHBender::Construct(G4LogicalVolume *motherLV) {
-
-	G4GDMLParser parser;
-
-	G4String gdmlFilename = "gdml/HBender.gdml";
-	parser.Read(gdmlFilename);
-
-	G4LogicalVolume *HBenderLV = parser.GetVolume("HBender");
-	PlaceCylindrical(HBenderLV,motherLV,"HBender",0,0,0);
-}
+  
+  G4double ShmsAng = 16.0*deg, PosHB = 1.76*m;
+  G4GDMLParser parser;
+  
+  G4String gdmlFilename = "gdml/HBender.gdml";
+  parser.Read(gdmlFilename);
+  
+  G4LogicalVolume *HBBoreLV = parser.GetVolume("HBBoreLogic");
+  G4LogicalVolume *HBCoilLV = parser.GetVolume("HBCoilLogic");
+  G4LogicalVolume *HBYorkLV = parser.GetVolume("HBYorkLogic");
+  G4LogicalVolume *HBCryoBoxLV = parser.GetVolume("HBCryoBoxLogic");
+  
+  PlaceCylindrical(HBBoreLV,motherLV,"HBBore", PosHB, ShmsAng,0);
+  PlaceCylindrical(HBCoilLV,motherLV,"HBCoil", PosHB, ShmsAng,0);
+  PlaceCylindrical(HBYorkLV,motherLV,"HBYork", PosHB, ShmsAng,0);
+  PlaceCylindrical(HBCryoBoxLV,motherLV,"HBCryoBox", PosHB, ShmsAng,0);
+} 
 

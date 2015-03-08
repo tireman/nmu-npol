@@ -26,6 +26,7 @@
 #include "NpolDipole2.hh"
 #include "NpolShieldHut.hh"
 #include "NpolHBender.hh"
+#include "NpolBDump.hh"
 #include "NpolDataStructure.hh"
 
 NpolDetectorConstruction::NpolDetectorConstruction() {
@@ -39,6 +40,7 @@ NpolDetectorConstruction::NpolDetectorConstruction() {
 	activeDetectors["Dipole 2"] = new NpolDipole2();
 	activeDetectors["Shield Hut"] = new NpolShieldHut();
 	activeDetectors["HBender"] = new NpolHBender();
+	activeDetectors["Beam Dump"] = new NpolBDump();
 }
 
 NpolDetectorConstruction::~NpolDetectorConstruction() {

@@ -14,8 +14,9 @@ Data Out - Ntuple
 		Maybe kill tracks later
 
 Geometry
-	HBender (gdml) - place 4 volumes and not the "World" volume
-	Dump (gdml) - fix
+	HBender (gdml)- 4 vols placed, check for lines that can be removed
+	In GDML parsing, find solution to repeating materials
+
 	Immediate Downstream Beamline (rings around one pipe section OR unions with pipe sections)
 	Scattering Chamber (subtract solid pipe and add hollow stubs after)
 		Change beamlines 

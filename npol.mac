@@ -22,6 +22,6 @@
 #/gun/energy 2.1 GeV
 /gun/particle e-
 /gun/energy 4400 MeV
-/run/printProgress 500
-/run/beamOn 5000
+/run/printProgress 1000
+/run/beamOn 100000
 
