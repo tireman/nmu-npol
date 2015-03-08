@@ -18,6 +18,7 @@ Geometry
 	Dump (gdml) - fix
 	Immediate Downstream Beamline (rings around one pipe section OR unions with pipe sections)
 	Scattering Chamber (subtract solid pipe and add hollow stubs after)
+		Change beamlines 
 	Consider: GDML or constructor files?
 	
 Mag Fields
