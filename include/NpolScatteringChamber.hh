@@ -31,7 +31,13 @@ class NpolScatteringChamber : public NpolSubDetector {
 
 		virtual G4VPhysicalVolume *Construct(G4LogicalVolume *motherLV);
 
+		static G4double insideRadius;
+		static G4double insideHeight;
+		static G4double wallThickness;
+		static G4double holeRadius;
+
 	private:
+
 		G4LogicalVolume *innerChamberLV;
 		G4LogicalVolume *chamberWallLV;
 };

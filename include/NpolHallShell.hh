@@ -29,6 +29,14 @@ class NpolHallShell : public NpolSubDetector {
 		void ConstructHallShellRoof();
 		virtual G4VPhysicalVolume *Construct(G4LogicalVolume *motherLV);
 
+		static G4double insideRadius;
+		static G4double floorRadius;
+		static G4double shellHeight;
+		static G4double roofRadius;
+		static G4double creteThick;
+		static G4double xPlacementOffset;
+		static G4double zPlacementOffset;
+
 	private: 
 		G4LogicalVolume *HallShellWallLV;
 		G4LogicalVolume *HallShellFloorLV;

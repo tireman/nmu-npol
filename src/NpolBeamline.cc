@@ -25,8 +25,14 @@
 #include "G4ios.hh"
 #include "G4TwoVector.hh"
 #include "G4ExtrudedSolid.hh"
+
 #include "NpolMaterials.hh"
+#include "NpolHallShell.hh"
 #include "NpolBeamline.hh"
+
+G4double NpolBeamline::upperInnerRadius = 1.75*cm;
+G4double NpolBeamline::upperOuterRadius = 2.5*cm;
+G4double NpolBeamline::upperLen = NpolBeamline::calculateUpperBeamLineLen();
 
 NpolBeamline::NpolBeamline() {
 	G4cout << "Initializing Beamline: Up-stream and Down-Stream" << G4endl;
@@ -40,7 +46,7 @@ NpolBeamline::~NpolBeamline() {
 // circular portion constructed in polygon and two sections in z-axis. 
 //  First section is a fixed length and diameter while the section section 
 // is scaled by using the scaling in zsections for the last section.  This 
-// yields a tappered section that can be adjusted later. 
+// yields a tappered section that can be adjusted later.
 void NpolBeamline::ConstructBeamlineDown(){
 	G4double dia = 2.5*cm, zlen1 = +5.44*m, zlen2 = 26.78*m, tScale = 5.0;
 	G4int gnum = 60; // # of facets to circle for polygon
@@ -96,22 +102,24 @@ void NpolBeamline::ConstructBeamlineDownInner(){
 
 // Construct the Up stream portion of beamline in the world
 void NpolBeamline::ConstructBeamlineUpper() {
-	G4double len= 9.02*m, inDia = 0.0*cm, outDia = 2.5*cm;
-	G4Tubs *BeamlineUpper = new G4Tubs("BeamlineUpper", inDia, outDia, 
-			len, 0.0*deg, 360.*deg);
+
+	G4Tubs *BeamlineUpper = new G4Tubs("BeamlineUpper", 0, upperOuterRadius, 
+			upperLen, 0.0*deg, 360.*deg);
 	BeamlineUpperLV = new G4LogicalVolume(BeamlineUpper,
 			NpolMaterials::GetInstance()->GetSSteel(),"BeamlineUpperLV",0,0,0);
 	G4VisAttributes *UpperVisAtt= new G4VisAttributes(G4Colour(1.0,1.5,0.5));
+
 	BeamlineUpperLV->SetVisAttributes(UpperVisAtt);
 }
 
 // Fill the up stream portion with a vacuum
 void NpolBeamline::ConstructBeamlineUpperInner() {
-	G4double len= 9.02*m, inDia = 0.0*cm, outDia = 1.75*cm;
-	G4Tubs *BeamlineUpperInner = new G4Tubs("BeamlineUpperInner", inDia, outDia, 
-			len, 0.0*deg, 360.*deg);
+
+	G4Tubs *BeamlineUpperInner = new G4Tubs("BeamlineUpperInner", 0, upperOuterRadius, 
+			upperLen, 0.0*deg, 360.*deg);
 	BeamlineUpperInnerLV = new G4LogicalVolume(BeamlineUpperInner,
 			NpolMaterials::GetInstance()->GetVacuum(),"BeamlineUpperInnerLV",0,0,0);
+
 	BeamlineUpperInnerLV->SetVisAttributes(G4VisAttributes::GetInvisible());
 }
 
@@ -121,10 +129,20 @@ G4VPhysicalVolume *NpolBeamline::Construct(G4LogicalVolume *motherLV) {
 	ConstructBeamlineDown();
 	ConstructBeamlineUpperInner();
 	ConstructBeamlineDownInner();
+
 	PlaceCylindrical(BeamlineUpperLV, motherLV, "BeamLineUpper", -9.125*m,0,0);
 	PlaceCylindrical(BeamlineUpperInnerLV, BeamlineUpperLV, "BeamLineUpperInner",
 			0,0,0);
 	PlaceCylindrical(BeamlineDownLV, motherLV, "BeamLineDown", +0.103*m,0,0);
 	return PlaceCylindrical(BeamlineDownInnerLV,BeamlineDownLV,"BeamLineDownInner", 0,0,0);
+}
+
+G4double NpolBeamline::calculateUpperBeamLineLen() {
+
+	G4double x0 = NpolHallShell::xPlacementOffset;
+	G4double z0 = NpolHallShell::zPlacementOffset;
+	G4double r = NpolHallShell::insideRadius;
+
+	return z0 + sqrt(r*r - z0*z0);
 }
 

@@ -22,22 +22,28 @@ class G4AssemblyVolume;
 class G4VPhysicalVolume;
 
 class NpolBeamline : public NpolSubDetector {
-  
-public:
-  NpolBeamline();
-  ~NpolBeamline();
-  
-  void ConstructBeamlineUpper();
-  void ConstructBeamlineDown();
-  void ConstructBeamlineUpperInner();
-  void ConstructBeamlineDownInner();
-  virtual G4VPhysicalVolume *Construct(G4LogicalVolume *motherLV);
- 
-private: 
-  G4LogicalVolume *BeamlineUpperLV;
-  G4LogicalVolume *BeamlineDownLV;
-  G4LogicalVolume *BeamlineUpperInnerLV;
-  G4LogicalVolume *BeamlineDownInnerLV;
+
+	public:
+		NpolBeamline();
+		~NpolBeamline();
+
+		void ConstructBeamlineUpper();
+		void ConstructBeamlineDown();
+		void ConstructBeamlineUpperInner();
+		void ConstructBeamlineDownInner();
+		virtual G4VPhysicalVolume *Construct(G4LogicalVolume *motherLV);
+
+		static G4double upperInnerRadius;
+		static G4double upperOuterRadius;
+		static G4double upperLen;
+
+	private: 
+		static G4double calculateUpperBeamLineLen();
+
+		G4LogicalVolume *BeamlineUpperLV;
+		G4LogicalVolume *BeamlineDownLV;
+		G4LogicalVolume *BeamlineUpperInnerLV;
+		G4LogicalVolume *BeamlineDownInnerLV;
 };
 
 #endif

@@ -32,11 +32,15 @@
 // inside diameter and outside diameter of the hall; hall height; concrete
 // is set to 2.0m thick (guess 1/1/15) and I used a roof diamter of 42m 
 // to get a curve that from a sphere will cover the shell roof.  Estimated.
-G4double inDia = 22.860*m, outDia = 24.7744*m, shellHeight = 7.0*m;
-G4double roofDia = 42.0*m, creteThick=2.0*m;
+G4double NpolHallShell::insideRadius = 22.860*m;
+G4double NpolHallShell::floorRadius = 24.7744*m;
+G4double NpolHallShell::shellHeight = 7.0*m;
+G4double NpolHallShell::roofRadius = 42.0*m;
+G4double NpolHallShell::creteThick = 2.0*m;
+G4double NpolHallShell::xPlacementOffset = -4.700*m;
+G4double NpolHallShell::zPlacementOffset = 4.700*m;
 
 NpolHallShell::NpolHallShell() {
-
 	G4cout << "Initializing Hall Shell: Wall, floor, roof" << G4endl;
 }
 
@@ -47,8 +51,8 @@ NpolHallShell::~NpolHallShell() {
 // Construct the Hall Wall in the world; cylinder of concrete
 void NpolHallShell::ConstructHallShellWall() {
 
-	G4Tubs *Wall = new G4Tubs("Wall", inDia, outDia, shellHeight, 0.0*deg, 360.*deg);
-	G4Tubs *Hole = new G4Tubs("Hole", inDia-20.0*cm, outDia+20.0*cm, shellHeight/10, 76.0*deg, 5.*deg);
+	G4Tubs *Wall = new G4Tubs("Wall", insideRadius, floorRadius, shellHeight, 0.0*deg, 360.*deg);
+	G4Tubs *Hole = new G4Tubs("Hole", insideRadius-20.0*cm, floorRadius+20.0*cm, shellHeight/10, 76.0*deg, 5.*deg);
 
 	G4RotationMatrix *Rot = new G4RotationMatrix;
 	G4ThreeVector zTrans(+0.0*m, 0.0*m, +3.0*m);
@@ -66,7 +70,7 @@ void NpolHallShell::ConstructHallShellWall() {
 // Construct the Hall Floor in the world
 void NpolHallShell::ConstructHallShellFloor() {
 
-	G4Tubs *HallShellFloor = new G4Tubs("HallShellFloor",0.0*m, outDia, 
+	G4Tubs *HallShellFloor = new G4Tubs("HallShellFloor",0.0*m, floorRadius, 
 			(creteThick/2), 0.0*deg, 360.*deg);
 	HallShellFloorLV = new G4LogicalVolume(HallShellFloor,
 			NpolMaterials::GetInstance()->GetConcrete(),"HallShellFloorLV",0,0,0);
@@ -79,8 +83,8 @@ void NpolHallShell::ConstructHallShellFloor() {
 // Construct the Hall Roof in the world
 void NpolHallShell::ConstructHallShellRoof() {
 
-	G4Sphere *HallShellRoof = new G4Sphere("HallShellRoof",(roofDia-creteThick), 
-			roofDia, 0.0*deg, 360.0*deg, 0.0*deg, 38.0*deg);
+	G4Sphere *HallShellRoof = new G4Sphere("HallShellRoof",(roofRadius-creteThick), 
+			roofRadius, 0.0*deg, 360.0*deg, 0.0*deg, 38.0*deg);
 	HallShellRoofLV = new G4LogicalVolume(HallShellRoof,
 			NpolMaterials::GetInstance()->GetConcrete(),"HallShellRoofLV",0,0,0);
 
