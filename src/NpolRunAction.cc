@@ -31,9 +31,11 @@ NpolRunAction::NpolRunAction() {
 	G4cout << "Using " << analysisManager->GetType() << " Analysis Manager." << G4endl;
 
 	analysisManager->SetHistoDirectoryName("histograms");
+	analysisManager->SetNtupleDirectoryName("ntuples");
 	analysisManager->SetVerboseLevel(1);
 	analysisManager->SetFirstHistoId(1);
 
+	dataStructure->CreateNtuple();
 	dataStructure->CreateHistograms();
 
 	// Setup the run timer

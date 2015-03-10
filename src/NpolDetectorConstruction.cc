@@ -35,7 +35,7 @@ NpolDetectorConstruction::NpolDetectorConstruction() {
 	activeDetectors["Polarimeter"] = new NpolPolarimeter();
 	activeDetectors["Scattering Chamber"] = new NpolScatteringChamber(); 
 	activeDetectors["Hall Shell"] = new NpolHallShell();
-	activeDetectors["Beamline"] = new NpolBeamline();
+//	activeDetectors["Beamline"] = new NpolBeamline();
 	activeDetectors["Dipole 1"] = new NpolDipole1();
 	activeDetectors["Dipole 2"] = new NpolDipole2();
 	activeDetectors["Shield Hut"] = new NpolShieldHut();

@@ -16,6 +16,23 @@
 #include <map>
 
 #include "G4SystemOfUnits.hh"
+#include "G4VPhysicalVolume.hh"
+
+#define PROTON_ID 1
+#define NEUTRON_ID 2
+#define ELECTRON_ID 3
+#define POSITRON_ID 4
+#define GAMMA_ID 5
+
+struct NtupleColumns {
+	G4int volumeNameColID;
+	G4int particleIDColID;
+	G4int parentIDColID;
+	G4int vertexEnergyColID;
+	G4int xPosColID;
+	G4int yPosColID;
+	G4int zPosColID;
+};
 
 struct HistoData {
 	G4int histoID;
@@ -27,24 +44,22 @@ struct HistoData {
 };
 
 struct ActiveDetectorData {
-
 	G4double EDep;
-
 	struct HistoData *histoData;
 };
-
-class G4VPhysicalVolume;
 
 class NpolDataStructure {
 
 	public:
 		static NpolDataStructure *GetInstance();
-		void RegisterActiveDetectorNTuple(G4VPhysicalVolume *PV);
 		void RegisterActiveDetectorEDepHistogram(G4VPhysicalVolume *PV, G4String nname, G4String ttitle, G4int nnbins, G4double xxmin, G4double xxmax);
 		void CreateHistograms();
+		void CreateNtuple();
 		void PrepareNewEvent();
 		void AddEDep(G4VPhysicalVolume *PV, G4double dep);
 		void FillHistograms();
+		void FillNtuple(G4String volName, G4int particleID, G4int parentID, G4double vertexEnergy,
+				G4double xPos, G4double yPos, G4double zPos);
 
 	private:
 		void FillAHistogram(struct HistoData *histoData, G4double dep);
@@ -56,6 +71,7 @@ class NpolDataStructure {
 		~NpolDataStructure();
 
 		std::map<G4VPhysicalVolume *, struct ActiveDetectorData> detData;
+		struct NtupleColumns cols;
 };
 
 #endif
