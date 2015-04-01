@@ -1,20 +1,28 @@
 %% issues.txt - used to track standing issues in the devlopment of Npol %%
 	
-	Think of better name for NpolDataStructure
+Consider string Ntuple for volume names
+	hashes?
 
-	SteppingAction - set requirements for saving to ntuple (ParentID < 3, and certain particles (and maybe volumes))
+Think of better name for NpolDataStructure
+
+SteppingAction - set requirements for saving to ntuple (ParentID < 3, and certain particles (and maybe volumes))
 		Maybe kill tracks later
+
+Fix EDep histogram titles
 
 Geometry
 	In GDML parsing, find solution to repeating materials
-
-	Fix polarimeter EDep histogram title strings
+		Use a materials.xml files ala example extended/persistency/gdml/G01/
+		Or perhaps just rename the materials in the gdml files
 
 	Immediate Downstream Beamline (rings around one pipe section OR unions with pipe sections)
-	Scattering Chamber (subtract solid pipe and add hollow stubs after)
-		Change beamlines 
+		Split downstream Beamline extruded solid into two files
+
+	Fix downstream beamline
 	
 Mag Fields
+	Use Geant4 built-in dipole fields for now (G4UniformMagField)
 
 Multi-Threading
+	Low priority
 

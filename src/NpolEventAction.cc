@@ -57,6 +57,7 @@ void NpolEventAction::BeginOfEventAction(const G4Event* evt) {
 void NpolEventAction::EndOfEventAction(const G4Event* evt) {
 
 	NpolDataStructure *dataStructure = NpolDataStructure::GetInstance();
+	G4AnalysisManager *analysisManager = G4AnalysisManager::Instance();
 
 	dataStructure->FillHistograms();
 }

@@ -47,9 +47,9 @@ void NpolScatteringChamber::ConstructChamber() {
 	yRot90deg.rotateY(90*deg);
 	G4Transform3D transform = G4Transform3D(yRot90deg, translation);
 
-	G4Tubs *innerChamber = new G4Tubs("InnerChamber", 0*m, insideRadius, insideHeight, 0*deg, 360*deg);
+	G4Tubs *innerChamber = new G4Tubs("InnerChamber", 0*m, insideRadius, insideHeight/2, 0*deg, 360*deg);
 	G4Tubs *solidChamber = new G4Tubs("SolidChamber", 0*m, insideRadius+wallThickness,
-			insideHeight+(2*wallThickness), 0*deg, 360*deg);
+			(insideHeight+(2*wallThickness))/2, 0*deg, 360*deg);
 	G4SubtractionSolid *chamberWall = new G4SubtractionSolid("ChamberWall",solidChamber,innerChamber);
 	G4Tubs *beamPipeHoles = new G4Tubs("BeamPipeHoles", 0*m, holeRadius, insideRadius+1*m, 0*deg, 360*deg);
 	G4SubtractionSolid *chamberWallWithHoles = new G4SubtractionSolid("ChamberWallWithHoles",

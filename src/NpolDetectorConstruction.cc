@@ -38,7 +38,7 @@ NpolDetectorConstruction::NpolDetectorConstruction() {
 //	activeDetectors["Beamline"] = new NpolBeamline();
 	activeDetectors["Dipole 1"] = new NpolDipole1();
 	activeDetectors["Dipole 2"] = new NpolDipole2();
-	activeDetectors["Shield Hut"] = new NpolShieldHut();
+//	activeDetectors["Shield Hut"] = new NpolShieldHut();
 	activeDetectors["HBender"] = new NpolHBender();
 	activeDetectors["Beam Dump"] = new NpolBDump();
 }

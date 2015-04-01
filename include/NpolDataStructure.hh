@@ -36,16 +36,12 @@ struct NtupleColumns {
 
 struct HistoData {
 	G4int histoID;
-	const char *name;
-	const char *title;
+	char *name;
+	char *title;
 	G4int nbins;
 	G4double xmin;
 	G4double xmax;
-};
-
-struct ActiveDetectorData {
 	G4double EDep;
-	struct HistoData *histoData;
 };
 
 class NpolDataStructure {
@@ -62,15 +58,14 @@ class NpolDataStructure {
 				G4double xPos, G4double yPos, G4double zPos);
 
 	private:
-		void FillAHistogram(struct HistoData *histoData, G4double dep);
+		void FillAHistogram(struct HistoData *histoData);
 		bool isVolumeActive(G4VPhysicalVolume *PV);
-		bool volumeHasEDepHistogram(G4VPhysicalVolume *PV);
 
 	private:
 		NpolDataStructure();
 		~NpolDataStructure();
 
-		std::map<G4VPhysicalVolume *, struct ActiveDetectorData> detData;
+		std::map<G4VPhysicalVolume *, struct HistoData> detData;
 		struct NtupleColumns cols;
 };
 

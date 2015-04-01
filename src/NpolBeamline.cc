@@ -27,6 +27,7 @@
 #include "G4ExtrudedSolid.hh"
 
 #include "NpolMaterials.hh"
+#include "NpolScatteringChamber.hh"
 #include "NpolHallShell.hh"
 #include "NpolBeamline.hh"
 
@@ -104,7 +105,7 @@ void NpolBeamline::ConstructBeamlineDownInner(){
 void NpolBeamline::ConstructBeamlineUpper() {
 
 	G4Tubs *BeamlineUpper = new G4Tubs("BeamlineUpper", 0, upperOuterRadius, 
-			upperLen, 0.0*deg, 360.*deg);
+			upperLen/2, 0.0*deg, 360.*deg);
 	BeamlineUpperLV = new G4LogicalVolume(BeamlineUpper,
 			NpolMaterials::GetInstance()->GetSSteel(),"BeamlineUpperLV",0,0,0);
 	G4VisAttributes *UpperVisAtt= new G4VisAttributes(G4Colour(1.0,1.5,0.5));
@@ -116,7 +117,7 @@ void NpolBeamline::ConstructBeamlineUpper() {
 void NpolBeamline::ConstructBeamlineUpperInner() {
 
 	G4Tubs *BeamlineUpperInner = new G4Tubs("BeamlineUpperInner", 0, upperOuterRadius, 
-			upperLen, 0.0*deg, 360.*deg);
+			upperLen/2, 0.0*deg, 360.*deg);
 	BeamlineUpperInnerLV = new G4LogicalVolume(BeamlineUpperInner,
 			NpolMaterials::GetInstance()->GetVacuum(),"BeamlineUpperInnerLV",0,0,0);
 
@@ -130,7 +131,7 @@ G4VPhysicalVolume *NpolBeamline::Construct(G4LogicalVolume *motherLV) {
 	ConstructBeamlineUpperInner();
 	ConstructBeamlineDownInner();
 
-	PlaceCylindrical(BeamlineUpperLV, motherLV, "BeamLineUpper", -9.125*m,0,0);
+	PlaceCylindrical(BeamlineUpperLV, motherLV, "BeamLineUpper", -upperLen/2 - NpolScatteringChamber::insideRadius - NpolScatteringChamber::wallThickness,0,0);
 	PlaceCylindrical(BeamlineUpperInnerLV, BeamlineUpperLV, "BeamLineUpperInner",
 			0,0,0);
 	PlaceCylindrical(BeamlineDownLV, motherLV, "BeamLineDown", +0.103*m,0,0);
@@ -143,6 +144,6 @@ G4double NpolBeamline::calculateUpperBeamLineLen() {
 	G4double z0 = NpolHallShell::zPlacementOffset;
 	G4double r = NpolHallShell::insideRadius;
 
-	return z0 + sqrt(r*r - z0*z0);
+	return abs((z0 - sqrt(r*r - x0*x0))) - NpolScatteringChamber::insideRadius - NpolScatteringChamber::wallThickness;
 }
 
