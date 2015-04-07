@@ -14,6 +14,9 @@
 /tracking/verbose 0
 /tracking/storeTrajectory 1
 
+#File name can be changed here
+/analysis/setFileName npol_test
+
 #/gun/particle proton 
 #/gun/particle pi0 
 #/gun/particle mu- 
@@ -22,6 +25,6 @@
 #/gun/energy 2.1 GeV
 /gun/particle e-
 /gun/energy 4400 MeV
-/run/printProgress 1000
-/run/beamOn 100000
+/run/printProgress 10
+/run/beamOn 1000
 

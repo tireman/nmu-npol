@@ -50,7 +50,7 @@ void NpolRunAction::BeginOfRunAction(const G4Run* aRun) {
 
 	G4AnalysisManager *analysisManager = G4AnalysisManager::Instance();
 
-	analysisManager->OpenFile("npol");
+	analysisManager->OpenFile();
 	runTimer->Start();
 
 	G4cout << "### Run " << aRun->GetRunID() << " start." << G4endl;

@@ -1,7 +1,7 @@
 %% issues.txt - used to track standing issues in the devlopment of Npol %%
 	
 Consider string Ntuple for volume names
-	hashes?
+	packing characters into doubles and saving into Ntuple double columns (4 columns = 32 chars max)
 
 Think of better name for NpolDataStructure
 
@@ -10,15 +10,25 @@ SteppingAction - set requirements for saving to ntuple (ParentID < 3, and certai
 
 Fix EDep histogram titles
 
+NTuple columns: add TrackID and Step number, px, py, pz
+add particles: pi+, pi-, pi0
+
+Output tests:
+	Neutron (or proton) flux on polarimeter
+	Full system - e- beam on target
+		shield hut - all on, no floor but all walls, all on but no back wall, all off
+		downstream beamline stuff - on/off
+		beam dump - on/off
+		magnets - on/off
+
 Geometry
 	In GDML parsing, find solution to repeating materials
 		Use a materials.xml files ala example extended/persistency/gdml/G01/
-		Or perhaps just rename the materials in the gdml files
 
 	Immediate Downstream Beamline (rings around one pipe section OR unions with pipe sections)
 		Split downstream Beamline extruded solid into two files
 
-	Fix downstream beamline
+	Fix downstream beamline length
 	
 Mag Fields
 	Use Geant4 built-in dipole fields for now (G4UniformMagField)
