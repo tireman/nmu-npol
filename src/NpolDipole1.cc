@@ -30,6 +30,7 @@
 
 #include "NpolMaterials.hh"
 #include "NpolDipole1.hh"
+#include "NpolBeamlineDown.hh"
 
 NpolDipole1::NpolDipole1() {
 	G4cout << "Initializing Dipole 1" << G4endl;
@@ -111,12 +112,12 @@ void NpolDipole1::ConstructDipole1FieldClamp1(){
 
 	G4double height = 1.528*m, width = 2.35*m, thick = 0.0508*m;
 	G4double Inheight = 0.254*m, Inwidth = 0.56*m;
-	G4double radius = 0.035*m, CyLen = 5.10*cm, NpolAng = 28.0*deg;
+	G4double radius = 1.0*cm + NpolBeamlineDown::SecA2OutRadius, CyLen = 10.0*cm, NpolAng = 28.0*deg;
 
 	// Create the necessary solids
 	G4Box *Slab = new G4Box("Slab", width/2, height/2, thick/2);
 	G4Box *Hole = new G4Box("Hole", Inwidth/2, Inheight/2, (thick+0.001*m)/2);
-	G4Tubs *BHole = new G4Tubs("BHole", 0.0*m, radius, ((CyLen/2)+radius*tan(NpolAng)), 0.0*deg, 360.*deg);
+	G4Tubs *BHole = new G4Tubs("BHole", 0.0*m, radius, ((CyLen/2)+radius*tan(NpolAng)+2.0*cm), 0.0*deg, 360.*deg);
 
 	// Rotation and translation information for the hole for the beam line
 	G4RotationMatrix *yRot = new G4RotationMatrix;

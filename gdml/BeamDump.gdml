@@ -29,8 +29,8 @@
   	<position name="Origin" unit="cm" x="0.0" y="0.0" z="0.0" />
 	<position name="HeVesselPos" unit="cm" x="0" y="0" z="-50.0" />
 	<position name="pEndDump" unit="cm" x="0.0" y="0.0" z="fBDumpHeliumVesselDz/2" />
-	<position name="pDumpWindow" unit="cm" x="fBDumpWindowCenterX" y="fBDumpWindowCenterY" z="fBDumpWindowCenterZ" />
-	<position name="pDumpFace" unit="cm" x="fBDumpFaceCenterX" y="fBDumpFaceCenterY" z="fBDumpFaceCenterZ" />
+	<position name="pDumpWindow" unit="cm" x="fBDumpWindowCenterX" y="fBDumpWindowCenterY" z="(fBDumpWindowCenterZ)-50.0" />
+	<position name="pDumpFace" unit="cm" x="fBDumpFaceCenterX" y="fBDumpFaceCenterY" z="(fBDumpFaceCenterZ)-50.0" />
 	<position name="pDumpHeVessel" unit="cm" x="fBDumpHeVesselCenterX" y="fBDumpHeVesselCenterY" z="fBDumpHeVesselCenterZ" />
   	<position name="pHeliumFill" unit="cm" x="0" y="0" z="(-fBDumpFaceCentralDz+fBDumpFaceDz)*0.25" /> 
  
@@ -39,7 +39,7 @@
 </define>
 
 <materials>
-	<element name="videRef" formula="VACUUM" Z="1">
+	<element name="videRef" formula="DVACUUM" Z="1">
 	<atom value="1"/>
 	</element>
 
@@ -51,22 +51,22 @@
    	<atom value="15.999" />
   	</element>
 
-   	<material formula=" " name="Air" >
+   	<material formula=" " name="DAir" >
    	<D value="0.00129" />
    	<fraction n="0.7" ref="Nitrogen" />
    	<fraction n="0.3" ref="Oxygen" />
 	</material>
 
-	<material name="Al" Z="13.0">
+	<material name="DAl" Z="13.0">
    	<D unit="g/cm3" value="2.70"/> <atom unit="g/mole"  value="26.98"/>
   	</material>
 
-	<material name="Vacuum" formula="Vacuum">
+	<material name="DVacuum" formula="DVacuum">
 	<D unit="g/cm3" value ="1E-25"/>
 	<fraction n="1.0" ref="videRef"/>
 	</material>
 	
-	<material name="SSteel" Z="1.0">
+	<material name="DSSteel" Z="1.0">
    	<D value="2.70"/> <atom value="26.98"/>
   	</material>
 
@@ -74,7 +74,7 @@
    	<D value="10"/> <atom value="10"/>
   	</material>
 
-	<material name="He" Z="2">
+	<material name="DHe" Z="2">
    	<D unit="g/cm3" value="0.0001785"/> <atom unit="g/mole"  value="4"/>
   	</material>
 
@@ -117,35 +117,35 @@
 <structure>
 
 	<volume name="BeamDumpWindowLogic">
-	<materialref ref="Al"/>
+	<materialref ref="DAl"/>
 	<solidref ref="beamDumpWindow"/>
 	<auxiliary auxtype="SensDet" auxvalue="DumpWindow"/>
 	</volume>
 
 	<volume name="HeliumFillLogic">
-	<materialref ref="He"/>
+	<materialref ref="DHe"/>
 	<solidref ref="dumpHeliumFill"/>
 	</volume>
 
 	<volume name="BeamDumpHeliumVesselLogic">
-	<materialref ref="Al"/>
+	<materialref ref="DAl"/>
 	<solidref ref="beamDumpHeliumVessel"/>
 	</volume>
 
 	<volume name="BeamDumpFaceLogic">
-	<materialref ref="Al"/>
+	<materialref ref="DAl"/>
 	<solidref ref="dumpFace"/>
 	<auxiliary auxtype="SensDet" auxvalue="DumpFace"/>
 	</volume>	
 
 	<volume name="EndDumpLogic">
-	<materialref ref="SSteel"/>
+	<materialref ref="DSSteel"/>
 	<solidref ref="endDump"/>
 	<auxiliary auxtype="SensDet" auxvalue="EndDump"/>
 	</volume>
 
 	<volume name="BDump">
-	  <materialref ref="Air"/> 
+	  <materialref ref="DAir"/> 
 	  <solidref ref="dumpTunnel"/>
 	  
 	  <physvol name="BeamDumpWindow">

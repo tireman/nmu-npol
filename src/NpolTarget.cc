@@ -36,7 +36,7 @@ NpolTarget::~NpolTarget() {
 // Construct the target can in which we place the fluid
 void NpolTarget::ConstructTargetCan() {
 
-	G4Tubs *TargetCan = new G4Tubs("TargetCan",0.0*cm, 2.2*cm, 10.1*cm,
+	G4Tubs *TargetCan = new G4Tubs("TargetCan",0.0*cm, 2.2*cm, 20.1*cm,
 			0.0*deg, 360.*deg);
 	TargetCanLV = new G4LogicalVolume(TargetCan,
 			NpolMaterials::GetInstance()->GetAl(),"TargetCanLV",0,0,0);
@@ -49,7 +49,7 @@ void NpolTarget::ConstructTargetCan() {
 void NpolTarget::ConstructTargetFluid() {
 
 	G4Tubs *TargetFluid = new G4Tubs("TargetFluid",0.0*cm, 2.0*cm, 
-			10.0*cm, 0.0*deg, 360.*deg);
+			20.0*cm, 0.0*deg, 360.*deg);
 	TargetFluidLV = new G4LogicalVolume(TargetFluid,
 			NpolMaterials::GetInstance()->GetLD2(),"TargetFluidLV",0,0,0);
 

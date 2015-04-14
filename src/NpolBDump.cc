@@ -26,7 +26,7 @@ NpolBDump::~NpolBDump() {
 G4VPhysicalVolume *NpolBDump::Construct(G4LogicalVolume *motherLV) {
   
   // Constants
-  G4double PosDump =39.5*m;
+  G4double PosDump =38.0*m;
 
   G4GDMLParser parser;
   
@@ -37,6 +37,7 @@ G4VPhysicalVolume *NpolBDump::Construct(G4LogicalVolume *motherLV) {
    // world. Beam dump contains simplifed helium vessel and stainless
    // steel end dump
    G4LogicalVolume *BDumpLV = parser.GetVolume("BDump");
+   //BDumpLV->SetVisAttributes(G4VisAttributes::GetInvisible());
    PlaceCylindrical(BDumpLV,motherLV,"BDump", PosDump, 0.0*deg, 0); 
 }
 

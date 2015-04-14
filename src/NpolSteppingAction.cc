@@ -48,9 +48,15 @@ void NpolSteppingAction::UserSteppingAction(const G4Step *aStep) {
 
 	G4String volName = preStepPoint->GetPhysicalVolume()->GetName();
 
-	dataStructure->AddEDep(preStepPoint->GetPhysicalVolume(), aStep->GetTotalEnergyDeposit());
-
-	dataStructure->FillNtuple(volName, particleID, parentID, vertexEnergy,
-			positionInWorld.x(), positionInWorld.y(), positionInWorld.z());
+	G4String matName = preStepPoint->GetMaterial()->GetName();
+	if(volName == "EndDump"){
+	  aTrack->SetTrackStatus(fStopAndKill);
+	}else if (matName == "Scint"){
+	  dataStructure->AddEDep(preStepPoint->GetPhysicalVolume(), 
+	      aStep->GetTotalEnergyDeposit());
+	  
+	  dataStructure->FillNtuple(volName, particleID, parentID, vertexEnergy,
+	      positionInWorld.x(), positionInWorld.y(), positionInWorld.z());
+	}
 }
 

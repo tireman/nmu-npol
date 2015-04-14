@@ -21,7 +21,8 @@
 #include "NpolPolarimeter.hh"
 #include "NpolScatteringChamber.hh"
 #include "NpolHallShell.hh"
-#include "NpolBeamline.hh"
+#include "NpolBeamlineUpper.hh"
+#include "NpolBeamlineDown.hh"
 #include "NpolDipole1.hh"
 #include "NpolDipole2.hh"
 #include "NpolShieldHut.hh"
@@ -35,12 +36,13 @@ NpolDetectorConstruction::NpolDetectorConstruction() {
 	activeDetectors["Polarimeter"] = new NpolPolarimeter();
 	activeDetectors["Scattering Chamber"] = new NpolScatteringChamber(); 
 	activeDetectors["Hall Shell"] = new NpolHallShell();
-//	activeDetectors["Beamline"] = new NpolBeamline();
+	activeDetectors["Upper Beamline"] = new NpolBeamlineUpper();
+	activeDetectors["Down Beamline"] = new NpolBeamlineDown();
 	activeDetectors["Dipole 1"] = new NpolDipole1();
 	activeDetectors["Dipole 2"] = new NpolDipole2();
-//	activeDetectors["Shield Hut"] = new NpolShieldHut();
-	activeDetectors["HBender"] = new NpolHBender();
-	activeDetectors["Beam Dump"] = new NpolBDump();
+	activeDetectors["Shield Hut"] = new NpolShieldHut();
+	//activeDetectors["HBender"] = new NpolHBender();
+	//activeDetectors["Beam Dump"] = new NpolBDump();
 }
 
 NpolDetectorConstruction::~NpolDetectorConstruction() {

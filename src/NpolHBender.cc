@@ -41,14 +41,20 @@ G4VPhysicalVolume *NpolHBender::Construct(G4LogicalVolume *motherLV) {
   G4String gdmlFilename = "gdml/HBender.gdml";
   parser.Read(gdmlFilename);
   
-  G4LogicalVolume *HBBoreLV = parser.GetVolume("HBBoreLogic");
-  G4LogicalVolume *HBCoilLV = parser.GetVolume("HBCoilLogic");
-  G4LogicalVolume *HBYorkLV = parser.GetVolume("HBYorkLogic");
-  G4LogicalVolume *HBCryoBoxLV = parser.GetVolume("HBCryoBoxLogic");
-  
-  PlaceCylindrical(HBBoreLV,motherLV,"HBBore", PosHB, ShmsAng,0);
-  PlaceCylindrical(HBCoilLV,motherLV,"HBCoil", PosHB, ShmsAng,0);
-  PlaceCylindrical(HBYorkLV,motherLV,"HBYork", PosHB, ShmsAng,0);
-  PlaceCylindrical(HBCryoBoxLV,motherLV,"HBCryoBox", PosHB, ShmsAng,0);
-} 
+  G4LogicalVolume *HBenderLV = parser.GetVolume("HBenderPV");
+  G4LogicalVolume *HBCryoBoxLV = parser.GetVolume("HBCryoBoxLogic");  
+  G4LogicalVolume *HBBoreLogicLV = parser.GetVolume("HBBoreLogic");
+
+  //G4VisAttributes *TopVisAtt= new G4VisAttributes(G4Colour(0.0,0.0,1.0));
+  //HBenderLV->SetVisAttributes(TopVisAtt);
+  HBenderLV->SetVisAttributes(G4VisAttributes::GetInvisible());
+
+  G4VisAttributes *TopVisAtt= new G4VisAttributes(G4Colour(1.0,0.0,1.0));
+  HBCryoBoxLV->SetVisAttributes(TopVisAtt);
+
+  TopVisAtt= new G4VisAttributes(G4Colour(0.0,1.0,1.0));
+  HBBoreLogicLV->SetVisAttributes(TopVisAtt);
+
+  PlaceCylindrical(HBenderLV,motherLV, "HBender", PosHB, ShmsAng, 0);
+  } 
 

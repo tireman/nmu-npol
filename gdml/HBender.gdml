@@ -11,7 +11,7 @@
 	<constant name="fBpipeRMin1" value="-fBpipeThick+fBpipeRMax1"/>
 	<constant name="fBpipeRMax2" value="30.48"/>
 	<constant name="fBpipeRMin2" value="-fBpipeThick+fBpipeRMax2"/>
-	<constant name="fBpipeDz" value="115.5"/>
+	<constant name="fBpipeDz" value="115.75"/>
 	<constant name="fHBBpipeCenterX" value="-cos(8.5*pi/180)*sin(5.5*pi/180)*target_to_hbbore_center+2"/>
 	<constant name="fHBBpipeCenterY" value="0"/>
 	<constant name="fHBBpipeCenterZ" value="-sin(8.5*pi/180)*sin(5.5*pi/180)*target_to_hbbore_center+2"/>
@@ -112,7 +112,7 @@
    	<D unit="g/cm3" value="8.96"/> <atom unit="g/mole" value="63.546"/>
   	</material>
 
-	<material name="Vacuum" formula="Vacuum">
+	<material name="BVacuum" formula="Vacuum">
 	<D unit="g/cm3" value ="1E-25"/>
 	<fraction n="1.0" ref="videRef"/>
 	</material>
@@ -123,12 +123,21 @@
 </materials>
 
 <solids>
-
+ 
 	<cone name = "beamPipeFull" rmin1="0" rmax1="fBpipeRMax1" rmin2="0" rmax2="fBpipeRMax2" z="fBpipeDz" startphi="0" deltaphi="360" aunit="deg" lunit= "cm" />
 	<cone name = "beamPipeVac" rmin1="0" rmax1="fBpipeRMin1" rmin2="0" rmax2="fBpipeRMin2" z="fBpipeDz" startphi="0" deltaphi="360" aunit="deg" lunit= "cm" />
 
+	<arb8 lunit="cm" name="HBenderBox" dz="fHBCoilBoxZ/2+15" 
+		v1x="+62.0" v1y="+64.0" 
+		v2x="+62.0" v2y="-64.0"
+             	v3x="-14.0" v3y="-64.0" 
+		v4x="-14.0" v4y="+64.0" 
+		v5x="+62.0" v5y="+64.0" 
+		v6x="+62.0" v6y="-64.0"
+             	v7x="-24.0" v7y="-64.0" 
+		v8x="-24.0" v8y="+64.0"/>
 
-	<arb8 lunit="cm" name="hbBore" dz="fHBBoreZ/2" 
+	<arb8 lunit="cm" name="hbBore" dz="(fHBBoreZ/2)+0.5" 
 		v1x="fHBBoreXfn" v1y="-fHBBoreY/2" 
 		v2x="fHBBoreXfn" v2y="fHBBoreY/2"
              	v3x="fHBBoreXfp" v3y="fHBBoreY/2" 
@@ -251,31 +260,58 @@
 
 <structure>
 
-	<volume name="HBBoreLogic">
-	<materialref ref="Vacuum"/>
-	<solidref ref="hbBore"/>
-	</volume>
+  <volume name="HBBoreLogic">
+      <materialref ref="BVacuum"/>
+      <solidref ref="hbBore"/>
+    </volume>
+    
+    <volume name="HBCoilLogic">
+      <materialref ref="Copper"/>
+      <solidref ref="hbCoils"/>
+      <auxiliary auxtype="SensDet" auxvalue="HBCoil"/>
+    </volume>
+    
+    <volume name="HBYorkLogic">
+      <materialref ref="SSteel"/>
+      <solidref ref="HBYorkSolid"/>
+     </volume>
+    
+    <volume name="HBCryoBoxLogic">
+      <materialref ref="SSteel"/>
+      <solidref ref="hbCryoMinusBore"/>
+       <auxiliary auxtype="SensDet" auxvalue="HBCryoBox"/>
+    </volume>
 
-	<volume name="HBCoilLogic">
-	<materialref ref="Copper"/>
-	<solidref ref="hbCoils"/>
-	<auxiliary auxtype="SensDet" auxvalue="HBCoil"/>
-	</volume>
 
-	<volume name="HBYorkLogic">
-	<materialref ref="SSteel"/>
-	<solidref ref="HBYorkSolid"/>
-	</volume>
-
-	<volume name="HBCryoBoxLogic">
-	<materialref ref="SSteel"/>
-	<solidref ref="hbCryoMinusBore"/>
-	<auxiliary auxtype="SensDet" auxvalue="HBCryoBox"/>
-	</volume>
-
+  <volume name="HBenderPV">
+    <materialref ref="Air"/>
+    <solidref ref="HBenderBox"/>
+    
+    <physvol name="HBBorePV">
+      <volumeref ref="HBBoreLogic"/>
+      <positionref ref="Origin"/>
+    </physvol>
+    
+    <physvol name="HBCoilPV">
+      <volumeref ref="HBCoilLogic"/>
+      <positionref ref="Origin"/>
+    </physvol>
+    
+    <physvol name="HBYorkPV">
+      <volumeref ref="HBYorkLogic"/>
+      <positionref ref="Origin"/>
+    </physvol>
+    
+    <physvol name="HBCryoBoxPV">
+      <volumeref ref="HBCryoBoxLogic"/>
+      <positionref ref="Origin"/>
+    </physvol>
+    
+  </volume>
+  
 </structure>
 <setup name="Default" version="1.0">
-  <world ref="HBBoreLogic" />
+  <world ref="HBenderPV" />
 </setup>
 
 </gdml>
