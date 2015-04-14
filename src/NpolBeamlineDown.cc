@@ -244,6 +244,7 @@ void NpolBeamlineDown::ConstructBeamlineSecA(){
 }
 
 
+// vacuum liner for the first section
 void NpolBeamlineDown::ConstructSecA1Inner(){
 
   G4Tubs *SecA1In = new G4Tubs("SecA1In", 0, SecA1InRadius, SecA1zLen/2+0.2*cm, 0*deg, 360*deg);
@@ -254,6 +255,7 @@ void NpolBeamlineDown::ConstructSecA1Inner(){
   SecA1InLV->SetVisAttributes(BeamlineVisAtt);  
 }
 
+// vacuum liner for the second section
 void NpolBeamlineDown::ConstructSecA2Inner(){
 
   G4Tubs *SecA2In = new G4Tubs("SecA2In", 0, SecA2InRadius, SecA2zLen/2+0.2*cm, 0*deg, 360*deg);
@@ -264,6 +266,7 @@ void NpolBeamlineDown::ConstructSecA2Inner(){
   SecA2InLV->SetVisAttributes(BeamlineVisAtt);  
 }
 
+// vacuum liner for the third section
 void NpolBeamlineDown::ConstructSecA3Inner(){
 
   G4Tubs *SecA3In = new G4Tubs("SecA3In", 0, SecA3InRadius, SecA3zLen/2+0.2*cm, 0*deg, 360*deg);
@@ -287,7 +290,7 @@ G4VPhysicalVolume *NpolBeamlineDown::Construct(G4LogicalVolume *motherLV) {
   PlaceCylindrical(SecA1InLV, motherLV, "SecA1In", SecA1zLen/2 + NpolScatteringChamber::insideRadius + NpolScatteringChamber::wallThickness, 0, 0);
   PlaceCylindrical(SecA2InLV, motherLV, "SecA2In", SecA2zLen/2 + SecA1zLen + NpolScatteringChamber::insideRadius + NpolScatteringChamber::wallThickness, 0, 0);
   PlaceCylindrical(SecA3InLV, motherLV, "SecA3In", SecA3zLen/2 + SecA2zLen + SecA1zLen + NpolScatteringChamber::insideRadius + NpolScatteringChamber::wallThickness, 0, 0);
-  PlaceCylindrical(BeamlineDownLV, motherLV, "BeamLineDown", SecA1zLen + 2*NpolScatteringChamber::insideRadius + 2*NpolScatteringChamber::wallThickness + NpolHallShell::zPlacementOffset,0,0);
+  PlaceCylindrical(BeamlineDownLV, motherLV, "BeamLineDown", -2.1*cm + SecA1zLen + 2*NpolScatteringChamber::insideRadius + 2*NpolScatteringChamber::wallThickness + NpolHallShell::zPlacementOffset,0,0);
   return PlaceCylindrical(BeamlineDownInnerLV,BeamlineDownLV,"BeamLineDownInner", 0,0,0);
 }
 
