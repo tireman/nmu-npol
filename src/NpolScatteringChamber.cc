@@ -48,16 +48,19 @@ void NpolScatteringChamber::ConstructChamber() {
 	G4Transform3D transform = G4Transform3D(yRot90deg, translation);
 
 	G4Tubs *innerChamber = new G4Tubs("InnerChamber", 0*m, insideRadius, insideHeight/2, 0*deg, 360*deg);
-	G4Tubs *solidChamber = new G4Tubs("SolidChamber", 0*m, insideRadius+wallThickness,
-			(insideHeight+(2*wallThickness))/2, 0*deg, 360*deg);
+	G4Tubs *solidChamber = new G4Tubs("SolidChamber", 0*m, insideRadius+wallThickness, (insideHeight+(2*wallThickness))/2, 0*deg, 360*deg);
+	G4Tubs *npolWindow = new G4Tubs("npolWindow",insideRadius-1.0*cm,insideRadius+wallThickness-0.04*cm, 6.0*cm, 190.0*deg, 60.0*deg);
+G4Tubs *shmsWindow = new G4Tubs("shmsWindow",insideRadius-1.0*cm,insideRadius+wallThickness-0.04*cm, 5.0*cm, 110.0*deg, 60.0*deg);
+
+
 	G4SubtractionSolid *chamberWall = new G4SubtractionSolid("ChamberWall",solidChamber,innerChamber);
 	G4Tubs *beamPipeHoles = new G4Tubs("BeamPipeHoles", 0*m, holeRadius, insideRadius+1*m, 0*deg, 360*deg);
-	G4SubtractionSolid *chamberWallWithHoles = new G4SubtractionSolid("ChamberWallWithHoles",
-			chamberWall, beamPipeHoles, transform);
-
+	G4SubtractionSolid *chamberWallWithHoles = new G4SubtractionSolid("ChamberWallWithHoles",chamberWall, beamPipeHoles, transform);
+	G4SubtractionSolid *chamberWallWithWindow = new G4SubtractionSolid("ChamberWallWithWindow", chamberWallWithHoles, npolWindow);
+	G4SubtractionSolid *chamberWallWithSHMS = new G4SubtractionSolid("ChamberWallWithSHMS", chamberWallWithWindow, shmsWindow);
 	innerChamberLV = new G4LogicalVolume(innerChamber,
 			NpolMaterials::GetInstance()->GetVacuum(), "InnerChamberLV, 0,0,0");
-	chamberWallLV = new G4LogicalVolume(chamberWallWithHoles,
+	chamberWallLV = new G4LogicalVolume(chamberWallWithSHMS,
 			NpolMaterials::GetInstance()->GetAl(), "ChamberWallLV", 0,0,0);
 }
 

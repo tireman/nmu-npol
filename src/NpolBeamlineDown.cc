@@ -30,6 +30,7 @@
 #include "G4SubtractionSolid.hh"
 #include "G4RotationMatrix.hh"
 #include "G4Transform3D.hh"
+#include "G4ThreeVector.hh"
 
 #include "NpolMaterials.hh"
 #include "NpolScatteringChamber.hh"
@@ -129,8 +130,9 @@ void NpolBeamlineDown::ConstructBeamlineDownInner(){
 void NpolBeamlineDown::ConstructBeamlineSecA(){
  
   G4double GateVertShift = 4.2863*cm, A2OffSet = 15.0*cm;
-  G4ThreeVector translation;
+  G4ThreeVector translation = G4ThreeVector(0,0,0);
   G4RotationMatrix Rot;
+  Rot.rotateX(0*deg); Rot.rotateY(0*deg); Rot.rotateZ(0*deg);
   G4Transform3D transform;
 
   G4Tubs *SecA1 = new G4Tubs("SecA1",SecA1InRadius, SecA1OutRadius, SecA1zLen/2+0.2*cm, 0*deg, 360*deg);
@@ -300,6 +302,6 @@ G4double NpolBeamlineDown::calculateDownBeamLineLen() {
   G4double z0 = NpolHallShell::zPlacementOffset;
   G4double r = NpolHallShell::insideRadius;
   
-  return abs((z0 - sqrt(r*r - x0*x0))) + NpolScatteringChamber::insideRadius + NpolScatteringChamber::wallThickness + NpolHallShell::zPlacementOffset;
+  return abs((z0 - sqrt(r*r - x0*x0))) + NpolScatteringChamber::insideRadius + NpolScatteringChamber::wallThickness + NpolHallShell::zPlacementOffset - NpolHallShell::creteThick/2;
 }
 

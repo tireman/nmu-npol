@@ -52,7 +52,7 @@ NpolHallShell::~NpolHallShell() {
 void NpolHallShell::ConstructHallShellWall() {
 
 	G4Tubs *Wall = new G4Tubs("Wall", insideRadius, floorRadius, shellHeight, 0.0*deg, 360.*deg);
-	G4Tubs *Hole = new G4Tubs("Hole", insideRadius-20.0*cm, floorRadius+20.0*cm, shellHeight/10, 76.0*deg, 5.*deg);
+	G4Tubs *Hole = new G4Tubs("Hole", insideRadius-20.0*cm, floorRadius+20.0*cm, shellHeight/8, 76.0*deg, 5.5*deg);
 
 	G4RotationMatrix *Rot = new G4RotationMatrix;
 	G4ThreeVector zTrans(+0.0*m, 0.0*m, +3.0*m);
