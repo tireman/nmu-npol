@@ -59,9 +59,12 @@ void NpolRunAction::BeginOfRunAction(const G4Run* aRun) {
 void NpolRunAction::EndOfRunAction(const G4Run*) {
 
 	G4AnalysisManager *analysisManager = G4AnalysisManager::Instance();
+	NpolDataStructure *dataStructure = NpolDataStructure::GetInstance();
 
 	analysisManager->Write();
 	analysisManager->CloseFile();
+
+	dataStructure->WriteDetectorIDsToFile();
 
 	runTimer->Stop();
 	G4cout << "Run Time: " << *(runTimer) << G4endl;

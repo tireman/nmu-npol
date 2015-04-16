@@ -25,39 +25,41 @@ NpolSteppingAction::NpolSteppingAction() {}
 NpolSteppingAction::~NpolSteppingAction() {}
 
 void NpolSteppingAction::UserSteppingAction(const G4Step *aStep) {
-  NpolDataStructure *dataStructure = NpolDataStructure::GetInstance();
-  
-  G4Track *aTrack = aStep->GetTrack();
-  G4StepPoint *preStepPoint = aStep->GetPreStepPoint();	
-  
-  G4int parentID = aTrack->GetParentID();
-  
-  G4int particleID = -1;
-  G4String particleName = aTrack->GetDynamicParticle()->GetDefinition()->GetParticleName();
-  if(particleName == "e-") particleID = ELECTRON_ID;
-  else if(particleName == "e+") particleID = POSITRON_ID;
-  else if(particleName == "proton") particleID = PROTON_ID;
-  else if(particleName == "neutron") particleID = NEUTRON_ID;
-  else if(particleName == "gamma") particleID = GAMMA_ID;
-  
-  G4double vertexEnergy = aTrack->GetVertexKineticEnergy();
-  
-  G4ThreeVector positionInWorld = preStepPoint->GetPosition();
-  G4ThreeVector positionInVolume = 
-    preStepPoint->GetTouchableHandle()->GetHistory()->GetTopTransform().TransformPoint(positionInWorld);
-  
-  G4String volName = preStepPoint->GetPhysicalVolume()->GetName();
-  
-  G4String matName = preStepPoint->GetMaterial()->GetName();
-  if(volName == "EndDump"){
-    aTrack->SetTrackStatus(fStopAndKill);
-  }else if (matName == "Scint"){
-    dataStructure->AddEDep(preStepPoint->GetPhysicalVolume(),
-       aStep->GetTotalEnergyDeposit());
-    
-    dataStructure->FillNtuple(volName, particleID, parentID, 
-       vertexEnergy, positionInWorld.x(), positionInWorld.y(), 
-       positionInWorld.z());
-  }
+	NpolDataStructure *dataStructure = NpolDataStructure::GetInstance();
+
+	G4Track *aTrack = aStep->GetTrack();
+	G4StepPoint *preStepPoint = aStep->GetPreStepPoint();	
+
+	G4int parentID = aTrack->GetParentID();
+
+	G4int particleID = -1;
+	G4String particleName = aTrack->GetDynamicParticle()->GetDefinition()->GetParticleName();
+	if(particleName == "e-") particleID = ELECTRON_ID;
+	else if(particleName == "e+") particleID = POSITRON_ID;
+	else if(particleName == "proton") particleID = PROTON_ID;
+	else if(particleName == "neutron") particleID = NEUTRON_ID;
+	else if(particleName == "gamma") particleID = GAMMA_ID;
+
+	G4double vertexEnergy = aTrack->GetVertexKineticEnergy();
+
+	G4ThreeVector positionInWorld = preStepPoint->GetPosition();
+	G4ThreeVector positionInVolume = 
+		preStepPoint->GetTouchableHandle()->GetHistory()->GetTopTransform().TransformPoint(positionInWorld);
+
+	G4ThreeVector momentum = preStepPoint->GetMomentum();
+
+	G4VPhysicalVolume *volume = preStepPoint->GetPhysicalVolume();
+
+	G4String matName = preStepPoint->GetMaterial()->GetName();
+	if(volume->GetName() == "EndDump"){
+		aTrack->SetTrackStatus(fStopAndKill);
+	}else if (matName == "Scint"){
+		dataStructure->AddEDep(volume,
+				aStep->GetTotalEnergyDeposit());
+
+		dataStructure->FillNtuple(volume, particleID, parentID, vertexEnergy,
+				positionInWorld.x(), positionInWorld.y(), positionInWorld.z(), 
+				momentum.x(), momentum.y(), momentum.z());
+	}
 }
 

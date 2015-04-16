@@ -24,6 +24,7 @@
 static NpolDataStructure *pInstance = NULL;
 
 NpolDataStructure::NpolDataStructure() {
+	nextVolumeID = 0;
 	memset(&cols,0,sizeof(struct NtupleColumns));
 }
 
@@ -78,13 +79,16 @@ void NpolDataStructure::CreateNtuple() {
 	analysisManager->CreateH1("dummy", "Dummy Histogram - Please Disregard", 100, 0*MeV, 100*MeV);
 
 	analysisManager->CreateNtuple("NpolData", "Npol Data");
-	//cols.volumeNameColID = analysisManager->CreateNtupleSColumn("VolumeName");
+	cols.volumeIDColID = analysisManager->CreateNtupleIColumn("VolumeID");
 	cols.particleIDColID = analysisManager->CreateNtupleIColumn("ParticleID");
 	cols.parentIDColID = analysisManager->CreateNtupleIColumn("ParentID");
 	cols.vertexEnergyColID = analysisManager->CreateNtupleDColumn("VertexEnergy");
 	cols.xPosColID = analysisManager->CreateNtupleDColumn("XPosition");
 	cols.yPosColID = analysisManager->CreateNtupleDColumn("YPosition");
 	cols.zPosColID = analysisManager->CreateNtupleDColumn("ZPosition");
+	cols.xMomColID = analysisManager->CreateNtupleDColumn("XMomentum");
+	cols.yMomColID = analysisManager->CreateNtupleDColumn("YMomentum");
+	cols.zMomColID = analysisManager->CreateNtupleDColumn("ZMomentum");
 	analysisManager->FinishNtuple();
 }
 
@@ -108,22 +112,34 @@ void NpolDataStructure::FillHistograms() {
 		FillAHistogram(&(it->second));
 }
 
-void NpolDataStructure::FillNtuple(G4String volName, G4int particleID, G4int parentID, G4double vertexEnergy,
-		G4double xPos, G4double yPos, G4double zPos) {
+void NpolDataStructure::FillNtuple(G4VPhysicalVolume *PV, G4int particleID, G4int parentID, G4double vertexEnergy, G4double xPos, G4double yPos, G4double zPos, G4double xMom, G4double yMom, G4double zMom) {
 
 	G4AnalysisManager *analysisManager = G4AnalysisManager::Instance();
 
-	//analysisManager->FillNtupleSColumn(cols.volumeNameColID, volName);
+	int volumeID = getVolIDFor(PV);
+
+	analysisManager->FillNtupleIColumn(cols.volumeIDColID, volumeID);
 	analysisManager->FillNtupleIColumn(cols.particleIDColID, particleID);
 	analysisManager->FillNtupleIColumn(cols.parentIDColID, parentID);
 	analysisManager->FillNtupleDColumn(cols.vertexEnergyColID, vertexEnergy);
 	analysisManager->FillNtupleDColumn(cols.xPosColID, xPos);
 	analysisManager->FillNtupleDColumn(cols.yPosColID, yPos);
 	analysisManager->FillNtupleDColumn(cols.zPosColID, zPos);
+	analysisManager->FillNtupleDColumn(cols.xMomColID, xMom);
+	analysisManager->FillNtupleDColumn(cols.yMomColID, yMom);
+	analysisManager->FillNtupleDColumn(cols.zMomColID, zMom);
 	analysisManager->AddNtupleRow();
 }
 
-/* *** private methods *** */
+int NpolDataStructure::getVolIDFor(G4VPhysicalVolume *PV) {
+
+	std::pair<std::map<G4VPhysicalVolume *, int>::iterator, bool> ret;
+
+	ret = detectorIDs.insert(std::pair<G4VPhysicalVolume *, int>(PV, nextVolumeID++));
+	if(!(ret.second))
+		nextVolumeID--;
+	return (ret.first)->second;
+}
 
 void NpolDataStructure::FillAHistogram(struct HistoData *histoData) {
 
@@ -135,5 +151,16 @@ void NpolDataStructure::FillAHistogram(struct HistoData *histoData) {
 
 bool NpolDataStructure::isVolumeActive(G4VPhysicalVolume *PV) {
 	return (detData.find(PV) != detData.end());
+}
+
+void NpolDataStructure::WriteDetectorIDsToFile() {
+
+	std::map<G4VPhysicalVolume *, int>::iterator it;
+	FILE *f = fopen("/data/dwilbern/detIDs.txt","w+");
+
+	for(it = detectorIDs.begin(); it != detectorIDs.end(); it++)
+		fprintf(f,"%03d,%s\n",it->second, it->first->GetName().data());
+
+	fclose(f);
 }
 
