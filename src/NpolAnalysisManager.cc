@@ -112,7 +112,7 @@ void NpolAnalysisManager::FillHistograms() {
 		FillAHistogram(&(it->second));
 }
 
-void NpolAnalysisManager::FillNtuple(G4VPhysicalVolume *PV, G4int particleID, G4int parentID, G4int eventID, G4double vertexEnergy, G4double xPos, G4double yPos, G4double zPos, G4double xMom, G4double yMom, G4double zMom) {
+void NpolAnalysisManager::FillNtuple(G4VPhysicalVolume *PV, G4int particleID, G4int parentID, G4double vertexEnergy, G4double xPos, G4double yPos, G4double zPos, G4double xMom, G4double yMom, G4double zMom) {
 
 	G4AnalysisManager *analysisMan = G4AnalysisManager::Instance();
 
