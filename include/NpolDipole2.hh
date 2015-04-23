@@ -17,13 +17,13 @@
 
 #include "G4SystemOfUnits.hh"
 
-#include "NpolSubDetector.hh"
+#include "NpolDetectorFactory.hh"
 
 class G4LogicalVolume;
 class G4AssemblyVolume;
 class G4VPhysicalVolume;
 
-class NpolDipole2 : public NpolSubDetector {
+class NpolDipole2 : public NpolDetectorFactory {
 
 	public:
 		NpolDipole2();

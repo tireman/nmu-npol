@@ -12,13 +12,13 @@
 #define Npol_HallShell_h
 
 #include "G4SystemOfUnits.hh"
-#include "NpolSubDetector.hh"
+#include "NpolDetectorFactory.hh"
 
 class G4LogicalVolume;
 class G4AssemblyVolume;
 class G4VPhsycialVolume;
 
-class NpolHallShell : public NpolSubDetector {
+class NpolHallShell : public NpolDetectorFactory {
 
 	public:
 		NpolHallShell();

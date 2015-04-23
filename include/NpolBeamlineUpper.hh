@@ -15,13 +15,13 @@
 #define Npol_BeamlineUpper_h
 
 #include "G4SystemOfUnits.hh"
-#include "NpolSubDetector.hh"
+#include "NpolDetectorFactory.hh"
 
 class G4LogicalVolume;
 class G4AssemblyVolume;
 class G4VPhysicalVolume;
 
-class NpolBeamlineUpper : public NpolSubDetector {
+class NpolBeamlineUpper : public NpolDetectorFactory {
 
 	public:
 		NpolBeamlineUpper();

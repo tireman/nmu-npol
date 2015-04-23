@@ -11,13 +11,13 @@
 #ifndef Npol_Polarimiter_h
 #define Npol_Polarimiter_h
 
-#include "NpolSubDetector.hh"
+#include "NpolDetectorFactory.hh"
 
 class G4LogicalVolume;
 class G4AssemblyVolume;
 class G4VPhysicalVolume;
 
-class NpolWorld : public NpolSubDetector {
+class NpolWorld : public NpolDetectorFactory {
 
 	public:
 		NpolWorld();

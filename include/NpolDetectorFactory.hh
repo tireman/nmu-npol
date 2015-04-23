@@ -15,11 +15,11 @@
 
 class G4LogicalVolume;
 
-class NpolSubDetector {
+class NpolDetectorFactory {
 
 	public:
-		NpolSubDetector() {}
-		virtual ~NpolSubDetector() {}
+		NpolDetectorFactory() {}
+		virtual ~NpolDetectorFactory() {}
 
 		virtual G4String GetName() = 0;
 		virtual void Place(G4LogicalVolume *motherLV) = 0;

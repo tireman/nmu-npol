@@ -7,13 +7,13 @@
 
 #include "G4SystemOfUnits.hh"
 
-#include "NpolSubDetector.hh"
+#include "NpolDetectorFactory.hh"
 
 class G4LogicalVolume;
 class G4AssemblyVolume;
 class G4VPhysicalVolume;
 
-class NpolBDump : public NpolSubDetector {
+class NpolBDump : public NpolDetectorFactory {
 
 	public:
 		NpolBDump();

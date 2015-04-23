@@ -21,7 +21,7 @@ class G4VPhysicalVolume;
 class G4String;
 
 class NpolSensitiveDetector;
-class NpolSubDetector;
+class NpolDetectorFactory;
 class NpolWorld;
 
 class NpolDetectorConstruction : public G4VUserDetectorConstruction
@@ -34,7 +34,7 @@ class NpolDetectorConstruction : public G4VUserDetectorConstruction
 		virtual void ConstructSDandField();
 
 	private:
-		std::set<NpolSubDetector *> detectors;
+		std::set<NpolDetectorFactory *> detectors;
 		NpolWorld *world;
 };
 

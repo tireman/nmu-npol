@@ -15,14 +15,14 @@
 #ifndef Npol_ScatteringChamber_h
 #define Npol_ScatteringChamber_h
 
-#include "NpolSubDetector.hh"
+#include "NpolDetectorFactory.hh"
 #include "NpolTarget.hh"
 
 class G4LogicalVolume;
 class G4AssemblyVolume;
 class G4VPhysicalVolume;
 
-class NpolScatteringChamber : public NpolSubDetector {
+class NpolScatteringChamber : public NpolDetectorFactory {
 
 	public:
 		NpolScatteringChamber();

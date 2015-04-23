@@ -16,7 +16,7 @@
 #include "G4ios.hh"
 
 #include "NpolDetectorConstruction.hh"
-#include "NpolSubDetector.hh"
+#include "NpolDetectorFactory.hh"
 #include "NpolWorld.hh"
 #include "NpolPolarimeter.hh"
 #include "NpolScatteringChamber.hh"
@@ -67,7 +67,7 @@ G4VPhysicalVolume* NpolDetectorConstruction::Construct() {
 	world->Place(NULL);
 
 	// Iterate through the set and construct each detector.
-	std::set<NpolSubDetector *>::iterator it;
+	std::set<NpolDetectorFactory *>::iterator it;
 	for(it = detectors.begin(); it != detectors.end(); it++) {
 		G4cout << "Placing " << (*it)->GetName() << G4endl;
 		(*it)->Place(world->GetWorldLV());

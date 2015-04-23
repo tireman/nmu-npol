@@ -8,7 +8,7 @@
 //* include a list of copyright holders.     		      	*
 //******************************************************************
 
-//%% NpolSubDetector.cc %% **
+//%% NpolDetectorFactory.cc %% **
 
 // Implements methods common to all objects in the setup
 // Created: Daniel Wilbern December 2014
@@ -17,10 +17,10 @@
 #include "G4PhysicalConstants.hh"
 #include "G4PVPlacement.hh"
 
-#include "NpolSubDetector.hh"
+#include "NpolDetectorFactory.hh"
 
 // Place a volume in its mother volume at a location specified by rectangular coordinates.
-G4VPhysicalVolume *NpolSubDetector::PlaceRectangular(G4LogicalVolume *detLV, G4LogicalVolume *motherLV,
+G4VPhysicalVolume *NpolDetectorFactory::PlaceRectangular(G4LogicalVolume *detLV, G4LogicalVolume *motherLV,
 		G4String detName, G4double x, G4double y, G4double z,
 		G4double Rx, G4double Ry, G4double Rz) {
 
@@ -43,7 +43,7 @@ G4VPhysicalVolume *NpolSubDetector::PlaceRectangular(G4LogicalVolume *detLV, G4L
 
 // Place a volume in its mother volume at a location specified by cylindrical polar coordinates.
 // The polar axis is the positive Z axis.
-G4VPhysicalVolume *NpolSubDetector::PlaceCylindrical(G4LogicalVolume *detLV, G4LogicalVolume *motherLV,
+G4VPhysicalVolume *NpolDetectorFactory::PlaceCylindrical(G4LogicalVolume *detLV, G4LogicalVolume *motherLV,
 		G4String detName, G4double rho, G4double phi, G4double z) {
 
 	G4RotationMatrix Rm;

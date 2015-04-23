@@ -15,13 +15,13 @@
 #ifndef Npol_ShieldHut_h
 #define Npol_ShieldHut_h
 
-#include "NpolSubDetector.hh"
+#include "NpolDetectorFactory.hh"
 
 class G4LogicalVolume;
 class G4AssemblyVolume;
 class G4VPhysicalVolume;
 
-class NpolShieldHut : public NpolSubDetector {
+class NpolShieldHut : public NpolDetectorFactory {
 
 	public:
 		NpolShieldHut();

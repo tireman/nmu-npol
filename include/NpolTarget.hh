@@ -15,13 +15,13 @@
 #ifndef Npol_Target_h
 #define Npol_Target_h
 
-#include "NpolSubDetector.hh"
+#include "NpolDetectorFactory.hh"
 
 class G4LogicalVolume;
 class G4AssemblyVolume;
 class G4VPhysicalVolume;
 
-class NpolTarget : public NpolSubDetector {
+class NpolTarget : public NpolDetectorFactory {
 
 	public:
 		NpolTarget();
