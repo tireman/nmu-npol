@@ -26,35 +26,36 @@
 #include "NpolHBender.hh"
 
 NpolHBender::NpolHBender() {
-	G4cout << "Initializing HBender" << G4endl;
+	G4GDMLParser parser;
+
+	G4String gdmlFilename = "gdml/HBender.gdml";
+	parser.Read(gdmlFilename);
+
+	HBenderLV = parser.GetVolume("HBenderPV");
+	HBCryoBoxLV = parser.GetVolume("HBCryoBoxLogic");  
+	HBBoreLogicLV = parser.GetVolume("HBBoreLogic");
+
+	//G4VisAttributes *VisAtt= new G4VisAttributes(G4Colour(0.0,0.0,1.0));
+	//HBenderLV->SetVisAttributes(VisAtt);
+	HBenderLV->SetVisAttributes(G4VisAttributes::GetInvisible());
+
+	G4VisAttributes *VisAtt= new G4VisAttributes(G4Colour(1.0,0.0,1.0));
+	HBCryoBoxLV->SetVisAttributes(VisAtt);
+
+	VisAtt= new G4VisAttributes(G4Colour(0.0,1.0,1.0));
+	HBBoreLogicLV->SetVisAttributes(VisAtt);
 }
 
-NpolHBender::~NpolHBender() {
-	G4cout << "Deleting HBender" << G4endl;
+NpolHBender::~NpolHBender() {}
+
+G4String NpolHBender::GetName() {
+	return G4String("Horizontal Bender");
 }
 
-G4VPhysicalVolume *NpolHBender::Construct(G4LogicalVolume *motherLV) {
-  
-  G4double ShmsAng = 16.0*deg, PosHB = 1.76*m;
-  G4GDMLParser parser;
-  
-  G4String gdmlFilename = "gdml/HBender.gdml";
-  parser.Read(gdmlFilename);
-  
-  G4LogicalVolume *HBenderLV = parser.GetVolume("HBenderPV");
-  G4LogicalVolume *HBCryoBoxLV = parser.GetVolume("HBCryoBoxLogic");  
-  G4LogicalVolume *HBBoreLogicLV = parser.GetVolume("HBBoreLogic");
+void NpolHBender::Place(G4LogicalVolume *motherLV) {
+	G4double ShmsAng = 16.0*deg;
+	G4double PosHB = 1.76*m;
 
-  //G4VisAttributes *TopVisAtt= new G4VisAttributes(G4Colour(0.0,0.0,1.0));
-  //HBenderLV->SetVisAttributes(TopVisAtt);
-  HBenderLV->SetVisAttributes(G4VisAttributes::GetInvisible());
-
-  G4VisAttributes *TopVisAtt= new G4VisAttributes(G4Colour(1.0,0.0,1.0));
-  HBCryoBoxLV->SetVisAttributes(TopVisAtt);
-
-  TopVisAtt= new G4VisAttributes(G4Colour(0.0,1.0,1.0));
-  HBBoreLogicLV->SetVisAttributes(TopVisAtt);
-
-  PlaceCylindrical(HBenderLV,motherLV, "HBender", PosHB, ShmsAng, 0);
-  } 
+	PlaceCylindrical(HBenderLV,motherLV, "HBender", PosHB, ShmsAng, 0);
+} 
 

@@ -34,7 +34,9 @@ class NpolDipole1 : public NpolSubDetector {
 		void ConstructDipole1CuEnd();
 		void ConstructDipole1FieldClamp1();
 		void ConstructDipole1FieldClamp2();
-		virtual G4VPhysicalVolume *Construct(G4LogicalVolume *motherLV);
+
+		virtual G4String GetName();
+		virtual void Place(G4LogicalVolume *motherLV);
 
 	private: 
 		G4LogicalVolume *Dipole1YokeLV, *Dipole1CuBarLV, *Dipole1CuEndLV;

@@ -28,11 +28,16 @@
 #include "NpolDipole2.hh"
 
 NpolDipole2::NpolDipole2() {
-	G4cout << "Initializing Dipole 2" << G4endl;
+	ConstructDipole2Yoke();
+	ConstructDipole2CuBar();
+	ConstructDipole2CuEnd();
+	ConstructDipole2FieldClamp();
 }
 
-NpolDipole2::~NpolDipole2() {
-	G4cout << "Deleting Dipole 2" << G4endl;
+NpolDipole2::~NpolDipole2() {}
+
+G4String NpolDipole2::GetName() {
+	return G4String("Dipole 2");
 }
 
 // Construct the yokes using the extruded class
@@ -113,45 +118,31 @@ void NpolDipole2::ConstructDipole2FieldClamp(){
 	FieldClampLV->SetVisAttributes(Clamp);
 }
 
-G4VPhysicalVolume *NpolDipole2::Construct(G4LogicalVolume *motherLV) {
+void NpolDipole2::Place(G4LogicalVolume *motherLV) {
 	G4double PosD2 = 4.6866*m, NpolAng = 28.0*deg, BarOffSet = +0.7730*m;
 	G4double VertOffSet = 0.231/2*m, EndOffSet = +0.8235*m;
 	G4double ClampOffSet = 1.039*m;
 
-	ConstructDipole2Yoke();
-	ConstructDipole2CuBar();
-	ConstructDipole2CuEnd();
-	ConstructDipole2FieldClamp();
-
 	// Place 4 copes of the Copper bars in the magnet
 	PlaceRectangular(Dipole2CuBarLV, motherLV, "Dipole2CuBar", (BarOffSet*cos(NpolAng)-PosD2*sin(NpolAng)), VertOffSet, (BarOffSet*sin(NpolAng)+PosD2*cos(NpolAng)), 0*deg, -NpolAng, 0.0); 
-
 	PlaceRectangular(Dipole2CuBarLV, motherLV, "Dipole2CuBar", (-BarOffSet*cos(NpolAng)-PosD2*sin(NpolAng)), VertOffSet, (-BarOffSet*sin(NpolAng)+PosD2*cos(NpolAng)), 0*deg, -NpolAng, 0.0);
-
 	PlaceRectangular(Dipole2CuBarLV, motherLV, "Dipole2CuBar", (BarOffSet*cos(NpolAng)-PosD2*sin(NpolAng)), -VertOffSet, (BarOffSet*sin(NpolAng)+PosD2*cos(NpolAng)), 0*deg, -NpolAng, 0.0); 
-
 	PlaceRectangular(Dipole2CuBarLV, motherLV, "Dipole2CuBar", (-BarOffSet*cos(NpolAng)-PosD2*sin(NpolAng)), -VertOffSet, (-BarOffSet*sin(NpolAng)+PosD2*cos(NpolAng)), 0*deg, -NpolAng, 0.0);
 
 	// Place 4 copies of the extruded copper ends for the coil packs
-
 	PlaceCylindrical(Dipole2CuEndLV, motherLV, "Dipole2CuEnd", (PosD2-EndOffSet), -NpolAng, 0.0*m);
-
 	PlaceCylindrical(Dipole2CuEndLV, motherLV, "Dipole2CuEnd", (PosD2+EndOffSet), -NpolAng, 0.0*m);
-
 	PlaceRectangular(Dipole2CuEndLV, motherLV, "Dipole2CuEnd", (-(PosD2-EndOffSet)*sin(NpolAng)), 0.0*m, ((PosD2-EndOffSet)*cos(NpolAng)), 0.0*deg, NpolAng, 180.*deg);
-
 	PlaceRectangular(Dipole2CuEndLV, motherLV, "Dipole2CuEnd", (-(PosD2+EndOffSet)*sin(NpolAng)), 0.0*m, ((PosD2+EndOffSet)*cos(NpolAng)), 0.0*deg, NpolAng, 180.*deg);
 
 	// Place 2 copies of the field clamps for BNL 48D48
-
 	PlaceCylindrical(FieldClampLV, motherLV, "FieldClamp", (PosD2-ClampOffSet), -NpolAng, 0.0*m);
-
 	PlaceCylindrical(FieldClampLV, motherLV, "FieldClamp", (PosD2+ClampOffSet), -NpolAng, 0.0*m);
 
 	// Plcae the two copies of the yokes with 2nd one flipped over
 	PlaceCylindrical(Dipole2YokeLV, motherLV, "Dipole2", 
 			PosD2,-NpolAng,+0.0*cm);
-	return PlaceRectangular(Dipole2YokeLV, motherLV, "Dipole2", 
+	PlaceRectangular(Dipole2YokeLV, motherLV, "Dipole2", 
 			(-PosD2*sin(NpolAng)), 0.0*cm, 
 			(PosD2*cos(NpolAng)), 0*deg, NpolAng, 180*deg);
 }

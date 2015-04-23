@@ -41,11 +41,15 @@ G4double NpolHallShell::xPlacementOffset = -4.700*m;
 G4double NpolHallShell::zPlacementOffset = 4.700*m;
 
 NpolHallShell::NpolHallShell() {
-	G4cout << "Initializing Hall Shell: Wall, floor, roof" << G4endl;
+	ConstructHallShellWall();
+	ConstructHallShellFloor();
+	ConstructHallShellRoof();
 }
 
-NpolHallShell::~NpolHallShell() {
-	G4cout << "Deleting Hall Shell: Wall, floor, roof" << G4endl;
+NpolHallShell::~NpolHallShell() {}
+
+G4String NpolHallShell::GetName() {
+	return G4String("Hall Shell");
 }
 
 // Construct the Hall Wall in the world; cylinder of concrete
@@ -62,9 +66,9 @@ void NpolHallShell::ConstructHallShellWall() {
 	HallShellWallLV = new G4LogicalVolume(HallShellWall,
 			NpolMaterials::GetInstance()->GetConcrete(),"HallShellWallLV",0,0,0);
 
-	//G4VisAttributes *TopVisAtt= new G4VisAttributes(G4Colour(2.0,1.0,0.0));
-	//HallShellWallLV->SetVisAttributes(TopVisAtt);
-	HallShellWallLV->SetVisAttributes(G4VisAttributes::GetInvisible());
+	G4VisAttributes *TopVisAtt= new G4VisAttributes(G4Colour(2.0,1.0,0.0));
+	HallShellWallLV->SetVisAttributes(TopVisAtt);
+	//HallShellWallLV->SetVisAttributes(G4VisAttributes::GetInvisible());
 }
 
 // Construct the Hall Floor in the world
@@ -75,9 +79,9 @@ void NpolHallShell::ConstructHallShellFloor() {
 	HallShellFloorLV = new G4LogicalVolume(HallShellFloor,
 			NpolMaterials::GetInstance()->GetConcrete(),"HallShellFloorLV",0,0,0);
 
-	//G4VisAttributes *TopVisAtt= new G4VisAttributes(G4Colour(1.0,1.0,1.0));
-	//HallShellFloorLV->SetVisAttributes(TopVisAtt);
-	HallShellFloorLV->SetVisAttributes(G4VisAttributes::GetInvisible());
+	G4VisAttributes *TopVisAtt= new G4VisAttributes(G4Colour(1.0,1.0,1.0));
+	HallShellFloorLV->SetVisAttributes(TopVisAtt);
+	//HallShellFloorLV->SetVisAttributes(G4VisAttributes::GetInvisible());
 }
 
 // Construct the Hall Roof in the world
@@ -93,17 +97,13 @@ void NpolHallShell::ConstructHallShellRoof() {
 	HallShellRoofLV->SetVisAttributes(G4VisAttributes::GetInvisible());
 }
 
-G4VPhysicalVolume *NpolHallShell::Construct(G4LogicalVolume *motherLV) {
-
-	ConstructHallShellWall();
-	ConstructHallShellFloor();
-	ConstructHallShellRoof();
+void NpolHallShell::Place(G4LogicalVolume *motherLV) {
 
 	PlaceRectangular(HallShellRoofLV, motherLV, "HallShellRoof", 
 			-4.700*m, -21.60*m, +4.700*m, -90*deg, 0*deg, 0*deg);
 	PlaceRectangular(HallShellFloorLV, motherLV, "HallShellFloor", 
 			-4.700*m, -5.00*m, +4.700*m, -90*deg, 0*deg, 0*deg);
-	return PlaceRectangular(HallShellWallLV, motherLV, "HallShellWall", 
+	PlaceRectangular(HallShellWallLV, motherLV, "HallShellWall", 
 			-4.700*m,+3.00*m,+4.700*m, 90*deg, 0*deg, 0*deg);
 }
 

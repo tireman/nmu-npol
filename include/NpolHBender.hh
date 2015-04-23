@@ -24,14 +24,18 @@ class G4AssemblyVolume;
 class G4VPhysicalVolume;
 
 class NpolHBender : public NpolSubDetector {
-  
-public:
-  NpolHBender();
-  ~NpolHBender();
-  
-  virtual G4VPhysicalVolume *Construct(G4LogicalVolume *motherLV);
- 
-private: 
+
+	public:
+		NpolHBender();
+		~NpolHBender();
+
+		virtual G4String GetName();
+		virtual void Place(G4LogicalVolume *motherLV);
+
+	private:
+		G4LogicalVolume *HBenderLV;
+		G4LogicalVolume *HBCryoBoxLV;
+		G4LogicalVolume *HBBoreLogicLV;
 };
 
 #endif

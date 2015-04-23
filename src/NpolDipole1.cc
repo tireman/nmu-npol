@@ -33,11 +33,17 @@
 #include "NpolBeamlineDown.hh"
 
 NpolDipole1::NpolDipole1() {
-	G4cout << "Initializing Dipole 1" << G4endl;
+	ConstructDipole1Yoke();
+	ConstructDipole1CuBar();
+	ConstructDipole1CuEnd();
+	ConstructDipole1FieldClamp1();
+	ConstructDipole1FieldClamp2();
 }
 
-NpolDipole1::~NpolDipole1() {
-	G4cout << "Deleting Dipole 1" << G4endl;
+NpolDipole1::~NpolDipole1() {}
+
+G4String NpolDipole1::GetName() {
+	return G4String("Dipole 1");
 }
 
 // Construct the yokes using the extruded class
@@ -150,45 +156,30 @@ void NpolDipole1::ConstructDipole1FieldClamp2(){
 	FieldClamp2LV->SetVisAttributes(Clamp);
 }
 
-G4VPhysicalVolume *NpolDipole1::Construct(G4LogicalVolume *motherLV) {
+void NpolDipole1::Place(G4LogicalVolume *motherLV) {
 	G4double PosD1 = 2.5096*m, NpolAng = 28.0*deg, BarOffSet = 0.47*m;
 	G4double EndOffSet = +0.735*m, ClampOffSet = 0.9398*m;
 
-	ConstructDipole1Yoke();
-	ConstructDipole1CuBar();
-	ConstructDipole1CuEnd();
-	ConstructDipole1FieldClamp1();
-	ConstructDipole1FieldClamp2();
-
 	// Place 4 of the Copper bars in the magnet
 	PlaceRectangular(Dipole1CuBarLV, motherLV, "Dipole1CuBar", (BarOffSet*cos(NpolAng)-PosD1*sin(NpolAng)), +0.125*m, (BarOffSet*sin(NpolAng)+PosD1*cos(NpolAng)), 0*deg, -NpolAng, 0.0); 
-
 	PlaceRectangular(Dipole1CuBarLV, motherLV, "Dipole1CuBar", (BarOffSet*cos(NpolAng)-PosD1*sin(NpolAng)), -0.125*m, (BarOffSet*sin(NpolAng)+PosD1*cos(NpolAng)), 0*deg, -NpolAng, 0.0); 
-
 	PlaceRectangular(Dipole1CuBarLV, motherLV, "Dipole1CuBar", (-BarOffSet*cos(NpolAng)-PosD1*sin(NpolAng)), +0.125*m, (-BarOffSet*sin(NpolAng)+PosD1*cos(NpolAng)), 0*deg, -NpolAng, 0.0); 
-
 	PlaceRectangular(Dipole1CuBarLV, motherLV, "Dipole1CuBar", (-BarOffSet*cos(NpolAng)-PosD1*sin(NpolAng)), -0.125*m, (-BarOffSet*sin(NpolAng)+PosD1*cos(NpolAng)), 0*deg, -NpolAng, 0.0); 
 
 	// Place 4 copies of the extruded copper ends for the coil packs
-
 	PlaceCylindrical(Dipole1CuEndLV, motherLV, "Dipole1CuEnd", (PosD1-EndOffSet), -NpolAng, +5.08*cm);
-
 	PlaceCylindrical(Dipole1CuEndLV, motherLV, "Dipole1CuEnd", (PosD1+EndOffSet), -NpolAng, +5.08*cm);
-
 	PlaceRectangular(Dipole1CuEndLV, motherLV, "Dipole1CuEnd", (-(PosD1-EndOffSet)*sin(NpolAng)), -5.08*cm, ((PosD1-EndOffSet)*cos(NpolAng)), 0.0*deg, NpolAng, 180.*deg);
-
 	PlaceRectangular(Dipole1CuEndLV, motherLV, "Dipole1CuEnd", (-(PosD1+EndOffSet)*sin(NpolAng)), -5.08*cm, ((PosD1+EndOffSet)*cos(NpolAng)), 0.0*deg, NpolAng, 180.*deg);
 
 	// Place 2 copies of the Charybdis field clamps
-
 	PlaceCylindrical(FieldClamp1LV, motherLV, "FieldClamp1", (PosD1-ClampOffSet), -NpolAng, 0.0*m);
-
 	PlaceCylindrical(FieldClamp2LV, motherLV, "FieldClamp2", (PosD1+ClampOffSet), -NpolAng, 0.0*m);
 
 	// Place upper yoke piece
 	PlaceCylindrical(Dipole1YokeLV, motherLV, "Dipole1", PosD1,-NpolAng,+5.08*cm); 
 	// Place lower yoke piece 
-	return PlaceRectangular(Dipole1YokeLV, motherLV, "Dipole1", (-PosD1*sin(NpolAng)), -5.08*cm,(PosD1*cos(NpolAng)), 0*deg, NpolAng, 180*deg); 
+	PlaceRectangular(Dipole1YokeLV, motherLV, "Dipole1", (-PosD1*sin(NpolAng)), -5.08*cm,(PosD1*cos(NpolAng)), 0*deg, NpolAng, 180*deg); 
 
 	// End Dipole 1 (Charybdis) construction.  May the field be with it. 
 }

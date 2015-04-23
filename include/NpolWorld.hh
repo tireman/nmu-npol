@@ -23,7 +23,9 @@ class NpolWorld : public NpolSubDetector {
 		NpolWorld();
 		~NpolWorld();
 
-		virtual G4VPhysicalVolume *Construct(G4LogicalVolume *motherLV);
+		virtual G4String GetName();
+		virtual void Place(G4LogicalVolume *motherLV);
+
 		G4VPhysicalVolume *GetWorldPV();
 		G4LogicalVolume *GetWorldLV();
 

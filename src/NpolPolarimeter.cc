@@ -30,8 +30,6 @@
 #include "NpolAnalysis.hh"
 
 NpolPolarimeter::NpolPolarimeter() {
-	G4cout << "Initializing Polarimeter" << G4endl;
-	// TODO: make this box as small as possible
 	G4VSolid *PolarimeterBox = new G4Box("PolarimeterBox",1.30*m,1.45*m,1.85*m);
 	PolarimeterLV = new G4LogicalVolume(PolarimeterBox,
 			NpolMaterials::GetInstance()->GetAir(), "PolarimeterLV",0,0,0);
@@ -45,11 +43,12 @@ NpolPolarimeter::NpolPolarimeter() {
 	ConstructBottomVetoArray(PolarimeterLV);
 	ConstructFrontDetArray(PolarimeterLV);
 	ConstructFrontTagArray(PolarimeterLV);
-
 }
 
-NpolPolarimeter::~NpolPolarimeter() {
-	G4cout << "Deleting Polarimeter" << G4endl;
+NpolPolarimeter::~NpolPolarimeter() {}
+
+G4String NpolPolarimeter::GetName() {
+	return G4String("Polarimeter");
 }
 
 G4AssemblyVolume *NpolPolarimeter::MakePlate(G4LogicalVolume *detLV, \
@@ -310,8 +309,8 @@ void NpolPolarimeter::ConstructFrontTagArray(G4LogicalVolume *motherLV) {
 	FrontTagLV->SetVisAttributes(FrontTagVisAtt);
 }
 
-G4VPhysicalVolume *NpolPolarimeter::Construct(G4LogicalVolume *motherLV) {
+void NpolPolarimeter::Place(G4LogicalVolume *motherLV) {
 
-	return PlaceCylindrical(PolarimeterLV,motherLV,"Polarimeter",8.7*m,-28.0*deg,0.0*m);
+	PlaceCylindrical(PolarimeterLV,motherLV,"Polarimeter",8.7*m,-28.0*deg,0.0*m);
 }
 

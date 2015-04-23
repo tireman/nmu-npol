@@ -36,7 +36,8 @@ class NpolPolarimeter : public NpolSubDetector {
 		void ConstructFrontDetArray(G4LogicalVolume *motherLV);
 		void ConstructFrontTagArray(G4LogicalVolume *motherLV);
 
-		virtual G4VPhysicalVolume *Construct(G4LogicalVolume *motherLV);
+		virtual G4String GetName();
+		virtual void Place(G4LogicalVolume *motherLV);
 		void TranslateRotateAndPlace(G4LogicalVolume *polarimeterLV, G4LogicalVolume *motherLV,
 				G4double rho, G4double phi, G4double z);
 

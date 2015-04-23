@@ -16,6 +16,7 @@
 #define Npol_ScatteringChamber_h
 
 #include "NpolSubDetector.hh"
+#include "NpolTarget.hh"
 
 class G4LogicalVolume;
 class G4AssemblyVolume;
@@ -29,7 +30,8 @@ class NpolScatteringChamber : public NpolSubDetector {
 
 		void ConstructChamber();
 
-		virtual G4VPhysicalVolume *Construct(G4LogicalVolume *motherLV);
+		virtual G4String GetName();
+		virtual void Place(G4LogicalVolume *motherLV);
 
 		static G4double insideRadius;
 		static G4double insideHeight;
@@ -40,6 +42,7 @@ class NpolScatteringChamber : public NpolSubDetector {
 
 		G4LogicalVolume *innerChamberLV;
 		G4LogicalVolume *chamberWallLV;
+		NpolTarget *target;
 };
 
 #endif

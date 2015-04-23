@@ -16,28 +16,27 @@
 #include "NpolBDump.hh"
 
 NpolBDump::NpolBDump() {
-  G4cout << "Initializing BDump" << G4endl;
+	G4GDMLParser parser;
+
+	G4String gdmlFilename = "gdml/BeamDump.gdml";
+	parser.Read(gdmlFilename);
+
+	// retrieve the Beam Dump volume from GDML file and place in the
+	// world. Beam dump contains simplifed helium vessel and stainless
+	// steel end dump
+	BDumpLV = parser.GetVolume("BDump");
+	//BDumpLV->SetVisAttributes(G4VisAttributes::GetInvisible());
 }
 
-NpolBDump::~NpolBDump() {
-  G4cout << "Deleting BDump" << G4endl;
+NpolBDump::~NpolBDump() {}
+
+G4String NpolBDump::GetName() {
+	return G4String("Beam Dump");
 }
 
-G4VPhysicalVolume *NpolBDump::Construct(G4LogicalVolume *motherLV) {
-  
-  // Constants
-  G4double PosDump =38.0*m;
+void NpolBDump::Place(G4LogicalVolume *motherLV) {
+	G4double PosDump =38.0*m;
 
-  G4GDMLParser parser;
-  
-  G4String gdmlFilename = "gdml/BeamDump.gdml";
-   parser.Read(gdmlFilename);
-  
-   // retrieve the Beam Dump volume from GDML file and place in the
-   // world. Beam dump contains simplifed helium vessel and stainless
-   // steel end dump
-   G4LogicalVolume *BDumpLV = parser.GetVolume("BDump");
-   //BDumpLV->SetVisAttributes(G4VisAttributes::GetInvisible());
-   PlaceCylindrical(BDumpLV,motherLV,"BDump", PosDump, 0.0*deg, 0); 
+	PlaceCylindrical(BDumpLV,motherLV,"BDump", PosDump, 0.0*deg, 0); 
 }
 

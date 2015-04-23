@@ -11,7 +11,7 @@
 #ifndef Npol_DetectorConstruction_h
 #define Npol_DetectorConstruction_h
 
-#include <map>
+#include <set>
 
 #include "globals.hh"
 #include "G4VUserDetectorConstruction.hh"
@@ -27,18 +27,14 @@ class NpolWorld;
 class NpolDetectorConstruction : public G4VUserDetectorConstruction
 {
 	public:
-
 		NpolDetectorConstruction();
 		~NpolDetectorConstruction();
 
 		virtual G4VPhysicalVolume* Construct();
 		virtual void ConstructSDandField();
 
-		G4VPhysicalVolume *ConstructSubDetector(NpolSubDetector *det);
-
 	private:
-		
-		std::map<G4String, NpolSubDetector *> activeDetectors;
+		std::set<NpolSubDetector *> detectors;
 		NpolWorld *world;
 };
 

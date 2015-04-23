@@ -23,28 +23,28 @@
 #include "NpolMaterials.hh"
 
 NpolWorld::NpolWorld() {
-  G4cout << "Initializing world" << G4endl;
+	G4Box *expHall = new G4Box("ExpHall", 31.0*m, 30.0*m, 60.0*m);
+	expHallLV = new G4LogicalVolume(expHall, 
+			NpolMaterials::GetInstance()->GetAir(), "expHallLV", 0, 0, 0);
+	expHallLV->SetVisAttributes(G4VisAttributes::GetInvisible());
 }
 
-NpolWorld::~NpolWorld() {
-  G4cout << "Deleting world" << G4endl;
+NpolWorld::~NpolWorld() {}
+
+G4String NpolWorld::GetName() {
+	return G4String("NpolWorld");
 }
 
-G4VPhysicalVolume *NpolWorld::Construct(G4LogicalVolume *motherLV) {
+void NpolWorld::Place(G4LogicalVolume *motherLV) {
 
-  G4Box *expHall = new G4Box("ExpHall", 31.0*m, 30.0*m, 60.0*m);
-  expHallLV = new G4LogicalVolume(expHall, 
-	    NpolMaterials::GetInstance()->GetAir(), "expHallLV", 0, 0, 0);
-  expHallLV->SetVisAttributes(G4VisAttributes::GetInvisible());
-
-  return (expHallPV = PlaceRectangular(expHallLV, motherLV, "ExpHall", 0,0,0));
+	expHallPV = PlaceRectangular(expHallLV, motherLV, "ExpHall", 0,0,0);
 }
 
 G4VPhysicalVolume *NpolWorld::GetWorldPV() {
-  return expHallPV;
+	return expHallPV;
 }
 
 G4LogicalVolume *NpolWorld::GetWorldLV() {
-  return expHallLV;
+	return expHallLV;
 }
 

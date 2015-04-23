@@ -21,7 +21,8 @@ class NpolSubDetector {
 		NpolSubDetector() {}
 		virtual ~NpolSubDetector() {}
 
-		virtual G4VPhysicalVolume *Construct(G4LogicalVolume *motherLV) = 0;
+		virtual G4String GetName() = 0;
+		virtual void Place(G4LogicalVolume *motherLV) = 0;
 
 		G4VPhysicalVolume *PlaceRectangular(G4LogicalVolume *detLV, G4LogicalVolume *motherLV,
 				G4String detName, G4double x, G4double y, G4double z,

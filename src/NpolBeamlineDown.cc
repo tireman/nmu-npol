@@ -61,11 +61,18 @@ G4double NpolBeamlineDown::GateZ = 2.9210*cm;
 G4double NpolBeamlineDown::downLen = NpolBeamlineDown::calculateDownBeamLineLen();
 
 NpolBeamlineDown::NpolBeamlineDown() {
-  G4cout << "Initializing Beamline: Up-stream and Down-Stream" << G4endl;
+  ConstructBeamlineDown();
+  ConstructBeamlineDownInner();
+  ConstructBeamlineSecA();
+  ConstructSecA1Inner();
+  ConstructSecA2Inner();
+  ConstructSecA3Inner();
 }
 
-NpolBeamlineDown::~NpolBeamlineDown() {
-  G4cout << "Deleting Beamline: Up-stream and Down-Stream" << G4endl;
+NpolBeamlineDown::~NpolBeamlineDown() {}
+
+G4String NpolBeamlineDown::GetName() {
+	return G4String("Down Beamline");
 }
 
 // This downstream beamline is a extruded solid consisting of 60 facets for
@@ -279,21 +286,14 @@ void NpolBeamlineDown::ConstructSecA3Inner(){
   SecA3InLV->SetVisAttributes(BeamlineVisAtt);  
 }
 
-G4VPhysicalVolume *NpolBeamlineDown::Construct(G4LogicalVolume *motherLV) {
+void NpolBeamlineDown::Place(G4LogicalVolume *motherLV) {
   
-  ConstructBeamlineDown();
-  ConstructBeamlineDownInner();
-  ConstructBeamlineSecA();
-  ConstructSecA1Inner();
-  ConstructSecA2Inner();
-  ConstructSecA3Inner();
-
   PlaceCylindrical(SectionALV, motherLV, "SectionA", SecA1zLen/2 + NpolScatteringChamber::insideRadius + NpolScatteringChamber::wallThickness, 0, 0);
   PlaceCylindrical(SecA1InLV, motherLV, "SecA1In", SecA1zLen/2 + NpolScatteringChamber::insideRadius + NpolScatteringChamber::wallThickness, 0, 0);
   PlaceCylindrical(SecA2InLV, motherLV, "SecA2In", SecA2zLen/2 + SecA1zLen + NpolScatteringChamber::insideRadius + NpolScatteringChamber::wallThickness, 0, 0);
   PlaceCylindrical(SecA3InLV, motherLV, "SecA3In", SecA3zLen/2 + SecA2zLen + SecA1zLen + NpolScatteringChamber::insideRadius + NpolScatteringChamber::wallThickness, 0, 0);
   PlaceCylindrical(BeamlineDownLV, motherLV, "BeamLineDown", -2.1*cm + SecA1zLen + 2*NpolScatteringChamber::insideRadius + 2*NpolScatteringChamber::wallThickness + NpolHallShell::zPlacementOffset,0,0);
-  return PlaceCylindrical(BeamlineDownInnerLV,BeamlineDownLV,"BeamLineDownInner", 0,0,0);
+  PlaceCylindrical(BeamlineDownInnerLV,BeamlineDownLV,"BeamLineDownInner", 0,0,0);
 }
 
 G4double NpolBeamlineDown::calculateDownBeamLineLen() {

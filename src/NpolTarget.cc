@@ -26,11 +26,14 @@
 #include "NpolTarget.hh"
 
 NpolTarget::NpolTarget() {
-	G4cout << "Initializing Target" << G4endl;
+	ConstructTargetCan();
+	ConstructTargetFluid();
 }
 
-NpolTarget::~NpolTarget() {
-	G4cout << "Deleting Target" << G4endl;
+NpolTarget::~NpolTarget() {}
+
+G4String NpolTarget::GetName() {
+	return G4String("Target");
 }
 
 // Construct the target can in which we place the fluid
@@ -57,12 +60,9 @@ void NpolTarget::ConstructTargetFluid() {
 	TargetFluidLV->SetVisAttributes(TopVisAtt);
 }
 
-G4VPhysicalVolume *NpolTarget::Construct(G4LogicalVolume *motherLV) {
-
-	ConstructTargetCan();
-	ConstructTargetFluid();
+void NpolTarget::Place(G4LogicalVolume *motherLV) {
 
 	PlaceRectangular(TargetCanLV, motherLV, "TargetCan", 0,0,0,90*deg,0,0);
-	return PlaceRectangular(TargetFluidLV, TargetCanLV, "TargetFluid", 0,0,0); 
+	PlaceRectangular(TargetFluidLV, TargetCanLV, "TargetFluid", 0,0,0); 
 }
 

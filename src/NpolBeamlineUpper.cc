@@ -36,11 +36,14 @@ G4double NpolBeamlineUpper::upperOuterRadius = 2.5*cm;
 G4double NpolBeamlineUpper::upperLen = NpolBeamlineUpper::calculateUpperBeamLineLen();
 
 NpolBeamlineUpper::NpolBeamlineUpper() {
-	G4cout << "Initializing Beamline: Up-stream and Down-Stream" << G4endl;
+  ConstructBeamlineUpper();
+  ConstructBeamlineUpperInner();
 }
 
-NpolBeamlineUpper::~NpolBeamlineUpper() {
-	G4cout << "Deleting Beamline: Up-stream and Down-Stream" << G4endl;
+NpolBeamlineUpper::~NpolBeamlineUpper() {}
+
+G4String NpolBeamlineUpper::GetName() {
+	return G4String("Upper Beamline");
 }
 
 // Construct the Up stream portion of beamline in the world
@@ -65,13 +68,10 @@ void NpolBeamlineUpper::ConstructBeamlineUpperInner() {
   BeamlineUpperInnerLV->SetVisAttributes(G4VisAttributes::GetInvisible());
 }
 
-G4VPhysicalVolume *NpolBeamlineUpper::Construct(G4LogicalVolume *motherLV) {
-  
-  ConstructBeamlineUpper();
-  ConstructBeamlineUpperInner();
+void NpolBeamlineUpper::Place(G4LogicalVolume *motherLV) {
   
   PlaceCylindrical(BeamlineUpperLV, motherLV, "BeamLineUpper", -upperLen/2 - NpolScatteringChamber::insideRadius - NpolScatteringChamber::wallThickness ,0,0);
-  return PlaceCylindrical(BeamlineUpperInnerLV, BeamlineUpperLV, "BeamLineUpperInner",
+  PlaceCylindrical(BeamlineUpperInnerLV, BeamlineUpperLV, "BeamLineUpperInner",
      0,0,0);
 }
 

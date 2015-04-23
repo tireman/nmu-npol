@@ -27,19 +27,16 @@
 #include "NpolShieldHut.hh"
 
 NpolShieldHut::NpolShieldHut() {
-	G4cout << "Initializing Shield Hut" << G4endl;
-	G4cout << "... Front wall" << G4endl;
-	G4cout << "... Side walls" << G4endl;
-	G4cout << "... Back wall" << G4endl;
-	G4cout << "... Roof" << G4endl;
+	ConstructHutFrontWall();
+	ConstructHutBackWall();
+	ConstructHutSideWall();
+	ConstructHutRoof();
 }
 
-NpolShieldHut::~NpolShieldHut() {
-	G4cout << "Deleting Shield Hut" << G4endl;
-	G4cout << "... Front wall" << G4endl;
-	G4cout << "... Side walls" << G4endl;
-	G4cout << "... Back wall" << G4endl;
-	G4cout << "... Roof" << G4endl;
+NpolShieldHut::~NpolShieldHut() {}
+
+G4String NpolShieldHut::GetName() {
+	return G4String("Shield Hut");
 }
 
 // Construct the front wall of the shield hut from 4 ft by 4 ft by 3 ft blocks
@@ -105,20 +102,15 @@ void NpolShieldHut::ConstructHutRoof() {
 	HutRoofLV->SetVisAttributes(RoofVisAtt);
 }
 
-G4VPhysicalVolume *NpolShieldHut::Construct(G4LogicalVolume *motherLV) {
+void NpolShieldHut::Place(G4LogicalVolume *motherLV) {
 
 	G4double NpolAng = 28.0*deg, PosSide = 9.3025*m, AngSide = 14.0*deg, VertOffSet = 0.3424*m;
 	G4double PosFront = 6.2739*m, PosBack = 11.7739*m, PosRoof = 9.0239*m, OffSetRoof = 3.7776*m;
-
-	ConstructHutFrontWall();
-	ConstructHutBackWall();
-	ConstructHutSideWall();
-	ConstructHutRoof();
 
 	PlaceCylindrical(HutFrontWallLV, motherLV, "HutFrontWall", PosFront,-NpolAng,-VertOffSet);
 	PlaceCylindrical(HutBackWallLV, motherLV, "HutBackWall", PosBack,-NpolAng,-VertOffSet);
 	PlaceRectangular(HutSideWallLV, motherLV, "HutSideWall", -PosSide*sin(AngSide+NpolAng), -VertOffSet, PosSide*cos(AngSide+NpolAng), 0*deg, -NpolAng, 0*deg);
 	PlaceRectangular(HutSideWallLV, motherLV, "HutSideWall", -PosSide*sin(AngSide), -VertOffSet, PosSide*cos(AngSide), 0*deg, -NpolAng, 0);
-	return PlaceCylindrical(HutRoofLV, motherLV, "HutRoof", PosRoof, -NpolAng, OffSetRoof);
+	PlaceCylindrical(HutRoofLV, motherLV, "HutRoof", PosRoof, -NpolAng, OffSetRoof);
 }
 
