@@ -26,7 +26,7 @@
 
 #include "NpolMaterials.hh"
 #include "NpolPolarimeter.hh"
-#include "NpolDataStructure.hh"
+#include "NpolAnalysisManager.hh"
 #include "NpolAnalysis.hh"
 
 NpolPolarimeter::NpolPolarimeter() {
@@ -91,7 +91,7 @@ void NpolPolarimeter::ImprintPlate(G4AssemblyVolume *plate,
 
 void NpolPolarimeter::ActivateImprintedPVs(G4AssemblyVolume *AV, int arrayNo = 0) {
 
-	NpolDataStructure *dataStructure = NpolDataStructure::GetInstance();
+	NpolAnalysisManager *dataStructure = NpolAnalysisManager::GetInstance();
 	std::vector<G4VPhysicalVolume *>::iterator AVit = AV->GetVolumesIterator();
 	G4int numImprinted = AV->TotalImprintedVolumes();
 	G4String LVName = (*AVit)->GetLogicalVolume()->GetName();

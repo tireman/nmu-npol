@@ -17,7 +17,7 @@
 #include "G4Track.hh"
 #include "G4Step.hh"
 
-#include "NpolDataStructure.hh"
+#include "NpolAnalysisManager.hh"
 #include "NpolSteppingAction.hh"
 
 NpolSteppingAction::NpolSteppingAction() {}
@@ -25,7 +25,7 @@ NpolSteppingAction::NpolSteppingAction() {}
 NpolSteppingAction::~NpolSteppingAction() {}
 
 void NpolSteppingAction::UserSteppingAction(const G4Step *aStep) {
-	NpolDataStructure *dataStructure = NpolDataStructure::GetInstance();
+	NpolAnalysisManager *dataStructure = NpolAnalysisManager::GetInstance();
 
 	G4Track *aTrack = aStep->GetTrack();
 	G4StepPoint *preStepPoint = aStep->GetPreStepPoint();	

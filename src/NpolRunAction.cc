@@ -20,13 +20,13 @@
 #include "G4Timer.hh"
 
 #include "NpolRunAction.hh"
-#include "NpolDataStructure.hh"
+#include "NpolAnalysisManager.hh"
 #include "NpolAnalysis.hh"
 
 NpolRunAction::NpolRunAction() {
 
 	G4AnalysisManager *analysisManager = G4AnalysisManager::Instance();
-	NpolDataStructure *dataStructure = NpolDataStructure::GetInstance();
+	NpolAnalysisManager *dataStructure = NpolAnalysisManager::GetInstance();
 
 	G4cout << "Using " << analysisManager->GetType() << " Analysis Manager." << G4endl;
 
@@ -59,7 +59,7 @@ void NpolRunAction::BeginOfRunAction(const G4Run* aRun) {
 void NpolRunAction::EndOfRunAction(const G4Run*) {
 
 	G4AnalysisManager *analysisManager = G4AnalysisManager::Instance();
-	NpolDataStructure *dataStructure = NpolDataStructure::GetInstance();
+	NpolAnalysisManager *dataStructure = NpolAnalysisManager::GetInstance();
 
 	analysisManager->Write();
 	analysisManager->CloseFile();

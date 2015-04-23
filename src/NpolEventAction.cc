@@ -28,7 +28,7 @@
 #include "G4PhysicalConstants.hh"
 #include "G4AutoLock.hh"
 
-#include "NpolDataStructure.hh"
+#include "NpolAnalysisManager.hh"
 #include "NpolAnalysis.hh"
 #include "NpolEventAction.hh"
 
@@ -49,14 +49,14 @@ NpolEventAction::~NpolEventAction()
 
 void NpolEventAction::BeginOfEventAction(const G4Event* evt) {
 
-	NpolDataStructure *dataStructure = NpolDataStructure::GetInstance();
+	NpolAnalysisManager *dataStructure = NpolAnalysisManager::GetInstance();
 
 	dataStructure->PrepareNewEvent();
 }
 
 void NpolEventAction::EndOfEventAction(const G4Event* evt) {
 
-	NpolDataStructure *dataStructure = NpolDataStructure::GetInstance();
+	NpolAnalysisManager *dataStructure = NpolAnalysisManager::GetInstance();
 	G4AnalysisManager *analysisManager = G4AnalysisManager::Instance();
 
 	dataStructure->FillHistograms();

@@ -28,7 +28,7 @@
 #include "NpolShieldHut.hh"
 #include "NpolHBender.hh"
 #include "NpolBDump.hh"
-#include "NpolDataStructure.hh"
+#include "NpolAnalysisManager.hh"
 
 NpolDetectorConstruction::NpolDetectorConstruction() {
 

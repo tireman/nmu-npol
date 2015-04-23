@@ -50,10 +50,10 @@ struct HistoData {
 	G4double EDep;
 };
 
-class NpolDataStructure {
+class NpolAnalysisManager {
 
 	public:
-		static NpolDataStructure *GetInstance();
+		static NpolAnalysisManager *GetInstance();
 		void RegisterActiveDetectorEDepHistogram(G4VPhysicalVolume *PV, G4String nname, G4String ttitle, G4int nnbins, G4double xxmin, G4double xxmax);
 		void CreateHistograms();
 		void CreateNtuple();
@@ -71,8 +71,8 @@ class NpolDataStructure {
 		int getVolIDFor(G4VPhysicalVolume *PV);
 
 	private:
-		NpolDataStructure();
-		~NpolDataStructure();
+		NpolAnalysisManager();
+		~NpolAnalysisManager();
 
 		std::map<G4VPhysicalVolume *, struct HistoData> detData;
 		std::map<G4VPhysicalVolume *, int> detectorIDs;
