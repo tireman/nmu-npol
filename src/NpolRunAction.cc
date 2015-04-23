@@ -26,7 +26,7 @@
 NpolRunAction::NpolRunAction() {
 
 	G4AnalysisManager *analysisManager = G4AnalysisManager::Instance();
-	NpolAnalysisManager *dataStructure = NpolAnalysisManager::GetInstance();
+	NpolAnalysisManager *analysisMan = NpolAnalysisManager::GetInstance();
 
 	G4cout << "Using " << analysisManager->GetType() << " Analysis Manager." << G4endl;
 
@@ -35,8 +35,8 @@ NpolRunAction::NpolRunAction() {
 	analysisManager->SetVerboseLevel(1);
 	analysisManager->SetFirstHistoId(1);
 
-	dataStructure->CreateNtuple();
-	dataStructure->CreateHistograms();
+	analysisMan->CreateNtuple();
+	analysisMan->CreateHistograms();
 
 	// Setup the run timer
 	runTimer = new G4Timer();
@@ -59,12 +59,12 @@ void NpolRunAction::BeginOfRunAction(const G4Run* aRun) {
 void NpolRunAction::EndOfRunAction(const G4Run*) {
 
 	G4AnalysisManager *analysisManager = G4AnalysisManager::Instance();
-	NpolAnalysisManager *dataStructure = NpolAnalysisManager::GetInstance();
+	NpolAnalysisManager *analysisMan = NpolAnalysisManager::GetInstance();
 
 	analysisManager->Write();
 	analysisManager->CloseFile();
 
-	dataStructure->WriteDetectorIDsToFile();
+	analysisMan->WriteDetectorIDsToFile();
 
 	runTimer->Stop();
 	G4cout << "Run Time: " << *(runTimer) << G4endl;

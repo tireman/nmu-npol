@@ -19,24 +19,13 @@
 #include "G4Event.hh"
 #include "G4EventManager.hh"
 #include "G4RunManager.hh"
-#include "G4SDManager.hh"
-#include "G4HCofThisEvent.hh"
 #include "G4ios.hh"
 #include "G4String.hh"
-#include "G4THitsCollection.hh"
 #include "G4SystemOfUnits.hh"
 #include "G4PhysicalConstants.hh"
-#include "G4AutoLock.hh"
 
 #include "NpolAnalysisManager.hh"
-#include "NpolAnalysis.hh"
 #include "NpolEventAction.hh"
-
-typedef G4THitsCollection<NpolHit> NpolHitsCollection;
-
-class NpolHit {};
-
-G4Mutex aMutex = G4MUTEX_INITIALIZER; // Have to use a mutex for calls to strtok()
 
 NpolEventAction::NpolEventAction()
 {
@@ -49,16 +38,15 @@ NpolEventAction::~NpolEventAction()
 
 void NpolEventAction::BeginOfEventAction(const G4Event* evt) {
 
-	NpolAnalysisManager *dataStructure = NpolAnalysisManager::GetInstance();
+	NpolAnalysisManager *analysisMan = NpolAnalysisManager::GetInstance();
 
-	dataStructure->PrepareNewEvent();
+	analysisMan->PrepareNewEvent();
 }
 
 void NpolEventAction::EndOfEventAction(const G4Event* evt) {
 
-	NpolAnalysisManager *dataStructure = NpolAnalysisManager::GetInstance();
-	G4AnalysisManager *analysisManager = G4AnalysisManager::Instance();
+	NpolAnalysisManager *analysisMan = NpolAnalysisManager::GetInstance();
 
-	dataStructure->FillHistograms();
+	analysisMan->FillHistograms();
 }
 

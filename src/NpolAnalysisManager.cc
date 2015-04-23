@@ -56,40 +56,40 @@ void NpolAnalysisManager::RegisterActiveDetectorEDepHistogram(G4VPhysicalVolume 
 
 void NpolAnalysisManager::CreateHistograms() {
 
-	G4AnalysisManager *analysisManager = G4AnalysisManager::Instance();
+	G4AnalysisManager *analysisMan = G4AnalysisManager::Instance();
 	std::map<G4VPhysicalVolume *, struct HistoData>::iterator it;
 
 	G4cout << "Creating EDep Histograms." << G4endl;
 
 	for(it = detData.begin(); it != detData.end(); it++) {
 		struct HistoData *histEntry = &(it->second);
-		histEntry->histoID = analysisManager->CreateH1(G4String(histEntry->name), G4String(histEntry->title),
+		histEntry->histoID = analysisMan->CreateH1(G4String(histEntry->name), G4String(histEntry->title),
 				histEntry->nbins, histEntry->xmin, histEntry->xmax);
 	}
 }
 
 void NpolAnalysisManager::CreateNtuple() {
 
-	G4AnalysisManager *analysisManager = G4AnalysisManager::Instance();
+	G4AnalysisManager *analysisMan = G4AnalysisManager::Instance();
 
 	G4cout << "Creating Ntuple." << G4endl;
 
 	// For some reason (a bug?) the Ntuple is not created properly if at least one histogram doesn't exist.
 	// We'll make a dummy one here just to make sure
-	analysisManager->CreateH1("dummy", "Dummy Histogram - Please Disregard", 100, 0*MeV, 100*MeV);
+	analysisMan->CreateH1("dummy", "Dummy Histogram - Please Disregard", 100, 0*MeV, 100*MeV);
 
-	analysisManager->CreateNtuple("NpolData", "Npol Data");
-	cols.volumeIDColID = analysisManager->CreateNtupleIColumn("VolumeID");
-	cols.particleIDColID = analysisManager->CreateNtupleIColumn("ParticleID");
-	cols.parentIDColID = analysisManager->CreateNtupleIColumn("ParentID");
-	cols.vertexEnergyColID = analysisManager->CreateNtupleDColumn("VertexEnergy");
-	cols.xPosColID = analysisManager->CreateNtupleDColumn("XPosition");
-	cols.yPosColID = analysisManager->CreateNtupleDColumn("YPosition");
-	cols.zPosColID = analysisManager->CreateNtupleDColumn("ZPosition");
-	cols.xMomColID = analysisManager->CreateNtupleDColumn("XMomentum");
-	cols.yMomColID = analysisManager->CreateNtupleDColumn("YMomentum");
-	cols.zMomColID = analysisManager->CreateNtupleDColumn("ZMomentum");
-	analysisManager->FinishNtuple();
+	analysisMan->CreateNtuple("NpolData", "Npol Data");
+	cols.volumeIDColID = analysisMan->CreateNtupleIColumn("VolumeID");
+	cols.particleIDColID = analysisMan->CreateNtupleIColumn("ParticleID");
+	cols.parentIDColID = analysisMan->CreateNtupleIColumn("ParentID");
+	cols.vertexEnergyColID = analysisMan->CreateNtupleDColumn("VertexEnergy");
+	cols.xPosColID = analysisMan->CreateNtupleDColumn("XPosition");
+	cols.yPosColID = analysisMan->CreateNtupleDColumn("YPosition");
+	cols.zPosColID = analysisMan->CreateNtupleDColumn("ZPosition");
+	cols.xMomColID = analysisMan->CreateNtupleDColumn("XMomentum");
+	cols.yMomColID = analysisMan->CreateNtupleDColumn("YMomentum");
+	cols.zMomColID = analysisMan->CreateNtupleDColumn("ZMomentum");
+	analysisMan->FinishNtuple();
 }
 
 void NpolAnalysisManager::PrepareNewEvent() {
@@ -112,23 +112,23 @@ void NpolAnalysisManager::FillHistograms() {
 		FillAHistogram(&(it->second));
 }
 
-void NpolAnalysisManager::FillNtuple(G4VPhysicalVolume *PV, G4int particleID, G4int parentID, G4double vertexEnergy, G4double xPos, G4double yPos, G4double zPos, G4double xMom, G4double yMom, G4double zMom) {
+void NpolAnalysisManager::FillNtuple(G4VPhysicalVolume *PV, G4int particleID, G4int parentID, G4int eventID, G4double vertexEnergy, G4double xPos, G4double yPos, G4double zPos, G4double xMom, G4double yMom, G4double zMom) {
 
-	G4AnalysisManager *analysisManager = G4AnalysisManager::Instance();
+	G4AnalysisManager *analysisMan = G4AnalysisManager::Instance();
 
 	int volumeID = getVolIDFor(PV);
 
-	analysisManager->FillNtupleIColumn(cols.volumeIDColID, volumeID);
-	analysisManager->FillNtupleIColumn(cols.particleIDColID, particleID);
-	analysisManager->FillNtupleIColumn(cols.parentIDColID, parentID);
-	analysisManager->FillNtupleDColumn(cols.vertexEnergyColID, vertexEnergy);
-	analysisManager->FillNtupleDColumn(cols.xPosColID, xPos);
-	analysisManager->FillNtupleDColumn(cols.yPosColID, yPos);
-	analysisManager->FillNtupleDColumn(cols.zPosColID, zPos);
-	analysisManager->FillNtupleDColumn(cols.xMomColID, xMom);
-	analysisManager->FillNtupleDColumn(cols.yMomColID, yMom);
-	analysisManager->FillNtupleDColumn(cols.zMomColID, zMom);
-	analysisManager->AddNtupleRow();
+	analysisMan->FillNtupleIColumn(cols.volumeIDColID, volumeID);
+	analysisMan->FillNtupleIColumn(cols.particleIDColID, particleID);
+	analysisMan->FillNtupleIColumn(cols.parentIDColID, parentID);
+	analysisMan->FillNtupleDColumn(cols.vertexEnergyColID, vertexEnergy);
+	analysisMan->FillNtupleDColumn(cols.xPosColID, xPos);
+	analysisMan->FillNtupleDColumn(cols.yPosColID, yPos);
+	analysisMan->FillNtupleDColumn(cols.zPosColID, zPos);
+	analysisMan->FillNtupleDColumn(cols.xMomColID, xMom);
+	analysisMan->FillNtupleDColumn(cols.yMomColID, yMom);
+	analysisMan->FillNtupleDColumn(cols.zMomColID, zMom);
+	analysisMan->AddNtupleRow();
 }
 
 int NpolAnalysisManager::getVolIDFor(G4VPhysicalVolume *PV) {
@@ -143,10 +143,10 @@ int NpolAnalysisManager::getVolIDFor(G4VPhysicalVolume *PV) {
 
 void NpolAnalysisManager::FillAHistogram(struct HistoData *histoData) {
 
-	G4AnalysisManager *analysisManager = G4AnalysisManager::Instance();
+	G4AnalysisManager *analysisMan = G4AnalysisManager::Instance();
 
 	if(histoData->EDep != 0.0*MeV)
-		analysisManager->FillH1(histoData->histoID, histoData->EDep);
+		analysisMan->FillH1(histoData->histoID, histoData->EDep);
 }
 
 bool NpolAnalysisManager::isVolumeActive(G4VPhysicalVolume *PV) {

@@ -25,7 +25,7 @@ NpolSteppingAction::NpolSteppingAction() {}
 NpolSteppingAction::~NpolSteppingAction() {}
 
 void NpolSteppingAction::UserSteppingAction(const G4Step *aStep) {
-	NpolAnalysisManager *dataStructure = NpolAnalysisManager::GetInstance();
+	NpolAnalysisManager *analysisMan = NpolAnalysisManager::GetInstance();
 
 	G4Track *aTrack = aStep->GetTrack();
 	G4StepPoint *preStepPoint = aStep->GetPreStepPoint();	
@@ -54,10 +54,10 @@ void NpolSteppingAction::UserSteppingAction(const G4Step *aStep) {
 	if(volume->GetName() == "EndDump"){
 		aTrack->SetTrackStatus(fStopAndKill);
 	}else if (matName == "Scint"){
-		dataStructure->AddEDep(volume,
+		analysisMan->AddEDep(volume,
 				aStep->GetTotalEnergyDeposit());
 
-		dataStructure->FillNtuple(volume, particleID, parentID, vertexEnergy,
+		analysisMan->FillNtuple(volume, particleID, parentID, vertexEnergy,
 				positionInWorld.x(), positionInWorld.y(), positionInWorld.z(), 
 				momentum.x(), momentum.y(), momentum.z());
 	}

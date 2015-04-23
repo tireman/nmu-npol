@@ -91,7 +91,7 @@ void NpolPolarimeter::ImprintPlate(G4AssemblyVolume *plate,
 
 void NpolPolarimeter::ActivateImprintedPVs(G4AssemblyVolume *AV, int arrayNo = 0) {
 
-	NpolAnalysisManager *dataStructure = NpolAnalysisManager::GetInstance();
+	NpolAnalysisManager *analysisMan = NpolAnalysisManager::GetInstance();
 	std::vector<G4VPhysicalVolume *>::iterator AVit = AV->GetVolumesIterator();
 	G4int numImprinted = AV->TotalImprintedVolumes();
 	G4String LVName = (*AVit)->GetLogicalVolume()->GetName();
@@ -105,42 +105,42 @@ void NpolPolarimeter::ActivateImprintedPVs(G4AssemblyVolume *AV, int arrayNo = 0
 			sprintf(num,"%02d%02d",arrayNo,i+1);
 			histoName = G4String("TopDet") + num;
 			histoTitle = G4String("Top Array ") + arrayNo + G4String(": Detector ") + num;
-			dataStructure->RegisterActiveDetectorEDepHistogram(*(AVit++), histoName, histoTitle, 100, 0., 20*MeV);
+			analysisMan->RegisterActiveDetectorEDepHistogram(*(AVit++), histoName, histoTitle, 100, 0., 20*MeV);
 		}
 	} else if(LVName == "TopVetoLV") {
 		for(i = 0; i < numImprinted; i++) {
 			sprintf(num,"%02d%02d",arrayNo,i+1);
 			histoName = G4String("TopVeto") + num;
 			histoTitle = G4String("Top Veto Array ") + arrayNo + G4String(": Detector ") + num;
-			dataStructure->RegisterActiveDetectorEDepHistogram(*(AVit++), histoName, histoTitle, 100, 0., 20*MeV);
+			analysisMan->RegisterActiveDetectorEDepHistogram(*(AVit++), histoName, histoTitle, 100, 0., 20*MeV);
 		}
 	} else if(LVName == "BottomDetLV") {
 		for(i = 0; i < numImprinted; i++) {
 			sprintf(num,"%02d%02d",arrayNo,i+1);
 			histoName = G4String("BottomDet") + num;
 			histoTitle = G4String("Bottom Array ") + arrayNo + G4String(": Detector ") + num;
-			dataStructure->RegisterActiveDetectorEDepHistogram(*(AVit++), histoName, histoTitle, 100, 0., 20*MeV);
+			analysisMan->RegisterActiveDetectorEDepHistogram(*(AVit++), histoName, histoTitle, 100, 0., 20*MeV);
 		}
 	} else if(LVName == "BottomVetoLV") {
 		for(i = 0; i < numImprinted; i++) {
 			sprintf(num,"%02d%02d",arrayNo,i+1);
 			histoName = G4String("BottomVeto") + num;
 			histoTitle = G4String("Bottom Veto Array ") + arrayNo + G4String(": Detector ") + num;
-			dataStructure->RegisterActiveDetectorEDepHistogram(*(AVit++), histoName, histoTitle, 100, 0., 20*MeV);
+			analysisMan->RegisterActiveDetectorEDepHistogram(*(AVit++), histoName, histoTitle, 100, 0., 20*MeV);
 		}
 	} else if(LVName == "FrontDetLV") {
 		for(i = 0; i < numImprinted; i++) {
 			sprintf(num,"%02d%02d",arrayNo,i+1);
 			histoName = G4String("FrontDet") + num;
 			histoTitle = G4String("Front Array ") + arrayNo + G4String(": Detector ") + num;
-			dataStructure->RegisterActiveDetectorEDepHistogram(*(AVit++), histoName, histoTitle, 100, 0., 20*MeV);
+			analysisMan->RegisterActiveDetectorEDepHistogram(*(AVit++), histoName, histoTitle, 100, 0., 20*MeV);
 		}
 	} else if(LVName == "FrontTagLV") {
 		for(i = 0; i < numImprinted; i++) {
 			sprintf(num,"%02d%02d",arrayNo,i+1);
 			histoName = G4String("FrontTag") + num;
 			histoTitle = G4String("Front Tagger Array ") + arrayNo + G4String(": Detector ") + num;
-			dataStructure->RegisterActiveDetectorEDepHistogram(*(AVit++), histoName, histoTitle, 100, 0., 20*MeV);
+			analysisMan->RegisterActiveDetectorEDepHistogram(*(AVit++), histoName, histoTitle, 100, 0., 20*MeV);
 		}
 	}
 
