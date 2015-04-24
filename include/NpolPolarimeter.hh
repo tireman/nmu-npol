@@ -49,10 +49,12 @@ class NpolPolarimeter : public NpolDetectorFactory {
 				G4double TmX, G4double TmY, G4double TmZ, G4double RmZ);
 
 		void ActivateImprintedPVs(G4AssemblyVolume *AV, int arrayNo);
+		void RegisterHistogramFor(G4VPhysicalVolume *PV, const char *namePrefix, const char *titlePrefix, int arrayNo, int num);
 
-	private:
-		G4LogicalVolume *PolarimeterLV;
-};
+
+			private:
+				G4LogicalVolume *PolarimeterLV;
+		};
 
 #endif
 

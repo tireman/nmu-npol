@@ -55,7 +55,7 @@ class NpolAnalysisManager {
 
 	public:
 		static NpolAnalysisManager *GetInstance();
-		void RegisterActiveDetectorEDepHistogram(G4VPhysicalVolume *PV, G4String nname, G4String ttitle, G4int nnbins, G4double xxmin, G4double xxmax);
+		void RegisterActiveDetectorEDepHistogram(G4VPhysicalVolume *PV, char *nname, char *ttitle, G4int nnbins, G4double xxmin, G4double xxmax);
 		void CreateHistograms();
 		void CreateNtuple();
 		void PrepareNewEvent(int eventID);

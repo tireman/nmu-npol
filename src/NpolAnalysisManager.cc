@@ -40,14 +40,14 @@ NpolAnalysisManager *NpolAnalysisManager::GetInstance() {
 	return pInstance;
 }
 
-void NpolAnalysisManager::RegisterActiveDetectorEDepHistogram(G4VPhysicalVolume *PV, G4String nname, G4String ttitle,
+void NpolAnalysisManager::RegisterActiveDetectorEDepHistogram(G4VPhysicalVolume *PV, char *nname, char *ttitle,
 		G4int nnbins, G4double xxmin, G4double xxmax) {
 
 	if(!isVolumeActive(PV)) {
 
 		detData[PV].histoID = -1;
-		detData[PV].name = strdup(nname.data());
-		detData[PV].title = strdup(ttitle.data());
+		detData[PV].name = nname;
+		detData[PV].title = ttitle;
 		detData[PV].nbins = nnbins;
 		detData[PV].xmin = xxmin;
 		detData[PV].xmax = xxmax;
