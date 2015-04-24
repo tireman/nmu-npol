@@ -25,6 +25,7 @@ static NpolAnalysisManager *pInstance = NULL;
 
 NpolAnalysisManager::NpolAnalysisManager() {
 	nextVolumeID = 0;
+	currentEventID = 0;
 	memset(&cols,0,sizeof(struct NtupleColumns));
 }
 
@@ -82,6 +83,7 @@ void NpolAnalysisManager::CreateNtuple() {
 	cols.volumeIDColID = analysisMan->CreateNtupleIColumn("VolumeID");
 	cols.particleIDColID = analysisMan->CreateNtupleIColumn("ParticleID");
 	cols.parentIDColID = analysisMan->CreateNtupleIColumn("ParentID");
+	cols.eventIDColID = analysisMan->CreateNtupleIColumn("EventID");
 	cols.vertexEnergyColID = analysisMan->CreateNtupleDColumn("VertexEnergy");
 	cols.xPosColID = analysisMan->CreateNtupleDColumn("XPosition");
 	cols.yPosColID = analysisMan->CreateNtupleDColumn("YPosition");
@@ -92,9 +94,10 @@ void NpolAnalysisManager::CreateNtuple() {
 	analysisMan->FinishNtuple();
 }
 
-void NpolAnalysisManager::PrepareNewEvent() {
+void NpolAnalysisManager::PrepareNewEvent(int eventID) {
 	std::map<G4VPhysicalVolume *, struct HistoData>::iterator it;
 
+	currentEventID = eventID;
 	for(it = detData.begin(); it != detData.end(); it++)
 		(it->second).EDep = 0.0;
 }
@@ -121,6 +124,7 @@ void NpolAnalysisManager::FillNtuple(G4VPhysicalVolume *PV, G4int particleID, G4
 	analysisMan->FillNtupleIColumn(cols.volumeIDColID, volumeID);
 	analysisMan->FillNtupleIColumn(cols.particleIDColID, particleID);
 	analysisMan->FillNtupleIColumn(cols.parentIDColID, parentID);
+	analysisMan->FillNtupleIColumn(cols.eventIDColID, currentEventID);
 	analysisMan->FillNtupleDColumn(cols.vertexEnergyColID, vertexEnergy);
 	analysisMan->FillNtupleDColumn(cols.xPosColID, xPos);
 	analysisMan->FillNtupleDColumn(cols.yPosColID, yPos);

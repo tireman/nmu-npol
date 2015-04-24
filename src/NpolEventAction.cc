@@ -40,7 +40,7 @@ void NpolEventAction::BeginOfEventAction(const G4Event* evt) {
 
 	NpolAnalysisManager *analysisMan = NpolAnalysisManager::GetInstance();
 
-	analysisMan->PrepareNewEvent();
+	analysisMan->PrepareNewEvent(evt->GetEventID());
 }
 
 void NpolEventAction::EndOfEventAction(const G4Event* evt) {

@@ -31,6 +31,7 @@ struct NtupleColumns {
 	G4int volumeIDColID;
 	G4int particleIDColID;
 	G4int parentIDColID;
+	G4int eventIDColID;
 	G4int vertexEnergyColID;
 	G4int xPosColID;
 	G4int yPosColID;
@@ -57,7 +58,7 @@ class NpolAnalysisManager {
 		void RegisterActiveDetectorEDepHistogram(G4VPhysicalVolume *PV, G4String nname, G4String ttitle, G4int nnbins, G4double xxmin, G4double xxmax);
 		void CreateHistograms();
 		void CreateNtuple();
-		void PrepareNewEvent();
+		void PrepareNewEvent(int eventID);
 		void AddEDep(G4VPhysicalVolume *PV, G4double dep);
 		void FillHistograms();
 		void WriteDetectorIDsToFile();
@@ -78,6 +79,7 @@ class NpolAnalysisManager {
 		std::map<G4VPhysicalVolume *, int> detectorIDs;
 		struct NtupleColumns cols;
 		int nextVolumeID;
+		int currentEventID;
 };
 
 #endif
