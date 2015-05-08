@@ -49,12 +49,17 @@ NpolPrimaryGeneratorAction::~NpolPrimaryGeneratorAction()
 // This function is called at the beginning of each event.
 void NpolPrimaryGeneratorAction::GeneratePrimaries(G4Event* anEvent)
 {
+ // added in a raster pattern.  Circular in shape.
 
-	G4double x0 = 0.0*m;
-	G4double y0 = 0.0*m;
-	G4double z0 = -17.0*m;
-
-	particleGun->SetParticlePosition(G4ThreeVector(x0,y0,z0));
-	particleGun->GeneratePrimaryVertex(anEvent);
+  //G4double x0 = 0.0*m;
+  G4double r = (2.0* (2.0*G4UniformRand()-1))*mm;
+  G4double theta = (2*3.14159265 * (2.0*G4UniformRand()-1));
+  G4double x0 = r*cos(theta);
+  G4double y0 = r*sin(theta);
+  // G4double y0 = 0.0*m;
+  G4double z0 = -3.0*m;
+  
+  particleGun->SetParticlePosition(G4ThreeVector(x0,y0,z0));
+  particleGun->GeneratePrimaryVertex(anEvent);
 }
 

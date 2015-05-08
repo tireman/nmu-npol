@@ -26,36 +26,36 @@
 #include "NpolHBender.hh"
 
 NpolHBender::NpolHBender() {
-	G4GDMLParser parser;
-
-	G4String gdmlFilename = "gdml/HBender.gdml";
-	parser.Read(gdmlFilename);
-
-	HBenderLV = parser.GetVolume("HBenderPV");
-	HBCryoBoxLV = parser.GetVolume("HBCryoBoxLogic");  
-	HBBoreLogicLV = parser.GetVolume("HBBoreLogic");
-
-	//G4VisAttributes *VisAtt= new G4VisAttributes(G4Colour(0.0,0.0,1.0));
-	//HBenderLV->SetVisAttributes(VisAtt);
-	HBenderLV->SetVisAttributes(G4VisAttributes::GetInvisible());
-
-	G4VisAttributes *VisAtt= new G4VisAttributes(G4Colour(1.0,0.0,1.0));
-	HBCryoBoxLV->SetVisAttributes(VisAtt);
-
-	VisAtt= new G4VisAttributes(G4Colour(0.0,1.0,1.0));
-	HBBoreLogicLV->SetVisAttributes(VisAtt);
+  G4GDMLParser parser;
+  
+  G4String gdmlFilename = "gdml/HBender.gdml";
+  parser.Read(gdmlFilename);
+  
+  HBenderLV = parser.GetVolume("HBenderPV");
+  HBCryoBoxLV = parser.GetVolume("HBCryoBoxLogic");  
+  HBBoreLogicLV = parser.GetVolume("HBBoreLogic");
+  
+  //G4VisAttributes *VisAtt= new G4VisAttributes(G4Colour(0.0,0.0,1.0));
+  //HBenderLV->SetVisAttributes(VisAtt);
+  HBenderLV->SetVisAttributes(G4VisAttributes::GetInvisible());
+  
+  G4VisAttributes *VisAtt= new G4VisAttributes(G4Colour(1.0,0.0,1.0));
+  HBCryoBoxLV->SetVisAttributes(VisAtt);
+  
+  VisAtt= new G4VisAttributes(G4Colour(0.0,1.0,1.0));
+  HBBoreLogicLV->SetVisAttributes(VisAtt);
 }
 
 NpolHBender::~NpolHBender() {}
 
 G4String NpolHBender::GetName() {
-	return G4String("Horizontal Bender");
+  return G4String("Horizontal Bender");
 }
 
 void NpolHBender::Place(G4LogicalVolume *motherLV) {
-	G4double ShmsAng = 16.0*deg;
-	G4double PosHB = 1.76*m;
-
-	PlaceCylindrical(HBenderLV,motherLV, "HBender", PosHB, ShmsAng, 0);
+  G4double ShmsAng = 36.53*deg;
+  G4double PosHB = 1.76*m;
+  
+  PlaceCylindrical(HBenderLV,motherLV, "HBender", PosHB, ShmsAng, 0);
 } 
 

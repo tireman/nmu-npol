@@ -107,9 +107,9 @@ void NpolPolarimeter::ActivateImprintedPVs(G4AssemblyVolume *AV, int arrayNo = 0
 	if(LVName == "TopDetLV") {
 		namePrefix = "TopDet";
 		titlePrefix = "Top Array";
-		nbins = 100;
+		nbins = 240;
 		xmin = 0;
-		xmax = 20*MeV;
+		xmax = 120*MeV;
 	} else if(LVName == "TopVetoLV") {
 		namePrefix = "TopVeto";
 		titlePrefix =  "Top Veto Array";
@@ -119,9 +119,9 @@ void NpolPolarimeter::ActivateImprintedPVs(G4AssemblyVolume *AV, int arrayNo = 0
 	} else if(LVName == "BottomDetLV") {
 		namePrefix = "BottomDet";
 		titlePrefix = "Bottom Array";
-		nbins = 100;
+		nbins = 240;
 		xmin = 0;
-		xmax = 20*MeV;
+		xmax = 120*MeV;
 	} else if(LVName == "BottomVetoLV") {
 		namePrefix = "BottomVeto";
 		titlePrefix = "Bottom Veto Array";
@@ -131,9 +131,9 @@ void NpolPolarimeter::ActivateImprintedPVs(G4AssemblyVolume *AV, int arrayNo = 0
 	} else if(LVName == "FrontDetLV") {
 		namePrefix = "FrontDet";
 		titlePrefix = "Front Array";
-		nbins = 100;
+		nbins = 240;
 		xmin = 0;
-		xmax = 20*MeV;
+		xmax = 120*MeV;
 	} else if(LVName == "FrontTagLV") {
 		namePrefix = "FrontTag";
 		titlePrefix = "Front Tagger Array";
