@@ -28,17 +28,23 @@
 #define PINEUTRAL 8
 
 struct NtupleColumns {
-	G4int volumeIDColID;
-	G4int particleIDColID;
-	G4int parentIDColID;
-	G4int eventIDColID;
-	G4int vertexEnergyColID;
-	G4int xPosColID;
-	G4int yPosColID;
-	G4int zPosColID;
-	G4int xMomColID;
-	G4int yMomColID;
-	G4int zMomColID;
+  G4int volumeIDColID;
+  G4int particleIDColID;
+  G4int parentIDColID;
+  G4int trackIDColID;
+  G4int stepIDColID;
+  G4int eventIDColID;
+  G4int vertexEnergyColID;
+  G4int kineticEnergyColID; 
+  G4int WxPosColID;
+  G4int WyPosColID;
+  G4int WzPosColID; 
+  G4int VxPosColID;
+  G4int VyPosColID;
+  G4int VzPosColID;
+  G4int xMomColID;
+  G4int yMomColID;
+  G4int zMomColID;
 };
 
 struct HistoData {
@@ -62,8 +68,7 @@ class NpolAnalysisManager {
 		void AddEDep(G4VPhysicalVolume *PV, G4double dep);
 		void FillHistograms();
 		void WriteDetectorIDsToFile();
-		void FillNtuple(G4VPhysicalVolume *, G4int particleID, G4int parentID, G4double vertexEnergy,
-				G4double xPos, G4double yPos, G4double zPos, G4double xMom, G4double yMom, G4double zMom);
+  void FillNtuple(G4VPhysicalVolume *PV, G4int particleID, G4int parentID, G4float trackID, G4float stepID,G4float depositEnergy, G4float vertexEnergy, G4float kineticEnergy, G4float WxPos, G4float WyPos, G4float WzPos, G4float VxPos, G4float VyPos, G4float VzPos, G4float xMom, G4float yMom, G4float zMom);
 
 	private:
 		void FillVolNameColumns(char *volName);

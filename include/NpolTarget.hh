@@ -22,20 +22,26 @@ class G4AssemblyVolume;
 class G4VPhysicalVolume;
 
 class NpolTarget : public NpolDetectorFactory {
+  
+public:
+  NpolTarget();
+  ~NpolTarget();
 
-	public:
-		NpolTarget();
-		~NpolTarget();
-
-		void ConstructTargetCan();
-		void ConstructTargetFluid();
-
-		virtual G4String GetName();
-		virtual void Place(G4LogicalVolume *motherLV);
-
-	private: 
-		G4LogicalVolume *TargetCanLV;
-		G4LogicalVolume *TargetFluidLV;
+  void ConstructTargetCan();
+  void ConstructTargetFluid();
+  
+  virtual G4String GetName();
+  virtual void Place(G4LogicalVolume *motherLV);
+  
+  static G4double TargetCellDiameter;
+  static G4double TargetCellLength;
+  static G4double TargetCellUpStreamWindow;
+  static G4double TargetCellDownStreamWindow;
+  static G4double TargetCellSideWindow;
+  
+private: 
+  G4LogicalVolume *TargetCanLV;
+  G4LogicalVolume *TargetFluidLV;
 };
 
 #endif

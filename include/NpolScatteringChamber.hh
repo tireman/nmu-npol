@@ -24,25 +24,32 @@ class G4VPhysicalVolume;
 
 class NpolScatteringChamber : public NpolDetectorFactory {
 
-	public:
-		NpolScatteringChamber();
-		~NpolScatteringChamber();
+public:
+  NpolScatteringChamber();
+  ~NpolScatteringChamber();
 
-		void ConstructChamber();
+  void ConstructChamber();
+  
+  virtual G4String GetName();
+  virtual void Place(G4LogicalVolume *motherLV);
 
-		virtual G4String GetName();
-		virtual void Place(G4LogicalVolume *motherLV);
+  static G4double insideRadius;
+  static G4double insideHeight;
+  static G4double wallThickness;
+  static G4double holeRadius;
+  static G4double WindowThickness;
+  static G4double shmsWindowAngle;
+  static G4double shmsWindowDeltaAngle;
+  static G4double npolWindowAngle;
+  static G4double npolWindowDeltaAngle;
+  static G4double npolWindowHeight;
+  static G4double shmsWindowHeight;
 
-		static G4double insideRadius;
-		static G4double insideHeight;
-		static G4double wallThickness;
-		static G4double holeRadius;
-
-	private:
-
-		G4LogicalVolume *innerChamberLV;
-		G4LogicalVolume *chamberWallLV;
-		NpolTarget *target;
+private:
+  
+  G4LogicalVolume *innerChamberLV;
+  G4LogicalVolume *chamberWallLV;
+  NpolTarget *target;
 };
 
 #endif

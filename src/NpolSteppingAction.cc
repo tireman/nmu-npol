@@ -31,6 +31,8 @@ void NpolSteppingAction::UserSteppingAction(const G4Step *aStep) {
   G4StepPoint *preStepPoint = aStep->GetPreStepPoint();	
   
   G4int parentID = aTrack->GetParentID();
+  G4int stepID = aTrack->GetCurrentStepNumber();
+  G4int trackID = aTrack->GetTrackID();
   
   G4int particleID = -1;
   G4String particleName = aTrack->GetDynamicParticle()->GetDefinition()->GetParticleName();
@@ -39,27 +41,29 @@ void NpolSteppingAction::UserSteppingAction(const G4Step *aStep) {
   else if(particleName == "proton") particleID = PROTON_ID;
   else if(particleName == "neutron") particleID = NEUTRON_ID;
   else if(particleName == "gamma") particleID = GAMMA_ID;
-  
-  G4double vertexEnergy = aTrack->GetVertexKineticEnergy();
-  
-  G4ThreeVector positionInWorld = preStepPoint->GetPosition();
+  else if(particleName == "pi-") particleID = PINEG;
+  else if(particleName == "pi+") particleID = PIPOS;
+  else if(particleName == "pi0") particleID = PINEUTRAL;
+   
+  G4float vertexEnergy = aTrack->GetVertexKineticEnergy()/MeV;
+  G4float kineticEnergy = aTrack->GetKineticEnergy()/MeV;
+  G4float depositEnergy = aStep->GetTotalEnergyDeposit()/MeV;
+  G4ThreeVector positionInWorld = preStepPoint->GetPosition()/cm;
   G4ThreeVector positionInVolume = 
     preStepPoint->GetTouchableHandle()->GetHistory()->GetTopTransform().TransformPoint(positionInWorld);
   
-  G4ThreeVector momentum = preStepPoint->GetMomentum();
+  G4ThreeVector momentum = preStepPoint->GetMomentum()/MeV;
   
   G4VPhysicalVolume *volume = preStepPoint->GetPhysicalVolume();
   
   G4String matName = preStepPoint->GetMaterial()->GetName();
   if(volume->GetName() == "EndDump"){
     aTrack->SetTrackStatus(fStopAndKill);
-  }else {
+  }else if(trackID < 4) {
     analysisMan->AddEDep(volume,
 	 aStep->GetTotalEnergyDeposit());
     
-    analysisMan->FillNtuple(volume, particleID, parentID, vertexEnergy,
-	    positionInWorld.x(), positionInWorld.y(), positionInWorld.z(), 
-	    momentum.x(), momentum.y(), momentum.z());
+    analysisMan->FillNtuple(volume, particleID, parentID, trackID, stepID, depositEnergy, vertexEnergy, kineticEnergy, positionInWorld.x(), positionInWorld.y(), positionInWorld.z(), positionInVolume.x(), positionInVolume.y(), positionInVolume.z(), momentum.x(), momentum.y(), momentum.z());
   }
 }
 

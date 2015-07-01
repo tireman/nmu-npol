@@ -23,8 +23,9 @@
 
 #include "NpolPrimaryGeneratorActionPS.hh"
 
-	NpolPrimaryGeneratorActionPS::NpolPrimaryGeneratorActionPS()
+NpolPrimaryGeneratorActionPS::NpolPrimaryGeneratorActionPS()
 : worldBox(NULL)
+
 {
 	G4int n_particle = 1;
 	particleGun  = new G4ParticleGun(n_particle);
