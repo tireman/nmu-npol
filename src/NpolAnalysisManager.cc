@@ -174,7 +174,7 @@ bool NpolAnalysisManager::isVolumeActive(G4VPhysicalVolume *PV) {
 void NpolAnalysisManager::WriteDetectorIDsToFile() {
   
   std::map<G4VPhysicalVolume *, int>::iterator it;
-  FILE *f = fopen("/data/tireman/simulation/output/FirstPass/Test/detIDs_2.txt","w+");
+  FILE *f = fopen("/data/tireman/simulation/output/FirstPass/Test/detIDs_test.txt","w+");
   
   for(it = detectorIDs.begin(); it != detectorIDs.end(); it++)
     fprintf(f,"%03d,%s\n",it->second, it->first->GetName().data());

@@ -15,6 +15,7 @@
 #include "G4Colour.hh"
 #include "G4ios.hh"
 
+
 #include "NpolDetectorConstruction.hh"
 #include "NpolDetectorFactory.hh"
 #include "NpolWorld.hh"
@@ -76,6 +77,6 @@ G4VPhysicalVolume* NpolDetectorConstruction::Construct() {
 	return world->GetWorldPV();
 }
 
-void NpolDetectorConstruction::ConstructSDandField() {
+void NpolDetectorConstruction::ConstructSDandField() { 
 }
 

@@ -26,16 +26,17 @@ class NpolWorld;
 
 class NpolDetectorConstruction : public G4VUserDetectorConstruction
 {
-	public:
-		NpolDetectorConstruction();
-		~NpolDetectorConstruction();
-
-		virtual G4VPhysicalVolume* Construct();
-		virtual void ConstructSDandField();
-
-	private:
-		std::set<NpolDetectorFactory *> detectors;
-		NpolWorld *world;
+public:
+  NpolDetectorConstruction();
+  ~NpolDetectorConstruction();
+  
+  virtual G4VPhysicalVolume* Construct();
+  virtual void ConstructSDandField();
+  
+private:
+  std::set<NpolDetectorFactory *> detectors;
+  NpolWorld *world;
+  
 };
 
 #endif

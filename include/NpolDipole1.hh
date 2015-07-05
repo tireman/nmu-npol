@@ -16,6 +16,13 @@
 #define Npol_Dipole1_h
 
 #include "G4SystemOfUnits.hh"
+#include "G4UniformMagField.hh"
+#include "G4Mag_UsualEqRhs.hh"
+#include "G4MagIntegratorStepper.hh"
+#include "G4ChordFinder.hh"
+#include "G4FieldManager.hh"
+#include "G4TransportationManager.hh"
+#include "G4PropagatorInField.hh"
 
 #include "NpolDetectorFactory.hh"
 
@@ -24,23 +31,36 @@ class G4AssemblyVolume;
 class G4VPhysicalVolume;
 
 class NpolDipole1 : public NpolDetectorFactory {
+  
+public:
+  NpolDipole1();
+  ~NpolDipole1();
+  
+  void ConstructDipole1Yoke();
+  void ConstructDipole1CuBar();
+  void ConstructDipole1CuEnd();
+  void ConstructDipole1FieldClamp1();
+  void ConstructDipole1FieldClamp2();
+  void ConstructDipole1Field();
+  
+  virtual G4String GetName();
+  virtual void Place(G4LogicalVolume *motherLV);
+  
+  static G4double yokeLength;
+  static G4double gapWidth;
+  static G4double gapHeight;
+  static G4double gapLength;
+  
+private: 
+  G4LogicalVolume *Dipole1YokeLV, *Dipole1CuBarLV, *Dipole1CuEndLV;
+  G4LogicalVolume *FieldClamp1LV, *FieldClamp2LV, * Dipole1FieldLV;
 
-	public:
-		NpolDipole1();
-		~NpolDipole1();
+  G4double dipole1FieldY, minStepMagneticField;
 
-		void ConstructDipole1Yoke();
-		void ConstructDipole1CuBar();
-		void ConstructDipole1CuEnd();
-		void ConstructDipole1FieldClamp1();
-		void ConstructDipole1FieldClamp2();
-
-		virtual G4String GetName();
-		virtual void Place(G4LogicalVolume *motherLV);
-
-	private: 
-		G4LogicalVolume *Dipole1YokeLV, *Dipole1CuBarLV, *Dipole1CuEndLV;
-		G4LogicalVolume *FieldClamp1LV, *FieldClamp2LV;
+  G4UniformMagField* magField;
+  G4Mag_EqRhs *fEqMagField;
+  G4MagIntegratorStepper* stepperMagField;
+  G4ChordFinder* fChordFinder;
 };
 
 #endif
