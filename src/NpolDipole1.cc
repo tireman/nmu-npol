@@ -41,9 +41,9 @@
 #include "NpolDetectorConstruction.hh"
 
 G4double NpolDipole1::yokeLength = 0.6096*m;
-G4double NpolDipole1::gapWidth = 0.56*m;
+G4double NpolDipole1::gapWidth = 1.22*m;
 G4double NpolDipole1::gapLength = 1.22*m;
-G4double NpolDipole1::gapHeight = 0.2096*m;
+G4double NpolDipole1::gapHeight = 0.4699*m;
 
 NpolDipole1::NpolDipole1() {
   ConstructDipole1Yoke();
@@ -181,7 +181,7 @@ void NpolDipole1::ConstructDipole1Field(){
   G4TransportationManager* tmanMagField = G4TransportationManager::GetTransportationManager();
   tmanMagField -> GetPropagatorInField() -> SetLargestAcceptableStep(1*mm);
   
-  dipole1FieldY = 1.2*tesla;
+  dipole1FieldY = 1.5*tesla;
   
   magField = new G4UniformMagField(G4ThreeVector(0., dipole1FieldY, 0.));
   fEqMagField = new G4Mag_UsualEqRhs(magField);
