@@ -43,7 +43,7 @@
 G4double NpolDipole1::yokeLength = 0.6096*m;
 G4double NpolDipole1::gapWidth = 0.56*m;
 G4double NpolDipole1::gapLength = 1.22*m;
-G4double NpolDipole1::gapHeight = 0.1896*m;
+G4double NpolDipole1::gapHeight = 0.1890*m;
 
 NpolDipole1::NpolDipole1() {
   ConstructDipole1Yoke();
@@ -135,8 +135,8 @@ void NpolDipole1::ConstructDipole1FieldClamp1(){
   
   // Create the necessary solids
   G4Box *Slab = new G4Box("Slab", width/2, height/2, thick/2);
-  G4Box *Hole = new G4Box("Hole", Inwidth/2, Inheight/2, (thick+0.001*m)/2);
-  G4Tubs *BHole = new G4Tubs("BHole", 0.0*m, radius+3.0*mm, ((CyLen/2)+radius*tan(NpolAng)+4.0*cm), 0.0*deg, 360.*deg);
+  G4Box *Hole = new G4Box("Hole", Inwidth/2, Inheight/2, (thick+0.01*m)/2);
+  G4Tubs *BHole = new G4Tubs("BHole", 0.0*m, radius+0.50*cm, ((CyLen/2)+radius*tan(NpolAng)+10.0*cm), 0.0*deg, 360.*deg);
   
   // Rotation and translation information for the hole for the beam line
   G4RotationMatrix *yRot = new G4RotationMatrix;
@@ -160,7 +160,7 @@ void NpolDipole1::ConstructDipole1FieldClamp2(){
   G4double Inheight = 0.254*m, Inwidth = 0.56*m;
   
   G4Box *Slab = new G4Box("Slab", width/2, height/2, thick/2);
-  G4Box *Hole = new G4Box("Hole", Inwidth/2, Inheight/2, (thick+0.001*m)/2);
+  G4Box *Hole = new G4Box("Hole", Inwidth/2, Inheight/2, (thick+0.01*m)/2);
 
   G4SubtractionSolid *FieldClamp2 = new G4SubtractionSolid("FieldClamp2", Slab, Hole); 
   
@@ -207,7 +207,7 @@ void NpolDipole1::Place(G4LogicalVolume *motherLV) {
   PlaceRectangular(Dipole1CuBarLV, motherLV, "Dipole1CuBar", (-BarOffSet*cos(NpolAng)-PosD1*sin(NpolAng)), -0.125*m, (-BarOffSet*sin(NpolAng)+PosD1*cos(NpolAng)), 0*deg, -NpolAng, 0.0); 
   
   // Place 4 copies of the extruded copper ends for the coil packs
-  /*  PlaceCylindrical(Dipole1CuEndLV, motherLV, "Dipole1CuEnd", (PosD1-EndOffSet), -NpolAng, +5.08*cm);
+  PlaceCylindrical(Dipole1CuEndLV, motherLV, "Dipole1CuEnd", (PosD1-EndOffSet), -NpolAng, +5.08*cm);
   PlaceCylindrical(Dipole1CuEndLV, motherLV, "Dipole1CuEnd", (PosD1+EndOffSet), -NpolAng, +5.08*cm);
   PlaceRectangular(Dipole1CuEndLV, motherLV, "Dipole1CuEnd", (-(PosD1-EndOffSet)*sin(NpolAng)), -5.08*cm, ((PosD1-EndOffSet)*cos(NpolAng)), 0.0*deg, NpolAng, 180.*deg);
   PlaceRectangular(Dipole1CuEndLV, motherLV, "Dipole1CuEnd", (-(PosD1+EndOffSet)*sin(NpolAng)), -5.08*cm, ((PosD1+EndOffSet)*cos(NpolAng)), 0.0*deg, NpolAng, 180.*deg);
@@ -215,11 +215,11 @@ void NpolDipole1::Place(G4LogicalVolume *motherLV) {
   // Place 2 copies of the Charybdis field clamps
   PlaceCylindrical(FieldClamp1LV, motherLV, "FieldClamp1", (PosD1-ClampOffSet), -NpolAng, 0.0*m);
   PlaceCylindrical(FieldClamp2LV, motherLV, "FieldClamp2", (PosD1+ClampOffSet), -NpolAng, 0.0*m);
-  */
+  
   // Place upper yoke piece
   PlaceCylindrical(Dipole1YokeLV, motherLV, "Dipole1", PosD1,-NpolAng,+5.08*cm); 
   // Place lower yoke piece 
-  //PlaceRectangular(Dipole1YokeLV, motherLV, "Dipole1", (-PosD1*sin(NpolAng)), -5.08*cm,(PosD1*cos(NpolAng)), 0*deg, NpolAng, 180*deg); 
+  PlaceRectangular(Dipole1YokeLV, motherLV, "Dipole1", (-PosD1*sin(NpolAng)), -5.08*cm,(PosD1*cos(NpolAng)), 0*deg, NpolAng, 180*deg); 
   
   // Place the magnetic field volume
   PlaceCylindrical(Dipole1FieldLV, motherLV, "Field1", PosD1,-NpolAng,0.0*cm);
