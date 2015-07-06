@@ -37,7 +37,7 @@
 G4double NpolDipole2::yokeLength = 0.6096*m;
 G4double NpolDipole2::gapWidth = 1.22*m;
 G4double NpolDipole2::gapLength = 1.22*m;
-G4double NpolDipole2::gapHeight = 0.2096*m;
+G4double NpolDipole2::gapHeight = 0.4699*m;
 
 NpolDipole2::NpolDipole2() {
   ConstructDipole2Yoke();

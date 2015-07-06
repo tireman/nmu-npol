@@ -88,7 +88,7 @@ void NpolHallShell::ConstructHallShellFloor() {
 void NpolHallShell::ConstructHallShellRoof() {
 
 	G4Sphere *HallShellRoof = new G4Sphere("HallShellRoof",(roofRadius-creteThick), 
-			roofRadius, 0.0*deg, 360.0*deg, 0.0*deg, 38.0*deg);
+			roofRadius, 0.0*deg, 360.0*deg, 0.0*deg, 37.0*deg);
 	HallShellRoofLV = new G4LogicalVolume(HallShellRoof,
 			NpolMaterials::GetInstance()->GetConcrete(),"HallShellRoofLV",0,0,0);
 

@@ -36,7 +36,7 @@ G4VPhysicalVolume *NpolDetectorFactory::PlaceRectangular(G4LogicalVolume *detLV,
 	Tr = G4Transform3D(Rm,Tv);
 
 	G4VPhysicalVolume *detPV = new G4PVPlacement(Tr, detLV,
-			detName, motherLV, false, 0);
+		   detName, motherLV, false, 0,true);
 
 	return detPV;
 }
@@ -55,7 +55,7 @@ G4VPhysicalVolume *NpolDetectorFactory::PlaceCylindrical(G4LogicalVolume *detLV,
 	Tr = G4Transform3D(Rm,Tv);
 
 	G4VPhysicalVolume *detPV = new G4PVPlacement(Tr, detLV,
-			detName, motherLV, false, 0);
+						     detName, motherLV, false, 0,true);
 
 	return detPV;
 }

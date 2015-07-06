@@ -30,7 +30,8 @@ NpolHBender::NpolHBender() {
   
   G4String gdmlFilename = "gdml/HBender.gdml";
   parser.Read(gdmlFilename);
-  
+  parser.SetOverlapCheck(true);
+
   HBenderLV = parser.GetVolume("HBenderPV");
   HBCryoBoxLV = parser.GetVolume("HBCryoBoxLogic");  
   HBBoreLogicLV = parser.GetVolume("HBBoreLogic");

@@ -80,7 +80,7 @@ void NpolShieldHut::ConstructHutBackWall() {
 // Construct the side walls (one construct, two placements) for the shield 
 // hut out of concrete.
 void NpolShieldHut::ConstructHutSideWall() {
-	G4double xlen = 0.9144*m, ylen = 7.3152*m, zlen = 5.50*m-xlen;
+	G4double xlen = 0.9144*m, ylen = 7.3152*m, zlen = 5.50*m-xlen-0.0050*m;
 
 	G4Box *HutSideWall = new G4Box("HutSideWall",xlen/2, ylen/2, zlen/2);
 	HutSideWallLV = new G4LogicalVolume(HutSideWall,
