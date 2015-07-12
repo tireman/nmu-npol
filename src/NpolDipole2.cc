@@ -155,7 +155,7 @@ void NpolDipole2::ConstructDipole2Field(){
   
   fChordFinder = new G4ChordFinder(magField, minStepMagneticField, stepperMagField);
   
-  Dipole2FieldLV->SetFieldManager(fieldManMagField, true);
+  //Dipole2FieldLV->SetFieldManager(fieldManMagField, true);
 }
 void NpolDipole2::Place(G4LogicalVolume *motherLV) {
   G4double PosD2 = 4.6866*m, NpolAng = 28.0*deg, BarOffSet = +0.7730*m;

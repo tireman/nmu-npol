@@ -22,24 +22,26 @@ class G4AssemblyVolume;
 class G4VPhysicalVolume;
 
 class NpolShieldHut : public NpolDetectorFactory {
-
-	public:
-		NpolShieldHut();
-		~NpolShieldHut();
-
-		void ConstructHutSideWall();
-		void ConstructHutFrontWall();
-		void ConstructHutBackWall();
-		void ConstructHutRoof();
-
-		virtual G4String GetName();
-		virtual void Place(G4LogicalVolume *motherLV);
-
-	private: 
-		G4LogicalVolume *HutSideWallLV;
-		G4LogicalVolume *HutFrontWallLV;
-		G4LogicalVolume *HutBackWallLV;
-		G4LogicalVolume *HutRoofLV;
+  
+public:
+  NpolShieldHut();
+  ~NpolShieldHut();
+  
+  void ConstructHutSideWall();
+  void ConstructHutFrontWall();
+  void ConstructHutBackWall();
+  void ConstructHutRoof();
+  void ConstructLeadCurtain();
+  
+  virtual G4String GetName();
+  virtual void Place(G4LogicalVolume *motherLV);
+  
+private: 
+  G4LogicalVolume *HutSideWallLV;
+  G4LogicalVolume *HutFrontWallLV;
+  G4LogicalVolume *HutBackWallLV;
+  G4LogicalVolume *HutRoofLV;
+  G4LogicalVolume *LeadCurtainLV;
 };
 
 #endif

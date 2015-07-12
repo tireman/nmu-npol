@@ -24,37 +24,36 @@ class G4AssemblyVolume;
 class G4VPhsicalVolume;
 
 class NpolPolarimeter : public NpolDetectorFactory {
-
-	public:
-		NpolPolarimeter();
-		~NpolPolarimeter();
-
-		void ConstructTopDetArray(G4LogicalVolume *motherLV);
-		void ConstructTopVetoArray(G4LogicalVolume *motherLV);
-		void ConstructBottomDetArray(G4LogicalVolume *motherLV);
-		void ConstructBottomVetoArray(G4LogicalVolume *motherLV);
-		void ConstructFrontDetArray(G4LogicalVolume *motherLV);
-		void ConstructFrontTagArray(G4LogicalVolume *motherLV);
-
-		virtual G4String GetName();
-		virtual void Place(G4LogicalVolume *motherLV);
-		void TranslateRotateAndPlace(G4LogicalVolume *polarimeterLV, G4LogicalVolume *motherLV,
-				G4double rho, G4double phi, G4double z);
-
-		G4AssemblyVolume *MakePlate(G4LogicalVolume *detLV, G4int numDets, 
-				G4double TmX, G4double TmY, G4double TmZ,
-				G4double TmdX, G4double TmdY, G4double TmdZ);
-
-		void ImprintPlate(G4AssemblyVolume *plate, G4LogicalVolume *motherLV,
-				G4double TmX, G4double TmY, G4double TmZ, G4double RmZ);
-
-		void ActivateImprintedPVs(G4AssemblyVolume *AV, int arrayNo);
-		void RegisterHistogramFor(G4VPhysicalVolume *PV, const char *namePrefix, const char *titlePrefix, int arrayNo, int num);
-
-
-			private:
-				G4LogicalVolume *PolarimeterLV;
-		};
+  
+public:
+  NpolPolarimeter();
+  ~NpolPolarimeter();
+  
+  void ConstructTopDetArray(G4LogicalVolume *motherLV);
+  void ConstructTopVetoArray(G4LogicalVolume *motherLV);
+  void ConstructBottomDetArray(G4LogicalVolume *motherLV);
+  void ConstructBottomVetoArray(G4LogicalVolume *motherLV);
+  void ConstructFrontDetArray(G4LogicalVolume *motherLV);
+  void ConstructFrontTagArray(G4LogicalVolume *motherLV);
+  
+  virtual G4String GetName();
+  virtual void Place(G4LogicalVolume *motherLV);
+  void TranslateRotateAndPlace(G4LogicalVolume *polarimeterLV, G4LogicalVolume *motherLV,G4double rho, G4double phi, G4double z);
+  
+  G4AssemblyVolume *MakePlate(G4LogicalVolume *detLV, G4int numDets, 
+			      G4double TmX, G4double TmY, G4double TmZ,
+			      G4double TmdX, G4double TmdY, G4double TmdZ);
+  
+  void ImprintPlate(G4AssemblyVolume *plate, G4LogicalVolume *motherLV,
+		    G4double TmX, G4double TmY, G4double TmZ, G4double RmZ);
+  
+  void ActivateImprintedPVs(G4AssemblyVolume *AV, int arrayNo);
+  void RegisterHistogramFor(G4VPhysicalVolume *PV, const char *namePrefix, const char *titlePrefix, int arrayNo, int num);
+  
+  
+private:
+  G4LogicalVolume *PolarimeterLV;
+};
 
 #endif
 

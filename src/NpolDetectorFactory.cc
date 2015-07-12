@@ -20,43 +20,40 @@
 #include "NpolDetectorFactory.hh"
 
 // Place a volume in its mother volume at a location specified by rectangular coordinates.
-G4VPhysicalVolume *NpolDetectorFactory::PlaceRectangular(G4LogicalVolume *detLV, G4LogicalVolume *motherLV,
-		G4String detName, G4double x, G4double y, G4double z,
-		G4double Rx, G4double Ry, G4double Rz) {
+G4VPhysicalVolume *NpolDetectorFactory::PlaceRectangular(G4LogicalVolume *detLV, G4LogicalVolume *motherLV,G4String detName, G4double x, G4double y, G4double z,G4double Rx, G4double Ry, G4double Rz) {
 
-	G4RotationMatrix Rm; 
-	G4ThreeVector Tv;
-	G4Transform3D Tr;
-
-	Rm.rotateX(Rx);
-	Rm.rotateY(Ry);
-	Rm.rotateZ(Rz);
-
-	Tv.setX(x); Tv.setY(y); Tv.setZ(z);
-	Tr = G4Transform3D(Rm,Tv);
-
-	G4VPhysicalVolume *detPV = new G4PVPlacement(Tr, detLV,
-		   detName, motherLV, false, 0,true);
-
-	return detPV;
+  G4RotationMatrix Rm; 
+  G4ThreeVector Tv;
+  G4Transform3D Tr;
+  
+  Rm.rotateX(Rx);
+  Rm.rotateY(Ry);
+  Rm.rotateZ(Rz);
+  
+  Tv.setX(x); Tv.setY(y); Tv.setZ(z);
+  Tr = G4Transform3D(Rm,Tv);
+  
+  G4VPhysicalVolume *detPV = new G4PVPlacement(Tr, detLV,
+       detName, motherLV, false, 0,false); // last bool for overlapcheck
+  
+  return detPV;
 }
 
 // Place a volume in its mother volume at a location specified by cylindrical polar coordinates.
 // The polar axis is the positive Z axis.
-G4VPhysicalVolume *NpolDetectorFactory::PlaceCylindrical(G4LogicalVolume *detLV, G4LogicalVolume *motherLV,
-		G4String detName, G4double rho, G4double phi, G4double z) {
+G4VPhysicalVolume *NpolDetectorFactory::PlaceCylindrical(G4LogicalVolume *detLV, G4LogicalVolume *motherLV,G4String detName, G4double rho, G4double phi, G4double z) {
 
-	G4RotationMatrix Rm;
-	G4ThreeVector Tv;
-	G4Transform3D Tr;
+  G4RotationMatrix Rm;
+  G4ThreeVector Tv;
+  G4Transform3D Tr;
+  
+  Rm.rotateY(phi);
+  Tv.setX(rho*sin(phi)); Tv.setY(z); Tv.setZ(rho*cos(phi));
+  Tr = G4Transform3D(Rm,Tv);
+  
+  G4VPhysicalVolume *detPV = new G4PVPlacement(Tr, detLV,
+       detName, motherLV, false, 0,false); // last bool for overlap check
 
-	Rm.rotateY(phi);
-	Tv.setX(rho*sin(phi)); Tv.setY(z); Tv.setZ(rho*cos(phi));
-	Tr = G4Transform3D(Rm,Tv);
-
-	G4VPhysicalVolume *detPV = new G4PVPlacement(Tr, detLV,
-						     detName, motherLV, false, 0,true);
-
-	return detPV;
+  return detPV;
 }
 

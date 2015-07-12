@@ -29,7 +29,7 @@
 
 NpolEventAction::NpolEventAction()
 {
-	// set printing per each 10 events
+	// set printing per each 10 events default (can be changed in macro)
 	G4RunManager::GetRunManager()->SetPrintProgress(10);     
 }
 

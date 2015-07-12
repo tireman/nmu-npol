@@ -32,49 +32,49 @@
 #include "NpolAnalysisManager.hh"
 
 NpolDetectorConstruction::NpolDetectorConstruction() {
-
-	G4cout << "Constructing volumes." << G4endl;
-	world = new NpolWorld();
-	detectors.insert(new NpolPolarimeter());
-	detectors.insert(new NpolScatteringChamber);
-	detectors.insert(new NpolHallShell);
-	detectors.insert(new NpolBeamlineUpper);
-	detectors.insert(new NpolBeamlineDown);
-	detectors.insert(new NpolDipole1);
-	detectors.insert(new NpolDipole2);
-	detectors.insert(new NpolShieldHut);
-	detectors.insert(new NpolHBender);
-	detectors.insert(new NpolBDump);
+  
+  G4cout << "Constructing volumes." << G4endl;
+  world = new NpolWorld();
+  detectors.insert(new NpolPolarimeter());
+  detectors.insert(new NpolScatteringChamber);
+  detectors.insert(new NpolHallShell);
+  detectors.insert(new NpolBeamlineUpper);
+  detectors.insert(new NpolBeamlineDown);
+  detectors.insert(new NpolDipole1);
+  detectors.insert(new NpolDipole2);
+  detectors.insert(new NpolShieldHut);
+  detectors.insert(new NpolHBender);
+  detectors.insert(new NpolBDump);
 }
 
 NpolDetectorConstruction::~NpolDetectorConstruction() {
 
-	G4cout << "Deleting " << world->GetName() << G4endl;
-	delete world;
-	while(!detectors.empty()) {
-		G4cout << "Deleting " << (*detectors.begin())->GetName() << G4endl;
-		delete *(detectors.begin());
-		detectors.erase(detectors.begin());
-	}
+  G4cout << "Deleting " << world->GetName() << G4endl;
+  delete world;
+  while(!detectors.empty()) {
+    G4cout << "Deleting " << (*detectors.begin())->GetName() << G4endl;
+    delete *(detectors.begin());
+    detectors.erase(detectors.begin());
+  }
 }
 
 G4VPhysicalVolume* NpolDetectorConstruction::Construct() {
-
-	if(detectors.empty())
-		return NULL;
-
-	// Place the world.
-	G4cout << "Placing World" << G4endl;
-	world->Place(NULL);
-
-	// Iterate through the set and construct each detector.
-	std::set<NpolDetectorFactory *>::iterator it;
-	for(it = detectors.begin(); it != detectors.end(); it++) {
-		G4cout << "Placing " << (*it)->GetName() << G4endl;
-		(*it)->Place(world->GetWorldLV());
-	}
-
-	return world->GetWorldPV();
+  
+  if(detectors.empty())
+    return NULL;
+  
+  // Place the world.
+  G4cout << "Placing World" << G4endl;
+  world->Place(NULL);
+  
+  // Iterate through the set and construct each detector.
+  std::set<NpolDetectorFactory *>::iterator it;
+  for(it = detectors.begin(); it != detectors.end(); it++) {
+    G4cout << "Placing " << (*it)->GetName() << G4endl;
+    (*it)->Place(world->GetWorldLV());
+  }
+  
+  return world->GetWorldPV();
 }
 
 void NpolDetectorConstruction::ConstructSDandField() { 

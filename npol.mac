@@ -15,7 +15,7 @@
 /tracking/storeTrajectory 1
 
 #File name can be changed here
-/analysis/setFileName npol_10Mevt_20MeV
+/analysis/setFileName /data/tireman/simulation/output/FirstPass/Lead/npol_11
 
 #/gun/particle proton 
 #/gun/particle pi0 
@@ -23,8 +23,10 @@
 #/gun/particle anti_proton 
 #/gun/particle neutron 
 #/gun/energy 2.1 GeV
+
 /gun/particle e-
 /gun/energy 4400 MeV
 /run/printProgress 10000
-/run/beamOn 10000000
+#/random/setSeeds 1234237278 523
+/run/beamOn 50000
 

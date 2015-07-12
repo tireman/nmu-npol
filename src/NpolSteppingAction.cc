@@ -59,7 +59,7 @@ void NpolSteppingAction::UserSteppingAction(const G4Step *aStep) {
   G4String matName = preStepPoint->GetMaterial()->GetName();
   if(volume->GetName() == "EndDump"){
     aTrack->SetTrackStatus(fStopAndKill);
-  }else if(trackID < 4) {
+  }else if(volume->GetName() == "LeadCurtain") {
     analysisMan->AddEDep(volume,
 	 aStep->GetTotalEnergyDeposit());
     

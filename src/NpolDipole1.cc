@@ -193,7 +193,7 @@ void NpolDipole1::ConstructDipole1Field(){
   
   fChordFinder = new G4ChordFinder(magField, minStepMagneticField, stepperMagField);
   
-  Dipole1FieldLV->SetFieldManager(fieldManMagField, true);
+  // Dipole1FieldLV->SetFieldManager(fieldManMagField, true);
 }
 
 void NpolDipole1::Place(G4LogicalVolume *motherLV) {
