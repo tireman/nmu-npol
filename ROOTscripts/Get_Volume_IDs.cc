@@ -10,7 +10,7 @@
 // to each volume in the simulation and fill a STL map with this information.
 void Fill_Map(std::map<int, const char *>& aMap) {
 
-	const char *filename = "/data/dwilbern/detIDs.txt";
+	const char *filename = "detIDs.txt";
 	FILE *volIDsFile = fopen(filename, "r");
 	if(volIDsFile == NULL) {
 		perror("Error opening file containing volume IDs");

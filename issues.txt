@@ -1,36 +1,16 @@
 %% issues.txt - used to track standing issues in the devlopment of Npol %%
+
+Main issue ... for one second of 80 microAmp beam there is about 5x10^14 electrons.  To simulate 100x10^6 electrons takes 10 threads over 15 hours.  Yikes.  Need to find some optimizations.  
 	
-Consider string Ntuple for volume names
-	packing characters into doubles and saving into Ntuple double columns (4 columns = 32 chars max)
+SteppingAction - set requirements for saving to ntuple (ParentID < 3, and certain particles (and maybe volumes)) Maybe kill tracks later.  Really need a plan for running with electrons on target and get distributions of particles on the front taggers (layer 1 and 2) so we can created a distribution function.  Then we can focus on just throwing those particles at the system from the target area and turn off other parts and particles.  
 
-Think of better name for NpolDataStructure
+Check where the backround comes from.  If the beam dump, last section of downstream piple and hall shell contribute next to nothing then we can turn them off and increase speed significantly. 
 
-SteppingAction - set requirements for saving to ntuple (ParentID < 3, and certain particles (and maybe volumes))
-		Maybe kill tracks later
+Check Horizontal bender magnet of overlap problems.  It passes overlap check but there may be a problem.  May require tearing apart the GDML file we got from B.Waidyawansa SHMS code and reworking the variables a bit.
 
-Fix EDep histogram titles
-
-NTuple columns: add TrackID and Step number, px, py, pz
-add particles: pi+, pi-, pi0
-
-Output tests:
-	Neutron (or proton) flux on polarimeter
-	Full system - e- beam on target
-		shield hut - all on, no floor but all walls, all on but no back wall, all off
-		downstream beamline stuff - on/off
-		beam dump - on/off
-		magnets - on/off
-
-Geometry
-	In GDML parsing, find solution to repeating materials
-		Use a materials.xml files ala example extended/persistency/gdml/G01/
-
-	Immediate Downstream Beamline (rings around one pipe section OR unions with pipe sections)
-		Split downstream Beamline extruded solid into two files
-
-	Fix downstream beamline length
+Same for the beam dump and beam dump pipe.  It doesn't make a lot of sense to me but it is low priority at this point as it doesn't add a lot to the background radiation. 
 	
-Mag Fields
+Mag Field for Horizontal Bender Magnet
 	Use Geant4 built-in dipole fields for now (G4UniformMagField)
 
 Multi-Threading
