@@ -59,11 +59,11 @@ void NpolSteppingAction::UserSteppingAction(const G4Step *aStep) {
   G4String matName = preStepPoint->GetMaterial()->GetName();
   if(volume->GetName() == "EndDump"){
     aTrack->SetTrackStatus(fStopAndKill);
-  }else if(volume->GetName() == "LeadCurtain") {
-    analysisMan->AddEDep(volume,
-	 aStep->GetTotalEnergyDeposit());
+  }//else if(preStepPoint->GetMaterial()->GetName().compare("Scint") == 0) {
+  //analysisMan->AddEDep(volume,aStep->GetTotalEnergyDeposit());
     
+  
     analysisMan->FillNtuple(volume, particleID, parentID, trackID, stepID, depositEnergy, vertexEnergy, kineticEnergy, positionInWorld.x(), positionInWorld.y(), positionInWorld.z(), positionInVolume.x(), positionInVolume.y(), positionInVolume.z(), momentum.x(), momentum.y(), momentum.z());
-  }
+    // }
 }
 

@@ -13,6 +13,12 @@
 
 #include <cstdlib>
 #include <map>
+#include <cstdio>
+#include <iostream>
+#include <cstring>
+
+#include <string>
+#include <functional>
 
 #include "G4ios.hh"
 #include "G4SystemOfUnits.hh"
@@ -125,7 +131,9 @@ void NpolAnalysisManager::FillNtuple(G4VPhysicalVolume *PV, G4int particleID, G4
   G4AnalysisManager *analysisMan = G4AnalysisManager::Instance();
   
   int volumeID = getVolIDFor(PV);
-  
+  // G4long hashID = myhash(PV);
+  //printf("My hash value = %lu \n",hashID);
+
   analysisMan->FillNtupleIColumn(cols.volumeIDColID, volumeID);
   analysisMan->FillNtupleIColumn(cols.particleIDColID, particleID);
   analysisMan->FillNtupleIColumn(cols.parentIDColID, parentID);
@@ -172,11 +180,23 @@ bool NpolAnalysisManager::isVolumeActive(G4VPhysicalVolume *PV) {
 void NpolAnalysisManager::WriteDetectorIDsToFile() {
   
   std::map<G4VPhysicalVolume *, int>::iterator it;
-  FILE *f = fopen("/data/tireman/simulation/output/FirstPass/Lead/detIDs_11.txt","w+");
+  FILE *f = fopen("/data/tireman/simulation/output/FirstPass/ScintOnly/detIDs_test2.txt","w+");
   
   for(it = detectorIDs.begin(); it != detectorIDs.end(); it++)
     fprintf(f,"%03d,%s\n",it->second, it->first->GetName().data());
   
   fclose(f);
+}
+
+
+int NpolAnalysisManager::myhash(G4VPhysicalVolume *PV){
+
+  G4long hash = 255;
+  std::string str = PV->GetName();
+  if(str.length() == 0) return hash;
+  for(size_t i = 0; i < str.length(); i++){
+    hash = 2 * hash + (unsigned int)str[i];
+  }
+  return hash;
 }
 

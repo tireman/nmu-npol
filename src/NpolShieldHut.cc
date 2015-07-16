@@ -31,7 +31,7 @@ NpolShieldHut::NpolShieldHut() {
   ConstructHutBackWall();
   ConstructHutSideWall();
   ConstructHutRoof();
-  ConstructLeadCurtain();
+  //  ConstructLeadCurtain();
 }
 
 NpolShieldHut::~NpolShieldHut() {}
@@ -119,7 +119,7 @@ void NpolShieldHut::Place(G4LogicalVolume *motherLV) {
   G4double NpolAng = 28.0*deg, PosSide = 9.3025*m, AngSide = 14.0*deg, VertOffSet = 0.3424*m;
   G4double PosFront = 6.2739*m, PosBack = 11.7739*m, PosRoof = 9.0239*m, OffSetRoof = 3.7776*m;
 
-  PlaceCylindrical(LeadCurtainLV, motherLV, "LeadCurtain", PosFront-0.52*m,-NpolAng, 0); //-VertOffSet);
+  //  PlaceCylindrical(LeadCurtainLV, motherLV, "LeadCurtain", PosFront-0.52*m,-NpolAng, 0);
   PlaceCylindrical(HutFrontWallLV, motherLV, "HutFrontWall", PosFront,-NpolAng,-VertOffSet);
   PlaceCylindrical(HutBackWallLV, motherLV, "HutBackWall", PosBack,-NpolAng,-VertOffSet);
   PlaceRectangular(HutSideWallLV, motherLV, "HutSideWall", -PosSide*sin(AngSide+NpolAng), -VertOffSet, PosSide*cos(AngSide+NpolAng), 0*deg, -NpolAng, 0*deg);
