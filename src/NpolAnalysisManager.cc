@@ -16,9 +16,11 @@
 #include <cstdio>
 #include <iostream>
 #include <cstring>
-
 #include <string>
 #include <functional>
+
+#include "TROOT.h"
+#include "TFile.h"
 
 #include "G4ios.hh"
 #include "G4SystemOfUnits.hh"
@@ -38,7 +40,8 @@ NpolAnalysisManager::NpolAnalysisManager() {
 NpolAnalysisManager::~NpolAnalysisManager() {
 }
 
-// NpolAnalysisManager is a singleton.  This function will return a pointer to the singleton.
+// NpolAnalysisManager is a singleton.  This function will 
+// return a pointer to the singleton.
 NpolAnalysisManager *NpolAnalysisManager::GetInstance() {
   if(pInstance == NULL)
     pInstance = new NpolAnalysisManager();
@@ -79,7 +82,8 @@ void NpolAnalysisManager::CreateNtuple() {
   
   G4cout << "Creating Ntuple." << G4endl;
   
-  // For some reason (a bug?) the Ntuple is not created properly if at least one histogram doesn't exist.
+  // For some reason (a bug?) the Ntuple is not created properly if at 
+  // least one histogram doesn't exist.
   // We'll make a dummy one here just to make sure
   analysisMan->CreateH1("dummy", "Dummy Histogram - Please Disregard", 100, 0*MeV, 100*MeV);
   
@@ -102,7 +106,7 @@ void NpolAnalysisManager::CreateNtuple() {
   cols.xMomColID = analysisMan->CreateNtupleFColumn("XMomentum");
   cols.yMomColID = analysisMan->CreateNtupleFColumn("YMomentum");
   cols.zMomColID = analysisMan->CreateNtupleFColumn("ZMomentum");
-  analysisMan->FinishNtuple();
+  analysisMan->FinishNtuple(); 
 }
 
 void NpolAnalysisManager::PrepareNewEvent(int eventID) {
@@ -131,8 +135,6 @@ void NpolAnalysisManager::FillNtuple(G4VPhysicalVolume *PV, G4int particleID, G4
   G4AnalysisManager *analysisMan = G4AnalysisManager::Instance();
   
   int volumeID = getVolIDFor(PV);
-  // G4long hashID = myhash(PV);
-  //printf("My hash value = %lu \n",hashID);
 
   analysisMan->FillNtupleIColumn(cols.volumeIDColID, volumeID);
   analysisMan->FillNtupleIColumn(cols.particleIDColID, particleID);
@@ -188,15 +190,4 @@ void NpolAnalysisManager::WriteDetectorIDsToFile() {
   fclose(f);
 }
 
-
-int NpolAnalysisManager::myhash(G4VPhysicalVolume *PV){
-
-  G4long hash = 255;
-  std::string str = PV->GetName();
-  if(str.length() == 0) return hash;
-  for(size_t i = 0; i < str.length(); i++){
-    hash = 2 * hash + (unsigned int)str[i];
-  }
-  return hash;
-}
 
