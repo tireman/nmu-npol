@@ -14,20 +14,31 @@
 #include "G4UserRunAction.hh"
 #include "G4Timer.hh"
 
-class G4Run;
+#include "TROOT.h"
+#include "TFile.h"
+#include "TTree.h"
+//#include "TSystem.h"
+//#include "TString.h"
+//#include "TObject.h"
 
+class G4Run;
+class TTree;
+class TFile;
 class NpolRunAction : public G4UserRunAction
 {
-	public:
-		NpolRunAction();
-		~NpolRunAction();
+public:
+  G4Run* GenerateRun();
+NpolRunAction();
+~NpolRunAction();
 
-	public:
-		void BeginOfRunAction(const G4Run*);
-		void EndOfRunAction(const G4Run*);
+public:
+void BeginOfRunAction(const G4Run*);
+void EndOfRunAction(const G4Run*);
 
-	private:
-		G4Timer* runTimer;
+private:
+G4Timer* runTimer;
+TFile *theTFile;
+TTree *tree;
 };
 
 #endif

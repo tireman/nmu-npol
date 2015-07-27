@@ -33,10 +33,10 @@ void NpolActionInitialization::Build() const {
   
   // Three sources to choose from. First is just a beam down the beamline
   // Second (*ActionPS) is an attempt at a points source with spherical 
-  //distribution of momentum vectors
+  // distribution of momentum vectors
   // Third (*ActionFS) is a flat source that generates a random point 
-  //in the xz plane and rotates it and then fires the particle at a 
-  //vector relative to z-axis (NpolAng) all parallel.
+  // in the xz plane and rotates it and then fires the particle at a 
+  // vector relative to z-axis (NpolAng) all parallel.
   
   SetUserAction(new NpolPrimaryGeneratorAction);
   //SetUserAction(new NpolPrimaryGeneratorActionPS);

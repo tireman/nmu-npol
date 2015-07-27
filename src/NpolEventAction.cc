@@ -29,24 +29,25 @@
 
 NpolEventAction::NpolEventAction()
 {
-	// set printing per each 10 events default (can be changed in macro)
-	G4RunManager::GetRunManager()->SetPrintProgress(10);     
+  // set printing per each 10 events default (can be changed in macro)
+  G4RunManager::GetRunManager()->SetPrintProgress(10);     
 }
 
 NpolEventAction::~NpolEventAction()
 {}
 
 void NpolEventAction::BeginOfEventAction(const G4Event* evt) {
+  
+  NpolAnalysisManager *analysisMan = NpolAnalysisManager::GetInstance();
+  
+  analysisMan->PrepareNewEvent(evt->GetEventID());
 
-	NpolAnalysisManager *analysisMan = NpolAnalysisManager::GetInstance();
-
-	analysisMan->PrepareNewEvent(evt->GetEventID());
 }
 
 void NpolEventAction::EndOfEventAction(const G4Event* evt) {
-
-	NpolAnalysisManager *analysisMan = NpolAnalysisManager::GetInstance();
-
-	analysisMan->FillHistograms();
+  
+  NpolAnalysisManager *analysisMan = NpolAnalysisManager::GetInstance();
+  
+  analysisMan->FillHistograms();
 }
 

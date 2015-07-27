@@ -1,0 +1,26 @@
+#ifndef NpolSD_h
+#define NpolSD_h 1
+
+#include "G4VSensitiveDetector.hh"
+#include "G4Step.hh"
+
+class NpolSD: public G4VSenitiveDetector {
+
+public:
+  NpolSD();
+  ~NpolSD();
+  void Initialize(G4HCofThisEvent *HCE);
+  G4bool ProcessHits(G4Step *aStep, G4TouchableHistory *ROhist);
+  void EndOfEvent(G4HCofThisEvent *HCE);
+  void Draw();
+  void Print();
+
+private:
+  NpolHitsCollection *ScintCollection;
+
+  int* CellID;
+  int numberOfCells;
+  int HCID;
+};
+
+#endif
