@@ -11,6 +11,7 @@
 #ifndef Npol_EventAction_h
 #define Npol_EventAction_h
 
+#include "G4HCofThisEvent.hh"
 #include "G4UserEventAction.hh"
 
 class G4Event;
@@ -18,13 +19,13 @@ class NpolHit;
 
 class NpolEventAction : public G4UserEventAction
 {
-	public:
-		NpolEventAction();
-		~NpolEventAction();
-
-	public:
-		void BeginOfEventAction(const G4Event*);
-		void EndOfEventAction(const G4Event*);
+public:
+  NpolEventAction();
+  ~NpolEventAction();
+  
+public:
+  void BeginOfEventAction(const G4Event*);
+  void EndOfEventAction(const G4Event*);
 };
 
 #endif

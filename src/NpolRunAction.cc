@@ -19,13 +19,11 @@
 
 #include "G4Run.hh"
 #include "G4SystemOfUnits.hh"
-#include "G4Timer.hh"
 #include "G4ios.hh"
  
 #include "NpolRunAction.hh"
 #include "NpolAnalysisManager.hh"
 #include "NpolAnalysis.hh"
-#include "NpolRun.hh"
 
 NpolRunAction::NpolRunAction() {
 
@@ -47,33 +45,24 @@ runTimer = new G4Timer();
 }
 
 NpolRunAction::~NpolRunAction() {
-if(theTFile) delete theTFile;
+  //if(theTFile) delete theTFile;
 delete G4AnalysisManager::Instance();
-}
-
-G4Run* NpolRunAction::GenerateRun()
-{
-  G4cout << "Generate Run" << G4endl;
- 
-  NpolRun* run = new NpolRun;
-
-  return run;
 }
 
 void NpolRunAction::BeginOfRunAction(const G4Run* aRun) {
 
 G4AnalysisManager *analysisManager = G4AnalysisManager::Instance();
 
+G4cout << "\n----> Open rootfile .. " << G4endl;
 analysisManager->OpenFile();
 
-
-G4cout << "\n----> Open rootfile .. " << G4endl;
+/*G4cout << "\n----> Open rootfile .. " << G4endl;
 theTFile = new TFile("TestRoot.root", "RECREATE", "Example");
-tree = new TTree("T","Tree for Npol simulation");
+tree = new TTree("Tree","Tree for Npol simulation");
 
 NpolRun* RunData = (NpolRun*) aRun;
 tree->Branch("Run Branch",RunData->GetNtuplePointer(),"vertex/I:event/I");
-RunData->SetTree(tree);
+RunData->SetTree(tree);*/
 
 runTimer->Start();
 
@@ -88,12 +77,12 @@ void NpolRunAction::EndOfRunAction(const G4Run*) {
 analysisManager->Write();
 analysisManager->CloseFile();
 
-if (theTFile)
+/*if (theTFile)
   {
 theTFile -> Write(); 
       theTFile -> Close();
 }
-theTFile = 0;
+theTFile = 0;*/
 
 analysisMan->WriteDetectorIDsToFile();
 

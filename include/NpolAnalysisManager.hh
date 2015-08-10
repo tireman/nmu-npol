@@ -17,9 +17,10 @@
 
 #include "G4SystemOfUnits.hh"
 #include "G4VPhysicalVolume.hh"
+#include "G4Event.hh"
 
-#include "TROOT.h"
-#include "TFile.h"
+//#include "TROOT.h"
+//#include "TFile.h"
 
 
 #define PROTON_ID 1
@@ -72,7 +73,8 @@ public:
   void AddEDep(G4VPhysicalVolume *PV, G4double dep);
   void FillHistograms();
   void WriteDetectorIDsToFile();
-  void FillNtuple(G4VPhysicalVolume *PV, G4int particleID, G4int parentID, G4float trackID, G4float stepID,G4float depositEnergy, G4float vertexEnergy, G4float kineticEnergy, G4float WxPos, G4float WyPos, G4float WzPos, G4float VxPos, G4float VyPos, G4float VzPos, G4float xMom, G4float yMom, G4float zMom);
+  void FillNtuple(G4VPhysicalVolume *PV, G4int particleID, G4int parentID, G4int trackID, G4int stepID, G4double depositEnergy, G4double vertexEnergy, G4double kineticEnergy);
+//, G4double VxPos, G4double VyPos, G4double VzPos, G4double xMom, G4double yMom, G4double zMom);
   
 private:
   void FillVolNameColumns(char *volName);

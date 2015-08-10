@@ -20,7 +20,7 @@ class NpolDetectorFactory {
 	public:
 		NpolDetectorFactory() {}
 		virtual ~NpolDetectorFactory() {}
-
+ 
 		virtual G4String GetName() = 0;
 		virtual void Place(G4LogicalVolume *motherLV) = 0;
 

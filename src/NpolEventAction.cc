@@ -19,13 +19,22 @@
 #include "G4Event.hh"
 #include "G4EventManager.hh"
 #include "G4RunManager.hh"
+//#include "G4VPhysicalVolume.hh"
 #include "G4ios.hh"
 #include "G4String.hh"
-#include "G4SystemOfUnits.hh"
-#include "G4PhysicalConstants.hh"
+//#include "G4SystemOfUnits.hh"
+//#include "G4PhysicalConstants.hh"
+#include "G4SDManager.hh"
+#include "G4THitsCollection.hh"
+#include "G4HCofThisEvent.hh"
 
-#include "NpolAnalysisManager.hh"
 #include "NpolEventAction.hh"
+#include "NpolAnalysis.hh"
+#include "NpolAnalysisManager.hh"
+#include "NpolSensitiveDetector.hh"
+#include "NpolHit.hh"
+
+//typedef G4THitsCollection<NpolHit> NpolHitsCollection;
 
 NpolEventAction::NpolEventAction()
 {
@@ -46,8 +55,38 @@ void NpolEventAction::BeginOfEventAction(const G4Event* evt) {
 
 void NpolEventAction::EndOfEventAction(const G4Event* evt) {
   
+  //G4int event_id = evt->GetEventID();
   NpolAnalysisManager *analysisMan = NpolAnalysisManager::GetInstance();
-  
+  G4SDManager *SDMan = G4SDManager::GetSDMpointer();
+  G4HCofThisEvent *HCE = evt->GetHCofThisEvent();
+  NpolHitsCollection *hitsCollection = NULL;
+
+  int CHCIDs[6] = {SDMan->GetCollectionID("TopDetHC"),
+		   SDMan->GetCollectionID("TopVetoHC"),
+		   SDMan->GetCollectionID("BottomDetHC"),
+		   SDMan->GetCollectionID("BottomVetoHC"),
+		   SDMan->GetCollectionID("FrontDetHC"),
+		   SDMan->GetCollectionID("FrontTagHC")};
+ 
+  int i,j;
+  int n_hits =0;
+  G4VPhysicalVolume *volume;
+
+  for(j = 0; j < 6; j++){
+    if (HCE != NULL){
+      hitsCollection = (NpolHitsCollection *)(HCE->GetHC(CHCIDs[j]));
+    }
+
+    if(hitsCollection != NULL){
+      n_hits = hitsCollection->entries();
+      for(i = 0; i < n_hits; i++){
+	NpolHit *aHit = (*hitsCollection)[i];
+	volume = aHit->GetVolumePointer();
+	analysisMan->AddEDep(volume, aHit->GetTotalEnergyDeposit());
+	analysisMan->FillNtuple(volume, aHit->GetParticleID(), aHit->GetParentID(), aHit->GetTrackID(), aHit->GetStepNumber(),  aHit->GetTotalEnergyDeposit(),  aHit->GetVertexEnergy(),  aHit->GetKineticEnergy());//, aHit->GetPreStepPos.x(), aHit->GetPreStepPos.y(), aHit->GetPreStepPos.z(), aHit->GetParticleMomentum.x(), aHit->GetParticleMomentum.y(), aHit->GetParticleMomentum.z());
+      }
+    }
+  }
   analysisMan->FillHistograms();
 }
 

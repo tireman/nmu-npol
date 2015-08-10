@@ -66,7 +66,8 @@ int main(int argc,char *argv[]) {
   
   // mandatory user initialization classes
   runManager->SetUserInitialization(new NpolDetectorConstruction);
-  runManager->SetUserInitialization(new QGSP_BERT_HP);
+  runManager->SetUserInitialization(new QGSP_BERT);
+  //runManager->SetUserInitialization(new QGSP_BERT_HP);
   runManager->SetUserInitialization(new NpolActionInitialization);
   
   // initialize Geant4 kernel

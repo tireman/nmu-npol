@@ -16,6 +16,7 @@
 
 #File name can be changed here
 #/analysis/setFileName /data/tireman/simulation/output/FirstPass/ScintOnly/npol_test2
+/analysis/setFileName npol_test
 
 #/gun/particle proton 
 #/gun/particle pi0 
@@ -26,6 +27,6 @@
 
 /gun/particle e-
 /gun/energy 4400 MeV
-/run/printProgress 10
-/run/beamOn 100
+/run/printProgress 5
+/run/beamOn 10
 

@@ -19,15 +19,18 @@
 #include <string>
 #include <functional>
 
-#include "TROOT.h"
-#include "TFile.h"
+//#include "TROOT.h"
+//#include "TFile.h"
 
 #include "G4ios.hh"
 #include "G4SystemOfUnits.hh"
 #include "G4VPhysicalVolume.hh"
+#include "G4THitsCollection.hh"
+#include "G4Event.hh"
 
 #include "NpolAnalysisManager.hh"
 #include "NpolAnalysis.hh"
+#include "NpolHit.hh"
 
 static NpolAnalysisManager *pInstance = NULL;
 
@@ -97,15 +100,15 @@ void NpolAnalysisManager::CreateNtuple() {
   cols.vertexEnergyColID = analysisMan->CreateNtupleFColumn("DepositedEnergy");
   cols.vertexEnergyColID = analysisMan->CreateNtupleFColumn("VertexEnergy");
   cols.kineticEnergyColID = analysisMan->CreateNtupleFColumn("KineticEnergy");
-  cols.WxPosColID = analysisMan->CreateNtupleFColumn("WorldXPosition");
+  /*cols.WxPosColID = analysisMan->CreateNtupleFColumn("WorldXPosition");
   cols.WyPosColID = analysisMan->CreateNtupleFColumn("WorldYPosition");
   cols.WzPosColID = analysisMan->CreateNtupleFColumn("WorldZPosition");
-  cols.VxPosColID = analysisMan->CreateNtupleFColumn("VolumeXPosition");
+   cols.VxPosColID = analysisMan->CreateNtupleFColumn("VolumeXPosition");
   cols.VyPosColID = analysisMan->CreateNtupleFColumn("VolumeYPosition");
   cols.VzPosColID = analysisMan->CreateNtupleFColumn("VolumeZPosition");
   cols.xMomColID = analysisMan->CreateNtupleFColumn("XMomentum");
   cols.yMomColID = analysisMan->CreateNtupleFColumn("YMomentum");
-  cols.zMomColID = analysisMan->CreateNtupleFColumn("ZMomentum");
+  cols.zMomColID = analysisMan->CreateNtupleFColumn("ZMomentum");*/
   analysisMan->FinishNtuple(); 
 }
 
@@ -130,7 +133,9 @@ void NpolAnalysisManager::FillHistograms() {
     FillAHistogram(&(it->second));
 }
 
-void NpolAnalysisManager::FillNtuple(G4VPhysicalVolume *PV, G4int particleID, G4int parentID, G4float trackID, G4float stepID, G4float depositEnergy, G4float vertexEnergy, G4float kineticEnergy, G4float WxPos, G4float WyPos, G4float WzPos, G4float VxPos, G4float VyPos, G4float VzPos, G4float xMom, G4float yMom, G4float zMom) {
+void NpolAnalysisManager::FillNtuple(G4VPhysicalVolume *PV, G4int particleID, G4int parentID, G4int trackID, G4int stepID, G4double depositEnergy, G4double vertexEnergy, G4double kineticEnergy)
+//, G4double VxPos, G4double VyPos, G4double VzPos, G4double xMom, G4double yMom, G4double zMom) 
+{
   
   G4AnalysisManager *analysisMan = G4AnalysisManager::Instance();
   
@@ -145,15 +150,15 @@ void NpolAnalysisManager::FillNtuple(G4VPhysicalVolume *PV, G4int particleID, G4
   analysisMan->FillNtupleFColumn(cols.vertexEnergyColID, depositEnergy);
   analysisMan->FillNtupleFColumn(cols.vertexEnergyColID, vertexEnergy);
   analysisMan->FillNtupleFColumn(cols.kineticEnergyColID, kineticEnergy);
-  analysisMan->FillNtupleFColumn(cols.WxPosColID, WxPos);
-  analysisMan->FillNtupleFColumn(cols.WyPosColID, WyPos);
-  analysisMan->FillNtupleFColumn(cols.WzPosColID, WzPos);
-  analysisMan->FillNtupleFColumn(cols.VxPosColID, VxPos);
+  //analysisMan->FillNtupleFColumn(cols.WxPosColID, WxPos);
+  //analysisMan->FillNtupleFColumn(cols.WyPosColID, WyPos);
+  //analysisMan->FillNtupleFColumn(cols.WzPosColID, WzPos);
+/* analysisMan->FillNtupleFColumn(cols.VxPosColID, VxPos);
   analysisMan->FillNtupleFColumn(cols.VyPosColID, VyPos);
   analysisMan->FillNtupleFColumn(cols.VzPosColID, VzPos);
   analysisMan->FillNtupleFColumn(cols.xMomColID, xMom);
   analysisMan->FillNtupleFColumn(cols.yMomColID, yMom);
-  analysisMan->FillNtupleFColumn(cols.zMomColID, zMom);
+  analysisMan->FillNtupleFColumn(cols.zMomColID, zMom);*/
   analysisMan->AddNtupleRow();
 }
 
@@ -182,7 +187,7 @@ bool NpolAnalysisManager::isVolumeActive(G4VPhysicalVolume *PV) {
 void NpolAnalysisManager::WriteDetectorIDsToFile() {
   
   std::map<G4VPhysicalVolume *, int>::iterator it;
-  FILE *f = fopen("/data/tireman/simulation/output/FirstPass/ScintOnly/detIDs_test2.txt","w+");
+  FILE *f = fopen("detIDs_test2.txt","w+");
   
   for(it = detectorIDs.begin(); it != detectorIDs.end(); it++)
     fprintf(f,"%03d,%s\n",it->second, it->first->GetName().data());
