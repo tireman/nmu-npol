@@ -21,13 +21,12 @@ class NpolRunAction;
 class NpolSteppingAction : public G4UserSteppingAction {
 
 public:
-  NpolSteppingAction(NpolDetectorConstruction*, NpolEventAction*, NpolRunAction*);
+  NpolSteppingAction(NpolEventAction*, NpolRunAction*);
   ~NpolSteppingAction();
   
   virtual void UserSteppingAction(const G4Step *aStep);
   
 private:
-  NpolDetectorConstruction* detector;
   NpolEventAction* eventAction;
   NpolRunAction* runAction;
 };

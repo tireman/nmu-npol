@@ -21,10 +21,11 @@
 #include "NpolSteppingAction.hh"
 #include "NpolRunAction.hh"
 
-NpolSteppingAction::NpolSteppingAction(NpolDetectorConstruction* det, NpolEventAction* evt, NpolRunAction* run)
-  :detector(det), eventAction(evt), runAction(run) 
+NpolSteppingAction::NpolSteppingAction(NpolEventAction* evt, NpolRunAction* run)
+  :eventAction(evt), runAction(run) 
 {
   runAction = run;
+  G4cout << "Firing up Stepping Action!" << G4endl;
 }
 
 NpolSteppingAction::~NpolSteppingAction() 
@@ -33,10 +34,10 @@ NpolSteppingAction::~NpolSteppingAction()
 }
 
 void NpolSteppingAction::UserSteppingAction(const G4Step *aStep) {
-  // NpolAnalysisManager *analysisMan = NpolAnalysisManager::GetInstance();
+  NpolAnalysisManager *analysisMan = NpolAnalysisManager::GetInstance();
   
-  //G4Track *aTrack = aStep->GetTrack();
-  //G4StepPoint *preStepPoint = aStep->GetPreStepPoint();	
+  G4Track *aTrack = aStep->GetTrack();
+  G4StepPoint *preStepPoint = aStep->GetPreStepPoint();	
   
   //G4int parentID = aTrack->GetParentID();
   //G4int stepID = aTrack->GetCurrentStepNumber();
@@ -62,12 +63,13 @@ void NpolSteppingAction::UserSteppingAction(const G4Step *aStep) {
   
   //G4ThreeVector momentum = preStepPoint->GetMomentum()/MeV;
   
-  //G4VPhysicalVolume *volume = preStepPoint->GetPhysicalVolume();
+ G4VPhysicalVolume *volume = preStepPoint->GetPhysicalVolume();
   
   //  G4String matName = preStepPoint->GetMaterial()->GetName();
 
-  // if(volume->GetName() == "EndDump"){
-  //  aTrack->SetTrackStatus(fStopAndKill);
+  if(volume->GetName() == "EndDump"){
+    aTrack->SetTrackStatus(fStopAndKill);
+  }
   //}else if(preStepPoint->GetMaterial()->GetName().compare("Scint") == 0) {
     //analysisMan->AddEDep(volume,aStep->GetTotalEnergyDeposit());
     

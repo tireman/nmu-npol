@@ -43,14 +43,15 @@ void NpolActionInitialization::Build() const {
   
   //SetUserAction(new NpolPrimaryGeneratorAction);
   //SetUserAction(new NpolPrimaryGeneratorActionPS);
+  //NpolDetectorConstruction* det_action = new NpolDetectorConstruction;
+  //SetUserInitialization(det_action);
   SetUserAction(new NpolPrimaryGeneratorActionFS);
   NpolEventAction* event_action = new NpolEventAction();
   SetUserAction(event_action);
   NpolRunAction* run_action = new NpolRunAction();
   SetUserAction(run_action);
-  NpolDetectorConstruction* det_action = new NpolDetectorConstruction();
   NpolSteppingAction* step_action = 
-    new NpolSteppingAction(det_action, event_action, run_action);
+  new NpolSteppingAction(event_action, run_action);
   SetUserAction(step_action);
-}
 
+}

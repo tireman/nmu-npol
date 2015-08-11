@@ -39,10 +39,9 @@ G4bool NpolSensitiveDetector::ProcessHits(G4Step* aStep, G4TouchableHistory*) {
   //aHit->Print();
   //G4cout << "Collection ID is: " << collectionID << G4endl;
 
-  if(collectionID > -1) {
+  if((collectionID > -1) && (aHit->GetProcessName() == "hadElastic")) {
     hitsCollection->insert(aHit);
-  
-    G4cout << "A hit was observed and inserted" << G4endl;
+    //G4cout << "A hit was observed and inserted" << G4endl;
   }else{
     delete aHit;
   }

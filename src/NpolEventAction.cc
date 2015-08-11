@@ -83,7 +83,7 @@ void NpolEventAction::EndOfEventAction(const G4Event* evt) {
 	NpolHit *aHit = (*hitsCollection)[i];
 	volume = aHit->GetVolumePointer();
 	analysisMan->AddEDep(volume, aHit->GetTotalEnergyDeposit());
-	analysisMan->FillNtuple(volume, aHit->GetParticleID(), aHit->GetParentID(), aHit->GetTrackID(), aHit->GetStepNumber(),  aHit->GetTotalEnergyDeposit(),  aHit->GetVertexEnergy(),  aHit->GetKineticEnergy());//, aHit->GetPreStepPos.x(), aHit->GetPreStepPos.y(), aHit->GetPreStepPos.z(), aHit->GetParticleMomentum.x(), aHit->GetParticleMomentum.y(), aHit->GetParticleMomentum.z());
+	analysisMan->FillNtuple(volume, aHit->GetParticleID(), aHit->GetParentID(), aHit->GetTrackID(), aHit->GetStepNumber(),  aHit->GetTotalEnergyDeposit(),  aHit->GetVertexEnergy(),  aHit->GetKineticEnergy()); //, aHit->GetPreStepPos.x(), aHit->GetPreStepPos.y(), aHit->GetPreStepPos.z(), aHit->GetParticleMomentum.x(), aHit->GetParticleMomentum.y(), aHit->GetParticleMomentum.z());
       }
     }
   }

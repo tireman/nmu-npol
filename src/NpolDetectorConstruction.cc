@@ -80,7 +80,5 @@ G4VPhysicalVolume* NpolDetectorConstruction::Construct() {
 
 void NpolDetectorConstruction::ConstructSDandField() {
 
-  G4cout << "Does it do it twice here?" << G4endl;
-
 }
 

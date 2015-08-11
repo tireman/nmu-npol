@@ -102,27 +102,27 @@ void NpolPolarimeter::ActivateSensitiveDetectors(G4LogicalVolume *DetLVname) {
    G4cout << "Detector logical name is: " <<detname << G4endl;
    if(detname == "TopDetLV"){
      NpolSensitiveDetector* TopDetSD = new NpolSensitiveDetector("TopDet", "TopDetHC");
-     //SDman->AddNewDetector(TopDetSD);
+     SDman->AddNewDetector(TopDetSD);
      DetLVname->SetSensitiveDetector(TopDetSD);
    }else if(detname == "TopVetoLV"){
      NpolSensitiveDetector* TopVetoSD = new NpolSensitiveDetector("TopVeto", "TopVetoHC");
-     //SDman->AddNewDetector(TopVetoSD);
+     SDman->AddNewDetector(TopVetoSD);
      DetLVname->SetSensitiveDetector(TopVetoSD);
    }else if(detname == "BottomDetLV"){
      NpolSensitiveDetector* BottomDetSD = new NpolSensitiveDetector("BottomDet", "BottomDetHC");
-     //SDman->AddNewDetector(BottomDetSD);
+     SDman->AddNewDetector(BottomDetSD);
      DetLVname->SetSensitiveDetector(BottomDetSD);
    }else if(detname == "BottomVetoLV"){
      NpolSensitiveDetector* BottomVetoSD = new NpolSensitiveDetector("BottomVeto", "BottomVetoHC");
-     //SDman->AddNewDetector(BottomVetoSD);  
+     SDman->AddNewDetector(BottomVetoSD);  
      DetLVname->SetSensitiveDetector(BottomVetoSD);
    }else if(detname == "FrontDetLV"){
      NpolSensitiveDetector* FrontDetSD = new NpolSensitiveDetector("FrontDet", "FrontDetHC");
-     //SDman->AddNewDetector(FrontDetSD);
+     SDman->AddNewDetector(FrontDetSD);
      DetLVname->SetSensitiveDetector(FrontDetSD);
    }else if(detname == "FrontTagLV"){   
      NpolSensitiveDetector* FrontTagSD = new NpolSensitiveDetector("FrontTag", "FrontTagHC");
-     //SDman->AddNewDetector(FrontTagSD);
+     SDman->AddNewDetector(FrontTagSD);
      DetLVname->SetSensitiveDetector(FrontTagSD);
    }   
 }
