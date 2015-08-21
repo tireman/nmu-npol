@@ -16,8 +16,10 @@
 #include "G4LogicalVolume.hh"
 #include "G4PhysicalConstants.hh"
 #include "G4PVPlacement.hh"
+#include "G4SDManager.hh"
 
 #include "NpolDetectorFactory.hh"
+#include "NpolSensitiveDetector.hh"
 
 // Place a volume in its mother volume at a location specified by rectangular coordinates.
 G4VPhysicalVolume *NpolDetectorFactory::PlaceRectangular(G4LogicalVolume *detLV, G4LogicalVolume *motherLV,G4String detName, G4double x, G4double y, G4double z,G4double Rx, G4double Ry, G4double Rz) {
@@ -56,4 +58,5 @@ G4VPhysicalVolume *NpolDetectorFactory::PlaceCylindrical(G4LogicalVolume *detLV,
 
   return detPV;
 }
+
 

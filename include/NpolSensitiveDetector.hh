@@ -10,20 +10,28 @@
 
 // Daniel Wilbern, dwilbern@nmu.edu
 
-#ifndef Npol_ActionInitialization_h
-#define Npol_ActionInitialization_h
+#ifndef Npol_SensitiveDetector_h
+#define Npol_SensitiveDetector_h
 
-#include "G4VUserActionInitialization.hh"
+#include "G4VSensitiveDetector.hh"
+#include "G4THitsCollection.hh"
+#include "G4Step.hh"
+#include "G4TouchableHistory.hh"
 
-class NpolActionInitialization : public G4VUserActionInitialization {
-  
+#include "NpolHit.hh"
+
+class NpolSensitiveDetector : public G4VSensitiveDetector {
+
+private:
+  NpolHitsCollection *hitsCollection;
+  G4int collectionID;
+
 public:
-  NpolActionInitialization();
-  virtual ~NpolActionInitialization();
-  
-  virtual void BuildForMaster() const;
-  virtual void Build() const;
+  NpolSensitiveDetector(G4String name, G4String colName);
+  virtual ~NpolSensitiveDetector();
+  virtual void Initialize(G4HCofThisEvent*HCE);
+  virtual void EndOfEvent(G4HCofThisEvent*HCE);
+  virtual G4bool ProcessHits(G4Step*aStep, G4TouchableHistory*ROHist);
 };
-
 #endif
-
+ 

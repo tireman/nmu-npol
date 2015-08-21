@@ -14,16 +14,16 @@ class G4AssemblyVolume;
 class G4VPhysicalVolume;
 
 class NpolBDump : public NpolDetectorFactory {
-
-	public:
-		NpolBDump();
-		~NpolBDump();
-
-		virtual G4String GetName();
-		virtual void Place(G4LogicalVolume *motherLV);
-
-	private:
-		G4LogicalVolume *BDumpLV;
+  
+public:
+  NpolBDump();
+  ~NpolBDump();
+  
+  virtual G4String GetName();
+  virtual void Place(G4LogicalVolume *motherLV);
+  
+private:
+  G4LogicalVolume *BDumpLV;
 };
 
 #endif

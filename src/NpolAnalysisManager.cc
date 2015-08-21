@@ -13,13 +13,24 @@
 
 #include <cstdlib>
 #include <map>
+#include <cstdio>
+#include <iostream>
+#include <cstring>
+#include <string>
+#include <functional>
+
+//#include "TROOT.h"
+//#include "TFile.h"
 
 #include "G4ios.hh"
 #include "G4SystemOfUnits.hh"
 #include "G4VPhysicalVolume.hh"
+#include "G4THitsCollection.hh"
+#include "G4Event.hh"
 
 #include "NpolAnalysisManager.hh"
 #include "NpolAnalysis.hh"
+#include "NpolHit.hh"
 
 static NpolAnalysisManager *pInstance = NULL;
 
@@ -32,11 +43,13 @@ NpolAnalysisManager::NpolAnalysisManager() {
 NpolAnalysisManager::~NpolAnalysisManager() {
 }
 
-// NpolAnalysisManager is a singleton.  This function will return a pointer to the singleton.
+// NpolAnalysisManager is a singleton.  This function will 
+// return a pointer to the singleton.
 NpolAnalysisManager *NpolAnalysisManager::GetInstance() {
-  if(pInstance == NULL)
+  if(pInstance == NULL){
     pInstance = new NpolAnalysisManager();
-  
+    G4cout << "Engaging Npol Analysis Manager, Captain" << G4endl;
+  }
   return pInstance;
 }
 
@@ -73,7 +86,8 @@ void NpolAnalysisManager::CreateNtuple() {
   
   G4cout << "Creating Ntuple." << G4endl;
   
-  // For some reason (a bug?) the Ntuple is not created properly if at least one histogram doesn't exist.
+  // For some reason (a bug?) the Ntuple is not created properly if at 
+  // least one histogram doesn't exist.
   // We'll make a dummy one here just to make sure
   analysisMan->CreateH1("dummy", "Dummy Histogram - Please Disregard", 100, 0*MeV, 100*MeV);
   
@@ -84,19 +98,19 @@ void NpolAnalysisManager::CreateNtuple() {
   cols.trackIDColID = analysisMan->CreateNtupleIColumn("TrackID");
   cols.stepIDColID = analysisMan->CreateNtupleIColumn("StepID");
   cols.eventIDColID = analysisMan->CreateNtupleIColumn("EventID");
-  cols.vertexEnergyColID = analysisMan->CreateNtupleFColumn("DepositedEnergy");
-  cols.vertexEnergyColID = analysisMan->CreateNtupleFColumn("VertexEnergy");
-  cols.kineticEnergyColID = analysisMan->CreateNtupleFColumn("KineticEnergy");
-  cols.WxPosColID = analysisMan->CreateNtupleFColumn("WorldXPosition");
-  cols.WyPosColID = analysisMan->CreateNtupleFColumn("WorldYPosition");
-  cols.WzPosColID = analysisMan->CreateNtupleFColumn("WorldZPosition");
-  cols.VxPosColID = analysisMan->CreateNtupleFColumn("VolumeXPosition");
-  cols.VyPosColID = analysisMan->CreateNtupleFColumn("VolumeYPosition");
-  cols.VzPosColID = analysisMan->CreateNtupleFColumn("VolumeZPosition");
-  cols.xMomColID = analysisMan->CreateNtupleFColumn("XMomentum");
-  cols.yMomColID = analysisMan->CreateNtupleFColumn("YMomentum");
-  cols.zMomColID = analysisMan->CreateNtupleFColumn("ZMomentum");
-  analysisMan->FinishNtuple();
+  cols.vertexEnergyColID = analysisMan->CreateNtupleDColumn("DepositedEnergy");
+  cols.vertexEnergyColID = analysisMan->CreateNtupleDColumn("VertexEnergy");
+  cols.kineticEnergyColID = analysisMan->CreateNtupleDColumn("KineticEnergy");
+  // cols.WxPosColID = analysisMan->CreateNtupleDColumn("WorldXPosition");
+  //cols.WyPosColID = analysisMan->CreateNtupleDColumn("WorldYPosition");
+  //cols.WzPosColID = analysisMan->CreateNtupleDColumn("WorldZPosition");
+  //cols.VxPosColID = analysisMan->CreateNtupleDColumn("VolumeXPosition");
+  /* cols.VyPosColID = analysisMan->CreateNtupleDColumn("VolumeYPosition");
+  cols.VzPosColID = analysisMan->CreateNtupleDColumn("VolumeZPosition");
+  cols.xMomColID = analysisMan->CreateNtupleDColumn("XMomentum");
+  cols.yMomColID = analysisMan->CreateNtupleDColumn("YMomentum");
+  cols.zMomColID = analysisMan->CreateNtupleDColumn("ZMomentum");*/
+  analysisMan->FinishNtuple(); 
 }
 
 void NpolAnalysisManager::PrepareNewEvent(int eventID) {
@@ -120,30 +134,31 @@ void NpolAnalysisManager::FillHistograms() {
     FillAHistogram(&(it->second));
 }
 
-void NpolAnalysisManager::FillNtuple(G4VPhysicalVolume *PV, G4int particleID, G4int parentID, G4float trackID, G4float stepID, G4float depositEnergy, G4float vertexEnergy, G4float kineticEnergy, G4float WxPos, G4float WyPos, G4float WzPos, G4float VxPos, G4float VyPos, G4float VzPos, G4float xMom, G4float yMom, G4float zMom) {
+void NpolAnalysisManager::FillNtuple(G4VPhysicalVolume *PV, G4int particleID, G4int parentID, G4int trackID, G4int stepID, G4double depositEnergy, G4double vertexEnergy, G4double kineticEnergy)//, G4double VxPos, G4double VyPos, G4double VzPos, G4double xMom, G4double yMom, G4double zMom) 
+{
   
   G4AnalysisManager *analysisMan = G4AnalysisManager::Instance();
   
   int volumeID = getVolIDFor(PV);
-  
+
   analysisMan->FillNtupleIColumn(cols.volumeIDColID, volumeID);
   analysisMan->FillNtupleIColumn(cols.particleIDColID, particleID);
   analysisMan->FillNtupleIColumn(cols.parentIDColID, parentID);
   analysisMan->FillNtupleIColumn(cols.trackIDColID, trackID);
   analysisMan->FillNtupleIColumn(cols.stepIDColID, stepID);
   analysisMan->FillNtupleIColumn(cols.eventIDColID, currentEventID);
-  analysisMan->FillNtupleFColumn(cols.vertexEnergyColID, depositEnergy);
-  analysisMan->FillNtupleFColumn(cols.vertexEnergyColID, vertexEnergy);
-  analysisMan->FillNtupleFColumn(cols.kineticEnergyColID, kineticEnergy);
-  analysisMan->FillNtupleFColumn(cols.WxPosColID, WxPos);
-  analysisMan->FillNtupleFColumn(cols.WyPosColID, WyPos);
-  analysisMan->FillNtupleFColumn(cols.WzPosColID, WzPos);
-  analysisMan->FillNtupleFColumn(cols.VxPosColID, VxPos);
-  analysisMan->FillNtupleFColumn(cols.VyPosColID, VyPos);
-  analysisMan->FillNtupleFColumn(cols.VzPosColID, VzPos);
-  analysisMan->FillNtupleFColumn(cols.xMomColID, xMom);
-  analysisMan->FillNtupleFColumn(cols.yMomColID, yMom);
-  analysisMan->FillNtupleFColumn(cols.zMomColID, zMom);
+  analysisMan->FillNtupleDColumn(cols.vertexEnergyColID, depositEnergy);
+  analysisMan->FillNtupleDColumn(cols.vertexEnergyColID, vertexEnergy);
+  analysisMan->FillNtupleDColumn(cols.kineticEnergyColID, kineticEnergy);
+  // analysisMan->FillNtupleDColumn(cols.WxPosColID, WxPos);
+  //analysisMan->FillNtupleDColumn(cols.WyPosColID, WyPos);
+  //analysisMan->FillNtupleDColumn(cols.WzPosColID, WzPos);
+  //analysisMan->FillNtupleDColumn(cols.VxPosColID, VxPos);
+  /*analysisMan->FillNtupleDColumn(cols.VyPosColID, VyPos);
+  analysisMan->FillNtupleDColumn(cols.VzPosColID, VzPos);
+  analysisMan->FillNtupleDColumn(cols.xMomColID, xMom);
+  analysisMan->FillNtupleDColumn(cols.yMomColID, yMom);
+  analysisMan->FillNtupleDColumn(cols.zMomColID, zMom);*/
   analysisMan->AddNtupleRow();
 }
 
@@ -172,11 +187,12 @@ bool NpolAnalysisManager::isVolumeActive(G4VPhysicalVolume *PV) {
 void NpolAnalysisManager::WriteDetectorIDsToFile() {
   
   std::map<G4VPhysicalVolume *, int>::iterator it;
-  FILE *f = fopen("/data/tireman/simulation/output/FirstPass/Lead/detIDs_11.txt","w+");
+  FILE *f = fopen("detIDs_test4.txt","w+");
   
   for(it = detectorIDs.begin(); it != detectorIDs.end(); it++)
     fprintf(f,"%03d,%s\n",it->second, it->first->GetName().data());
   
   fclose(f);
 }
+
 

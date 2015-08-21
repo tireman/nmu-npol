@@ -14,14 +14,21 @@
 #include "G4UserSteppingAction.hh"
 
 class G4Step;
+class NpolDetectorConstruction;
+class NpolEventAction;
+class NpolRunAction;
 
 class NpolSteppingAction : public G4UserSteppingAction {
 
-	public:
-		NpolSteppingAction();
-		~NpolSteppingAction();
-
-		virtual void UserSteppingAction(const G4Step *aStep);
+public:
+  NpolSteppingAction(NpolEventAction*, NpolRunAction*);
+  ~NpolSteppingAction();
+  
+  virtual void UserSteppingAction(const G4Step *aStep);
+  
+private:
+  NpolEventAction* eventAction;
+  NpolRunAction* runAction;
 };
 
 #endif

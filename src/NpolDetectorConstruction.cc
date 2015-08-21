@@ -7,6 +7,7 @@
 
 #include <set>
 
+#include "G4SDManager.hh"
 #include "G4SystemOfUnits.hh"
 #include "G4PhysicalConstants.hh"
 #include "G4LogicalVolume.hh"
@@ -14,7 +15,6 @@
 #include "G4VisAttributes.hh"
 #include "G4Colour.hh"
 #include "G4ios.hh"
-
 
 #include "NpolDetectorConstruction.hh"
 #include "NpolDetectorFactory.hh"
@@ -30,6 +30,7 @@
 #include "NpolHBender.hh"
 #include "NpolBDump.hh"
 #include "NpolAnalysisManager.hh"
+#include "NpolSensitiveDetector.hh"
 
 NpolDetectorConstruction::NpolDetectorConstruction() {
   
@@ -77,6 +78,7 @@ G4VPhysicalVolume* NpolDetectorConstruction::Construct() {
   return world->GetWorldPV();
 }
 
-void NpolDetectorConstruction::ConstructSDandField() { 
+void NpolDetectorConstruction::ConstructSDandField() {
+
 }
 

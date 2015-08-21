@@ -17,18 +17,15 @@ class G4LogicalVolume;
 
 class NpolDetectorFactory {
 
-	public:
-		NpolDetectorFactory() {}
-		virtual ~NpolDetectorFactory() {}
-
-		virtual G4String GetName() = 0;
-		virtual void Place(G4LogicalVolume *motherLV) = 0;
-
-		G4VPhysicalVolume *PlaceRectangular(G4LogicalVolume *detLV, G4LogicalVolume *motherLV,
-				G4String detName, G4double x, G4double y, G4double z,
-				G4double Rx = 0.0*deg, G4double Ry = 0.0*deg, G4double Rz = 0.0*deg);
-		G4VPhysicalVolume *PlaceCylindrical(G4LogicalVolume *detLV, G4LogicalVolume *motherLV,
-				G4String detName, G4double rho, G4double phi, G4double z);
+public:
+  NpolDetectorFactory() {}
+  virtual ~NpolDetectorFactory() {}
+  
+  virtual G4String GetName() = 0;
+  virtual void Place(G4LogicalVolume *motherLV) = 0;
+  
+  G4VPhysicalVolume *PlaceRectangular(G4LogicalVolume *detLV, G4LogicalVolume *motherLV,G4String detName, G4double x, G4double y, G4double z, G4double Rx = 0.0*deg, G4double Ry = 0.0*deg, G4double Rz = 0.0*deg);
+  G4VPhysicalVolume *PlaceCylindrical(G4LogicalVolume *detLV, G4LogicalVolume *motherLV, G4String detName, G4double rho, G4double phi, G4double z);
 };
 
 #endif
