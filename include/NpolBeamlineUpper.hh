@@ -22,26 +22,26 @@ class G4AssemblyVolume;
 class G4VPhysicalVolume;
 
 class NpolBeamlineUpper : public NpolDetectorFactory {
-
-	public:
-		NpolBeamlineUpper();
-		~NpolBeamlineUpper();
-
-		void ConstructBeamlineUpper();
-		void ConstructBeamlineUpperInner();
-
-		virtual G4String GetName();
-		virtual void Place(G4LogicalVolume *motherLV);
-
-		static G4double upperInnerRadius;
-		static G4double upperOuterRadius;
-		static G4double upperLen;
-
-	private: 
-		static G4double calculateUpperBeamLineLen();
-
-		G4LogicalVolume *BeamlineUpperLV;
-		G4LogicalVolume *BeamlineUpperInnerLV;
+  
+public:
+  NpolBeamlineUpper();
+  ~NpolBeamlineUpper();
+  
+  void ConstructBeamlineUpper();
+  void ConstructBeamlineUpperInner();
+  
+  virtual G4String GetName();
+  virtual void Place(G4LogicalVolume *motherLV);
+  
+  static G4double upperInnerRadius;
+  static G4double upperOuterRadius;
+  static G4double upperLen;
+  
+private: 
+  static G4double calculateUpperBeamLineLen();
+  
+  G4LogicalVolume *BeamlineUpperLV;
+  G4LogicalVolume *BeamlineUpperInnerLV;
 };
 
 #endif

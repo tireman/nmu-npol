@@ -18,7 +18,6 @@
 #include "NpolRunAction.hh"
 #include "NpolEventAction.hh"
 #include "NpolSteppingAction.hh"
-#include "NpolDetectorConstruction.hh"
 
 #include "G4RunManager.hh"
 
@@ -41,17 +40,15 @@ void NpolActionInitialization::Build() const {
   // in the xz plane and rotates it and then fires the particle at a 
   // vector relative to z-axis (NpolAng) all parallel.
   
-  //SetUserAction(new NpolPrimaryGeneratorAction);
+  SetUserAction(new NpolPrimaryGeneratorAction);
   //SetUserAction(new NpolPrimaryGeneratorActionPS);
-  //NpolDetectorConstruction* det_action = new NpolDetectorConstruction;
-  //SetUserInitialization(det_action);
-  SetUserAction(new NpolPrimaryGeneratorActionFS);
+  //SetUserAction(new NpolPrimaryGeneratorActionFS);
   NpolEventAction* event_action = new NpolEventAction();
   SetUserAction(event_action);
   NpolRunAction* run_action = new NpolRunAction();
   SetUserAction(run_action);
-  NpolSteppingAction* step_action = 
-  new NpolSteppingAction(event_action, run_action);
+  NpolSteppingAction* step_action = new NpolSteppingAction
+    (event_action, run_action);
   SetUserAction(step_action);
 
 }

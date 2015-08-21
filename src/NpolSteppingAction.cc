@@ -34,7 +34,7 @@ NpolSteppingAction::~NpolSteppingAction()
 }
 
 void NpolSteppingAction::UserSteppingAction(const G4Step *aStep) {
-  NpolAnalysisManager *analysisMan = NpolAnalysisManager::GetInstance();
+  //NpolAnalysisManager *analysisMan = NpolAnalysisManager::GetInstance();
   
   G4Track *aTrack = aStep->GetTrack();
   G4StepPoint *preStepPoint = aStep->GetPreStepPoint();	
@@ -69,6 +69,7 @@ void NpolSteppingAction::UserSteppingAction(const G4Step *aStep) {
 
   if(volume->GetName() == "EndDump"){
     aTrack->SetTrackStatus(fStopAndKill);
+    // G4cout << "Track found in End Dump and Killed." << G4endl;
   }
   //}else if(preStepPoint->GetMaterial()->GetName().compare("Scint") == 0) {
     //analysisMan->AddEDep(volume,aStep->GetTotalEnergyDeposit());

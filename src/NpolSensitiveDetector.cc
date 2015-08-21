@@ -1,4 +1,14 @@
-//Daniel Wilbern, dwilbern@nmu.edu
+//********************************************************************
+//* License and Disclaimer: From GEANT Collaboration                 *
+//*                                                                  *
+//* The  Geant4 software  is  copyright of the Copyright Holders  of *
+//* the Geant4 Collaboration.  It is provided  under  the terms  and *
+//* conditions of the Geant4 Software License,  included in the file *
+//* LICENSE and available at  http://cern.ch/geant4/license .  These *
+//* include a list of copyright holders.     		      	*
+//********************************************************************
+
+// Daniel Wilbern, dwilbern@nmu.edu
 
 #include "G4SDManager.hh"
 #include "NpolSensitiveDetector.hh"
@@ -39,7 +49,8 @@ G4bool NpolSensitiveDetector::ProcessHits(G4Step* aStep, G4TouchableHistory*) {
   //aHit->Print();
   //G4cout << "Collection ID is: " << collectionID << G4endl;
 
-  if((collectionID > -1) && (aHit->GetProcessName() == "hadElastic")) {
+  //if((collectionID > -1) && (aHit->GetProcessName() == "hadElastic")) {
+  if(collectionID > -1){  
     hitsCollection->insert(aHit);
     //G4cout << "A hit was observed and inserted" << G4endl;
   }else{

@@ -73,7 +73,7 @@ public:
   void AddEDep(G4VPhysicalVolume *PV, G4double dep);
   void FillHistograms();
   void WriteDetectorIDsToFile();
-  void FillNtuple(G4VPhysicalVolume *PV, G4int particleID, G4int parentID, G4int trackID, G4int stepID, G4double depositEnergy, G4double vertexEnergy, G4double kineticEnergy); //, G4double VxPos, G4double VyPos, G4double VzPos, G4double xMom, G4double yMom, G4double zMom);
+  void FillNtuple(G4VPhysicalVolume *PV, G4int particleID, G4int parentID, G4int trackID, G4int stepID, G4double depositEnergy, G4double vertexEnergy, G4double kineticEnergy);//, G4double VxPos, G4double VyPos, G4double VzPos, G4double xMom, G4double yMom, G4double zMom);
   
 private:
   void FillVolNameColumns(char *volName);
@@ -90,6 +90,7 @@ private:
   struct NtupleColumns cols;
   int nextVolumeID;
   int currentEventID;
+  
 };
 
 #endif

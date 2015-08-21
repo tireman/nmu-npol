@@ -27,13 +27,13 @@ class G4Run;
 class NpolRunAction : public G4UserRunAction
 {
 public:
-NpolRunAction();
-~NpolRunAction();
-
+  NpolRunAction();
+  ~NpolRunAction();
+  
 public:
-void BeginOfRunAction(const G4Run*);
-void EndOfRunAction(const G4Run*);
-
+  void BeginOfRunAction(const G4Run*);
+  void EndOfRunAction(const G4Run*);
+  
 private:
   G4Timer* runTimer;
   //TFile *theTFile;

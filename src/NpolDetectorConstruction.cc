@@ -44,8 +44,8 @@ NpolDetectorConstruction::NpolDetectorConstruction() {
   detectors.insert(new NpolDipole1);
   detectors.insert(new NpolDipole2);
   detectors.insert(new NpolShieldHut);
-  //detectors.insert(new NpolHBender);
-  //detectors.insert(new NpolBDump);
+  detectors.insert(new NpolHBender);
+  detectors.insert(new NpolBDump);
 }
 
 NpolDetectorConstruction::~NpolDetectorConstruction() {

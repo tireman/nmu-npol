@@ -1,5 +1,15 @@
+//********************************************************************
+//* License and Disclaimer: From GEANT Collaboration                 *
+//*                                                                  *
+//* The  Geant4 software  is  copyright of the Copyright Holders  of *
+//* the Geant4 Collaboration.  It is provided  under  the terms  and *
+//* conditions of the Geant4 Software License,  included in the file *
+//* LICENSE and available at  http://cern.ch/geant4/license .  These *
+//* include a list of copyright holders.     		      	     *
+//********************************************************************
 
-//Daniel Wilbern, dwilbern@nmu.edu
+// Orignal: Daniel Wilbern, dwilbern@nmu.edu
+// Updated: William Tireman, wtireman@nmu.edu
 
 #include "G4Step.hh"
 #include "G4Track.hh"
@@ -18,9 +28,6 @@
 #include "NpolAnalysisManager.hh"
 
 G4Allocator<NpolHit> NpolHitAllocator;
-
-//NpolHit::NpolHit()
-//{pLogV=NULL;}
 
 NpolHit::NpolHit(G4Step *aStep): G4VHit() {
   G4Track *aTrack = aStep->GetTrack();
@@ -46,7 +53,7 @@ NpolHit::NpolHit(G4Step *aStep): G4VHit() {
   else if(particleName == "pi-") particleID = PINEG;
   else if(particleName == "pi+") particleID = PIPOS;
   else if(particleName == "pi0") particleID = PINEUTRAL;
-  //  FilePrint();
+  //  FilePrint();  // A test point to see if a hit is recorded
 
 }
 

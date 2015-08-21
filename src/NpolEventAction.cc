@@ -19,11 +19,10 @@
 #include "G4Event.hh"
 #include "G4EventManager.hh"
 #include "G4RunManager.hh"
-//#include "G4VPhysicalVolume.hh"
 #include "G4ios.hh"
 #include "G4String.hh"
-//#include "G4SystemOfUnits.hh"
-//#include "G4PhysicalConstants.hh"
+#include "G4SystemOfUnits.hh"
+#include "G4PhysicalConstants.hh"
 #include "G4SDManager.hh"
 #include "G4THitsCollection.hh"
 #include "G4HCofThisEvent.hh"
@@ -52,6 +51,12 @@ void NpolEventAction::BeginOfEventAction(const G4Event* evt) {
   analysisMan->PrepareNewEvent(evt->GetEventID());
 
 }
+
+// Basic EndofEventAction method for now.  It includes the "loop" portion
+// for processing hits in the collection(s).  It should probably be broken
+// up for better readability and easier future processing.
+
+//Currently it just calls the old Ntuple Fill and Histogram Fill commands as the previous SteppingAction did.  This needs changed to a TTree processing method. 
 
 void NpolEventAction::EndOfEventAction(const G4Event* evt) {
   
@@ -83,7 +88,7 @@ void NpolEventAction::EndOfEventAction(const G4Event* evt) {
 	NpolHit *aHit = (*hitsCollection)[i];
 	volume = aHit->GetVolumePointer();
 	analysisMan->AddEDep(volume, aHit->GetTotalEnergyDeposit());
-	analysisMan->FillNtuple(volume, aHit->GetParticleID(), aHit->GetParentID(), aHit->GetTrackID(), aHit->GetStepNumber(),  aHit->GetTotalEnergyDeposit(),  aHit->GetVertexEnergy(),  aHit->GetKineticEnergy()); //, aHit->GetPreStepPos.x(), aHit->GetPreStepPos.y(), aHit->GetPreStepPos.z(), aHit->GetParticleMomentum.x(), aHit->GetParticleMomentum.y(), aHit->GetParticleMomentum.z());
+	analysisMan->FillNtuple(volume, aHit->GetParticleID(), aHit->GetParentID(), aHit->GetTrackID(), aHit->GetStepNumber(),  aHit->GetTotalEnergyDeposit(),  aHit->GetVertexEnergy(),  aHit->GetKineticEnergy()); //, aHit->GetPreStepPos.x()), aHit->GetPreStepPos.y(), aHit->GetPreStepPos.z(), aHit->GetParticleMomentum.x(), aHit->GetParticleMomentum.y(), aHit->GetParticleMomentum.z());
       }
     }
   }
