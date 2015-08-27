@@ -26,13 +26,10 @@
 #include "G4VisAttributes.hh"
 #include "G4Colour.hh"
 #include "G4ios.hh"
-#include "G4SDManager.hh"
 
 #include "NpolMaterials.hh"
 #include "NpolPolarimeter.hh"
 #include "NpolAnalysisManager.hh"
-#include "NpolAnalysis.hh"
-#include "NpolSensitiveDetector.hh"
 #include "NpolDetectorFactory.hh"
 #include "NpolDetectorConstruction.hh"
 
@@ -96,104 +93,6 @@ void NpolPolarimeter::ImprintPlate(G4AssemblyVolume *plate,
   plate->MakeImprint(motherLV,Tr);
 }
 
-void NpolPolarimeter::ActivateSensitiveDetectors(G4LogicalVolume *DetLVname) {
-   G4SDManager* SDman = G4SDManager::GetSDMpointer();
-   G4String detname = DetLVname->GetName();
-   G4cout << "Detector logical name is: " <<detname << G4endl;
-   if(detname == "TopDetLV"){
-     NpolSensitiveDetector* TopDetSD = new NpolSensitiveDetector("TopDet", "TopDetHC");
-     SDman->AddNewDetector(TopDetSD);
-     DetLVname->SetSensitiveDetector(TopDetSD);
-   }else if(detname == "TopVetoLV"){
-     NpolSensitiveDetector* TopVetoSD = new NpolSensitiveDetector("TopVeto", "TopVetoHC");
-     SDman->AddNewDetector(TopVetoSD);
-     DetLVname->SetSensitiveDetector(TopVetoSD);
-   }else if(detname == "BottomDetLV"){
-     NpolSensitiveDetector* BottomDetSD = new NpolSensitiveDetector("BottomDet", "BottomDetHC");
-     SDman->AddNewDetector(BottomDetSD);
-     DetLVname->SetSensitiveDetector(BottomDetSD);
-   }else if(detname == "BottomVetoLV"){
-     NpolSensitiveDetector* BottomVetoSD = new NpolSensitiveDetector("BottomVeto", "BottomVetoHC");
-     SDman->AddNewDetector(BottomVetoSD);  
-     DetLVname->SetSensitiveDetector(BottomVetoSD);
-   }else if(detname == "FrontDetLV"){
-     NpolSensitiveDetector* FrontDetSD = new NpolSensitiveDetector("FrontDet", "FrontDetHC");
-     SDman->AddNewDetector(FrontDetSD);
-     DetLVname->SetSensitiveDetector(FrontDetSD);
-   }else if(detname == "FrontTagLV"){   
-     NpolSensitiveDetector* FrontTagSD = new NpolSensitiveDetector("FrontTag", "FrontTagHC");
-     SDman->AddNewDetector(FrontTagSD);
-     DetLVname->SetSensitiveDetector(FrontTagSD);
-   }   
-}
-
-void NpolPolarimeter::ActivateImprintedPVs(G4AssemblyVolume *AV, int arrayNo = 0) {
-  
-  NpolAnalysisManager *analysisMan = NpolAnalysisManager::GetInstance();
-  std::vector<G4VPhysicalVolume *>::iterator AVit = AV->GetVolumesIterator();
-  G4int numImprinted = AV->TotalImprintedVolumes();
-  G4String LVName = (*AVit)->GetLogicalVolume()->GetName();
-  std::string namePrefix;
-  std::string titlePrefix;
-  int nbins;
-  double xmin, xmax;
-  char str[3];
-  int i;
-  
-  if(LVName == "TopDetLV") {
-    namePrefix = "TopDet";
-    titlePrefix = "Top Array";
-    nbins = 240;
-    xmin = 0;
-    xmax = 120*MeV;
-  } else if(LVName == "TopVetoLV") {
-    namePrefix = "TopVeto";
-    titlePrefix =  "Top Veto Array";
-    nbins = 100;
-    xmin = 0;
-    xmax = 20*MeV;
-  } else if(LVName == "BottomDetLV") {
-    namePrefix = "BottomDet";
-    titlePrefix = "Bottom Array";
-    nbins = 240;
-    xmin = 0;
-    xmax = 120*MeV;
-  } else if(LVName == "BottomVetoLV") {
-    namePrefix = "BottomVeto";
-    titlePrefix = "Bottom Veto Array";
-    nbins = 100;
-    xmin = 0;
-    xmax = 20*MeV;
-  } else if(LVName == "FrontDetLV") {
-    namePrefix = "FrontDet";
-    titlePrefix = "Front Array";
-    nbins = 240;
-    xmin = 0;
-    xmax = 120*MeV;
-  } else if(LVName == "FrontTagLV") {
-    namePrefix = "FrontTag";
-    titlePrefix = "Front Tagger Array";
-    nbins = 100;
-    xmin = 0;
-    xmax = 20*MeV;
-  }
-  
-  for(i = 0; i < numImprinted; i++) {
-    std::string histoName = namePrefix;
-    std::string histoTitle = titlePrefix;
-    histoTitle += " ";
-    sprintf(str,"%02d",arrayNo);
-    histoName += str;
-    histoTitle += str;
-    histoTitle += ": Detector ";
-    sprintf(str,"%02d",i+1);
-    histoName += str;
-    histoTitle += str;
-    
-    analysisMan->RegisterActiveDetectorEDepHistogram(*(AVit++), strdup(histoName.c_str()), strdup(histoTitle.c_str()), nbins,xmin,xmax);
-  }
-}
-
 //---------------------------
 // Top E detectors
 // Andrei's 2012 Plan B setup using 160 cm long detectors 10cm by 10cm
@@ -212,11 +111,6 @@ void NpolPolarimeter::ConstructTopDetArray(G4LogicalVolume *motherLV) {
   ImprintPlate(TopDetArray2, motherLV, 0.615*m, 0.80*m, 0.30*m, -45.0*deg);
   ImprintPlate(TopDetArray2, motherLV, -0.615*m, 0.80*m, 0.30*m, 45.0*deg);
   
-  ActivateImprintedPVs(TopDetArray1, 1);
-  ActivateImprintedPVs(TopDetArray2, 2);
-
-  ActivateSensitiveDetectors(TopDetLV);
-
   G4VisAttributes *TopVisAtt= new G4VisAttributes(G4Colour(1.0,0.0,1.0));
   TopDetLV->SetVisAttributes(TopVisAtt);
 }
@@ -237,11 +131,6 @@ void NpolPolarimeter::ConstructTopVetoArray(G4LogicalVolume *motherLV) {
   ImprintPlate(TopVetoArray1, motherLV, 0.0*m, 0.32*m, -1.15*m, 0.0*deg);
   ImprintPlate(TopVetoArray2, motherLV, 0.0*m, 0.42*m, 0.30*m, 0.0*deg);
   
-  ActivateImprintedPVs(TopVetoArray1, 1);
-  ActivateImprintedPVs(TopVetoArray2, 2);
-  
-  ActivateSensitiveDetectors(TopVetoLV);
-
   G4VisAttributes* TopaVisAtt= new G4VisAttributes(G4Colour(0.0,1.0,1.0));
   TopVetoLV->SetVisAttributes(TopaVisAtt);
 }
@@ -267,11 +156,6 @@ void NpolPolarimeter::ConstructBottomDetArray(G4LogicalVolume *motherLV) {
   ImprintPlate(BottomDetArray2, motherLV, 0.615*m, -0.80*m, 0.30*m, 45.0*deg);
   ImprintPlate(BottomDetArray2, motherLV, -0.615*m, -0.80*m, 0.30*m, 135.0*deg);
   
-  ActivateImprintedPVs(BottomDetArray1, 1);
-  ActivateImprintedPVs(BottomDetArray2, 2);
-     
-  ActivateSensitiveDetectors(BottomDetLV);
-
   G4VisAttributes *BotVisAtt= new G4VisAttributes(G4Colour(1.0,0.0,1.0));
   BottomDetLV->SetVisAttributes(BotVisAtt);
 }
@@ -294,11 +178,6 @@ void NpolPolarimeter::ConstructBottomVetoArray(G4LogicalVolume *motherLV) {
   ImprintPlate(BottomVetoArray1, motherLV, 0.0*m, -0.32*m, -1.15*m, 0.0*deg);
   ImprintPlate(BottomVetoArray2, motherLV, 0.0*m, -0.42*m, 0.30*m, 0.0*deg);
   
-  ActivateImprintedPVs(BottomVetoArray1, 1);
-  ActivateImprintedPVs(BottomVetoArray2, 2);
-  
-  ActivateSensitiveDetectors(BottomVetoLV);
-
   G4VisAttributes* BotaVisAtt= new G4VisAttributes(G4Colour(0.0,1.0,1.0));
   BottomVetoLV->SetVisAttributes(BotaVisAtt);
 }
@@ -325,11 +204,6 @@ void NpolPolarimeter::ConstructFrontDetArray(G4LogicalVolume *motherLV) {
   for(unsigned int i=2; i<4; i++)
     ImprintPlate(FrontDetArray2, motherLV, 0.0*m, 0.0*m, (-1.6992+0.65*i)*m, 0.0*deg);
   
-  ActivateImprintedPVs(FrontDetArray1, 1);
-  ActivateImprintedPVs(FrontDetArray2, 2);
-    
-  ActivateSensitiveDetectors(FrontDetLV);
-
   G4VisAttributes* FrontDetVisAtt= new G4VisAttributes(G4Colour(1.0,1.0,0.0));
   FrontDetLV->SetVisAttributes(FrontDetVisAtt);
 }
@@ -360,11 +234,6 @@ void NpolPolarimeter::ConstructFrontTagArray(G4LogicalVolume *motherLV) {
     ImprintPlate(FrontTaggerArray2, motherLV, 0.0*m, 0.0*m, 
 		 (-1.7692+0.65*i)*m, 0.0*deg);
   
-  ActivateImprintedPVs(FrontTaggerArray1, 1);
-  ActivateImprintedPVs(FrontTaggerArray2, 2);
-    
-  ActivateSensitiveDetectors(FrontTagLV);
-
   G4VisAttributes* FrontTagVisAtt= new G4VisAttributes(G4Colour(1.0,1.0,1.0));
   FrontTagLV->SetVisAttributes(FrontTagVisAtt);
 }

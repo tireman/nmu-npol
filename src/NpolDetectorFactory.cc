@@ -19,7 +19,6 @@
 #include "G4SDManager.hh"
 
 #include "NpolDetectorFactory.hh"
-#include "NpolSensitiveDetector.hh"
 
 // Place a volume in its mother volume at a location specified by rectangular coordinates.
 G4VPhysicalVolume *NpolDetectorFactory::PlaceRectangular(G4LogicalVolume *detLV, G4LogicalVolume *motherLV,G4String detName, G4double x, G4double y, G4double z,G4double Rx, G4double Ry, G4double Rz) {
@@ -36,7 +35,7 @@ G4VPhysicalVolume *NpolDetectorFactory::PlaceRectangular(G4LogicalVolume *detLV,
   Tr = G4Transform3D(Rm,Tv);
   
   G4VPhysicalVolume *detPV = new G4PVPlacement(Tr, detLV,
-       detName, motherLV, false, 0,false); // last bool for overlapcheck
+       detName, motherLV, false, 0,false); // last bool for overlap check
   
   return detPV;
 }

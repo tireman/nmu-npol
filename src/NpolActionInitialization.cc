@@ -17,6 +17,7 @@
 #include "NpolPrimaryGeneratorActionFS.hh"
 #include "NpolRunAction.hh"
 #include "NpolEventAction.hh"
+#include "NpolTrackingAction.hh"
 #include "NpolSteppingAction.hh"
 
 #include "G4RunManager.hh"
@@ -47,8 +48,10 @@ void NpolActionInitialization::Build() const {
   SetUserAction(event_action);
   NpolRunAction* run_action = new NpolRunAction();
   SetUserAction(run_action);
+  NpolTrackingAction *tracking_action = new NpolTrackingAction();
+  SetUserAction(tracking_action);
   NpolSteppingAction* step_action = new NpolSteppingAction
     (event_action, run_action);
   SetUserAction(step_action);
-
 }
+

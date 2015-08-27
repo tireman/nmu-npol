@@ -17,7 +17,6 @@
 #include "G4Track.hh"
 #include "G4Step.hh"
 
-#include "NpolAnalysisManager.hh"
 #include "NpolSteppingAction.hh"
 #include "NpolRunAction.hh"
 
@@ -34,47 +33,7 @@ NpolSteppingAction::~NpolSteppingAction()
 }
 
 void NpolSteppingAction::UserSteppingAction(const G4Step *aStep) {
-  //NpolAnalysisManager *analysisMan = NpolAnalysisManager::GetInstance();
-  
-  G4Track *aTrack = aStep->GetTrack();
-  G4StepPoint *preStepPoint = aStep->GetPreStepPoint();	
-  
-  //G4int parentID = aTrack->GetParentID();
-  //G4int stepID = aTrack->GetCurrentStepNumber();
-  //G4int trackID = aTrack->GetTrackID();
-  
-  /*G4int particleID = -1;
-  G4String particleName = aTrack->GetDynamicParticle()->GetDefinition()->GetParticleName();
-  if(particleName == "e-") particleID = ELECTRON_ID;
-  else if(particleName == "e+") particleID = POSITRON_ID;
-  else if(particleName == "proton") particleID = PROTON_ID;
-  else if(particleName == "neutron") particleID = NEUTRON_ID;
-  else if(particleName == "gamma") particleID = GAMMA_ID;
-  else if(particleName == "pi-") particleID = PINEG;
-  else if(particleName == "pi+") particleID = PIPOS;
-  else if(particleName == "pi0") particleID = PINEUTRAL;*/
-  
-  //  G4float vertexEnergy = aTrack->GetVertexKineticEnergy()/MeV;
-  //G4float kineticEnergy = aTrack->GetKineticEnergy()/MeV;
-  //G4float depositEnergy = aStep->GetTotalEnergyDeposit()/MeV;
-  //G4ThreeVector positionInWorld = preStepPoint->GetPosition()/cm;
-  // G4ThreeVector positionInVolume = 
-  // preStepPoint->GetTouchableHandle()->GetHistory()->GetTopTransform().TransformPoint(positionInWorld);
-  
-  //G4ThreeVector momentum = preStepPoint->GetMomentum()/MeV;
-  
- G4VPhysicalVolume *volume = preStepPoint->GetPhysicalVolume();
-  
-  //  G4String matName = preStepPoint->GetMaterial()->GetName();
-
-  if(volume->GetName() == "EndDump"){
-    aTrack->SetTrackStatus(fStopAndKill);
-    // G4cout << "Track found in End Dump and Killed." << G4endl;
-  }
-  //}else if(preStepPoint->GetMaterial()->GetName().compare("Scint") == 0) {
-    //analysisMan->AddEDep(volume,aStep->GetTotalEnergyDeposit());
-    
-    //   analysisMan->FillNtuple(volume, particleID, parentID, trackID, stepID, depositEnergy, vertexEnergy, kineticEnergy, positionInWorld.x(), positionInWorld.y(), positionInWorld.z(), positionInVolume.x(), positionInVolume.y(), positionInVolume.z(), momentum.x(), momentum.y(), momentum.z());
-  //}
+//  if(volume->GetName() == "EndDump")
+//    aTrack->SetTrackStatus(fStopAndKill);
 }
 

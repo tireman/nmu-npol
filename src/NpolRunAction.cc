@@ -20,77 +20,33 @@
 #include "G4Run.hh"
 #include "G4SystemOfUnits.hh"
 #include "G4ios.hh"
- 
+
 //#include "TROOT.h"
 //#include "TFile.h"
 //#include "TNtuple.h"
 //#include "TTree.h"
 #include "NpolRunAction.hh"
 #include "NpolAnalysisManager.hh"
-#include "NpolAnalysis.hh"
 
 NpolRunAction::NpolRunAction() {
-
-G4AnalysisManager *analysisManager = G4AnalysisManager::Instance();
-NpolAnalysisManager *analysisMan = NpolAnalysisManager::GetInstance();
-
-G4cout << "Using " << analysisManager->GetType() << " Analysis Manager." << G4endl;
-
-analysisManager->SetHistoDirectoryName("histograms");
-analysisManager->SetNtupleDirectoryName("ntuples");
-analysisManager->SetVerboseLevel(1);
-analysisManager->SetFirstHistoId(1);
-
-analysisMan->CreateNtuple();
-analysisMan->CreateHistograms();
-
-// Setup the run timer
-runTimer = new G4Timer();
+	// Setup the run timer
+	runTimer = new G4Timer();
 }
 
 NpolRunAction::~NpolRunAction() {
-  //if(theTFile) delete theTFile;
-delete G4AnalysisManager::Instance();
 }
 
 void NpolRunAction::BeginOfRunAction(const G4Run* aRun) {
-
-G4AnalysisManager *analysisManager = G4AnalysisManager::Instance();
-
-G4cout << "\n----> Open rootfile .. " << G4endl;
-analysisManager->OpenFile();
-
-/*G4cout << "\n----> Open rootfile .. " << G4endl;
-theTFile = new TFile("TestRoot.root", "RECREATE", "Example");
-tree = new TTree("Tree","Tree for Npol simulation");
-
-NpolRun* RunData = (NpolRun*) aRun;
-tree->Branch("Run Branch",RunData->GetNtuplePointer(),"vertex/I:event/I");
-RunData->SetTree(tree);*/
-
-runTimer->Start();
-
-G4cout << "### Run " << aRun->GetRunID() << " start." << G4endl;
+	runTimer->Start();
+	G4cout << "### Run " << aRun->GetRunID() << " start." << G4endl;
 }
 
 void NpolRunAction::EndOfRunAction(const G4Run*) {
-  
-  G4AnalysisManager *analysisManager = G4AnalysisManager::Instance();
-  NpolAnalysisManager *analysisMan = NpolAnalysisManager::GetInstance();
-  
-analysisManager->Write();
-analysisManager->CloseFile();
+	NpolAnalysisManager *analysisMan = NpolAnalysisManager::GetInstance();
+	analysisMan->WriteTree();
+	analysisMan->CloseFile();
 
-/*if (theTFile)
-  {
-theTFile -> Write(); 
-      theTFile -> Close();
-}
-theTFile = 0;*/
-
-analysisMan->WriteDetectorIDsToFile();
-
-runTimer->Stop();
-G4cout << "Run Time: " << *(runTimer) << G4endl;
+	runTimer->Stop();
+	G4cout << "Run Time: " << *(runTimer) << G4endl;
 }
 

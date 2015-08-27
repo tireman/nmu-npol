@@ -47,10 +47,6 @@ public:
   void ImprintPlate(G4AssemblyVolume *plate, G4LogicalVolume *motherLV,
 		    G4double TmX, G4double TmY, G4double TmZ, G4double RmZ);
   
-  void ActivateImprintedPVs(G4AssemblyVolume *AV, int arrayNo);
-  void RegisterHistogramFor(G4VPhysicalVolume *PV, const char *namePrefix, const char *titlePrefix, int arrayNo, int num);
-  void ActivateSensitiveDetectors(G4LogicalVolume * DetLVname);
-  
 private:
   G4LogicalVolume *PolarimeterLV;
 };

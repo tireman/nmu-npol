@@ -16,7 +16,7 @@
 
 #File name can be changed here
 #/analysis/setFileName /data/tireman/simulation/output/FirstPass/ScintOnly/npol_test2
-/analysis/setFileName npol_test
+#/analysis/setFileName npol_test
 
 #/gun/particle proton 
 #/gun/particle pi0 

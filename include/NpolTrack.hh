@@ -8,39 +8,21 @@
 //* include a list of copyright holders.     		      	*
 //********************************************************************
 
-// Daniel Wilbern, dwilbern@nmu.edu August 2015
-
-#ifndef Npol_Analysis_Manager_h
-#define Npol_Analysis_Manager_h
-
-#include <vector>
-
-class G4Track;
-class TFile;
-class TTree;
-class NpolTrack;
-
-class NpolAnalysisManager {
+class NpolTrack {
 
 	public:
-		static NpolAnalysisManager *GetInstance();
-		void Initialize();
-		void PrepareNewEvent();
-		void AddTrack(const G4Track *);
-		void FillTree();
-		void WriteTree();
-		void CloseFile();
-
-	private:
-		NpolAnalysisManager();
-		~NpolAnalysisManager();
-
-	private:
-		bool initialized;
-		TTree *npolTree;
-		TFile *npolOutFile;
-		std::vector<NpolTrack *> tracks;
+		int trackId;
+		int parentId;
+		double posX;
+		double posY;
+		double posZ;
+		double momX;
+		double momY;
+		double momZ;
+		double time;
+		double energy;
+		const char *particle;
+		const char *process;
+		const char *volume;
 };
-
-#endif
 

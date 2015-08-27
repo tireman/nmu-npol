@@ -11,11 +11,9 @@
 #ifndef Npol_EventAction_h
 #define Npol_EventAction_h
 
-#include "G4HCofThisEvent.hh"
 #include "G4UserEventAction.hh"
 
 class G4Event;
-class NpolHit;
 
 class NpolEventAction : public G4UserEventAction
 {

@@ -8,191 +8,97 @@
 //* include a list of copyright holders.     		      	*
 //********************************************************************
 
-// %% NpolAnalysisManager.cc %%
-// Daniel Wilbern, dwilbern@nmu.edu February 2015
+#include <G4Track.hh>
+#include <G4ThreeVector.hh>
+#include <G4String.hh>
+#include <G4ParticleDefinition.hh>
+#include <G4VProcess.hh>
 
-#include <cstdlib>
-#include <map>
-#include <cstdio>
-#include <iostream>
-#include <cstring>
-#include <string>
-#include <functional>
-
-//#include "TROOT.h"
-//#include "TFile.h"
-
-#include "G4ios.hh"
-#include "G4SystemOfUnits.hh"
-#include "G4VPhysicalVolume.hh"
-#include "G4THitsCollection.hh"
-#include "G4Event.hh"
+#include <TFile.h>
+#include <TTree.h>
+#include <TClassTable.h>
+#include <TSystem.h>
+#include <TInterpreter.h>
 
 #include "NpolAnalysisManager.hh"
-#include "NpolAnalysis.hh"
-#include "NpolHit.hh"
+#include "NpolTrack.hh"
 
 static NpolAnalysisManager *pInstance = NULL;
 
+NpolAnalysisManager *NpolAnalysisManager::GetInstance() {
+	if(pInstance == NULL)
+		pInstance = new NpolAnalysisManager();
+
+	return pInstance;
+}
+
 NpolAnalysisManager::NpolAnalysisManager() {
-  nextVolumeID = 0;
-  currentEventID = 0;
-  memset(&cols,0,sizeof(struct NtupleColumns));
+	initialized = false;
+	npolOutFile = NULL;
+	npolTree = NULL;
+
+	Initialize();
 }
 
 NpolAnalysisManager::~NpolAnalysisManager() {
+	delete npolTree;
+	npolOutFile->Close();
+	delete npolOutFile;
 }
 
-// NpolAnalysisManager is a singleton.  This function will 
-// return a pointer to the singleton.
-NpolAnalysisManager *NpolAnalysisManager::GetInstance() {
-  if(pInstance == NULL){
-    pInstance = new NpolAnalysisManager();
-    G4cout << "Engaging Npol Analysis Manager, Captain" << G4endl;
-  }
-  return pInstance;
+void NpolAnalysisManager::Initialize() {
+	if(initialized)
+		std::cout << "WARNING: NpolAnalysisManager is already initialized and is being initialized again." << std::endl;
+
+	if(!TClassTable::GetDict("NpolTrack.hh"))
+		gSystem->Load("NpolTrack_hh.so");
+
+	gInterpreter->GenerateDictionary("vector<NpolTrack *>","include/NpolTrack.hh;vector");
+
+	npolOutFile = new TFile("npol.root","RECREATE");
+	npolTree = new TTree("t_npolTree","Per-event information from Npol simulation");
+	npolTree->Branch("tracks_branch","std::vector<NpolTrack *>",&tracks,32000,2);
+	initialized = true;
 }
 
-void NpolAnalysisManager::RegisterActiveDetectorEDepHistogram(G4VPhysicalVolume *PV, char *nname, char *ttitle,G4int nnbins, G4double xxmin, G4double xxmax) {
-  
-  if(!isVolumeActive(PV)) {
-    
-    detData[PV].histoID = -1;
-    detData[PV].name = nname;
-    detData[PV].title = ttitle;
-    detData[PV].nbins = nnbins;
-    detData[PV].xmin = xxmin;
-    detData[PV].xmax = xxmax;
-    detData[PV].EDep = 0.0;
-  }
+void NpolAnalysisManager::PrepareNewEvent() {
+	std::vector<NpolTrack *>::iterator it;
+	for(it = tracks.begin(); it != tracks.end(); it++)
+		delete *it;
+	
+	tracks.clear();
 }
 
-void NpolAnalysisManager::CreateHistograms() {
-  
-  G4AnalysisManager *analysisMan = G4AnalysisManager::Instance();
-  std::map<G4VPhysicalVolume *, struct HistoData>::iterator it;
-  
-  G4cout << "Creating EDep Histograms." << G4endl;
-  
-  for(it = detData.begin(); it != detData.end(); it++) {
-    struct HistoData *histEntry = &(it->second);
-    histEntry->histoID = analysisMan->CreateH1(G4String(histEntry->name), G4String(histEntry->title),histEntry->nbins, histEntry->xmin, histEntry->xmax);
-  }
+void NpolAnalysisManager::AddTrack(const G4Track *aTrack) {
+	NpolTrack *anNpolTrack = new NpolTrack();
+
+	anNpolTrack->trackId = aTrack->GetTrackID();
+	anNpolTrack->parentId = aTrack->GetParentID();
+	anNpolTrack->posX = (aTrack->GetPosition()).x();
+	anNpolTrack->posY = (aTrack->GetPosition()).y();
+	anNpolTrack->posZ = (aTrack->GetPosition()).z();
+	anNpolTrack->momX = (aTrack->GetMomentum()).x();
+	anNpolTrack->momY = (aTrack->GetMomentum()).y();
+	anNpolTrack->momZ = (aTrack->GetMomentum()).z();
+	anNpolTrack->time = (aTrack->GetGlobalTime());
+	anNpolTrack->energy = aTrack->GetTotalEnergy();
+	anNpolTrack->particle = (aTrack->GetDefinition()->GetParticleName()).data();
+	if(aTrack->GetCreatorProcess() != NULL)
+		anNpolTrack->process = (aTrack->GetCreatorProcess()->GetProcessName()).data();
+	anNpolTrack->volume = (aTrack->GetVolume()->GetName()).data();
+
+	tracks.push_back(anNpolTrack);
 }
 
-void NpolAnalysisManager::CreateNtuple() {
-  
-  G4AnalysisManager *analysisMan = G4AnalysisManager::Instance();
-  
-  G4cout << "Creating Ntuple." << G4endl;
-  
-  // For some reason (a bug?) the Ntuple is not created properly if at 
-  // least one histogram doesn't exist.
-  // We'll make a dummy one here just to make sure
-  analysisMan->CreateH1("dummy", "Dummy Histogram - Please Disregard", 100, 0*MeV, 100*MeV);
-  
-  analysisMan->CreateNtuple("NpolData", "Npol Data");
-  cols.volumeIDColID = analysisMan->CreateNtupleIColumn("VolumeID");
-  cols.particleIDColID = analysisMan->CreateNtupleIColumn("ParticleID");
-  cols.parentIDColID = analysisMan->CreateNtupleIColumn("ParentID");
-  cols.trackIDColID = analysisMan->CreateNtupleIColumn("TrackID");
-  cols.stepIDColID = analysisMan->CreateNtupleIColumn("StepID");
-  cols.eventIDColID = analysisMan->CreateNtupleIColumn("EventID");
-  cols.vertexEnergyColID = analysisMan->CreateNtupleDColumn("DepositedEnergy");
-  cols.vertexEnergyColID = analysisMan->CreateNtupleDColumn("VertexEnergy");
-  cols.kineticEnergyColID = analysisMan->CreateNtupleDColumn("KineticEnergy");
-  // cols.WxPosColID = analysisMan->CreateNtupleDColumn("WorldXPosition");
-  //cols.WyPosColID = analysisMan->CreateNtupleDColumn("WorldYPosition");
-  //cols.WzPosColID = analysisMan->CreateNtupleDColumn("WorldZPosition");
-  //cols.VxPosColID = analysisMan->CreateNtupleDColumn("VolumeXPosition");
-  /* cols.VyPosColID = analysisMan->CreateNtupleDColumn("VolumeYPosition");
-  cols.VzPosColID = analysisMan->CreateNtupleDColumn("VolumeZPosition");
-  cols.xMomColID = analysisMan->CreateNtupleDColumn("XMomentum");
-  cols.yMomColID = analysisMan->CreateNtupleDColumn("YMomentum");
-  cols.zMomColID = analysisMan->CreateNtupleDColumn("ZMomentum");*/
-  analysisMan->FinishNtuple(); 
+void NpolAnalysisManager::FillTree() {
+	npolTree->Fill();
 }
 
-void NpolAnalysisManager::PrepareNewEvent(int eventID) {
-  std::map<G4VPhysicalVolume *, struct HistoData>::iterator it;
-  
-  currentEventID = eventID;
-  for(it = detData.begin(); it != detData.end(); it++)
-    (it->second).EDep = 0.0;
+void NpolAnalysisManager::WriteTree() {
+	npolTree->Write();
 }
 
-void NpolAnalysisManager::AddEDep(G4VPhysicalVolume *PV, G4double dep) {
-  
-  if(isVolumeActive(PV))
-    detData[PV].EDep += dep;
+void NpolAnalysisManager::CloseFile() {
+	npolOutFile->Close();
 }
-
-void NpolAnalysisManager::FillHistograms() {
-  
-  std::map<G4VPhysicalVolume *, struct HistoData>::iterator it;
-  for(it = detData.begin(); it != detData.end(); it++)
-    FillAHistogram(&(it->second));
-}
-
-void NpolAnalysisManager::FillNtuple(G4VPhysicalVolume *PV, G4int particleID, G4int parentID, G4int trackID, G4int stepID, G4double depositEnergy, G4double vertexEnergy, G4double kineticEnergy)//, G4double VxPos, G4double VyPos, G4double VzPos, G4double xMom, G4double yMom, G4double zMom) 
-{
-  
-  G4AnalysisManager *analysisMan = G4AnalysisManager::Instance();
-  
-  int volumeID = getVolIDFor(PV);
-
-  analysisMan->FillNtupleIColumn(cols.volumeIDColID, volumeID);
-  analysisMan->FillNtupleIColumn(cols.particleIDColID, particleID);
-  analysisMan->FillNtupleIColumn(cols.parentIDColID, parentID);
-  analysisMan->FillNtupleIColumn(cols.trackIDColID, trackID);
-  analysisMan->FillNtupleIColumn(cols.stepIDColID, stepID);
-  analysisMan->FillNtupleIColumn(cols.eventIDColID, currentEventID);
-  analysisMan->FillNtupleDColumn(cols.vertexEnergyColID, depositEnergy);
-  analysisMan->FillNtupleDColumn(cols.vertexEnergyColID, vertexEnergy);
-  analysisMan->FillNtupleDColumn(cols.kineticEnergyColID, kineticEnergy);
-  // analysisMan->FillNtupleDColumn(cols.WxPosColID, WxPos);
-  //analysisMan->FillNtupleDColumn(cols.WyPosColID, WyPos);
-  //analysisMan->FillNtupleDColumn(cols.WzPosColID, WzPos);
-  //analysisMan->FillNtupleDColumn(cols.VxPosColID, VxPos);
-  /*analysisMan->FillNtupleDColumn(cols.VyPosColID, VyPos);
-  analysisMan->FillNtupleDColumn(cols.VzPosColID, VzPos);
-  analysisMan->FillNtupleDColumn(cols.xMomColID, xMom);
-  analysisMan->FillNtupleDColumn(cols.yMomColID, yMom);
-  analysisMan->FillNtupleDColumn(cols.zMomColID, zMom);*/
-  analysisMan->AddNtupleRow();
-}
-
-int NpolAnalysisManager::getVolIDFor(G4VPhysicalVolume *PV) {
-  
-  std::pair<std::map<G4VPhysicalVolume *, int>::iterator, bool> ret;
-  
-  ret = detectorIDs.insert(std::pair<G4VPhysicalVolume *, int>(PV, nextVolumeID++));
-  if(!(ret.second))
-    nextVolumeID--;
-  return (ret.first)->second;
-}
-
-void NpolAnalysisManager::FillAHistogram(struct HistoData *histoData) {
-  
-  G4AnalysisManager *analysisMan = G4AnalysisManager::Instance();
-  
-  if(histoData->EDep != 0.0*MeV)
-    analysisMan->FillH1(histoData->histoID, histoData->EDep);
-}
-
-bool NpolAnalysisManager::isVolumeActive(G4VPhysicalVolume *PV) {
-  return (detData.find(PV) != detData.end());
-}
-
-void NpolAnalysisManager::WriteDetectorIDsToFile() {
-  
-  std::map<G4VPhysicalVolume *, int>::iterator it;
-  FILE *f = fopen("detIDs_test4.txt","w+");
-  
-  for(it = detectorIDs.begin(); it != detectorIDs.end(); it++)
-    fprintf(f,"%03d,%s\n",it->second, it->first->GetName().data());
-  
-  fclose(f);
-}
-
 

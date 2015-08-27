@@ -8,12 +8,23 @@
 //* include a list of copyright holders.     		      	*
 //********************************************************************
 
-// Daniel Wilbern, dwilbern@nmu.edu
+#ifndef Npol_TrackingAction_h
+#define Npol_TrackingAction_h
 
-#ifndef NpolAnalysis_h
-#define NpolAnalysis_h 
+#include "G4UserTrackingAction.hh"
 
-#include "g4root.hh"
+class G4Track;
+
+class NpolTrackingAction : public G4UserTrackingAction {
+
+	public:
+		NpolTrackingAction();
+		~NpolTrackingAction();
+
+	private:
+		virtual void PreUserTrackingAction(const G4Track *);
+		virtual void PostUserTrackingAction(const G4Track *);
+};
 
 #endif
 
