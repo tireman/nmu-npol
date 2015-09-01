@@ -50,12 +50,15 @@ void NpolAnalysisManager::Initialize() {
 	if(initialized)
 		std::cout << "WARNING: NpolAnalysisManager is already initialized and is being initialized again." << std::endl;
 
-	if(!TClassTable::GetDict("NpolTrack.hh"))
+	if(!TClassTable::GetDict("include/NpolTrack.hh"))
 		gSystem->Load("NpolTrack_hh.so");
 
 	gInterpreter->GenerateDictionary("vector<NpolTrack *>","include/NpolTrack.hh;vector");
 
-	npolOutFile = new TFile("npol.root","RECREATE");
+	// Method to open TFile.  Hoping to make this available from macro as
+	// some point -- W.T.
+	OpenFile();
+
 	npolTree = new TTree("t_npolTree","Per-event information from Npol simulation");
 	npolTree->Branch("tracks_branch","std::vector<NpolTrack *>",&tracks,32000,2);
 	initialized = true;
@@ -96,6 +99,9 @@ void NpolAnalysisManager::FillTree() {
 
 void NpolAnalysisManager::WriteTree() {
 	npolTree->Write();
+}
+void NpolAnalysisManager::OpenFile() {
+  npolOutFile = new TFile("/data/tireman/simulation/output/FirstPass/Test/npol_test.root","RECREATE");
 }
 
 void NpolAnalysisManager::CloseFile() {

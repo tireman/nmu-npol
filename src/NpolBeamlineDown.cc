@@ -67,6 +67,7 @@ NpolBeamlineDown::NpolBeamlineDown() {
   ConstructSecA1Inner();
   ConstructSecA2Inner();
   ConstructSecA3Inner();
+  ConstructBeamlineCap();
 }
 
 NpolBeamlineDown::~NpolBeamlineDown() {}
@@ -88,7 +89,7 @@ G4int gnum = 60; // # of facets to circle for polygon
   std::vector<G4TwoVector> polygon(gnum);
   for (int i = 0; i< gnum; i++) {
     polygon[i] = G4TwoVector(dia*cos(360.0*deg/gnum*i),dia*sin(360.0*deg/gnum*i));
-	}
+  }
   
   std::vector<G4ExtrudedSolid::ZSection> zsections;
   zsections.push_back(G4ExtrudedSolid::ZSection(0.0*m,
@@ -105,6 +106,24 @@ G4int gnum = 60; // # of facets to circle for polygon
   G4VisAttributes *BeamlineVisAtt= new G4VisAttributes(G4Colour(1.0,1.5,0.5));
   BeamlineDownLV->SetVisAttributes(BeamlineVisAtt);
 }
+
+// Downstream beamline "cap".  This volume is just to locate electrons that
+// have made it from the target to the end of the downstream beamline and we
+// will kill them in stepping action.  No need to transport after they get 
+// past the ugly parts.
+void NpolBeamlineDown::ConstructBeamlineCap(){
+
+  G4double Radius = SecA3OutRadius * 5.0;
+  G4double Thickness = 0.50*cm;
+
+  G4Tubs *Cap = new G4Tubs("Cap", 0.0*cm, Radius, Thickness/2, 0.0*deg, 360.0*deg);
+
+  CapLV = new G4LogicalVolume(Cap, NpolMaterials::GetInstance()->GetVacuum(),"CapLV", 0,0,0);
+
+  G4VisAttributes *CapVisAtt= new G4VisAttributes(G4Colour(0.80,0.2,0.5));
+  CapLV->SetVisAttributes(CapVisAtt);  
+}
+
 
 // This downstream inner part of the beam line is just a vacuum filler for 
 // the downstream portion made in the previous method. 
@@ -294,6 +313,7 @@ void NpolBeamlineDown::Place(G4LogicalVolume *motherLV) {
   PlaceCylindrical(SecA3InLV, motherLV, "SecA3In", 0.2*cm + SecA3zLen/2 + SecA2zLen + SecA1zLen + NpolScatteringChamber::insideRadius + NpolScatteringChamber::wallThickness, 0, 0);
   PlaceCylindrical(BeamlineDownLV, motherLV, "BeamLineDown", -2.1*cm + SecA1zLen + 2*NpolScatteringChamber::insideRadius + 2*NpolScatteringChamber::wallThickness + NpolHallShell::zPlacementOffset,0,0);
   PlaceCylindrical(BeamlineDownInnerLV,BeamlineDownLV,"BeamLineDownInner", 0,0,0);
+  PlaceCylindrical(CapLV,motherLV,"Cap", -1.8*cm + downLen + SecA1zLen + 2*NpolScatteringChamber::insideRadius + 2*NpolScatteringChamber::wallThickness + NpolHallShell::zPlacementOffset, 0, 0);
 }
 
 G4double NpolBeamlineDown::calculateDownBeamLineLen() {

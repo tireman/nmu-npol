@@ -33,6 +33,7 @@ public:
   void ConstructSecA1Inner();
   void ConstructSecA2Inner();
   void ConstructSecA3Inner();
+  void ConstructBeamlineCap();
   
   virtual G4String GetName();
   virtual void Place(G4LogicalVolume *motherLV);
@@ -64,6 +65,7 @@ private:
   G4LogicalVolume *BeamlineDownLV;
   G4LogicalVolume *BeamlineDownInnerLV;
   G4LogicalVolume *SectionALV, *SecA1InLV, *SecA2InLV, *SecA3InLV;
+  G4LogicalVolume *CapLV;
 };
 
 #endif

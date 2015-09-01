@@ -22,24 +22,24 @@ class NpolTrack;
 
 class NpolAnalysisManager {
 
-	public:
-		static NpolAnalysisManager *GetInstance();
-		void Initialize();
-		void PrepareNewEvent();
-		void AddTrack(const G4Track *);
-		void FillTree();
-		void WriteTree();
-		void CloseFile();
-
-	private:
-		NpolAnalysisManager();
-		~NpolAnalysisManager();
-
-	private:
-		bool initialized;
-		TTree *npolTree;
-		TFile *npolOutFile;
-		std::vector<NpolTrack *> tracks;
+public:
+  static NpolAnalysisManager *GetInstance();
+  void Initialize();
+  void PrepareNewEvent();
+  void AddTrack(const G4Track *);
+  void FillTree();
+  void WriteTree();
+  void CloseFile();
+  void OpenFile();
+private:
+  NpolAnalysisManager();
+  ~NpolAnalysisManager();
+  
+private:
+  bool initialized;
+  TTree *npolTree;
+  TFile *npolOutFile;
+  std::vector<NpolTrack *> tracks;
 };
 
 #endif

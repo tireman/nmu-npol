@@ -1,3 +1,8 @@
+Update: 8-24-2015
+
+
+
+-------------------------------------------------------------------------------
 Update: 7-12-2015
 
 Major changes have been made to the code. Geometry parts can be added and taken away in the NpolDetectorFactory.cc file.  New geometry is created in its own detector class and added to the DetectorFactory.  A map of all the Physical Volumes is generated and stored in a file called detIDs.txt which is needed later for ROOT scripts to sort through the generated Ntuple data.  This is all done automatically by the DetectorFactory Class.  

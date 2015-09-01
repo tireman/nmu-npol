@@ -33,7 +33,10 @@ NpolSteppingAction::~NpolSteppingAction()
 }
 
 void NpolSteppingAction::UserSteppingAction(const G4Step *aStep) {
-//  if(volume->GetName() == "EndDump")
-//    aTrack->SetTrackStatus(fStopAndKill);
+
+  G4Track *aTrack = aStep->GetTrack();
+  G4StepPoint *preStepPoint = aStep->GetPreStepPoint();	
+  G4VPhysicalVolume *volume = preStepPoint->GetPhysicalVolume();
+  if(volume->GetName() == "Cap") aTrack->SetTrackStatus(fStopAndKill);
 }
 
