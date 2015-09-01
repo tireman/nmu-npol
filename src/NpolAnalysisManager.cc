@@ -21,7 +21,7 @@
 #include <TInterpreter.h>
 
 #include "NpolAnalysisManager.hh"
-#include "NpolTrack.hh"
+#include "NpolVertex.hh"
 
 static NpolAnalysisManager *pInstance = NULL;
 
@@ -50,19 +50,19 @@ void NpolAnalysisManager::Initialize() {
 	if(initialized)
 		std::cout << "WARNING: NpolAnalysisManager is already initialized and is being initialized again." << std::endl;
 
-	if(!TClassTable::GetDict("NpolTrack.hh"))
-		gSystem->Load("NpolTrack_hh.so");
+	if(!TClassTable::GetDict("NpolVertex.hh"))
+		gSystem->Load("NpolVertex_hh.so");
 
-	gInterpreter->GenerateDictionary("vector<NpolTrack *>","include/NpolTrack.hh;vector");
+	gInterpreter->GenerateDictionary("vector<NpolVertex *>","include/NpolVertex.hh;vector");
 
 	npolOutFile = new TFile("npol.root","RECREATE");
 	npolTree = new TTree("t_npolTree","Per-event information from Npol simulation");
-	npolTree->Branch("tracks_branch","std::vector<NpolTrack *>",&tracks,32000,2);
+	npolTree->Branch("tracks_branch","std::vector<NpolVertex *>",&tracks,32000,2);
 	initialized = true;
 }
 
 void NpolAnalysisManager::PrepareNewEvent() {
-	std::vector<NpolTrack *>::iterator it;
+	std::vector<NpolVertex *>::iterator it;
 	for(it = tracks.begin(); it != tracks.end(); it++)
 		delete *it;
 	
@@ -70,24 +70,24 @@ void NpolAnalysisManager::PrepareNewEvent() {
 }
 
 void NpolAnalysisManager::AddTrack(const G4Track *aTrack) {
-	NpolTrack *anNpolTrack = new NpolTrack();
+	NpolVertex *anNpolVertex = new NpolVertex();
 
-	anNpolTrack->trackId = aTrack->GetTrackID();
-	anNpolTrack->parentId = aTrack->GetParentID();
-	anNpolTrack->posX = (aTrack->GetPosition()).x();
-	anNpolTrack->posY = (aTrack->GetPosition()).y();
-	anNpolTrack->posZ = (aTrack->GetPosition()).z();
-	anNpolTrack->momX = (aTrack->GetMomentum()).x();
-	anNpolTrack->momY = (aTrack->GetMomentum()).y();
-	anNpolTrack->momZ = (aTrack->GetMomentum()).z();
-	anNpolTrack->time = (aTrack->GetGlobalTime());
-	anNpolTrack->energy = aTrack->GetTotalEnergy();
-	anNpolTrack->particle = (aTrack->GetDefinition()->GetParticleName()).data();
+	anNpolVertex->trackId = aTrack->GetTrackID();
+	anNpolVertex->parentId = aTrack->GetParentID();
+	anNpolVertex->posX = (aTrack->GetPosition()).x();
+	anNpolVertex->posY = (aTrack->GetPosition()).y();
+	anNpolVertex->posZ = (aTrack->GetPosition()).z();
+	anNpolVertex->momX = (aTrack->GetMomentum()).x();
+	anNpolVertex->momY = (aTrack->GetMomentum()).y();
+	anNpolVertex->momZ = (aTrack->GetMomentum()).z();
+	anNpolVertex->time = (aTrack->GetGlobalTime());
+	anNpolVertex->energy = aTrack->GetTotalEnergy();
+	anNpolVertex->particle = (aTrack->GetDefinition()->GetParticleName()).data();
 	if(aTrack->GetCreatorProcess() != NULL)
-		anNpolTrack->process = (aTrack->GetCreatorProcess()->GetProcessName()).data();
-	anNpolTrack->volume = (aTrack->GetVolume()->GetName()).data();
+		anNpolVertex->process = (aTrack->GetCreatorProcess()->GetProcessName()).data();
+	anNpolVertex->volume = (aTrack->GetVolume()->GetName()).data();
 
-	tracks.push_back(anNpolTrack);
+	tracks.push_back(anNpolVertex);
 }
 
 void NpolAnalysisManager::FillTree() {

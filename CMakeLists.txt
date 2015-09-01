@@ -43,7 +43,7 @@ target_link_libraries(Npolapp ${Geant4_LIBRARIES} ${ROOT_LIBRARIES})
 
 # (6)
 set(Npolapp_SCRIPTS
-  npol.mac init.mac init_vis.mac vis.mac NpolTrack_hh.so include/NpolTrack.hh gdml/HBender.gdml gdml/BeamDump.gdml
+  npol.mac init.mac init_vis.mac vis.mac NpolVertex_hh.so include/NpolVertex.hh gdml/HBender.gdml gdml/BeamDump.gdml
 )
 
 foreach(_script ${Npolapp_SCRIPTS})

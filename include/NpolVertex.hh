@@ -8,7 +8,7 @@
 //* include a list of copyright holders.     		      	*
 //********************************************************************
 
-class NpolTrack {
+class NpolVertex {
 
 	public:
 		int trackId;
