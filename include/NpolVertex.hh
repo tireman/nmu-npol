@@ -8,6 +8,11 @@
 //* include a list of copyright holders.     		      	*
 //********************************************************************
 
+#ifndef Npol_Vertex_h
+#define Npol_Vertex_h
+
+#include <string>
+
 class NpolVertex {
 
 	public:
@@ -21,8 +26,13 @@ class NpolVertex {
 		double momZ;
 		double time;
 		double energy;
-		const char *particle;
-		const char *process;
-		const char *volume;
+		std::string particle;
+		std::string process;
+		std::string volume;
+//		const char *particle;
+//		const char *process;
+//		const char *volume;
 };
+
+#endif
 

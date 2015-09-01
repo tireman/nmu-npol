@@ -18,6 +18,7 @@
 class G4Track;
 class TFile;
 class TTree;
+class TBranch;
 class NpolVertex;
 
 class NpolAnalysisManager {
@@ -38,8 +39,9 @@ class NpolAnalysisManager {
 	private:
 		bool initialized;
 		TTree *npolTree;
+		TBranch *tracksBranch;
 		TFile *npolOutFile;
-		std::vector<NpolVertex *> tracks;
+		std::vector<NpolVertex *> *tracks;
 };
 
 #endif
