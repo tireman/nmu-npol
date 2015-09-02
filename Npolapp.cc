@@ -46,7 +46,7 @@ int main(int argc,char *argv[]) {
   //
   G4long seed = time(NULL);
   CLHEP::HepRandom::setTheSeed(seed);  
-  G4cout<<" Randome seed = "<<seed<<G4endl;
+  G4cout<<" Random seed = "<<seed<<G4endl;
   
   // RunManager construction
 #ifdef G4MULTITHREADED
@@ -75,7 +75,7 @@ int main(int argc,char *argv[]) {
   
   // Get the pointer to the User Interface manager
   G4UImanager *UImanager = G4UImanager::GetUIpointer();
-  
+ 
   if(argc != 1) {
     // batch mode
     G4String command = "/control/execute ";

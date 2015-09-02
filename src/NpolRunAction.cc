@@ -20,11 +20,9 @@
 #include "G4Run.hh"
 #include "G4SystemOfUnits.hh"
 #include "G4ios.hh"
+#include "G4UImanager.hh"
+#include "G4VVisManager.hh"
 
-//#include "TROOT.h"
-//#include "TFile.h"
-//#include "TNtuple.h"
-//#include "TTree.h"
 #include "NpolRunAction.hh"
 #include "NpolAnalysisManager.hh"
 
@@ -37,16 +35,18 @@ NpolRunAction::~NpolRunAction() {
 }
 
 void NpolRunAction::BeginOfRunAction(const G4Run* aRun) {
-	runTimer->Start();
-	G4cout << "### Run " << aRun->GetRunID() << " start." << G4endl;
+  runTimer->Start();
+  G4cout << "### Run " << aRun->GetRunID() << " start." << G4endl;
+  NpolAnalysisManager *analysisMan = NpolAnalysisManager::GetInstance();
+  analysisMan->BeginOfRun();
 }
 
 void NpolRunAction::EndOfRunAction(const G4Run*) {
-	NpolAnalysisManager *analysisMan = NpolAnalysisManager::GetInstance();
-	analysisMan->WriteTree();
-	analysisMan->CloseFile();
-
-	runTimer->Stop();
-	G4cout << "Run Time: " << *(runTimer) << G4endl;
+  NpolAnalysisManager *analysisMan = NpolAnalysisManager::GetInstance();
+  analysisMan->EndOfRun();
+  
+  runTimer->Stop();
+  G4cout << "Run Time: " << *(runTimer) << G4endl;
+  
 }
 

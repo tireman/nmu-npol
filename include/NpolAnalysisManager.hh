@@ -19,23 +19,29 @@ class G4Track;
 class TFile;
 class TTree;
 class NpolTrack;
+class NpolAnalysisMessenger;
 
 class NpolAnalysisManager {
 
 public:
   static NpolAnalysisManager *GetInstance();
-  void Initialize();
+  //void Initialize();				
+  void BeginOfRun();
+  void EndOfRun();
   void PrepareNewEvent();
   void AddTrack(const G4Track *);
   void FillTree();
   void WriteTree();
   void CloseFile();
   void OpenFile();
+  void setFileName(const G4String& nam);
 private:
   NpolAnalysisManager();
   ~NpolAnalysisManager();
   
 private:
+  NpolAnalysisMessenger* analysisMessenger;
+  G4String rootName;
   bool initialized;
   TTree *npolTree;
   TFile *npolOutFile;
