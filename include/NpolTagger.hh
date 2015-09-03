@@ -8,16 +8,16 @@
 //* include a list of copyright holders.     		      	*
 //********************************************************************
 
-#ifndef Npol_Vertex_h
-#define Npol_Vertex_h
+#ifndef Npol_Tagger_h
+#define Npol_Tagger_h
 
 #include <string>
 
-class NpolVertex {
-
+class NpolTagger {
+  
 public:
   int trackId;
-  int parentId;
+  //int parentId;
   double posX;
   double posY;
   double posZ;
@@ -27,8 +27,8 @@ public:
   double time;
   double energy;
   std::string particle;
-  std::string process;
-  std::string volume;
+  //std::string process;
+  //std::string volume;
 };
 
 #endif

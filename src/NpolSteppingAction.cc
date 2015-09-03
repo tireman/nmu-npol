@@ -18,6 +18,7 @@
 #include "G4Step.hh"
 
 #include "NpolSteppingAction.hh"
+#include "NpolAnalysisManager.hh"
 #include "NpolRunAction.hh"
 
 NpolSteppingAction::NpolSteppingAction(NpolEventAction* evt, NpolRunAction* run)
@@ -33,10 +34,14 @@ NpolSteppingAction::~NpolSteppingAction()
 }
 
 void NpolSteppingAction::UserSteppingAction(const G4Step *aStep) {
+  NpolAnalysisManager *analysisMan = NpolAnalysisManager::GetInstance();
 
   G4Track *aTrack = aStep->GetTrack();
   G4StepPoint *preStepPoint = aStep->GetPreStepPoint();	
   G4VPhysicalVolume *volume = preStepPoint->GetPhysicalVolume();
   if(volume->GetName() == "Cap") aTrack->SetTrackStatus(fStopAndKill);
+  if((volume->GetName() == "ParticleTagger")){
+    analysisMan->AddTaggedParticle(aTrack);
+  }
 }
 

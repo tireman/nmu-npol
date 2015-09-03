@@ -14,12 +14,14 @@
 #define Npol_Analysis_Manager_h
 
 #include <vector>
+#include "G4SystemOfUnits.hh"
 
 class G4Track;
 class TFile;
 class TTree;
 class TBranch;
 class NpolVertex;
+class NpolTagger;
 class NpolAnalysisMessenger;
 
 class NpolAnalysisManager {
@@ -31,6 +33,7 @@ public:
   void Initialize();
   void PrepareNewEvent();
   void AddTrack(const G4Track *);
+  void AddTaggedParticle(const G4Track *);
   void FillTree();
   void WriteTree();
   void CloseFile();
@@ -41,13 +44,14 @@ private:
   ~NpolAnalysisManager();
   
 private:
-  NpolAnalysisMessenger* analysisMessenger;
+  //.agptvNpolAnalysisMessenger* analysisMessenger;
   G4String rootName;
   bool initialized;
   TTree *npolTree;
   TBranch *tracksBranch;
   TFile *npolOutFile;
   std::vector<NpolVertex *> *tracks;
+  std::vector<NpolTagger *> *taggedParticle;
 };
 
 #endif

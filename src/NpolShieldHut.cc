@@ -53,7 +53,7 @@ void NpolShieldHut::ConstructLeadCurtain(){
 
 // Construct a thin air box so we can tag particles passing through the collimator.  Place it just a millimeter off the front steel wall
 void NpolShieldHut::ConstructParticleTagger(){
-  G4double xlen = 1.0*m; G4double ylen = 0.80*m; G4double zlen = 0.10*cm;
+  G4double xlen = 1.0*m; G4double ylen = 0.80*m; G4double zlen = 0.01*cm;
 
   G4Box *ParticleTagger = new G4Box("ParticleTagger",xlen/2,ylen/2,zlen/2);
   ParticleTaggerLV = new G4LogicalVolume(ParticleTagger,NpolMaterials::GetInstance()->GetAir(),"ParticleTaggerLV",0,0,0);

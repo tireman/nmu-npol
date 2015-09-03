@@ -18,6 +18,7 @@
 #include "G4VVisManager.hh"
 #include "G4UIcommand.hh"
 #include "G4UImanager.hh"
+#include "G4PhysicalConstants.hh"
 
 #include <TFile.h>
 #include <TTree.h>
@@ -29,6 +30,7 @@
 #include "NpolAnalysisManager.hh"
 #include "NpolAnalysisMessenger.hh"
 #include "NpolVertex.hh"
+#include "NpolTagger.hh"
 
 
 static NpolAnalysisManager *pInstance = NULL;
@@ -41,7 +43,8 @@ NpolAnalysisManager *NpolAnalysisManager::GetInstance() {
 }
 
 NpolAnalysisManager::NpolAnalysisManager(){
-  analysisMessenger = new NpolAnalysisMessenger(this);
+
+  //analysisMessenger = new NpolAnalysisMessenger(this);  issues to be resolved - W.T.
   initialized = false;
   npolOutFile = NULL;
   npolTree = NULL;
@@ -55,7 +58,7 @@ NpolAnalysisManager::~NpolAnalysisManager() {
   delete npolTree;
   delete npolOutFile;
   delete tracks;
-  delete analysisMessenger;
+  //delete analysisMessenger;
 }
 
 void NpolAnalysisManager::Initialize(){
@@ -64,13 +67,18 @@ void NpolAnalysisManager::Initialize(){
   
   if(!TClassTable::GetDict("include/NpolVertex.hh"))
     gSystem->Load("NpolVertex_hh.so");
+  if(!TClassTable::GetDict("include/NpolTagger.hh"))
+    gSystem->Load("NpolTagger_hh.so");
   
   gInterpreter->GenerateDictionary("vector<NpolVertex *>","include/NpolVertex.hh;vector");
+  gInterpreter->GenerateDictionary("vector<NpolTagger *>","include/NpolTagger.hh;vector");
 
   tracks = new std::vector<NpolVertex *>();
+  taggedParticle = new std::vector<NpolTagger *>();
     
   npolTree = new TTree("t_npolTree","Per-event information from Npol simulation");
   npolTree->Branch("tracks_branch","std::vector<NpolVertex *>",&tracks,32000,2);
+  npolTree->Branch("tagger_branch","std::vector<NpolTagger *>",&taggedParticle,32000,2);
   initialized = true;
 }
 
@@ -90,8 +98,13 @@ void NpolAnalysisManager::PrepareNewEvent() {
   std::vector<NpolVertex *>::iterator it;
   for(it = tracks->begin(); it != tracks->end(); it++)
     delete *it;
-  
+
+   std::vector<NpolTagger *>::iterator it2;
+  for(it2 = taggedParticle->begin(); it2 != taggedParticle->end(); it2++)
+    delete *it2;
+
   tracks->clear();
+  taggedParticle->clear();
 }
 
 void NpolAnalysisManager::AddTrack(const G4Track *aTrack) {
@@ -99,14 +112,14 @@ void NpolAnalysisManager::AddTrack(const G4Track *aTrack) {
   
   anNpolVertex->trackId = aTrack->GetTrackID();
   anNpolVertex->parentId = aTrack->GetParentID();
-  anNpolVertex->posX = (aTrack->GetPosition()).x();
-  anNpolVertex->posY = (aTrack->GetPosition()).y();
-  anNpolVertex->posZ = (aTrack->GetPosition()).z();
-  anNpolVertex->momX = (aTrack->GetMomentum()).x();
-  anNpolVertex->momY = (aTrack->GetMomentum()).y();
-  anNpolVertex->momZ = (aTrack->GetMomentum()).z();
-  anNpolVertex->time = (aTrack->GetGlobalTime());
-  anNpolVertex->energy = aTrack->GetTotalEnergy();
+  anNpolVertex->posX = (aTrack->GetPosition()).x()/m;
+  anNpolVertex->posY = (aTrack->GetPosition()).y()/m;
+  anNpolVertex->posZ = (aTrack->GetPosition()).z()/m;
+  anNpolVertex->momX = (aTrack->GetMomentum()).x()/MeV;
+  anNpolVertex->momY = (aTrack->GetMomentum()).y()/MeV;
+  anNpolVertex->momZ = (aTrack->GetMomentum()).z()/MeV;
+  anNpolVertex->time = (aTrack->GetGlobalTime())/s;
+  anNpolVertex->energy = aTrack->GetTotalEnergy()/MeV;
   anNpolVertex->particle = (aTrack->GetDefinition()->GetParticleName()).data();
   if(aTrack->GetCreatorProcess() != NULL)
     anNpolVertex->process = (aTrack->GetCreatorProcess()->GetProcessName()).data();
@@ -115,6 +128,23 @@ void NpolAnalysisManager::AddTrack(const G4Track *aTrack) {
   anNpolVertex->volume = (aTrack->GetVolume()->GetName()).data();
   
   tracks->push_back(anNpolVertex);
+}
+
+void NpolAnalysisManager::AddTaggedParticle(const G4Track *aTrack) {
+  NpolTagger *anNpolTaggedParticle = new NpolTagger();
+  
+  anNpolTaggedParticle->trackId = aTrack->GetTrackID();
+   anNpolTaggedParticle->posX = (aTrack->GetPosition()).x()/m;
+  anNpolTaggedParticle->posY = (aTrack->GetPosition()).y()/m;
+  anNpolTaggedParticle->posZ = (aTrack->GetPosition()).z()/m;
+  anNpolTaggedParticle->momX = (aTrack->GetMomentum()).x()/MeV;
+  anNpolTaggedParticle->momY = (aTrack->GetMomentum()).y()/MeV;
+  anNpolTaggedParticle->momZ = (aTrack->GetMomentum()).z()/MeV;
+  anNpolTaggedParticle->time = (aTrack->GetGlobalTime())/s;
+  anNpolTaggedParticle->energy = aTrack->GetTotalEnergy()/MeV;
+  anNpolTaggedParticle->particle = (aTrack->GetDefinition()->GetParticleName()).data();
+   
+  taggedParticle->push_back(anNpolTaggedParticle);
 }
 
 void NpolAnalysisManager::FillTree() {
