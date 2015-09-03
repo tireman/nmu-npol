@@ -31,6 +31,7 @@ NpolShieldHut::NpolShieldHut() {
   ConstructHutBackWall();
   ConstructHutSideWall();
   ConstructHutRoof();
+  ConstructParticleTagger();
   //  ConstructLeadCurtain();
 }
 
@@ -50,6 +51,15 @@ void NpolShieldHut::ConstructLeadCurtain(){
   LeadCurtainLV->SetVisAttributes(LeadCurtainVisAtt);
 }
 
+// Construct a thin air box so we can tag particles passing through the collimator.  Place it just a millimeter off the front steel wall
+void NpolShieldHut::ConstructParticleTagger(){
+  G4double xlen = 1.0*m; G4double ylen = 0.80*m; G4double zlen = 0.10*cm;
+
+  G4Box *ParticleTagger = new G4Box("ParticleTagger",xlen/2,ylen/2,zlen/2);
+  ParticleTaggerLV = new G4LogicalVolume(ParticleTagger,NpolMaterials::GetInstance()->GetAir(),"ParticleTaggerLV",0,0,0);
+  G4VisAttributes *ParticleTaggerVisAtt = new G4VisAttributes(G4Colour(0.2, 0.2, 0.2));
+  ParticleTaggerLV->SetVisAttributes(ParticleTaggerVisAtt);
+}
 
 // Construct the front wall of the shield hut from 4 ft by 4 ft by 3 ft blocks
 // will simplfy here to a 3 foot deep wall that is 16 feet wide and 15 feet high
@@ -117,9 +127,10 @@ void NpolShieldHut::ConstructHutRoof() {
 void NpolShieldHut::Place(G4LogicalVolume *motherLV) {
   
   G4double NpolAng = 28.0*deg, PosSide = 9.3025*m, AngSide = 14.0*deg, VertOffSet = 0.3424*m;
-  G4double PosFront = 6.2739*m, PosBack = 11.7739*m, PosRoof = 9.0239*m, OffSetRoof = 3.7776*m;
+  G4double PosFront = 6.2739*m, PosBack = 11.7739*m, PosRoof = 9.0239*m, OffSetRoof = 3.7776*m, PosLead = PosFront - 0.52*m, PosTagger = PosFront + 0.51*m;
 
-  //  PlaceCylindrical(LeadCurtainLV, motherLV, "LeadCurtain", PosFront-0.52*m,-NpolAng, 0);
+  //  PlaceCylindrical(LeadCurtainLV, motherLV, "LeadCurtain", PosLead,-NpolAng, 0);
+  PlaceCylindrical(ParticleTaggerLV, motherLV, "ParticleTagger", PosTagger, -NpolAng, 0);
   PlaceCylindrical(HutFrontWallLV, motherLV, "HutFrontWall", PosFront,-NpolAng,-VertOffSet);
   PlaceCylindrical(HutBackWallLV, motherLV, "HutBackWall", PosBack,-NpolAng,-VertOffSet);
   PlaceRectangular(HutSideWallLV, motherLV, "HutSideWall", -PosSide*sin(AngSide+NpolAng), -VertOffSet, PosSide*cos(AngSide+NpolAng), 0*deg, -NpolAng, 0*deg);

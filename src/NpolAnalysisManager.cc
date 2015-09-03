@@ -128,7 +128,7 @@ void NpolAnalysisManager::WriteTree() {
 void NpolAnalysisManager::OpenFile() {
   G4String fileName = rootName+".root";
   //npolOutFile = new TFile(fileName);
-  npolOutFile = new TFile("/data/tireman/simulation/output/FirstPass/Test/npol_testlong.root","RECREATE");
+  npolOutFile = new TFile("/data/tireman/simulation/output/FirstPass/Test/npol_test.root","RECREATE");
 }
 
 void NpolAnalysisManager::CloseFile() {

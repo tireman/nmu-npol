@@ -32,16 +32,16 @@ public:
   void ConstructHutBackWall();
   void ConstructHutRoof();
   void ConstructLeadCurtain();
+  void ConstructParticleTagger();
   
   virtual G4String GetName();
   virtual void Place(G4LogicalVolume *motherLV);
   
 private: 
-  G4LogicalVolume *HutSideWallLV;
-  G4LogicalVolume *HutFrontWallLV;
-  G4LogicalVolume *HutBackWallLV;
-  G4LogicalVolume *HutRoofLV;
-  G4LogicalVolume *LeadCurtainLV;
+  G4LogicalVolume *HutSideWallLV, *HutFrontWallLV;
+  G4LogicalVolume *HutBackWallLV, *HutRoofLV;
+  G4LogicalVolume *LeadCurtainLV, *ParticleTaggerLV;
+
 };
 
 #endif
