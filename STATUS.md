@@ -1,5 +1,10 @@
-Update: 8-24-2015
+Update: 9-2-2015
 
+Several changes to the analysis section.
+1) Added TTree output in the analysis manager.  This coincides with removal the ntuple methodolgy and all the associated parts and pieces.
+2) Changed from sensitive detectors and hit class to saving the vertex information (track) with the use of a vector in the TTree branch.
+3) Added an end cap to the end of the downstream beam line in NpolBeamlineDown.  This cap is thin and a vacuum.  Using steppingAction class, we kill all tracks that get to this point.  This cleans up the tracks from portions that were not going to effect the background in the neutron detectors.
+4) Added a NpolAnalysisMessenger class in attempt to generate a macro command 'setFileName' which would allow for setting the file name of the TFile from the Macro.  This didn't work but it is close ... needs checked.
 
 
 -------------------------------------------------------------------------------
