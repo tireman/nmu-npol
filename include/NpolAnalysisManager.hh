@@ -18,16 +18,17 @@
 class G4Track;
 class TFile;
 class TTree;
-class NpolTrack;
+class TBranch;
+class NpolVertex;
 class NpolAnalysisMessenger;
 
 class NpolAnalysisManager {
 
 public:
   static NpolAnalysisManager *GetInstance();
-  //void Initialize();				
   void BeginOfRun();
   void EndOfRun();
+  void Initialize();
   void PrepareNewEvent();
   void AddTrack(const G4Track *);
   void FillTree();
@@ -44,8 +45,9 @@ private:
   G4String rootName;
   bool initialized;
   TTree *npolTree;
+  TBranch *tracksBranch;
   TFile *npolOutFile;
-  std::vector<NpolTrack *> tracks;
+  std::vector<NpolVertex *> *tracks;
 };
 
 #endif

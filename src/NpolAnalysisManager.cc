@@ -8,6 +8,8 @@
 //* include a list of copyright holders.     		      	*
 //********************************************************************
 
+#include <string>
+
 #include <G4Track.hh>
 #include <G4ThreeVector.hh>
 #include <G4String.hh>
@@ -19,13 +21,15 @@
 
 #include <TFile.h>
 #include <TTree.h>
+#include <TBranch.h>
 #include <TClassTable.h>
 #include <TSystem.h>
 #include <TInterpreter.h>
 
 #include "NpolAnalysisManager.hh"
 #include "NpolAnalysisMessenger.hh"
-#include "NpolTrack.hh"
+#include "NpolVertex.hh"
+
 
 static NpolAnalysisManager *pInstance = NULL;
 
@@ -36,41 +40,44 @@ NpolAnalysisManager *NpolAnalysisManager::GetInstance() {
   return pInstance;
 }
 
-NpolAnalysisManager::NpolAnalysisManager()
-// : analysisMessenger(0)
- {
-analysisMessenger = new NpolAnalysisMessenger(this);
+NpolAnalysisManager::NpolAnalysisManager(){
+  analysisMessenger = new NpolAnalysisMessenger(this);
   initialized = false;
   npolOutFile = NULL;
   npolTree = NULL;
-  // Initialize();
-  
+  tracksBranch = NULL;
+  tracks = NULL;
+
+  Initialize();
 }
 
 NpolAnalysisManager::~NpolAnalysisManager() {
-	delete npolTree;
-	npolOutFile->Close();
-	delete npolOutFile;
-	delete analysisMessenger;
+  delete npolTree;
+  delete npolOutFile;
+  delete tracks;
+  delete analysisMessenger;
 }
 
-//void NpolAnalysisManager::Initialize() {
-  void NpolAnalysisManager::BeginOfRun(){
+void NpolAnalysisManager::Initialize(){
   if(initialized)
     std::cout << "WARNING: NpolAnalysisManager is already initialized and is being initialized again." << std::endl;
   
-  if(!TClassTable::GetDict("include/NpolTrack.hh"))
-    gSystem->Load("NpolTrack_hh.so");
+  if(!TClassTable::GetDict("include/NpolVertex.hh"))
+    gSystem->Load("NpolVertex_hh.so");
   
-  gInterpreter->GenerateDictionary("vector<NpolTrack *>","include/NpolTrack.hh;vector");
+  gInterpreter->GenerateDictionary("vector<NpolVertex *>","include/NpolVertex.hh;vector");
 
-  // Method to open TFile.  Hoping to make this available from macro as
-  // some point -- W.T.
-  OpenFile();
-  
+  tracks = new std::vector<NpolVertex *>();
+    
   npolTree = new TTree("t_npolTree","Per-event information from Npol simulation");
-  npolTree->Branch("tracks_branch","std::vector<NpolTrack *>",&tracks,32000,2);
+  npolTree->Branch("tracks_branch","std::vector<NpolVertex *>",&tracks,32000,2);
   initialized = true;
+}
+
+void NpolAnalysisManager::BeginOfRun(){
+  // Method to open TFile.  Hoping to make this available from macro at
+  // some point via the AnalysisMessenger class. -- W.T.
+  OpenFile();
 }
 
 void NpolAnalysisManager::EndOfRun(){
@@ -80,32 +87,34 @@ void NpolAnalysisManager::EndOfRun(){
 }
 
 void NpolAnalysisManager::PrepareNewEvent() {
-  std::vector<NpolTrack *>::iterator it;
-  for(it = tracks.begin(); it != tracks.end(); it++)
+  std::vector<NpolVertex *>::iterator it;
+  for(it = tracks->begin(); it != tracks->end(); it++)
     delete *it;
   
-  tracks.clear();
+  tracks->clear();
 }
 
 void NpolAnalysisManager::AddTrack(const G4Track *aTrack) {
-  NpolTrack *anNpolTrack = new NpolTrack();
+  NpolVertex *anNpolVertex = new NpolVertex();
   
-  anNpolTrack->trackId = aTrack->GetTrackID();
-  anNpolTrack->parentId = aTrack->GetParentID();
-  anNpolTrack->posX = (aTrack->GetPosition()).x();
-  anNpolTrack->posY = (aTrack->GetPosition()).y();
-  anNpolTrack->posZ = (aTrack->GetPosition()).z();
-  anNpolTrack->momX = (aTrack->GetMomentum()).x();
-  anNpolTrack->momY = (aTrack->GetMomentum()).y();
-  anNpolTrack->momZ = (aTrack->GetMomentum()).z();
-  anNpolTrack->time = (aTrack->GetGlobalTime());
-  anNpolTrack->energy = aTrack->GetTotalEnergy();
-  anNpolTrack->particle = (aTrack->GetDefinition()->GetParticleName()).data();
+  anNpolVertex->trackId = aTrack->GetTrackID();
+  anNpolVertex->parentId = aTrack->GetParentID();
+  anNpolVertex->posX = (aTrack->GetPosition()).x();
+  anNpolVertex->posY = (aTrack->GetPosition()).y();
+  anNpolVertex->posZ = (aTrack->GetPosition()).z();
+  anNpolVertex->momX = (aTrack->GetMomentum()).x();
+  anNpolVertex->momY = (aTrack->GetMomentum()).y();
+  anNpolVertex->momZ = (aTrack->GetMomentum()).z();
+  anNpolVertex->time = (aTrack->GetGlobalTime());
+  anNpolVertex->energy = aTrack->GetTotalEnergy();
+  anNpolVertex->particle = (aTrack->GetDefinition()->GetParticleName()).data();
   if(aTrack->GetCreatorProcess() != NULL)
-    anNpolTrack->process = (aTrack->GetCreatorProcess()->GetProcessName()).data();
-  anNpolTrack->volume = (aTrack->GetVolume()->GetName()).data();
+    anNpolVertex->process = (aTrack->GetCreatorProcess()->GetProcessName()).data();
+  else
+    anNpolVertex->process = "";
+  anNpolVertex->volume = (aTrack->GetVolume()->GetName()).data();
   
-  tracks.push_back(anNpolTrack);
+  tracks->push_back(anNpolVertex);
 }
 
 void NpolAnalysisManager::FillTree() {

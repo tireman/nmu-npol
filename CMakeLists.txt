@@ -42,14 +42,25 @@ add_executable(Npolapp Npolapp.cc ${sources} ${headers})
 target_link_libraries(Npolapp ${Geant4_LIBRARIES} ${ROOT_LIBRARIES})
 
 # (6)
-set(Npolapp_SCRIPTS
-  npol.mac init.mac init_vis.mac vis.mac NpolTrack_hh.so include/NpolTrack.hh gdml/HBender.gdml gdml/BeamDump.gdml
+set(Npolapp_FILES
+  npol.mac init.mac init_vis.mac vis.mac NpolVertex_hh.so include/NpolVertex.hh
+#  npol.mac init.mac init_vis.mac vis.mac gdml/HBender.gdml gdml/BeamDump.gdml NpolVertex_hh.so include/NpolVertex.hh
 )
 
-foreach(_script ${Npolapp_SCRIPTS})
+set(Npolapp_DIRS
+	  root/ gdml/
+)
+
+file( COPY root/ DESTINATION root/)
+
+foreach(_dir ${Npolapp_DIRS})
+  file( COPY ${_dir} DESTINATION ${_dir})
+endforeach()
+
+foreach(_file ${Npolapp_FILES})
   configure_file(
-    ${PROJECT_SOURCE_DIR}/${_script}
-    ${PROJECT_BINARY_DIR}/${_script}
+    ${PROJECT_SOURCE_DIR}/${_file}
+    ${PROJECT_BINARY_DIR}/${_file}
     COPYONLY
     )
 endforeach()
