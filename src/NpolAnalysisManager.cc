@@ -48,8 +48,9 @@ NpolAnalysisManager::NpolAnalysisManager(){
   initialized = false;
   npolOutFile = NULL;
   npolTree = NULL;
-  tracksBranch = NULL;
   tracks = NULL;
+  taggedParticles = NULL;
+  rootName = "npol"; // default filename, may be changed with setFileName() before file is opened
 
   Initialize();
 }
@@ -74,11 +75,11 @@ void NpolAnalysisManager::Initialize(){
   gInterpreter->GenerateDictionary("vector<NpolTagger *>","include/NpolTagger.hh;vector");
 
   tracks = new std::vector<NpolVertex *>();
-  taggedParticle = new std::vector<NpolTagger *>();
+  taggedParticles = new std::vector<NpolTagger *>();
     
   npolTree = new TTree("t_npolTree","Per-event information from Npol simulation");
   npolTree->Branch("tracks_branch","std::vector<NpolVertex *>",&tracks,32000,2);
-  npolTree->Branch("tagger_branch","std::vector<NpolTagger *>",&taggedParticle,32000,2);
+  npolTree->Branch("tagger_branch","std::vector<NpolTagger *>",&taggedParticles,32000,2);
   initialized = true;
 }
 
@@ -100,11 +101,11 @@ void NpolAnalysisManager::PrepareNewEvent() {
     delete *it;
 
    std::vector<NpolTagger *>::iterator it2;
-  for(it2 = taggedParticle->begin(); it2 != taggedParticle->end(); it2++)
+  for(it2 = taggedParticles->begin(); it2 != taggedParticles->end(); it2++)
     delete *it2;
 
   tracks->clear();
-  taggedParticle->clear();
+  taggedParticles->clear();
 }
 
 void NpolAnalysisManager::AddTrack(const G4Track *aTrack) {
@@ -144,7 +145,7 @@ void NpolAnalysisManager::AddTaggedParticle(const G4Track *aTrack) {
   anNpolTaggedParticle->energy = aTrack->GetTotalEnergy()/MeV;
   anNpolTaggedParticle->particle = (aTrack->GetDefinition()->GetParticleName()).data();
    
-  taggedParticle->push_back(anNpolTaggedParticle);
+  taggedParticles->push_back(anNpolTaggedParticle);
 }
 
 void NpolAnalysisManager::FillTree() {
@@ -157,8 +158,8 @@ void NpolAnalysisManager::WriteTree() {
 
 void NpolAnalysisManager::OpenFile() {
   G4String fileName = rootName+".root";
-  //npolOutFile = new TFile(fileName);
-  npolOutFile = new TFile("/data/tireman/simulation/output/FirstPass/Test/npol_test.root","RECREATE");
+  npolOutFile = new TFile(fileName,"RECREATE");
+  //npolOutFile = new TFile("/data/tireman/simulation/output/FirstPass/Test/npol_test.root","RECREATE");
 }
 
 void NpolAnalysisManager::CloseFile() {
