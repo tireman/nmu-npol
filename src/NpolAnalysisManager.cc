@@ -50,6 +50,7 @@ NpolAnalysisManager::NpolAnalysisManager(){
   npolTree = NULL;
   tracksBranch = NULL;
   tracks = NULL;
+  taggedParticle = NULL;
 
   Initialize();
 }
@@ -134,7 +135,7 @@ void NpolAnalysisManager::AddTaggedParticle(const G4Track *aTrack) {
   NpolTagger *anNpolTaggedParticle = new NpolTagger();
   
   anNpolTaggedParticle->trackId = aTrack->GetTrackID();
-   anNpolTaggedParticle->posX = (aTrack->GetPosition()).x()/m;
+  anNpolTaggedParticle->posX = (aTrack->GetPosition()).x()/m;
   anNpolTaggedParticle->posY = (aTrack->GetPosition()).y()/m;
   anNpolTaggedParticle->posZ = (aTrack->GetPosition()).z()/m;
   anNpolTaggedParticle->momX = (aTrack->GetMomentum()).x()/MeV;
@@ -158,7 +159,7 @@ void NpolAnalysisManager::WriteTree() {
 void NpolAnalysisManager::OpenFile() {
   G4String fileName = rootName+".root";
   //npolOutFile = new TFile(fileName);
-  npolOutFile = new TFile("/data/tireman/simulation/output/FirstPass/Test/npol_test.root","RECREATE");
+  npolOutFile = new TFile("/data/tireman/simulation/output/FirstPass/Test/npol_10.root","RECREATE");
 }
 
 void NpolAnalysisManager::CloseFile() {
