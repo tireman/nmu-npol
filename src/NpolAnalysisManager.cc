@@ -75,6 +75,7 @@ void NpolAnalysisManager::Initialize(){
   gInterpreter->GenerateDictionary("vector<NpolTagger *>","include/NpolTagger.hh;vector");
 
   tracks = new std::vector<NpolVertex *>();
+  tracks->push_back(NULL);
   taggedParticles = new std::vector<NpolTagger *>();
     
   npolTree = new TTree("t_npolTree","Per-event information from Npol simulation");
@@ -110,9 +111,11 @@ void NpolAnalysisManager::PrepareNewEvent() {
 
 void NpolAnalysisManager::AddTrack(const G4Track *aTrack) {
   NpolVertex *anNpolVertex = new NpolVertex();
+  unsigned int trackId = aTrack->GetTrackID();
+  unsigned int parentId = aTrack->GetParentID();
   
-  anNpolVertex->trackId = aTrack->GetTrackID();
-  anNpolVertex->parentId = aTrack->GetParentID();
+  anNpolVertex->trackId = trackId;
+  anNpolVertex->parentId = parentId;
   anNpolVertex->posX = (aTrack->GetPosition()).x()/m;
   anNpolVertex->posY = (aTrack->GetPosition()).y()/m;
   anNpolVertex->posZ = (aTrack->GetPosition()).z()/m;
@@ -127,8 +130,16 @@ void NpolAnalysisManager::AddTrack(const G4Track *aTrack) {
   else
     anNpolVertex->process = "";
   anNpolVertex->volume = (aTrack->GetVolume()->GetName()).data();
-  
-  tracks->push_back(anNpolVertex);
+
+  if(tracks->size() <= trackId)
+	  tracks->resize(trackId+1);
+  (*tracks)[trackId] = anNpolVertex;
+
+  if(parentId != 0) {
+	  NpolVertex *parent = tracks->at(parentId);
+	  (parent->daughterIds).push_back(trackId);
+  }
+
 }
 
 void NpolAnalysisManager::AddTaggedParticle(const G4Track *aTrack) {

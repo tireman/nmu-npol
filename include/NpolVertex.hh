@@ -12,6 +12,7 @@
 #define Npol_Vertex_h
 
 #include <string>
+#include <vector>
 
 class NpolVertex {
 
@@ -29,6 +30,7 @@ public:
   std::string particle;
   std::string process;
   std::string volume;
+  std::vector<int> daughterIds;
 };
 
 #endif
