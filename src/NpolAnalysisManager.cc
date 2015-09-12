@@ -48,9 +48,9 @@ NpolAnalysisManager::NpolAnalysisManager(){
   initialized = false;
   npolOutFile = NULL;
   npolTree = NULL;
-  tracksBranch = NULL;
   tracks = NULL;
-  taggedParticle = NULL;
+  taggedParticles = NULL;
+  rootName = "npol"; // default filename, may be changed with setFileName() before file is opened
 
   Initialize();
 }
@@ -75,11 +75,12 @@ void NpolAnalysisManager::Initialize(){
   gInterpreter->GenerateDictionary("vector<NpolTagger *>","include/NpolTagger.hh;vector");
 
   tracks = new std::vector<NpolVertex *>();
-  taggedParticle = new std::vector<NpolTagger *>();
+  tracks->push_back(NULL);
+  taggedParticles = new std::vector<NpolTagger *>();
     
   npolTree = new TTree("t_npolTree","Per-event information from Npol simulation");
   npolTree->Branch("tracks_branch","std::vector<NpolVertex *>",&tracks,32000,2);
-  npolTree->Branch("tagger_branch","std::vector<NpolTagger *>",&taggedParticle,32000,2);
+  npolTree->Branch("tagger_branch","std::vector<NpolTagger *>",&taggedParticles,32000,2);
   initialized = true;
 }
 
@@ -101,18 +102,20 @@ void NpolAnalysisManager::PrepareNewEvent() {
     delete *it;
 
    std::vector<NpolTagger *>::iterator it2;
-  for(it2 = taggedParticle->begin(); it2 != taggedParticle->end(); it2++)
+  for(it2 = taggedParticles->begin(); it2 != taggedParticles->end(); it2++)
     delete *it2;
 
   tracks->clear();
-  taggedParticle->clear();
+  taggedParticles->clear();
 }
 
 void NpolAnalysisManager::AddTrack(const G4Track *aTrack) {
   NpolVertex *anNpolVertex = new NpolVertex();
+  unsigned int trackId = aTrack->GetTrackID();
+  unsigned int parentId = aTrack->GetParentID();
   
-  anNpolVertex->trackId = aTrack->GetTrackID();
-  anNpolVertex->parentId = aTrack->GetParentID();
+  anNpolVertex->trackId = trackId;
+  anNpolVertex->parentId = parentId;
   anNpolVertex->posX = (aTrack->GetPosition()).x()/m;
   anNpolVertex->posY = (aTrack->GetPosition()).y()/m;
   anNpolVertex->posZ = (aTrack->GetPosition()).z()/m;
@@ -127,8 +130,16 @@ void NpolAnalysisManager::AddTrack(const G4Track *aTrack) {
   else
     anNpolVertex->process = "";
   anNpolVertex->volume = (aTrack->GetVolume()->GetName()).data();
-  
-  tracks->push_back(anNpolVertex);
+
+  if(tracks->size() <= trackId)
+	  tracks->resize(trackId+1);
+  (*tracks)[trackId] = anNpolVertex;
+
+  if(parentId != 0) {
+	  NpolVertex *parent = tracks->at(parentId);
+	  (parent->daughterIds).push_back(trackId);
+  }
+
 }
 
 void NpolAnalysisManager::AddTaggedParticle(const G4Track *aTrack) {
@@ -145,7 +156,7 @@ void NpolAnalysisManager::AddTaggedParticle(const G4Track *aTrack) {
   anNpolTaggedParticle->energy = aTrack->GetTotalEnergy()/MeV;
   anNpolTaggedParticle->particle = (aTrack->GetDefinition()->GetParticleName()).data();
    
-  taggedParticle->push_back(anNpolTaggedParticle);
+  taggedParticles->push_back(anNpolTaggedParticle);
 }
 
 void NpolAnalysisManager::FillTree() {
@@ -158,8 +169,8 @@ void NpolAnalysisManager::WriteTree() {
 
 void NpolAnalysisManager::OpenFile() {
   G4String fileName = rootName+".root";
-  //npolOutFile = new TFile(fileName);
-  npolOutFile = new TFile("/data/tireman/simulation/output/FirstPass/Test/npol_10.root","RECREATE");
+  npolOutFile = new TFile(fileName);
+  //  npolOutFile = new TFile("/data/tireman/simulation/output/FirstPass/Test/npol_10.root","RECREATE");
 }
 
 void NpolAnalysisManager::CloseFile() {

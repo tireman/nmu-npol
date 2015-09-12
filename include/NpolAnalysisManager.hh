@@ -48,10 +48,9 @@ private:
   G4String rootName;
   bool initialized;
   TTree *npolTree;
-  TBranch *tracksBranch;
   TFile *npolOutFile;
   std::vector<NpolVertex *> *tracks;
-  std::vector<NpolTagger *> *taggedParticle;
+  std::vector<NpolTagger *> *taggedParticles;
 };
 
 #endif
