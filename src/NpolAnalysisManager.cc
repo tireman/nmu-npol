@@ -124,6 +124,7 @@ void NpolAnalysisManager::AddTrack(const G4Track *aTrack) {
   anNpolVertex->momZ = (aTrack->GetMomentum()).z()/MeV;
   anNpolVertex->time = (aTrack->GetGlobalTime())/s;
   anNpolVertex->energy = aTrack->GetTotalEnergy()/MeV;
+  anNpolVertex->eMiss = false;
   anNpolVertex->particle = (aTrack->GetDefinition()->GetParticleName()).data();
   if(aTrack->GetCreatorProcess() != NULL)
     anNpolVertex->process = (aTrack->GetCreatorProcess()->GetProcessName()).data();
@@ -142,6 +143,10 @@ void NpolAnalysisManager::AddTrack(const G4Track *aTrack) {
 
 }
 
+void NpolAnalysisManager::SetTrackAsKilled(int trackId) {
+	(*tracks)[trackId]->eMiss = true;
+}
+
 void NpolAnalysisManager::AddTaggedParticle(const G4Track *aTrack) {
   NpolTagger *anNpolTaggedParticle = new NpolTagger();
   
@@ -153,7 +158,7 @@ void NpolAnalysisManager::AddTaggedParticle(const G4Track *aTrack) {
   anNpolTaggedParticle->momY = (aTrack->GetMomentum()).y()/MeV;
   anNpolTaggedParticle->momZ = (aTrack->GetMomentum()).z()/MeV;
   anNpolTaggedParticle->time = (aTrack->GetGlobalTime())/s;
-  anNpolTaggedParticle->energy = aTrack->GetTotalEnergy()/MeV;
+  anNpolTaggedParticle->energy = aTrack->GetKineticEnergy()/MeV;
   anNpolTaggedParticle->particle = (aTrack->GetDefinition()->GetParticleName()).data();
    
   taggedParticles->push_back(anNpolTaggedParticle);

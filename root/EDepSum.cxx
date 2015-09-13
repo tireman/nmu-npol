@@ -60,8 +60,11 @@ void EDepSum() {
 		// loop over vector elements (one per vertex)
 		for(it = anEntry->begin(); it != anEntry->end(); it++) {
 			NpolVertex *aVertex = *it;
-			if(aVertex == NULL) continue;
+			if(aVertex == NULL)
+				continue;
 			if(!(aVertex->daughterIds).empty())
+				continue;
+			if(aVertex->eMiss)
 				continue;
 
 			if(eDep.find(aVertex->volume) == eDep.end())
