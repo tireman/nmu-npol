@@ -27,6 +27,7 @@ public:
   double momZ;
   double time;
   double energy;
+  bool eMiss;
   std::string particle;
   std::string process;
   std::string volume;

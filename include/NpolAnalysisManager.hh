@@ -33,6 +33,7 @@ public:
   void Initialize();
   void PrepareNewEvent();
   void AddTrack(const G4Track *);
+  void SetTrackAsKilled(int trackID);
   void AddTaggedParticle(const G4Track *);
   void FillTree();
   void WriteTree();
