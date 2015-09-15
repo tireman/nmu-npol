@@ -143,7 +143,7 @@ void NpolDipole2::ConstructDipole2Field(){
   G4TransportationManager* tmanMagField = G4TransportationManager::GetTransportationManager();
   tmanMagField -> GetPropagatorInField() -> SetLargestAcceptableStep(1*mm);
   
-  dipole2FieldY = 1.5*tesla;
+  dipole2FieldY = 1.639*tesla;
   
   magField = new G4UniformMagField(G4ThreeVector(0., dipole2FieldY, 0.));
   fEqMagField = new G4Mag_UsualEqRhs(magField);
@@ -155,7 +155,7 @@ void NpolDipole2::ConstructDipole2Field(){
   
   fChordFinder = new G4ChordFinder(magField, minStepMagneticField, stepperMagField);
   
-  //Dipole2FieldLV->SetFieldManager(fieldManMagField, true);
+  Dipole2FieldLV->SetFieldManager(fieldManMagField, true);
 }
 void NpolDipole2::Place(G4LogicalVolume *motherLV) {
   G4double PosD2 = 4.6866*m, NpolAng = 28.0*deg, BarOffSet = +0.7730*m;

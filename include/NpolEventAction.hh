@@ -24,6 +24,10 @@ public:
 public:
   void BeginOfEventAction(const G4Event*);
   void EndOfEventAction(const G4Event*);
+  G4String sum(G4String a, G4String b);
+  G4String remleadzero(G4String a);
+
+  G4String ROOTFileNumber;
 };
 
 #endif

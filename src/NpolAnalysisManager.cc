@@ -9,6 +9,8 @@
 //********************************************************************
 
 #include <string>
+#include <iostream>
+#include <sstream>
 
 #include <G4Track.hh>
 #include <G4ThreeVector.hh>
@@ -56,9 +58,7 @@ NpolAnalysisManager::NpolAnalysisManager(){
 }
 
 NpolAnalysisManager::~NpolAnalysisManager() {
-  delete npolTree;
-  delete npolOutFile;
-  delete tracks;
+  ClearROOT();
   //delete analysisMessenger;
 }
 
@@ -87,6 +87,7 @@ void NpolAnalysisManager::Initialize(){
 void NpolAnalysisManager::BeginOfRun(){
   // Method to open TFile.  Hoping to make this available from macro at
   // some point via the AnalysisMessenger class. -- W.T.
+  SetROOTFileNumber("1");
   OpenFile();
 }
 
@@ -123,7 +124,7 @@ void NpolAnalysisManager::AddTrack(const G4Track *aTrack) {
   anNpolVertex->momY = (aTrack->GetMomentum()).y()/MeV;
   anNpolVertex->momZ = (aTrack->GetMomentum()).z()/MeV;
   anNpolVertex->time = (aTrack->GetGlobalTime())/s;
-  anNpolVertex->energy = aTrack->GetTotalEnergy()/MeV;
+  anNpolVertex->energy = aTrack->GetKineticEnergy()/MeV;
   anNpolVertex->particle = (aTrack->GetDefinition()->GetParticleName()).data();
   if(aTrack->GetCreatorProcess() != NULL)
     anNpolVertex->process = (aTrack->GetCreatorProcess()->GetProcessName()).data();
@@ -132,12 +133,12 @@ void NpolAnalysisManager::AddTrack(const G4Track *aTrack) {
   anNpolVertex->volume = (aTrack->GetVolume()->GetName()).data();
 
   if(tracks->size() <= trackId)
-	  tracks->resize(trackId+1);
+    tracks->resize(trackId+1);
   (*tracks)[trackId] = anNpolVertex;
 
   if(parentId != 0) {
-	  NpolVertex *parent = tracks->at(parentId);
-	  (parent->daughterIds).push_back(trackId);
+    NpolVertex *parent = tracks->at(parentId);
+    (parent->daughterIds).push_back(trackId);
   }
 
 }
@@ -168,9 +169,12 @@ void NpolAnalysisManager::WriteTree() {
 }
 
 void NpolAnalysisManager::OpenFile() {
-  G4String fileName = rootName+".root";
-  npolOutFile = new TFile(fileName);
-  //  npolOutFile = new TFile("/data/tireman/simulation/output/FirstPass/Test/npol_10.root","RECREATE");
+
+  G4String dirName = "/data/tireman/simulation/output/FirstPass/LongRun/";
+  G4String fileName = dirName+rootName+"_"+RootFileNumber+".root";
+  npolOutFile = new TFile(fileName,"RECREATE");
+  
+  G4cout << "------- File " << fileName << " has been opened. " << G4endl;
 }
 
 void NpolAnalysisManager::CloseFile() {
@@ -180,4 +184,25 @@ void NpolAnalysisManager::CloseFile() {
 void NpolAnalysisManager::setFileName(const G4String& nam) 
 {
   rootName = nam;
+  }
+
+void NpolAnalysisManager::SetROOTFileNumber(G4String number){
+  RootFileNumber = number;
+}
+
+void NpolAnalysisManager::CloseROOTChainFile(){
+  WriteTree();
+  CloseFile();
+}
+
+void NpolAnalysisManager::ClearROOT(){  
+  // delete npolTree;
+  //delete npolOutFile;
+  //delete tracks;
+  // delete taggedParticles;
+  npolOutFile = NULL;
+  npolTree = NULL;
+  tracks = NULL;
+  taggedParticles = NULL;
+  initialized = false;
 }
