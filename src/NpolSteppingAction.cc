@@ -38,12 +38,16 @@ void NpolSteppingAction::UserSteppingAction(const G4Step *aStep) {
 
   G4Track *aTrack = aStep->GetTrack();
   G4StepPoint *preStepPoint = aStep->GetPreStepPoint();	
-  G4VPhysicalVolume *volume = preStepPoint->GetPhysicalVolume();
-  if(volume->GetName() == "Cap") {
-	  analysisMan->SetTrackAsKilled(aTrack->GetTrackID());
-	  aTrack->SetTrackStatus(fStopAndKill);
+  G4StepPoint *postStepPoint = aStep->GetPostStepPoint();	
+  G4VPhysicalVolume *preStepVolume = preStepPoint->GetPhysicalVolume();
+  G4VPhysicalVolume *postStepVolume = postStepPoint->GetPhysicalVolume();
+
+  if(preStepVolume->GetName() == "Cap" || postStepVolume == NULL) {
+	analysisMan->SetTrackAsKilled(aTrack->GetTrackID());
+	aTrack->SetTrackStatus(fStopAndKill);
   }
-  if((volume->GetName() == "ParticleTagger")){
+
+  if((preStepVolume->GetName() == "ParticleTagger")){
     analysisMan->AddTaggedParticle(aTrack);
   }
 }
