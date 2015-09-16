@@ -23,7 +23,7 @@ include(${Geant4_USE_FILE})
 include_directories(${PROJECT_SOURCE_DIR}/include)
 
 # (3) Load ROOT and setup include directory
-set(CMAKE_MODULE_PATH /usr/local/lib/Geant4-10.0.1/Modules)
+#set(CMAKE_MODULE_PATH /usr/local/lib/Geant4-10.0.1/Modules)
 find_package(ROOT REQUIRED)
 include_directories(${ROOT_INCLUDE_DIR})
 
@@ -43,7 +43,7 @@ target_link_libraries(Npolapp ${Geant4_LIBRARIES} ${ROOT_LIBRARIES})
 
 # (6)
 set(Npolapp_FILES
-  npol.mac init.mac init_vis.mac vis.mac NpolVertex_hh.so include/NpolVertex.hh NpolTagger_hh.so include/NpolTagger.hh
+  npol.mac init.mac init_vis.mac vis.mac include/NpolVertex.hh include/NpolTagger.hh
 #  npol.mac init.mac init_vis.mac vis.mac gdml/HBender.gdml gdml/BeamDump.gdml NpolVertex_hh.so include/NpolVertex.hh
 )
 
