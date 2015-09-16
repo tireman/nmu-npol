@@ -44,7 +44,12 @@ void EDepSum() {
 
 	LoadClassesIntoDictionary();
 
-	TTree *npolTree = OpenFileAndGetTTree("../npol.root");
+	//TTree *npolTree = OpenFileAndGetTTree("../npol.root");
+	// TChain loads a list of root files with the small tree structure
+	// To add more use the "Add" function.  Wildcards are accepted.
+	TChain *npolTree = new TChain("t_npolTree");
+	npolTree->Add("../npol_1.root");
+
 	npolTree->SetBranchAddress("tracks_branch",&anEntry);
 
 	// loop over all entries (one per event)
