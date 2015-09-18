@@ -65,14 +65,6 @@ NpolAnalysisManager::~NpolAnalysisManager() {
 void NpolAnalysisManager::Initialize(){
   if(initialized)
     std::cout << "WARNING: NpolAnalysisManager is already initialized and is being initialized again." << std::endl;
-  
-  if(!TClassTable::GetDict("include/NpolVertex.hh"))
-    gSystem->Load("NpolVertex_hh.so");
-  if(!TClassTable::GetDict("include/NpolTagger.hh"))
-    gSystem->Load("NpolTagger_hh.so");
-  
-  gInterpreter->GenerateDictionary("vector<NpolVertex *>","include/NpolVertex.hh;vector");
-  gInterpreter->GenerateDictionary("vector<NpolTagger *>","include/NpolTagger.hh;vector");
 
   tracks = new std::vector<NpolVertex *>();
   tracks->push_back(NULL);

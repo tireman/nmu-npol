@@ -15,16 +15,6 @@
 #include "../include/NpolVertex.hh"
 #include "../include/NpolTagger.hh"
 
-void LoadClassesIntoDictionary() {
-	if(!TClassTable::GetDict("NpolVertex.hh"))
-		gSystem->Load("../NpolVertex_hh.so");
-	if(!TClassTable::GetDict("NpolTagger.hh"))
-		gSystem->Load("../NpolTagger_hh.so");
-
-	gInterpreter->GenerateDictionary("vector<NpolVertex *>","../include/NpolVertex.hh;vector");
-	gInterpreter->GenerateDictionary("vector<NpolTagger *>","../include/NpolTagger.hh;vector");
-}
-
 TTree *OpenFileAndGetTTree(const char *filename) {
 	TFile *inFile = new TFile("../npol.root","READ");
 	TTree *t = (TTree *)inFile->GetObjectChecked("t_npolTree","TTree");
@@ -41,8 +31,6 @@ TTree *OpenFileAndGetTTree(const char *filename) {
 void EDepSum() {
 
 	std::vector<NpolVertex *> *anEntry = NULL;
-
-	LoadClassesIntoDictionary();
 
 	//TTree *npolTree = OpenFileAndGetTTree("../npol.root");
 	// TChain loads a list of root files with the small tree structure

@@ -15,13 +15,6 @@ typedef struct detector_hit {
 	double eDep;
 } DetectorHit;
 
-void LoadClassesIntoDictionary() {
-	if(!TClassTable::GetDict("NpolVertex.hh"))
-		gSystem->Load("../NpolVertex_hh.so");
-
-	gInterpreter->GenerateDictionary("vector<NpolVertex *>","../include/NpolVertex.hh;vector");
-}
-
 TTree *OpenFileAndGetTTree(char *filename) {
 	TFile *inFile = new TFile("../npol.root","READ");
 	TTree *t = (TTree *)inFile->GetObjectChecked("t_npolTree","TTree");
@@ -38,8 +31,6 @@ TTree *OpenFileAndGetTTree(char *filename) {
 void TestScript() {
 
 	std::vector<NpolVertex *> *anEntry = NULL;
-
-	LoadClassesIntoDictionary();
 
 	TTree *npolTree = OpenFileAndGetTTree("../npol.root");
 	npolTree->SetBranchAddress("tracks_branch",&anEntry);

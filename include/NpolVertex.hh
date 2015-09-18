@@ -13,8 +13,9 @@
 
 #include <string>
 #include <vector>
+#include "TObject.h"
 
-class NpolVertex {
+class NpolVertex : public TObject {
 
 public:
   G4int trackId;
@@ -33,6 +34,11 @@ public:
   std::string process;
   std::string volume;
   std::vector<G4int> daughterIds;
+
+  inline NpolVertex() {};
+  virtual ~NpolVertex() {};
+
+  ClassDef(NpolVertex, 1);
 };
 
 #endif

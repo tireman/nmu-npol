@@ -12,8 +12,10 @@
 #define Npol_Tagger_h
 
 #include <string>
+#include "TObject.h"
 #include "globals.hh"
 
+class NpolTagger : public TObject {
 
 public:
   G4int trackId;
@@ -30,6 +32,11 @@ public:
   std::string particle;
   //std::string process;
   //std::string volume;
+
+  inline NpolTagger() {};
+  virtual ~NpolTagger() {};
+
+  ClassDef(NpolTagger, 1);
 };
 
 #endif
