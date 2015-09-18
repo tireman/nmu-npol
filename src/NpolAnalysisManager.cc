@@ -70,9 +70,9 @@ void NpolAnalysisManager::Initialize(){
   tracks->push_back(NULL);
   taggedParticles = new std::vector<NpolTagger *>();
     
-  npolTree = new TTree("t_npolTree","Per-event information from Npol simulation");
-  npolTree->Branch("tracks_branch","std::vector<NpolVertex *>",&tracks,32000,2);
-  npolTree->Branch("tagger_branch","std::vector<NpolTagger *>",&taggedParticles,32000,2);
+  npolTree = new TTree("T","Per-event information from Npol simulation");
+  npolTree->Branch("tracks","std::vector<NpolVertex *>",&tracks,32000,2);
+  npolTree->Branch("tagger","std::vector<NpolTagger *>",&taggedParticles,32000,2);
   initialized = true;
 }
 
