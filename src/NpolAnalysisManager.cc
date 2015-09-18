@@ -87,7 +87,7 @@ void NpolAnalysisManager::Initialize(){
 void NpolAnalysisManager::BeginOfRun(){
   // Method to open TFile.  Hoping to make this available from macro at
   // some point via the AnalysisMessenger class. -- W.T.
-  SetROOTFileNumber("1");
+  SetROOTFileNumber(1);
   OpenFile();
 }
 
@@ -174,10 +174,15 @@ void NpolAnalysisManager::WriteTree() {
 
 void NpolAnalysisManager::OpenFile() {
 
-  G4String dirName = "/data/tireman/simulation/output/FirstPass/LongRun/";
-  G4String fileName = dirName+rootName+"_"+RootFileNumber+".root";
+  G4String dirName = "output";
+  G4String fileName = Form("%s/%s_%04d.root", dirName.c_str(), rootName.c_str(), RootFileNumber);
   npolOutFile = new TFile(fileName,"RECREATE");
-  
+
+  if( npolOutFile->IsZombie() ) {
+    G4cerr << "------- File " << fileName << "  could not be opened. " << G4endl;
+    G4cerr << "             " << " Does the directory '" << dirName << "/' exist?" << G4endl;
+    exit(0);
+  }
   G4cout << "------- File " << fileName << " has been opened. " << G4endl;
 }
 
@@ -190,7 +195,7 @@ void NpolAnalysisManager::setFileName(const G4String& nam)
   rootName = nam;
   }
 
-void NpolAnalysisManager::SetROOTFileNumber(G4String number){
+void NpolAnalysisManager::SetROOTFileNumber(G4int number){
   RootFileNumber = number;
 }
 

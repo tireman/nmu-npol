@@ -37,11 +37,11 @@ void NpolEventAction::BeginOfEventAction(const G4Event* evt) {
   
   G4int evtID = evt->GetEventID();
   
-  if(evtID == 0) ROOTFileNumber = "1";
+  if(evtID == 0) ROOTFileNumber = 1;
   if((evtID%250000 == 0) && (evtID != 0)){
     analysisMan->CloseROOTChainFile();
     analysisMan->ClearROOT();
-    ROOTFileNumber = sum(ROOTFileNumber, "1");
+    ROOTFileNumber += 1;
     analysisMan->SetROOTFileNumber(ROOTFileNumber);
     analysisMan->OpenFile();
     analysisMan->Initialize();
@@ -52,29 +52,4 @@ void NpolEventAction::BeginOfEventAction(const G4Event* evt) {
 void NpolEventAction::EndOfEventAction(const G4Event* evt) {
   NpolAnalysisManager *analysisMan = NpolAnalysisManager::GetInstance();
   analysisMan->FillTree();
-}
-
-G4String NpolEventAction::sum (G4String a, G4String b) {
-
-  while (a.length() < b.length()) a = "0" + a;
-  while (b.length() < a.length()) b = "0" + b;
-  a = "0"+a;
-  b = "0"+b;
-  G4String sum = "";
-  G4int carry = 0;
-  for (G4int i=a.length()-1; i >= 0; i--) {
-    G4int ac = a[i] - '0'; //convert from char to int
-    G4int bc = b[i] - '0';
-    G4int ss = ac + bc + carry;
-    carry = ss / 10;
-    ss = ss % 10; //remainder when I divide by 10
-    sum = ((char)(ss + '0')) + sum;
-  }
-  return remleadzero (sum);
-}
-
-G4String NpolEventAction::remleadzero(G4String a) {
-  
-  while (a.length() >= 2 && a[0]=='0') a = a.substr(1);
-  return a;
 }

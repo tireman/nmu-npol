@@ -48,12 +48,13 @@ set(Npolapp_FILES
 )
 
 set(Npolapp_DIRS
-	  root/ gdml/
+  gdml/
+  root/
+  output/
 )
 
-file( COPY root/ DESTINATION root/)
-
 foreach(_dir ${Npolapp_DIRS})
+  file( MAKE_DIRECTORY ${_dir})
   file( COPY ${_dir} DESTINATION ${_dir})
 endforeach()
 

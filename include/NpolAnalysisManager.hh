@@ -40,7 +40,7 @@ public:
   void CloseFile();
   void OpenFile();
   void setFileName(const G4String& nam);
-  void SetROOTFileNumber(G4String number);
+  void SetROOTFileNumber(G4int number);
   void CloseROOTChainFile();
   void ClearROOT();
 private:
@@ -49,7 +49,7 @@ private:
   
 private:
   G4String rootName;
-  G4String RootFileNumber;
+  G4int RootFileNumber;
   bool initialized;
   TTree *npolTree;
   TFile *npolOutFile;
