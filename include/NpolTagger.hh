@@ -12,12 +12,14 @@
 #define Npol_Tagger_h
 
 #include <string>
+#include "TObject.h"
+#include "globals.hh"
 
-class NpolTagger {
-  
+class NpolTagger : public TObject {
+
 public:
-  int trackId;
-  //int parentId;
+  G4int trackId;
+  //G4int parentId;
   double posX;
   double posY;
   double posZ;
@@ -26,9 +28,15 @@ public:
   double momZ;
   double time;
   double energy;
+  G4int  particleId;
   std::string particle;
   //std::string process;
   //std::string volume;
+
+  inline NpolTagger() {};
+  virtual ~NpolTagger() {};
+
+  ClassDef(NpolTagger, 1);
 };
 
 #endif
