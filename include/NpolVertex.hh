@@ -17,8 +17,8 @@
 class NpolVertex {
 
 public:
-  int trackId;
-  int parentId;
+  G4int trackId;
+  G4int parentId;
   double posX;
   double posY;
   double posZ;
@@ -28,10 +28,11 @@ public:
   double time;
   double energy;
   bool eMiss;
+  G4int  particleId;
   std::string particle;
   std::string process;
   std::string volume;
-  std::vector<int> daughterIds;
+  std::vector<G4int> daughterIds;
 };
 
 #endif
