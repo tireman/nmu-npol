@@ -52,7 +52,7 @@ NpolAnalysisManager::NpolAnalysisManager(){
   npolTree = NULL;
   tracks = NULL;
   taggedParticles = NULL;
-  rootName = "npol"; // default filename, may be changed with setFileName() before file is opened
+  rootName = "npol"; // default filename
 
   Initialize();
 }
