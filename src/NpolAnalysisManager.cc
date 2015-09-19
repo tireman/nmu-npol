@@ -65,29 +65,21 @@ NpolAnalysisManager::~NpolAnalysisManager() {
 void NpolAnalysisManager::Initialize(){
   if(initialized)
     std::cout << "WARNING: NpolAnalysisManager is already initialized and is being initialized again." << std::endl;
-  
-  if(!TClassTable::GetDict("include/NpolVertex.hh"))
-    gSystem->Load("NpolVertex_hh.so");
-  if(!TClassTable::GetDict("include/NpolTagger.hh"))
-    gSystem->Load("NpolTagger_hh.so");
-  
-  gInterpreter->GenerateDictionary("vector<NpolVertex *>","include/NpolVertex.hh;vector");
-  gInterpreter->GenerateDictionary("vector<NpolTagger *>","include/NpolTagger.hh;vector");
 
   tracks = new std::vector<NpolVertex *>();
   tracks->push_back(NULL);
   taggedParticles = new std::vector<NpolTagger *>();
     
-  npolTree = new TTree("t_npolTree","Per-event information from Npol simulation");
-  npolTree->Branch("tracks_branch","std::vector<NpolVertex *>",&tracks,32000,2);
-  npolTree->Branch("tagger_branch","std::vector<NpolTagger *>",&taggedParticles,32000,2);
+  npolTree = new TTree("T","Per-event information from Npol simulation");
+  npolTree->Branch("tracks","std::vector<NpolVertex *>",&tracks,32000,2);
+  npolTree->Branch("tagger","std::vector<NpolTagger *>",&taggedParticles,32000,2);
   initialized = true;
 }
 
 void NpolAnalysisManager::BeginOfRun(){
   // Method to open TFile.  Hoping to make this available from macro at
   // some point via the AnalysisMessenger class. -- W.T.
-  SetROOTFileNumber("1");
+  SetROOTFileNumber(1);
   OpenFile();
 }
 
@@ -112,8 +104,8 @@ void NpolAnalysisManager::PrepareNewEvent() {
 
 void NpolAnalysisManager::AddTrack(const G4Track *aTrack) {
   NpolVertex *anNpolVertex = new NpolVertex();
-  unsigned int trackId = aTrack->GetTrackID();
-  unsigned int parentId = aTrack->GetParentID();
+  G4int trackId = aTrack->GetTrackID();
+  G4int parentId = aTrack->GetParentID();
   
   anNpolVertex->trackId = trackId;
   anNpolVertex->parentId = parentId;
@@ -127,13 +119,14 @@ void NpolAnalysisManager::AddTrack(const G4Track *aTrack) {
   anNpolVertex->energy = aTrack->GetKineticEnergy()/MeV;
   anNpolVertex->eMiss = false;
   anNpolVertex->particle = (aTrack->GetDefinition()->GetParticleName()).data();
+  anNpolVertex->particleId = (aTrack->GetDefinition()->GetPDGEncoding());
   if(aTrack->GetCreatorProcess() != NULL)
     anNpolVertex->process = (aTrack->GetCreatorProcess()->GetProcessName()).data();
   else
     anNpolVertex->process = "";
   anNpolVertex->volume = (aTrack->GetVolume()->GetName()).data();
 
-  if(tracks->size() <= trackId)
+  if(tracks->size() <= (unsigned int)trackId)
     tracks->resize(trackId+1);
   (*tracks)[trackId] = anNpolVertex;
 
@@ -160,6 +153,7 @@ void NpolAnalysisManager::AddTaggedParticle(const G4Track *aTrack) {
   anNpolTaggedParticle->time = (aTrack->GetGlobalTime())/s;
   anNpolTaggedParticle->energy = aTrack->GetKineticEnergy()/MeV;
   anNpolTaggedParticle->particle = (aTrack->GetDefinition()->GetParticleName()).data();
+  anNpolTaggedParticle->particleId = (aTrack->GetDefinition()->GetPDGEncoding());
    
   taggedParticles->push_back(anNpolTaggedParticle);
 }
@@ -174,10 +168,15 @@ void NpolAnalysisManager::WriteTree() {
 
 void NpolAnalysisManager::OpenFile() {
 
-  G4String dirName = "/data/tireman/simulation/output/FirstPass/LongRun/";
-  G4String fileName = dirName+rootName+"_"+RootFileNumber+".root";
+  G4String dirName = "output";
+  G4String fileName = Form("%s/%s_%04d.root", dirName.c_str(), rootName.c_str(), RootFileNumber);
   npolOutFile = new TFile(fileName,"RECREATE");
-  
+
+  if( npolOutFile->IsZombie() ) {
+    G4cerr << "------- File " << fileName << "  could not be opened. " << G4endl;
+    G4cerr << "             " << " Does the directory '" << dirName << "/' exist?" << G4endl;
+    exit(0);
+  }
   G4cout << "------- File " << fileName << " has been opened. " << G4endl;
 }
 
@@ -190,7 +189,7 @@ void NpolAnalysisManager::setFileName(const G4String& nam)
   rootName = nam;
   }
 
-void NpolAnalysisManager::SetROOTFileNumber(G4String number){
+void NpolAnalysisManager::SetROOTFileNumber(G4int number){
   RootFileNumber = number;
 }
 

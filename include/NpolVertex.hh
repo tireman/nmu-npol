@@ -13,12 +13,13 @@
 
 #include <string>
 #include <vector>
+#include "TObject.h"
 
-class NpolVertex {
+class NpolVertex : public TObject {
 
 public:
-  int trackId;
-  int parentId;
+  G4int trackId;
+  G4int parentId;
   double posX;
   double posY;
   double posZ;
@@ -28,10 +29,16 @@ public:
   double time;
   double energy;
   bool eMiss;
+  G4int  particleId;
   std::string particle;
   std::string process;
   std::string volume;
-  std::vector<int> daughterIds;
+  std::vector<G4int> daughterIds;
+
+  inline NpolVertex() {};
+  virtual ~NpolVertex() {};
+
+  ClassDef(NpolVertex, 1);
 };
 
 #endif

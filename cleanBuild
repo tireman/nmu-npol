@@ -1,0 +1,20 @@
+#!/bin/bash
+#
+# Simple script that blows away BUILDDIR and runs
+# 'cmake && make' from scratch.
+
+NPROC=2;           # who doesn't have at least a dual-core machine now...
+BUILDDIR="build"   # build binary here
+
+rm -rf "$BUILDDIR"
+
+if [ -x /usr/bin/nproc ]; then
+  NPROC=`/usr/bin/nproc`
+fi
+
+set -e
+mkdir "$BUILDDIR"
+cd "$BUILDDIR"
+#cmake --debug-output --trace CMakeLists.txt ../
+cmake CMakeLists.txt ../
+make -j${NPROC}
