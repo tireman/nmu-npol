@@ -67,6 +67,7 @@ installed.
     events in the npol.mac file and run:
   ```
     % cd build             # if not already in this directory
+    % source setuprun.sh   # sets up output dir and name; change as needed
     % ./Npolapp npol.mac
   ```
 

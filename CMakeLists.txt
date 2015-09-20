@@ -55,7 +55,7 @@ target_link_libraries(Npolapp ${Geant4_LIBRARIES} ${ROOT_LIBRARIES})
 
 # (6)
 set(Npolapp_FILES
-  npol.mac init.mac init_vis.mac vis.mac
+  npol.mac init.mac init_vis.mac vis.mac setuprun.sh
 )
 
 set(Npolapp_DIRS
