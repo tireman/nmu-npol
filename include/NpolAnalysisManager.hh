@@ -48,7 +48,8 @@ private:
   ~NpolAnalysisManager();
   
 private:
-  G4String rootName;
+  G4String rootName; 
+  G4String dirName;
   G4int RootFileNumber;
   bool initialized;
   TTree *npolTree;

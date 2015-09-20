@@ -11,6 +11,7 @@
 #include <string>
 #include <iostream>
 #include <sstream>
+//#include <stdlib.h>
 
 #include <G4Track.hh>
 #include <G4ThreeVector.hh>
@@ -30,7 +31,6 @@
 #include <TInterpreter.h>
 
 #include "NpolAnalysisManager.hh"
-#include "NpolAnalysisMessenger.hh"
 #include "NpolVertex.hh"
 #include "NpolTagger.hh"
 
@@ -46,20 +46,18 @@ NpolAnalysisManager *NpolAnalysisManager::GetInstance() {
 
 NpolAnalysisManager::NpolAnalysisManager(){
 
-  //analysisMessenger = new NpolAnalysisMessenger(this);  issues to be resolved - W.T.
   initialized = false;
   npolOutFile = NULL;
   npolTree = NULL;
   tracks = NULL;
   taggedParticles = NULL;
-  rootName = "npol"; // default filename
-
+  SetROOTFileNumber(1);
+  OpenFile();
   Initialize();
 }
 
 NpolAnalysisManager::~NpolAnalysisManager() {
   ClearROOT();
-  //delete analysisMessenger;
 }
 
 void NpolAnalysisManager::Initialize(){
@@ -77,10 +75,9 @@ void NpolAnalysisManager::Initialize(){
 }
 
 void NpolAnalysisManager::BeginOfRun(){
-  // Method to open TFile.  Hoping to make this available from macro at
-  // some point via the AnalysisMessenger class. -- W.T.
-  SetROOTFileNumber(1);
-  OpenFile();
+  // Called from EventAction ... once had the opening of the first 
+  // ROOT file but it was double the size.  Moved openFile to constructor
+  // and problem was solved. Curious.
 }
 
 void NpolAnalysisManager::EndOfRun(){
@@ -94,7 +91,7 @@ void NpolAnalysisManager::PrepareNewEvent() {
   for(it = tracks->begin(); it != tracks->end(); it++)
     delete *it;
 
-   std::vector<NpolTagger *>::iterator it2;
+  std::vector<NpolTagger *>::iterator it2;
   for(it2 = taggedParticles->begin(); it2 != taggedParticles->end(); it2++)
     delete *it2;
 
@@ -159,7 +156,27 @@ void NpolAnalysisManager::AddTaggedParticle(const G4Track *aTrack) {
 }
 
 void NpolAnalysisManager::FillTree() {
-  npolTree->Fill();
+  // This currently doesn't work.  Trying to not save events that do not
+  // have tracks in the Polorimeter.  This requires checking the vector
+  // before filling the tree, however, does it not like proceeding to 
+  // new event without a tree fill?  If so, we will need to null the vector(s)
+  // first, I believe.
+
+  /*std::vector<NpolVertex *>::iterator it;
+  for(it = tracks->begin(); it != tracks->end(); it++){
+    
+    std::string volName = (*it)->volume;
+    G4cout <<"Got to Here!" << G4endl;
+    G4cout << "Volume Name: " << volName << G4endl;
+    if(!((*it)->daughterIds).empty()){
+      G4String subVolName = volName.substr(0,3).c_str();
+      if(subVolName == "av_"){
+	npolTree->Fill();
+	break;
+      }
+    }
+    }*/
+    npolTree->Fill();
 }
 
 void NpolAnalysisManager::WriteTree() {
@@ -167,8 +184,18 @@ void NpolAnalysisManager::WriteTree() {
 }
 
 void NpolAnalysisManager::OpenFile() {
+  if(getenv("NPOLBASENAME")){
+    rootName = getenv("NPOLBASENAME");
+  }else{
+    rootName = "npol"; // default filename
+  }
 
-  G4String dirName = "output";
+  if(getenv("NPOLDIR")){
+    dirName = getenv("NPOLDIR");
+  }else{
+    dirName = "output"; // default directory location
+  }
+
   G4String fileName = Form("%s/%s_%04d.root", dirName.c_str(), rootName.c_str(), RootFileNumber);
   npolOutFile = new TFile(fileName,"RECREATE");
 

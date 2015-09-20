@@ -41,8 +41,9 @@ void NpolSteppingAction::UserSteppingAction(const G4Step *aStep) {
   G4StepPoint *postStepPoint = aStep->GetPostStepPoint();	
   G4VPhysicalVolume *preStepVolume = preStepPoint->GetPhysicalVolume();
   G4VPhysicalVolume *postStepVolume = postStepPoint->GetPhysicalVolume();
+  G4String volName = preStepVolume->GetName();
 
-  if(preStepVolume->GetName() == "Cap" || postStepVolume == NULL) {
+  if(volName == "Cap" || volName == "HallShellRoof" || volName == "HallShellFloor" || volName == "HallShellWall" || postStepVolume == NULL) {
 	analysisMan->SetTrackAsKilled(aTrack->GetTrackID());
 	aTrack->SetTrackStatus(fStopAndKill);
   }
