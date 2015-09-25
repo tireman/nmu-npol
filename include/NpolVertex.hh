@@ -14,6 +14,9 @@
 #include <string>
 #include <vector>
 #include "TObject.h"
+#include "/usr/local/geant4/geant4.10.00.p01/share/Geant4-10.0.1/include/Geant4/globals.hh"
+#include "/usr/local/geant4/geant4.10.00.p01/share/Geant4-10.0.1/include/Geant4/G4Types.hh"
+#include "/usr/local/geant4/geant4.10.00.p01/share/Geant4-10.0.1/include/Geant4/G4ios.hh"
 
 class NpolVertex : public TObject {
 

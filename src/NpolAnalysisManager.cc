@@ -11,7 +11,6 @@
 #include <string>
 #include <iostream>
 #include <sstream>
-//#include <stdlib.h>
 
 #include <G4Track.hh>
 #include <G4ThreeVector.hh>
@@ -50,7 +49,20 @@ NpolAnalysisManager::NpolAnalysisManager(){
   npolOutFile = NULL;
   npolTree = NULL;
   tracks = NULL;
-  taggedParticles = NULL;
+  taggedParticles = NULL;  
+
+  if(getenv("NPOLBASENAME")){
+    rootName = getenv("NPOLBASENAME");
+  }else{
+    rootName = "npol"; // default filename
+  }
+
+  if(getenv("NPOLDIR")){
+    dirName = getenv("NPOLDIR");
+  }else{
+    dirName = "output"; // default directory location
+  }
+
   SetROOTFileNumber(1);
   OpenFile();
   Initialize();
@@ -67,6 +79,7 @@ void NpolAnalysisManager::Initialize(){
   tracks = new std::vector<NpolVertex *>();
   tracks->push_back(NULL);
   taggedParticles = new std::vector<NpolTagger *>();
+  taggedParticles->push_back(NULL);
     
   npolTree = new TTree("T","Per-event information from Npol simulation");
   npolTree->Branch("tracks","std::vector<NpolVertex *>",&tracks,32000,2);
@@ -164,9 +177,13 @@ void NpolAnalysisManager::FillTree() {
 
   /*std::vector<NpolVertex *>::iterator it;
   for(it = tracks->begin(); it != tracks->end(); it++){
-    
-    std::string volName = (*it)->volume;
+
     G4cout <<"Got to Here!" << G4endl;
+
+    G4String volName = (*it)->volume;
+
+    G4cout <<"Got to Here!" << G4endl;
+
     G4cout << "Volume Name: " << volName << G4endl;
     if(!((*it)->daughterIds).empty()){
       G4String subVolName = volName.substr(0,3).c_str();
@@ -176,7 +193,7 @@ void NpolAnalysisManager::FillTree() {
       }
     }
     }*/
-    npolTree->Fill();
+  npolTree->Fill();
 }
 
 void NpolAnalysisManager::WriteTree() {
@@ -184,17 +201,6 @@ void NpolAnalysisManager::WriteTree() {
 }
 
 void NpolAnalysisManager::OpenFile() {
-  if(getenv("NPOLBASENAME")){
-    rootName = getenv("NPOLBASENAME");
-  }else{
-    rootName = "npol"; // default filename
-  }
-
-  if(getenv("NPOLDIR")){
-    dirName = getenv("NPOLDIR");
-  }else{
-    dirName = "output"; // default directory location
-  }
 
   G4String fileName = Form("%s/%s_%04d.root", dirName.c_str(), rootName.c_str(), RootFileNumber);
   npolOutFile = new TFile(fileName,"RECREATE");

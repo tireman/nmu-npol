@@ -1,4 +1,4 @@
 #!/bin/sh
 
-export NPOLDIR=/data/tireman/simulation/output/FirstPass/Test
-export NPOLBASENAME=npoltest
+export NPOLDIR=/data3/tireman/LongRun
+export NPOLBASENAME=npolRun_1

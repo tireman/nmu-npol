@@ -38,7 +38,7 @@ void NpolEventAction::BeginOfEventAction(const G4Event* evt) {
   G4int evtID = evt->GetEventID();
   
   if(evtID == 0) ROOTFileNumber = 1;
-  if((evtID%250000 == 0) && (evtID != 0)){
+  if((evtID%500000 == 0) && (evtID != 0)){
     analysisMan->CloseROOTChainFile();
     analysisMan->ClearROOT();
     ROOTFileNumber += 1;
