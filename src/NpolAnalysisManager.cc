@@ -175,16 +175,12 @@ void NpolAnalysisManager::FillTree() {
   // new event without a tree fill?  If so, we will need to null the vector(s)
   // first, I believe.
 
-  /*std::vector<NpolVertex *>::iterator it;
+  std::vector<NpolVertex *>::iterator it;
   for(it = tracks->begin(); it != tracks->end(); it++){
 
-    G4cout <<"Got to Here!" << G4endl;
-
+    if(*it == NULL) continue;
     G4String volName = (*it)->volume;
 
-    G4cout <<"Got to Here!" << G4endl;
-
-    G4cout << "Volume Name: " << volName << G4endl;
     if(!((*it)->daughterIds).empty()){
       G4String subVolName = volName.substr(0,3).c_str();
       if(subVolName == "av_"){
@@ -192,8 +188,8 @@ void NpolAnalysisManager::FillTree() {
 	break;
       }
     }
-    }*/
-  npolTree->Fill();
+  }
+  //npolTree->Fill();
 }
 
 void NpolAnalysisManager::WriteTree() {

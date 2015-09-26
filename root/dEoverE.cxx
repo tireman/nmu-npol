@@ -27,40 +27,27 @@ int GetAVNumber(const std::string &volName) {
   }
 }
 
-std::vector<NpolVertex *> *anEntry = NULL;
-std::vector<NpolVertex *>::iterator it;
-std::map<std::string, double> eDep;
-
 void dEoverE() {
   gSystem->Load("NpolClass.so");
-
-  // Use this section if you wish to load one file at a time ... but why?
-  //char *filename = "/data2/tireman/LongRun/npolRun_1_0001.root";
-  //TFile *inFile = new TFile(filename);//,"READ");
-  //TTree *npolTree = (TTree *)inFile->GetObjectChecked("T","TTree");
-  //if(npolTree == NULL) {
-  //  std::cout << "Tree not found in " << filename << "." << std::endl;
-  //  delete inFile;
-  // return;
-  //}
-  
+  std::vector<NpolVertex *> *anEntry = NULL;
+  std::map<std::string, double> eDep;
+   
   // The TChain is very nice.
   TChain *npolTree = new TChain("T");
-  npolTree->Add("/data2/tireman/LongRun/npolRun_*.root");
+  //npolTree->Add("/data2/tireman/LongRun/npolRun_*.root");
   //npolTree->Add("/data2/tireman/LongRun/npolRun_1_0001.root");
   // npolTree->Add("/data2/tireman/LongRun/npolRun_1_0002.root");
   
-  
+  npolTree->Add("/data/tireman/simulation/output/FirstPass/Test/EventCut_0001.root");
   npolTree->SetBranchAddress("tracks",&anEntry);
   
-  TFile *outFile = new TFile("dEoverE.root","RECREATE");
+  TFile *outFile = new TFile("dEoverE_p.root","RECREATE");
   TH2F *h_dEoverEtop = new TH2F("dEoverEtop","dE over E",20,0,150,40,0,20);
   TH2F *h_dEoverEbot = new TH2F("dEoverEbot","dE over E",20,0,150,40,0,20);
   TH2F *h_dEoverEplus = new TH2F("dEoverEplus","dE over E",20,0,150,40,0,20);
   TH2F *h_dEoverEdivide = new TH2F("dEoverEdivide","dE over E",20,0,150,40,0,20);
   
   // loop over all entries (one per event)
-  //for(int i = 0; i < 100000; i++) {
   Int_t nentries = npolTree->GetEntries();
   for(int i = 0; i < nentries; i++) {
     npolTree->GetEntry(i);
@@ -68,31 +55,20 @@ void dEoverE() {
     if(i % 10000 == 0)
       std::cout << "Processing event #" << i << std::endl;
     
-    Int_t nvertices = anEntry->size();
-    it = anEntry->begin();
-   
     // loop over vector elements (one per vertex)
-    // for(it = anEntry->begin(); it != anEntry->end(); it++) {
-         // HACK ALERT!     
-         // There is something up with this for loop.  Running as I have it is
-         // fine but using the for loop above fills up the memory even when you
-         // comment out ALL code in the loop.  What the ...?
-   
+    if(anEntry->empty()) continue;
+    Int_t nvertices = anEntry->size();
+ 
     for (Int_t j = 0; j < nvertices; j++){
-      NpolVertex *aVertex = *it;
+      NpolVertex *aVertex = (*anEntry)[j];
       
-      if(aVertex == NULL)
-	continue;
-      if(!(aVertex->daughterIds).empty())
-	continue;
-      if(aVertex->eMiss)
-	continue;
-      
+      if(aVertex == NULL) continue;
+      if(!(aVertex->daughterIds).empty()) continue;
+      if(aVertex->eMiss) continue;     
       if(eDep.find(aVertex->volume) == eDep.end())
 	eDep[aVertex->volume] = 0;
       eDep[aVertex->volume] += aVertex->energy;
       
-      it++;
     }
   
     double Etop = 0.0;
@@ -124,12 +100,11 @@ void dEoverE() {
       }		
     }
     
-    if((Etop > 20.0 || Ebot > 20.0) && (dEtop > 1.0 || dEbot > 1.0)){
-      h_dEoverEtop->Fill(Etop,dEtop);
-      h_dEoverEbot->Fill(Ebot,dEbot);
-      h_dEoverEplus->Fill(Etop+Ebot,dEtop+dEbot);
-      h_dEoverEdivide->Fill(Etop/Ebot,dEtop+dEbot);
-    }
+    h_dEoverEtop->Fill(Etop,dEtop);
+    h_dEoverEbot->Fill(Ebot,dEbot);
+    h_dEoverEplus->Fill(Etop+Ebot,dEtop+dEbot);
+    h_dEoverEdivide->Fill(Etop/Ebot,dEtop+dEbot);
+    
     eDep.clear();
     
   }

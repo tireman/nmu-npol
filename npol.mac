@@ -14,10 +14,6 @@
 /tracking/verbose 0
 /tracking/storeTrajectory 1
 
-#File name can be changed here (broken when TTree included ... will check later)
-#/npol/analysis/setFileName /data/tireman/simulation/output/FirstPass/Test/npol_test
-#/analysis/setFileName npol_test_long
-
 #/gun/particle proton 
 #/gun/particle pi0 
 #/gun/particle mu- 
@@ -28,5 +24,5 @@
 /gun/particle e-
 /gun/energy 4400 MeV
 /run/printProgress 10000
-/run/beamOn 10000000
+/run/beamOn 100000
 
