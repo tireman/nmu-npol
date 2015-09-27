@@ -49,11 +49,10 @@ int main(int argc,char *argv[]) {
   G4long systime = time(NULL);
   seeds[0] = (long) systime;
   seeds[1] = (long) (systime*G4UniformRand());
-  //G4Random::setTheSeeds(seeds);
-  CLHEP::HepRandom::setTheSeeds(seeds);  
-  //CLHEP::HepRandom::setTheSeeds(seeds,198);
+  G4int index = 215*(2*G4UniformRand()-1);
+  CLHEP::HepRandom::setTheSeeds(seeds, index);  
   G4cout << " Random seed = " << seeds[0] << "    " << seeds[1] <<G4endl;
-  
+ 
   // RunManager construction
 #ifdef G4MULTITHREADED
   G4RunManager *runManager = new G4RunManager;
