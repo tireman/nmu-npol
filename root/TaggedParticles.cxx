@@ -35,10 +35,8 @@ void TaggedParticles() {
 
   // The TChain is very nice.
   TChain *npolTree = new TChain("T");
-  //npolTree->Add("/data2/tireman/LongRun/npolRun_*.root");
-  //npolTree->Add("/data2/tireman/LongRun/npolRun_1_0001.root");
-  //npolTree->Add("/data2/tireman/LongRun/npolRun_1_0002.root");
-  npolTree->Add("/data/tireman/simulation/output/FirstPass/Test/EventCut_0001.root");
+  npolTree->Add("/data2/cgen/FirstRun/npolRun_*.root");
+  //npolTree->Add("/data2/cgen/FirstRun/npolRun_1_0001.root");
   
   npolTree->SetBranchAddress("tagger",&tagEntry);
   
@@ -54,14 +52,13 @@ void TaggedParticles() {
   for(int i = 0; i < nentries; i++) {
     npolTree->GetEntry(i);
       
-    if(i % 100 == 0)
+    if(i % 10 == 0)
       std::cout << "Processing event #" << i << std::endl;
     
     // loop over vector elements (one per vertex)
     if(tagEntry->empty()) continue;
     Int_t nvertices = tagEntry->size();
-    std::cout << "vertices = " << nvertices << endl;
-    
+        
    for (Int_t j = 0; j < 1; j++){
      
      NpolTagger *aVertex = (*tagEntry)[j];

@@ -1,4 +1,4 @@
 #!/bin/sh
 
-export NPOLDIR=/data/tireman/simulation/output/FirstPass/Test
-export NPOLBASENAME=EventCut
+export NPOLDIR=/data2/cgen/SecondRun
+export NPOLBASENAME=npolRun_6

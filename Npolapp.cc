@@ -44,9 +44,15 @@ int main(int argc,char *argv[]) {
   G4Random::setTheEngine(new CLHEP::RanecuEngine);
   //set random seed with system time
   //
-  G4long seed = time(NULL);
-  CLHEP::HepRandom::setTheSeed(seed);  
-  G4cout<<" Random seed = "<<seed<<G4endl;
+ 
+  G4long seeds[2];
+  G4long systime = time(NULL);
+  seeds[0] = (long) systime;
+  seeds[1] = (long) (systime*G4UniformRand());
+  //G4Random::setTheSeeds(seeds);
+  CLHEP::HepRandom::setTheSeeds(seeds);  
+  //CLHEP::HepRandom::setTheSeeds(seeds,198);
+  G4cout << " Random seed = " << seeds[0] << "    " << seeds[1] <<G4endl;
   
   // RunManager construction
 #ifdef G4MULTITHREADED

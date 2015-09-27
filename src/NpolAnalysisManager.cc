@@ -169,11 +169,14 @@ void NpolAnalysisManager::AddTaggedParticle(const G4Track *aTrack) {
 }
 
 void NpolAnalysisManager::FillTree() {
-  // This currently doesn't work.  Trying to not save events that do not
-  // have tracks in the Polorimeter.  This requires checking the vector
-  // before filling the tree, however, does it not like proceeding to 
-  // new event without a tree fill?  If so, we will need to null the vector(s)
-  // first, I believe.
+
+  // This portion of code checks to see if the vector has any daughters at
+  // all if it doesn't it does not fill the tree.  If it does then it 
+  // checks to see if at least one is in an assembly volume which is 
+  // part of the polarimeter.  If it is then it fills the tree, otherwise,
+  // it skips filling and the next event is generated.  Cuts down on space 
+  // used in the files from the majority of events which do not produce events
+  // in the polarimeter
 
   std::vector<NpolVertex *>::iterator it;
   for(it = tracks->begin(); it != tracks->end(); it++){
@@ -189,7 +192,6 @@ void NpolAnalysisManager::FillTree() {
       }
     }
   }
-  //npolTree->Fill();
 }
 
 void NpolAnalysisManager::WriteTree() {

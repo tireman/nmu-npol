@@ -34,11 +34,10 @@ void dEoverE() {
    
   // The TChain is very nice.
   TChain *npolTree = new TChain("T");
-  //npolTree->Add("/data2/tireman/LongRun/npolRun_*.root");
+  npolTree->Add("/data2/cgen/FirstRun/neutron_*.root");
   //npolTree->Add("/data2/tireman/LongRun/npolRun_1_0001.root");
   // npolTree->Add("/data2/tireman/LongRun/npolRun_1_0002.root");
   
-  npolTree->Add("/data/tireman/simulation/output/FirstPass/Test/EventCut_0001.root");
   npolTree->SetBranchAddress("tracks",&anEntry);
   
   TFile *outFile = new TFile("dEoverE_p.root","RECREATE");
