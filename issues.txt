@@ -1,12 +1,7 @@
 %% issues.txt - used to track standing issues in the devlopment of Npol %%
 
-Add ROOT file chaining in the AnalysisManager for long runs.
 
-Expand the ROOT analysis scripts.  Two stage system.
-
-Add a thin "detector" right in front of the first layer of taggers to track particles that get through the collimator. Will need to add a vector and process it in stepping action and save as a new branch to the ROOT file.  We really only want the first step in this volume for each particle as we want to use this to analyze the particle flux rates.
-
-Check Horizontal bender magnet of overlap problems.  It passes overlap check but there may be a problem.  May require tearing apart the GDML file we got from B.Waidyawansa SHMS code and reworking the variables a bit.
+Check Horizontal bender magnet of overlap problems.  It passes overlap check but there may be a problem.  May require tearing apart the GDML file we got from B.Waidyawansa's SHMS code and reworking the variables a bit.
 
 Update: Currently we don't build or use the beam dump but if desired in the future it needs checked. Same for the beam dump and beam dump pipe.  It doesn't make a lot of sense to me but it is low priority at this point as it doesn't add a lot to the background radiation. 
 	
@@ -14,5 +9,5 @@ Mag Field for Horizontal Bender Magnet
 	Use Geant4 built-in dipole fields for now (G4UniformMagField)
 
 Multi-Threading
-	VERY Low priority
+	VERY VERY Low priority
 
