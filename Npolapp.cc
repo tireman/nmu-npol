@@ -49,8 +49,9 @@ int main(int argc,char *argv[]) {
   G4long systime = time(NULL);
   seeds[0] = (long) systime;
   seeds[1] = (long) (systime*G4UniformRand());
-  G4int index = 215*(2*G4UniformRand()-1);
-  CLHEP::HepRandom::setTheSeeds(seeds, index);  
+  G4int index = (int) 215*G4UniformRand();
+  G4Random::setTheSeeds(seeds, index);
+  G4cout << " The Index is = " << index << G4endl;
   G4cout << " Random seed = " << seeds[0] << "    " << seeds[1] <<G4endl;
  
   // RunManager construction
@@ -61,8 +62,7 @@ int main(int argc,char *argv[]) {
 #else
   G4RunManager *runManager = new G4RunManager;
 #endif
-  
-  
+
 #ifdef G4VIS_USE
   // Visualization manager construction
   G4VisManager *visManager = new G4VisExecutive;
