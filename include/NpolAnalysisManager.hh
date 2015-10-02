@@ -50,6 +50,7 @@ private:
 private:
   G4String rootName; 
   G4String dirName;
+  G4String jobNumber;
   G4int RootFileNumber;
   bool initialized;
   TTree *npolTree;

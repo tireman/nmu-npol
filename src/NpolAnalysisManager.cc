@@ -63,6 +63,12 @@ NpolAnalysisManager::NpolAnalysisManager(){
     dirName = "output"; // default directory location
   }
 
+  if(getenv("JOBNUMBER")){
+    jobNumber = getenv("JOBNUMBER");
+  }else{
+    jobNumber = "1000";
+  }
+
   SetROOTFileNumber(1);
   OpenFile();
   Initialize();
@@ -200,7 +206,7 @@ void NpolAnalysisManager::WriteTree() {
 
 void NpolAnalysisManager::OpenFile() {
 
-  G4String fileName = Form("%s/%s_%04d.root", dirName.c_str(), rootName.c_str(), RootFileNumber);
+  G4String fileName = Form("%s/%s_%s_%04d.root", dirName.c_str(), rootName.c_str(), jobNumber.c_str(), RootFileNumber);
   npolOutFile = new TFile(fileName,"RECREATE");
 
   if( npolOutFile->IsZombie() ) {
