@@ -55,13 +55,14 @@ target_link_libraries(Npolapp ${Geant4_LIBRARIES} ${ROOT_LIBRARIES})
 
 # (6)
 set(Npolapp_FILES
-  npol.mac init.mac init_vis.mac vis.mac setuprun.sh
+  npol.mac init.mac init_vis.mac vis.mac 
 )
 
 set(Npolapp_DIRS
   gdml/
   root/
   output/
+  scripts/
 )
 
 foreach(_dir ${Npolapp_DIRS})
