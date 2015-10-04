@@ -1,7 +1,6 @@
 #!/bin/csh
 
-for ((i=$1; i<=$2; i++))
-do
+foreach i (`seq $1 1 $2`)
 
 cat > jsubfile_$i << EOF1
 PROJECT: e93038
@@ -11,16 +10,15 @@ JOBNAME : CGEN
 MAIL: tireman@jlab.org
 TIME: 2880
 COMMAND : source JLABsimRunCommands.csh $i
-OTHER_FILES : /home/tireman/scripts/JLABsimRunCommands.csh
+OTHER_FILES : /u/home/tireman/simulation/e11_12_009/background/nmu-npol/build/scripts/JLABsimRunCommands.csh
 EOF1
-done
+end
 
-for ((j=$1; j<=$2; j++))
-do
+foreach j (`seq $1 1 $2`)
 
-jsub jsubfile_$j
-sleep 2s
+  jsub jsubfile_$j
+  sleep 2s
 
-done
+end
 
 rm jsubfile_*
