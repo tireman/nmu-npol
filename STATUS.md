@@ -7,7 +7,7 @@ Several Changes to the analysis section and steppingacton along with file naming
 
 3. In that same routine, we currently dump all events that don't produce at least one track in the polarimeter.  This is to reduce file size and speed up ROOT scripts.  Unfortunately, this must be done after the event has been completed so it doesn't speed up the G4 simulation.
 
-4. A naming schema has been "adopted" by me.  Output files should have a base name like "npolRun" which is set in the script NMUsetuprun.sh or JLABsetuprun.csh using the env variable "NPOLBASE".  See next items. The default file name is "npolRun_1000_0001.root"  The first part is the NPOLBASENAME and the second part, between the undercores, is the JOBNUMBER.  The third part is the fileNumber which is set within NpolAnalysisManager during the run.
+4. A naming schema has been "adopted" by me.  Output files should have a base name like "npol" which is set in the script NMUsetuprun.sh or JLABsetuprun.csh using the env variable "NPOLBASE".  See next items. The default file name is "npol_1000_0001.root"  The first part is the NPOLBASENAME and the second part, between the undercores, is the JOBNUMBER.  The third part is the fileNumber which is set within NpolAnalysisManager during the run.
 
 5. To run the program you have some options.  Just typing ./Npolapp npolmac will run the program and a default location and name has been set.  If you want more control, read on.  Run scripts have been added to a folder called "scripts".
 

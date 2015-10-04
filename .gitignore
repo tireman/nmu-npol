@@ -15,5 +15,8 @@ cmake_install.cmake
 install_manifest.txt
 
 dict.*
+NpolClass.*
+dEoverE1.cxx
+TaggedParticles.cxx
 
 build/
