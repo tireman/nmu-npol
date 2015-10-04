@@ -1,3 +1,23 @@
+# Update: 10-3-2015
+
+Several Changes to the analysis section and steppingacton along with file naming "standard" ;).  Run scripts have been created as well.
+1. In analysis manager/tracking action the daughters along any track are added to that mother.  This is to create a "tree" so that we can scan through it in a root script. 
+
+2. Added in analysis manager a check to see any daughters exist at all.  If none then the electron when through the target with no production of daughters and the npolTree->fill() command is NOT executed.  The event is dumped!
+
+3. In that same routine, we currently dump all events that don't produce at least one track in the polarimeter.  This is to reduce file size and speed up ROOT scripts.  Unfortunately, this must be done after the event has been completed so it doesn't speed up the G4 simulation.
+
+4. A naming schema has been "adopted" by me.  Output files should have a base name like "npolRun" which is set in the script NMUsetuprun.sh or JLABsetuprun.csh using the env variable "NPOLBASE".  See next items. The default file name is "npolRun_1000_0001.root"  The first part is the NPOLBASENAME and the second part, between the undercores, is the JOBNUMBER.  The third part is the fileNumber which is set within NpolAnalysisManager during the run.
+
+5. To run the program you have some options.  Just typing ./Npolapp npolmac will run the program and a default location and name has been set.  If you want more control, read on.  Run scripts have been added to a folder called "scripts".
+
+   5.a.  For NMU, using "NMUjobsubmit 1 2" from the scripts folder will first source the NMUsetuprun.sh file then it will start two jobs with JOBNUMBER 1 and 2 respectively and place them in the background.  This is nice for starting multiply jobs without having to manually change file names and have many terminals open.  Putting in "12 15" will start 4 jobs with JOBNUMBERs 12, 13, 14, 15.  It will pipe all output to a text file in the output directory.  NMU can also start the job manually as long as they set the JOBNUMBER by hand otherwise it uses the above mentioned default name.  You can also source NMUsetuprun.sh manually as well after making the sensible modifcations for in that script. 
+   
+   5.b. For JLAB there is the default option like NMU to just launch the program with ./Npolapp npol.mac from the build directory and it will output the default name in the default folder.  You can also run the JLABsetuprun.csh script manually as well after making appropriate changes.  You will have to set the JOBNUMBER env variable manually if you want something other than the default value.  If you wish to submit to the farm system, you will need to run JLABjobscript.csh.  The action is "./JLABjobscript.csh 1 4".  Here, like the NMU one, the 1 and 4 are the first and last job you want to run for the JOBNUMBER env variable.  This script generates the jobfile (e.g. jobfile_1) which is needed for the 'jsub' command on the ifarm.  This file calls the JLABsimRunCommands.csh script which sets up the env variables using the JLABsetuprun.csh script, calls in the other stuff and then runs the program on the farm node.
+
+Whew!  That is a lot just to push jobs to a series of machines. 
+ 
+------------------------------------------------------------------------------
 # Update: 9-2-2015
 
 Several changes to the analysis section.

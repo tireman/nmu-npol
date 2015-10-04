@@ -1,5 +1,6 @@
 %% issues.txt - used to track standing issues in the devlopment of Npol %%
 
+On the Jlab ifarm there appears to be a problem with reading the GDML file.  I ran 11 runs with no problem then suddently a problem.  I've searched for an answer but they all point to needing to contract a web address to define a variable.  
 
 Check Horizontal bender magnet of overlap problems.  It passes overlap check but there may be a problem.  May require tearing apart the GDML file we got from B.Waidyawansa's SHMS code and reworking the variables a bit.
 
