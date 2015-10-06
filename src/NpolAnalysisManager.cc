@@ -50,25 +50,7 @@ NpolAnalysisManager::NpolAnalysisManager(){
   npolTree = NULL;
   tracks = NULL;
   taggedParticles = NULL;  
-
-  if(getenv("NPOLBASENAME")){
-    rootName = getenv("NPOLBASENAME");
-  }else{
-    rootName = "npol"; // default filename
-  }
-
-  if(getenv("NPOLDIR")){
-    dirName = getenv("NPOLDIR");
-  }else{
-    dirName = "output"; // default directory location
-  }
-
-  if(getenv("JOBNUMBER")){
-    jobNumber = getenv("JOBNUMBER");
-  }else{
-    jobNumber = "1000";
-  }
-
+  RetrieveEnvVariables();
   SetROOTFileNumber(1);
   OpenFile();
   Initialize();
@@ -241,4 +223,25 @@ void NpolAnalysisManager::ClearROOT(){
   tracks = NULL;
   taggedParticles = NULL;
   initialized = false;
+}
+
+void NpolAnalysisManager::RetrieveEnvVariables(){
+  if(getenv("NPOLBASENAME")){
+    rootName = getenv("NPOLBASENAME");
+  }else{
+    rootName = "npol"; // default filename
+  }
+
+  if(getenv("NPOLDIR")){
+    dirName = getenv("NPOLDIR");
+  }else{
+    dirName = "output"; // default directory location
+  }
+
+  if(getenv("JOBNUMBER")){
+    jobNumber = getenv("JOBNUMBER");
+  }else{
+    jobNumber = "99999";
+  }
+
 }
