@@ -43,6 +43,7 @@ public:
   void SetROOTFileNumber(G4int number);
   void CloseROOTChainFile();
   void ClearROOT();
+  void RetrieveEnvVariables();
 private:
   NpolAnalysisManager();
   ~NpolAnalysisManager();
