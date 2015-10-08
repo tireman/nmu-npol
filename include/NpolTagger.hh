@@ -13,7 +13,7 @@
 
 #include <string>
 #include "TObject.h"
-#include "/usr/local/geant4/geant4.10.00.p01/share/Geant4-10.0.1/include/Geant4/globals.hh"
+#include "globals.hh"
 
 class NpolTagger : public TObject {
 
