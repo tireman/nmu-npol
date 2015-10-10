@@ -32,7 +32,7 @@ NpolShieldHut::NpolShieldHut() {
   ConstructHutSideWall();
   ConstructHutRoof();
   ConstructParticleTagger();
-  //  ConstructLeadCurtain();
+  ConstructLeadCurtain();
 }
 
 NpolShieldHut::~NpolShieldHut() {}
@@ -43,7 +43,7 @@ G4String NpolShieldHut::GetName() {
 
 // Construct a lead shield for in front of the polarimeter
 void NpolShieldHut::ConstructLeadCurtain(){
-  G4double xlen = 0.70*m; G4double ylen = 0.45*m; G4double zlen = 0.10*m;
+  G4double xlen = 0.70*m; G4double ylen = 0.45*m; G4double zlen = 0.025*m;
 
   G4Box *LeadCurtain = new G4Box("LeadCurtain",xlen/2,ylen/2,zlen/2);
   LeadCurtainLV = new G4LogicalVolume(LeadCurtain,NpolMaterials::GetInstance()->GetPb(),"LeadCurtainLV",0,0,0);
@@ -65,7 +65,7 @@ void NpolShieldHut::ConstructParticleTagger(){
 // will simplfy here to a 3 foot deep wall that is 16 feet wide and 15 feet high
 void NpolShieldHut::ConstructHutFrontWall() {
   // constants for sizing and positioning
-  G4double xlen = 4.8768*m, ylen = 7.3152*m, zlen = 0.9144*m;
+  G4double xlen = 4.8768*m, ylen = 7.3152*m, zlen = 0.7944*m;
   G4double xlen1 = 0.66854*m, xlen2 = 0.82618*m;
   G4double ylen1 = 0.4012*m, ylen2 = 0.49574*m, VertOffSet = 0.3424*m;
   
@@ -127,9 +127,9 @@ void NpolShieldHut::ConstructHutRoof() {
 void NpolShieldHut::Place(G4LogicalVolume *motherLV) {
   
   G4double NpolAng = 28.0*deg, PosSide = 9.3025*m, AngSide = 14.0*deg, VertOffSet = 0.3424*m;
-  G4double PosFront = 6.2739*m, PosBack = 11.7739*m, PosRoof = 9.0239*m, OffSetRoof = 3.7776*m, PosLead = PosFront - 0.52*m, PosTagger = PosFront + 0.51*m;
+  G4double PosFront = 6.2739*m, PosBack = 11.7739*m, PosRoof = 9.0239*m, OffSetRoof = 3.7776*m, PosLead = PosFront - 0.48*m, PosTagger = PosFront + 0.51*m;
 
-  //  PlaceCylindrical(LeadCurtainLV, motherLV, "LeadCurtain", PosLead,-NpolAng, 0);
+  PlaceCylindrical(LeadCurtainLV, motherLV, "LeadCurtain", PosLead,-NpolAng, 0);
   PlaceCylindrical(ParticleTaggerLV, motherLV, "ParticleTagger", PosTagger, -NpolAng, 0);
   PlaceCylindrical(HutFrontWallLV, motherLV, "HutFrontWall", PosFront,-NpolAng,-VertOffSet);
   PlaceCylindrical(HutBackWallLV, motherLV, "HutBackWall", PosBack,-NpolAng,-VertOffSet);

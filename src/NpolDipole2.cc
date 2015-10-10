@@ -160,7 +160,7 @@ void NpolDipole2::ConstructDipole2Field(){
 void NpolDipole2::Place(G4LogicalVolume *motherLV) {
   G4double PosD2 = 4.6866*m, NpolAng = 28.0*deg, BarOffSet = +0.7730*m;
   G4double VertOffSet = 0.231/2*m, EndOffSet = +0.8235*m;
-  G4double ClampOffSet = 1.039*m;
+  G4double ClampOffSet = 1.00*m;
   
   // Place 4 copes of the Copper bars in the magnet
   PlaceRectangular(Dipole2CuBarLV, motherLV, "Dipole2CuBar", (BarOffSet*cos(NpolAng)-PosD2*sin(NpolAng)), VertOffSet, (BarOffSet*sin(NpolAng)+PosD2*cos(NpolAng)), 0*deg, -NpolAng, 0.0); 
