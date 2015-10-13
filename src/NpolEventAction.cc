@@ -33,20 +33,7 @@ NpolEventAction::~NpolEventAction()
 
 void NpolEventAction::BeginOfEventAction(const G4Event* evt) {
   NpolAnalysisManager *analysisMan = NpolAnalysisManager::GetInstance();
-  analysisMan->PrepareNewEvent();
-  
-  G4int evtID = evt->GetEventID();
-  
-  if(evtID == 0) ROOTFileNumber = 1;
-  if((evtID%1000000 == 0) && (evtID != 0)){
-    analysisMan->CloseROOTChainFile();
-    analysisMan->ClearROOT();
-    ROOTFileNumber += 1;
-    analysisMan->SetROOTFileNumber(ROOTFileNumber);
-    analysisMan->OpenFile();
-    analysisMan->Initialize();
-    analysisMan->PrepareNewEvent();
-    }
+  analysisMan->PrepareNewEvent(evt->GetEventID());
 }
 
 void NpolEventAction::EndOfEventAction(const G4Event* evt) {

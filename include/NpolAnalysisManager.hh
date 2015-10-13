@@ -31,29 +31,29 @@ public:
   void BeginOfRun();
   void EndOfRun();
   void Initialize();
-  void PrepareNewEvent();
+  void InitializeObjects();
+  void PrepareNewEvent(const G4int evtID);
   void AddTrack(const G4Track *);
   void SetTrackAsKilled(int trackID);
   void AddTaggedParticle(const G4Track *);
   void FillTree();
-  void WriteTree();
-  void CloseFile();
-  void OpenFile();
+  void WriteObjectsToFile();
+  void OpenRootFile();
   void setFileName(const G4String& nam);
-  void SetROOTFileNumber(G4int number);
-  void CloseROOTChainFile();
-  void ClearROOT();
-  void RetrieveEnvVariables();
+  void ClearObjects();
+  void InitializeFilenameVariables();
+
 private:
   NpolAnalysisManager();
   ~NpolAnalysisManager();
   
 private:
+  bool singletonInitialized;
+  int eventsPerFile;
   G4String rootName; 
   G4String dirName;
   G4String jobNumber;
   G4int RootFileNumber;
-  bool initialized;
   TTree *npolTree;
   TFile *npolOutFile;
   std::vector<NpolVertex *> *tracks;
