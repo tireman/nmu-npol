@@ -22,6 +22,7 @@ class TTree;
 class TBranch;
 class NpolVertex;
 class NpolTagger;
+class NpolStatistics;
 class NpolAnalysisMessenger;
 
 class NpolAnalysisManager {
@@ -49,7 +50,7 @@ private:
   
 private:
   bool singletonInitialized;
-  int eventsPerFile;
+  G4int eventsPerFile;
   G4String rootName; 
   G4String dirName;
   G4String jobNumber;
@@ -58,6 +59,7 @@ private:
   TFile *npolOutFile;
   std::vector<NpolVertex *> *tracks;
   std::vector<NpolTagger *> *taggedParticles;
+  NpolStatistics *statistics;
 };
 
 #endif

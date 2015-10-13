@@ -32,6 +32,7 @@
 #include "NpolAnalysisManager.hh"
 #include "NpolVertex.hh"
 #include "NpolTagger.hh"
+#include "NpolStatistics.hh"
 
 
 static NpolAnalysisManager *pInstance = NULL;
@@ -44,12 +45,17 @@ NpolAnalysisManager *NpolAnalysisManager::GetInstance() {
 }
 
 NpolAnalysisManager::NpolAnalysisManager(){
-	ClearObjects();
+	npolOutFile = NULL;
+	npolTree = NULL;
+	tracks = NULL;
+	taggedParticles = NULL;
+	statistics = NULL;
 	Initialize();
 }
 
 NpolAnalysisManager::~NpolAnalysisManager() {
 	ClearObjects();
+	delete statistics;
 }
 
 void NpolAnalysisManager::Initialize(){
@@ -57,7 +63,7 @@ void NpolAnalysisManager::Initialize(){
 		std::cout << "WARNING: NpolAnalysisManager is already initialized and is being initialized again." << std::endl;
 
 	InitializeFilenameVariables();
-	eventsPerFile = 1000; // the number of primary events that will be simulated before the output file is changed
+	eventsPerFile = 1000000; // the number of primary events that will be simulated before the output file is changed
 
 	InitializeObjects();
 
@@ -65,6 +71,10 @@ void NpolAnalysisManager::Initialize(){
 }
 
 void NpolAnalysisManager::InitializeObjects() {
+
+	statistics = new NpolStatistics();
+	statistics->version = 20151013;
+
 	tracks = new std::vector<NpolVertex *>();
 	tracks->push_back(NULL);
 	taggedParticles = new std::vector<NpolTagger *>();
@@ -114,6 +124,8 @@ void NpolAnalysisManager::PrepareNewEvent(const G4int evtID) {
 		OpenRootFile();
 		InitializeObjects();
 	}
+
+	(statistics->totalEvents)++;
 }
 
 void NpolAnalysisManager::AddTrack(const G4Track *aTrack) {
@@ -192,6 +204,7 @@ void NpolAnalysisManager::FillTree() {
 			G4String subVolName = volName.substr(0,3).c_str();
 			if(subVolName == "av_"){
 				npolTree->Fill();
+				(statistics->eventsSaved)++;
 				break;
 			}
 		}
@@ -199,8 +212,8 @@ void NpolAnalysisManager::FillTree() {
 }
 
 void NpolAnalysisManager::WriteObjectsToFile() {
-	if(npolOutFile != NULL)
-		npolTree->Write();
+	npolTree->Write();
+	statistics->Write();
 }
 
 void NpolAnalysisManager::OpenRootFile() {
@@ -225,6 +238,11 @@ void NpolAnalysisManager::ClearObjects(){
 	npolTree = NULL;
 	tracks = NULL;
 	taggedParticles = NULL;
+std::cout << "!";
+	if(statistics != NULL) {
+		statistics->totalEvents = 0;
+		statistics->eventsSaved = 0;
+	}
 }
 
 void NpolAnalysisManager::InitializeFilenameVariables(){
@@ -248,3 +266,4 @@ void NpolAnalysisManager::InitializeFilenameVariables(){
 
 	RootFileNumber = 0;
 }
+
