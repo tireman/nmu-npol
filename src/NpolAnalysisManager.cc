@@ -238,7 +238,6 @@ void NpolAnalysisManager::ClearObjects(){
 	npolTree = NULL;
 	tracks = NULL;
 	taggedParticles = NULL;
-std::cout << "!";
 	if(statistics != NULL) {
 		statistics->totalEvents = 0;
 		statistics->eventsSaved = 0;
