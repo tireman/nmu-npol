@@ -31,9 +31,12 @@ public:
   
   virtual G4String GetName();
   virtual void Place(G4LogicalVolume *motherLV);
+  void ConstructSHMSTagger();
+  void ConstructHBender();
   
 private:
-  G4LogicalVolume *HBenderLV;
+  //G4LogicalVolume *HBenderLV;
+  G4LogicalVolume *SHMSTaggerLV;
   G4LogicalVolume *HBCryoBoxLV;
   G4LogicalVolume *HBBoreLogicLV;
   G4LogicalVolume *HBCoilLogicLV;
