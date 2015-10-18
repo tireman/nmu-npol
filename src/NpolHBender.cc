@@ -21,7 +21,7 @@
 #include "G4Colour.hh"
 #include "G4ios.hh"
 #include "G4GDMLParser.hh"
-
+#include "G4tgbGeometryDumper.hh" 
 #include "NpolMaterials.hh"
 #include "NpolHBender.hh"
 
@@ -31,13 +31,13 @@ NpolHBender::NpolHBender() {
   G4String gdmlFilename = "gdml/HBender.gdml";
   parser.Read(gdmlFilename);
 
-  HBenderLV = parser.GetVolume("HBenderPV");
+  //HBenderLV = parser.GetVolume("HBenderPV");
   HBCryoBoxLV = parser.GetVolume("HBCryoBoxLogic");  
   HBBoreLogicLV = parser.GetVolume("HBBoreLogic");
   HBCoilLogicLV = parser.GetVolume("HBCoilLogic");
   HBYorkLogicLV = parser.GetVolume("HBYorkLogic");
   
-  //G4VisAttributes *VisAtt= new G4VisAttributes(G4Colour(0.0,0.0,1.0));
+   //G4VisAttributes *VisAtt= new G4VisAttributes(G4Colour(0.0,0.0,1.0));
   //HBenderLV->SetVisAttributes(VisAtt);
   HBenderLV->SetVisAttributes(G4VisAttributes::GetInvisible());
   
@@ -55,13 +55,13 @@ G4String NpolHBender::GetName() {
 }
 
 void NpolHBender::Place(G4LogicalVolume *motherLV) {
-  G4double ShmsAng = 36.53*deg;
+  G4double ShmsAng = 0.0*deg; // Angle at 4.4 GeV/c 36.53*deg; 
   G4double PosHB = 1.76*m;
   
   //PlaceCylindrical(HBenderLV,motherLV, "HBender", PosHB, ShmsAng, 0);
   PlaceCylindrical(HBBoreLogicLV, motherLV, "HBBore", PosHB, ShmsAng, 0);
-  PlaceCylindrical(HBCoilLogicLV, motherLV, "HBCoil", PosHB, ShmsAng, 0);
-  PlaceCylindrical(HBCoilLogicLV, motherLV, "HBYork", PosHB, ShmsAng, 0);
+  //PlaceCylindrical(HBCoilLogicLV, motherLV, "HBCoil", PosHB, ShmsAng, 0);
+  PlaceCylindrical(HBYorkLogicLV, motherLV, "HBYork", PosHB, ShmsAng, 0);
   PlaceCylindrical(HBCryoBoxLV, motherLV, "HBCyro", PosHB, ShmsAng, 0);
 } 
 
