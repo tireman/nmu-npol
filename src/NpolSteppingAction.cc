@@ -30,7 +30,7 @@ NpolSteppingAction::NpolSteppingAction(NpolEventAction* evt, NpolRunAction* run)
 
 NpolSteppingAction::~NpolSteppingAction() 
 {
-  G4cout<< "Ending NpolSteppingAction" << G4endl;
+  G4cout<< "Shutting Down Stepping Action" << G4endl;
 }
 
 void NpolSteppingAction::UserSteppingAction(const G4Step *aStep) {
@@ -48,8 +48,7 @@ void NpolSteppingAction::UserSteppingAction(const G4Step *aStep) {
 	aTrack->SetTrackStatus(fStopAndKill);
   }
 
-  if((preStepVolume->GetName() == "ParticleTagger")){
-    analysisMan->AddTaggedParticle(aTrack);
-  }
+  if(volName == "NpolTagger") analysisMan->AddNPOLTaggedParticle(aTrack);
+  if(volName == "SHMSTagger") analysisMan->AddSHMSTaggedParticle(aTrack);
 }
 

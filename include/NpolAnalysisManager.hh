@@ -36,7 +36,8 @@ public:
   void PrepareNewEvent(const G4int evtID);
   void AddTrack(const G4Track *);
   void SetTrackAsKilled(int trackID);
-  void AddTaggedParticle(const G4Track *);
+  void AddNPOLTaggedParticle(const G4Track *);
+  void AddSHMSTaggedParticle(const G4Track *);
   void FillTree();
   void WriteObjectsToFile();
   void OpenRootFile();
@@ -58,7 +59,8 @@ private:
   TTree *npolTree;
   TFile *npolOutFile;
   std::vector<NpolVertex *> *tracks;
-  std::vector<NpolTagger *> *taggedParticles;
+  std::vector<NpolTagger *> *NPOLTaggedParticle;
+  std::vector<NpolTagger *> *SHMSTaggedParticle;
   NpolStatistics *statistics;
 };
 

@@ -5,16 +5,7 @@
  	<constant name="PI" value="1.*pi"/>
 	<variable name="target_to_hbbore_center" value="176"/>
 	<constant name="fBoreRot" value="1.5"/>
-
-	<constant name="fBpipeThick" value="0.3"/>
-	<constant name="fBpipeRMax1" value="2.54"/>
-	<constant name="fBpipeRMin1" value="-fBpipeThick+fBpipeRMax1"/>
-	<constant name="fBpipeRMax2" value="30.48"/>
-	<constant name="fBpipeRMin2" value="-fBpipeThick+fBpipeRMax2"/>
-	<constant name="fBpipeDz" value="115.75"/>
-	<constant name="fHBBpipeCenterX" value="-cos(8.5*pi/180)*sin(5.5*pi/180)*target_to_hbbore_center+2"/>
-	<constant name="fHBBpipeCenterY" value="0"/>
-	<constant name="fHBBpipeCenterZ" value="-sin(8.5*pi/180)*sin(5.5*pi/180)*target_to_hbbore_center+2"/>
+	<constant name="tempOffSet" value="0.5"/>
 
 	<constant name="fHBBoreXfp" value="11.75"/>
 	<constant name="fHBBoreXfn" value="-4.13"/>
@@ -72,20 +63,15 @@
 	<constant name="fHBCryoBoxZ" value="-0.1+fHBBoreZ"/>
 
   	<position name="Origin" unit="cm" x="0" y="0" z="0" />
-  	<position name="pBPipe" unit="cm" x="fHBBpipeCenterX" y="fHBBpipeCenterY" z="fHBBpipeCenterX" />
-   	<position name="pYork" unit="cm" x="-6" y="0" z="0" />
-	
+   	<position name="pYork" unit="cm" x="-6" y="0" z="0" />	
 	<position name="pHBCoilTopCut" unit="cm" x="0" y="fHBCoilWidth+fHBCoilBoxTopCutY/2" z="0" />
   	<position name="pHBCoilBottomCut" unit="cm" x="0" y="-(fHBCoilWidth+fHBCoilBoxTopCutY/2)" z="0" />
-  	<position name="pBpipe" unit="cm" x="-236.65" y="0" z="1469.33" />
-  	<position name="pBpipeInCryo" unit="cm" x="-198.14" y="0" z="1475.34" />
- 
+  
+  
   	<rotation name="identity" x="0" y="0" z="0"/>
 	<rotation name="rHBRot" unit="deg" x="0" y="fBoreRot" z="0"/>
 	<rotation name="rHBCoilLeftRot" unit="deg" x="0" y="-3.0" z="0"/>
 	<rotation name="rHBCoilRightRot" unit="deg" x="0" y="-7.0" z="0"/>
-	<rotation name="rBpipe" unit="deg" x="0" y="8.5" z="0" />
-	<rotation name="rBpipeInCryo" unit="deg" x="0" y="-7.0" z="0" />
 
 </define>
 
@@ -124,9 +110,6 @@
 
 <solids>
  
-	<cone name = "beamPipeFull" rmin1="0" rmax1="fBpipeRMax1" rmin2="0" rmax2="fBpipeRMax2" z="fBpipeDz" startphi="0" deltaphi="360" aunit="deg" lunit= "cm" />
-	<cone name = "beamPipeVac" rmin1="0" rmax1="fBpipeRMin1" rmin2="0" rmax2="fBpipeRMin2" z="fBpipeDz" startphi="0" deltaphi="360" aunit="deg" lunit= "cm" />
-
 	<arb8 lunit="cm" name="HBenderBox" dz="fHBCoilBoxZ/2+15" 
 		v1x="+62.0" v1y="+64.0" 
 		v2x="+62.0" v2y="-64.0"
@@ -137,7 +120,7 @@
              	v7x="-24.0" v7y="-64.0" 
 		v8x="-24.0" v8y="+64.0"/>
 
-	<arb8 lunit="cm" name="hbBore" dz="(fHBBoreZ/2)+0.5" 
+	<arb8 lunit="cm" name="hbBore" dz="(fHBBoreZ/2)" 
 		v1x="fHBBoreXfn" v1y="-fHBBoreY/2" 
 		v2x="fHBBoreXfn" v2y="fHBBoreY/2"
              	v3x="fHBBoreXfp" v3y="fHBBoreY/2" 
@@ -146,7 +129,7 @@
 		v6x="fHBBoreXbn" v6y="fHBBoreY/2"
              	v7x="fHBBoreXbp" v7y="fHBBoreY/2" 
 		v8x="fHBBoreXbp" v8y="-fHBBoreY/2"/>
-
+	
 	<arb8 lunit="cm" name="hbYork" dz="fHBYorkZ/2" 
 		v1x="fHBYorkXfn" v1y="-fHBYorkY/2" 
 		v2x="fHBYorkXfn" v2y="fHBYorkY/2"
@@ -237,21 +220,14 @@
 	<positionref ref="Origin"/>
 	</subtraction>
 
-	<subtraction name="hbCryoBoxHollow">
+	<subtraction name="hbCryoSolid">
 	<first ref="hbCryoBoxFull"/>
 	<second ref="hbCryoBoxCut"/>
 	<positionref ref="Origin"/>
 	</subtraction>
 
-	<subtraction name="hbCryoSolidWithPipeCut">
-	<first ref="hbCryoBoxHollow"/>
-	<second ref="beamPipeFull"/>
-	<positionref ref="pBpipeInCryo"/>
-	<rotationref ref="rBpipeInCryo"/>	
-	</subtraction>
-
 	<subtraction name="hbCryoMinusBore">
-	<first ref="hbCryoSolidWithPipeCut"/>
+	<first ref="hbCryoSolid"/>
 	<second ref="hbBore"/>
 	<positionref ref="Origin"/>
 	</subtraction>
@@ -276,7 +252,7 @@
       <solidref ref="HBYorkSolid"/>
      </volume>
     
-    <volume name="HBCryoBoxLogic">
+     <volume name="HBCryoBoxLogic">
       <materialref ref="SSteel"/>
       <solidref ref="hbCryoMinusBore"/>
        <auxiliary auxtype="SensDet" auxvalue="HBCryoBox"/>
