@@ -31,7 +31,7 @@
 : worldBox(NULL)
 {
 	G4int n_particle = 1;
-	G4double NpolAng = 28.0*deg;
+	G4double NpolAng = 28.0*deg; // Npol Ang for Neutron/Proton 28.0*deg;
 	particleGun  = new G4ParticleGun(n_particle);
 
 	// default particle kinematic

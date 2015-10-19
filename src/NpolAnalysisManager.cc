@@ -86,7 +86,7 @@ void NpolAnalysisManager::InitializeObjects() {
   
   npolTree = new TTree("T","Per-event information from Npol simulation");
   npolTree->Branch("tracks","std::vector<NpolVertex *>",&tracks,32000,2);
-  npolTree->Branch("SHMS_Tagger","std::vector<NpolTagger *>",&NPOLTaggedParticle,32000,2);
+  npolTree->Branch("NPOL_Tagger","std::vector<NpolTagger *>",&NPOLTaggedParticle,32000,2);
   npolTree->Branch("SHMS_Tagger","std::vector<NpolTagger *>",&SHMSTaggedParticle,32000,2);
 }
 
@@ -139,37 +139,37 @@ void NpolAnalysisManager::PrepareNewEvent(const G4int evtID) {
 }
 
 void NpolAnalysisManager::AddTrack(const G4Track *aTrack) {
-	NpolVertex *anNpolVertex = new NpolVertex();
-	G4int trackId = aTrack->GetTrackID();
-	G4int parentId = aTrack->GetParentID();
-
-	anNpolVertex->trackId = trackId;
-	anNpolVertex->parentId = parentId;
-	anNpolVertex->posX = (aTrack->GetPosition()).x()/m;
-	anNpolVertex->posY = (aTrack->GetPosition()).y()/m;
-	anNpolVertex->posZ = (aTrack->GetPosition()).z()/m;
-	anNpolVertex->momX = (aTrack->GetMomentum()).x()/MeV;
-	anNpolVertex->momY = (aTrack->GetMomentum()).y()/MeV;
-	anNpolVertex->momZ = (aTrack->GetMomentum()).z()/MeV;
-	anNpolVertex->time = (aTrack->GetGlobalTime())/s;
-	anNpolVertex->energy = aTrack->GetKineticEnergy()/MeV;
-	anNpolVertex->eMiss = false;
-	anNpolVertex->particle = (aTrack->GetDefinition()->GetParticleName()).data();
-	anNpolVertex->particleId = (aTrack->GetDefinition()->GetPDGEncoding());
-	if(aTrack->GetCreatorProcess() != NULL)
-		anNpolVertex->process = (aTrack->GetCreatorProcess()->GetProcessName()).data();
-	else
-		anNpolVertex->process = "";
-	anNpolVertex->volume = (aTrack->GetVolume()->GetName()).data();
-
-	if(tracks->size() <= (unsigned int)trackId)
-		tracks->resize(trackId+1);
-	(*tracks)[trackId] = anNpolVertex;
-
-	if(parentId != 0) {
-		NpolVertex *parent = tracks->at(parentId);
-		(parent->daughterIds).push_back(trackId);
-	}
+  NpolVertex *anNpolVertex = new NpolVertex();
+  G4int trackId = aTrack->GetTrackID();
+  G4int parentId = aTrack->GetParentID();
+  
+  anNpolVertex->trackId = trackId;
+  anNpolVertex->parentId = parentId;
+  anNpolVertex->posX = (aTrack->GetPosition()).x()/m;
+  anNpolVertex->posY = (aTrack->GetPosition()).y()/m;
+  anNpolVertex->posZ = (aTrack->GetPosition()).z()/m;
+  anNpolVertex->momX = (aTrack->GetMomentum()).x()/MeV;
+  anNpolVertex->momY = (aTrack->GetMomentum()).y()/MeV;
+  anNpolVertex->momZ = (aTrack->GetMomentum()).z()/MeV;
+  anNpolVertex->time = (aTrack->GetGlobalTime())/s;
+  anNpolVertex->energy = aTrack->GetKineticEnergy()/MeV;
+  anNpolVertex->eMiss = false;
+  anNpolVertex->particle = (aTrack->GetDefinition()->GetParticleName()).data();
+  anNpolVertex->particleId = (aTrack->GetDefinition()->GetPDGEncoding());
+  if(aTrack->GetCreatorProcess() != NULL)
+    anNpolVertex->process = (aTrack->GetCreatorProcess()->GetProcessName()).data();
+  else
+    anNpolVertex->process = "";
+  anNpolVertex->volume = (aTrack->GetVolume()->GetName()).data();
+  
+  if(tracks->size() <= (unsigned int)trackId)
+    tracks->resize(trackId+1);
+  (*tracks)[trackId] = anNpolVertex;
+  
+  if(parentId != 0) {
+    NpolVertex *parent = tracks->at(parentId);
+    (parent->daughterIds).push_back(trackId);
+  }
 }
 
 void NpolAnalysisManager::SetTrackAsKilled(int trackId) {
