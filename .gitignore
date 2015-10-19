@@ -17,6 +17,7 @@ install_manifest.txt
 dict.*
 NpolClass.*
 dEoverE1.cxx
+dEoverE.cxx
 TaggedParticles.cxx
 
 build/
