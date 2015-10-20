@@ -13,7 +13,6 @@
 // Dipole 1 'Charybdis' Constructor file.  
 // Created: William Tireman - December 2014
 
-#include "G4PhysicalConstants.hh"
 #include "G4Material.hh"
 #include "G4Box.hh"
 #include "G4TwoVector.hh"
@@ -23,7 +22,6 @@
 #include "G4LogicalVolume.hh"
 #include "G4VisAttributes.hh"
 #include "G4Colour.hh"
-#include "G4ios.hh"
 #include "G4Transform3D.hh"
 #include "G4RotationMatrix.hh"
 #include "G4PVPlacement.hh"

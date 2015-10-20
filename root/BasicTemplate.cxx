@@ -7,15 +7,14 @@
 
 #include <TFile.h>
 #include <TTree.h>
+#include <TChain.h>
 #include <TBranch.h>
 #include <TVector.h>
 #include <TH1.h>
 #include <TSystem.h>
-#include <TClassTable.h>
-#include <TInterpreter.h>
 
-#include "../include/NpolVertex.hh"
-#include "../include/NpolTagger.hh"
+#include "NpolVertex.hh"
+#include "NpolTagger.hh"
 
 int GetAVNumber(const std::string &volName) {
   if(volName.substr(0,3) == "av_") {
@@ -36,7 +35,7 @@ void BasicTemplate() {
   // The TChain is very nice.
   TChain *npolTree = new TChain("T");
   //npolTree->Add("/data2/cgen/FirstRun/NoMagField/npolNoMagField_*.root");
-  npolTree->Add("/data2/cgen/FirstRun/npolNpol_*.root");  
+  npolTree->Add("/data2/cgen/FirstRun/npolNpol_1_*.root");  
   
   npolTree->SetBranchAddress("tagger",&tagEntry);
   npolTree->SetBranchAddress("tracks",&anEntry);

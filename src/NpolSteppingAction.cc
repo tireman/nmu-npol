@@ -43,11 +43,14 @@ void NpolSteppingAction::UserSteppingAction(const G4Step *aStep) {
   G4VPhysicalVolume *postStepVolume = postStepPoint->GetPhysicalVolume();
   G4String volName = preStepVolume->GetName();
  
+  // Kill tracks that reach certian volumes and won't produce background in 
+  // the polarimeter
   if(volName == "Cap" || volName == "HallShellRoof" || volName == "HallShellFloor" || volName == "HallShellWall" || postStepVolume == NULL) {
 	analysisMan->SetTrackAsKilled(aTrack->GetTrackID());
 	aTrack->SetTrackStatus(fStopAndKill);
   }
 
+  // Check if either tagger is hit and if so pass track to Vector
   if(volName == "NPOLTagger") {
     analysisMan->AddNPOLTaggedParticle(aTrack);
   }

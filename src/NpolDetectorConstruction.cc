@@ -76,7 +76,5 @@ G4VPhysicalVolume* NpolDetectorConstruction::Construct() {
   return world->GetWorldPV();
 }
 
-void NpolDetectorConstruction::ConstructSDandField() {
-
-}
+void NpolDetectorConstruction::ConstructSDandField() {}
 

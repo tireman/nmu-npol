@@ -13,7 +13,7 @@
 // Polarimeter Shield hut construction file
 // Created: William Tireman - January 2015
 
-#include "G4PhysicalConstants.hh"
+//#include "G4PhysicalConstants.hh"
 #include "G4Material.hh"
 #include "G4Box.hh"
 #include "G4Trd.hh"
@@ -126,8 +126,10 @@ void NpolShieldHut::ConstructHutRoof() {
 
 void NpolShieldHut::Place(G4LogicalVolume *motherLV) {
   
-  G4double NpolAng = 28.0*deg, PosSide = 9.3025*m, AngSide = 14.0*deg, VertOffSet = 0.3424*m;
-  G4double PosFront = 6.2739*m, PosBack = 11.7739*m, PosRoof = 9.0239*m, OffSetRoof = 3.7776*m, PosLead = PosFront - 0.48*m, PosTagger = PosFront + 0.51*m;
+  G4double NpolAng = 28.0*deg, PosSide = 9.3025*m, AngSide = 14.0*deg;
+  G4double VertOffSet = 0.3424*m, PosFront = 6.2739*m, PosBack = 11.7739*m;
+  G4double PosRoof = 9.0239*m, OffSetRoof = 3.7776*m;
+  G4double PosLead = PosFront - 0.48*m, PosTagger = PosFront + 0.51*m;
 
   PlaceCylindrical(LeadCurtainLV, motherLV, "LeadCurtain", PosLead,-NpolAng, 0);
   PlaceCylindrical(NPOLTaggerLV, motherLV, "NPOLTagger", PosTagger, -NpolAng, 0);

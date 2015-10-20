@@ -38,37 +38,37 @@
 static NpolAnalysisManager *pInstance = NULL;
 
 NpolAnalysisManager *NpolAnalysisManager::GetInstance() {
-	if(pInstance == NULL)
-		pInstance = new NpolAnalysisManager();
-
-	return pInstance;
+  if(pInstance == NULL)
+    pInstance = new NpolAnalysisManager();
+  
+  return pInstance;
 }
 
 NpolAnalysisManager::NpolAnalysisManager(){
-	npolOutFile = NULL;
-	npolTree = NULL;
-	tracks = NULL;
-	NPOLTaggedParticle = NULL;
-	SHMSTaggedParticle = NULL;
-	statistics = NULL;
-	Initialize();
+  npolOutFile = NULL;
+  npolTree = NULL;
+  tracks = NULL;
+  NPOLTaggedParticle = NULL;
+  SHMSTaggedParticle = NULL;
+  statistics = NULL;
+  Initialize();
 }
 
 NpolAnalysisManager::~NpolAnalysisManager() {
-	ClearObjects();
-	delete statistics;
+  ClearObjects();
+  delete statistics;
 }
 
 void NpolAnalysisManager::Initialize(){
-	if(singletonInitialized)
-		std::cout << "WARNING: NpolAnalysisManager is already initialized and is being initialized again." << std::endl;
-
-	InitializeFilenameVariables();
-	eventsPerFile = 1000000; // the number of primary events that will be simulated before the output file is changed
-
-	InitializeObjects();
-
-	singletonInitialized = true;
+  if(singletonInitialized)
+    std::cout << "WARNING: NpolAnalysisManager is already initialized and is being initialized again." << std::endl;
+  
+  InitializeFilenameVariables();
+  eventsPerFile = 1000000; // the number of primary events that will be simulated before the output file is changed
+  
+  InitializeObjects();
+  
+  singletonInitialized = true;
 }
 
 void NpolAnalysisManager::InitializeObjects() {
@@ -90,17 +90,13 @@ void NpolAnalysisManager::InitializeObjects() {
   npolTree->Branch("SHMS_Tagger","std::vector<NpolTagger *>",&SHMSTaggedParticle,32000,2);
 }
 
-void NpolAnalysisManager::BeginOfRun(){
-	// Called from EventAction ... once had the opening of the first 
-	// ROOT file but it was double the size.  Moved openFile to constructor
-	// and problem was solved. Curious.
-}
+void NpolAnalysisManager::BeginOfRun(){}
 
 void NpolAnalysisManager::EndOfRun(){
-	WriteObjectsToFile();
-	npolOutFile->Close();
-	ClearObjects();
-	G4cout << "Shutting down the run!" << G4endl;
+  WriteObjectsToFile();
+  npolOutFile->Close();
+  ClearObjects();
+  G4cout << "Shutting down the run!" << G4endl;
 }
 
 void NpolAnalysisManager::PrepareNewEvent(const G4int evtID) {
@@ -219,7 +215,7 @@ void NpolAnalysisManager::FillTree() {
   // checks to see if at least one is in an assembly volume which is 
   // part of the polarimeter.  If it is then it fills the tree, otherwise,
   // it skips filling and the next event is generated.  Cuts down on space 
-  // used in the files from the majority of events which do not produce events
+  // used in the files since the majority of events do not produce hits
   // in the polarimeter.
   
   std::vector<NpolVertex *>::iterator it;
