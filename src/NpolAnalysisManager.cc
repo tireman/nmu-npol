@@ -45,13 +45,16 @@ NpolAnalysisManager *NpolAnalysisManager::GetInstance() {
 }
 
 NpolAnalysisManager::NpolAnalysisManager(){
+
   npolOutFile = NULL;
   npolTree = NULL;
+  statsTree = NULL;
   tracks = NULL;
   NPOLTaggedParticle = NULL;
   SHMSTaggedParticle = NULL;
   statistics = NULL;
   Initialize();
+
 }
 
 NpolAnalysisManager::~NpolAnalysisManager() {
@@ -74,7 +77,9 @@ void NpolAnalysisManager::Initialize(){
 void NpolAnalysisManager::InitializeObjects() {
 
   statistics = new NpolStatistics();
-  statistics->version = 20151013;
+  statistics->version = 20151020;
+  statistics->totalEvents = 0;
+  statistics->eventsSaved = 0;
   
   tracks = new std::vector<NpolVertex *>();
   tracks->push_back(NULL);
@@ -88,6 +93,9 @@ void NpolAnalysisManager::InitializeObjects() {
   npolTree->Branch("tracks","std::vector<NpolVertex *>",&tracks,32000,2);
   npolTree->Branch("NPOL_Tagger","std::vector<NpolTagger *>",&NPOLTaggedParticle,32000,2);
   npolTree->Branch("SHMS_Tagger","std::vector<NpolTagger *>",&SHMSTaggedParticle,32000,2);
+  
+  statsTree = new TTree("T2","Per-run information from Npol simulation");
+  statsTree->Branch("stats","NpolStatistics",&statistics,32000,2);
 }
 
 void NpolAnalysisManager::BeginOfRun(){}
@@ -227,9 +235,9 @@ void NpolAnalysisManager::FillTree() {
     if(!((*it)->daughterIds).empty()){
       G4String subVolName = volName.substr(0,3).c_str();
       if(subVolName == "av_"){
-	npolTree->Fill();
-	(statistics->eventsSaved)++;
-	break;
+		npolTree->Fill();
+		(statistics->eventsSaved)++;
+		break;
       }
     }
   }
@@ -237,7 +245,8 @@ void NpolAnalysisManager::FillTree() {
 
 void NpolAnalysisManager::WriteObjectsToFile() {
   npolTree->Write();
-  statistics->Write();
+  statsTree->Fill();
+  statsTree->Write();
 }
 
 void NpolAnalysisManager::OpenRootFile() {
@@ -257,16 +266,14 @@ void NpolAnalysisManager::setFileName(const G4String& nam) {
   rootName = nam;
 }
 
-void NpolAnalysisManager::ClearObjects(){  
+void NpolAnalysisManager::ClearObjects(){
   npolOutFile = NULL;
   npolTree = NULL;
+  statsTree = NULL;
   tracks = NULL;
   NPOLTaggedParticle = NULL;
   SHMSTaggedParticle = NULL;
-  if(statistics != NULL) {
-    statistics->totalEvents = 0;
-    statistics->eventsSaved = 0;
-  }
+  statistics = NULL;
 }
 
 void NpolAnalysisManager::InitializeFilenameVariables(){

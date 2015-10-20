@@ -55,8 +55,9 @@ private:
   G4String rootName; 
   G4String dirName;
   G4String jobNumber;
-  G4int RootFileNumber;
   TTree *npolTree;
+  TTree *statsTree;
+  G4int RootFileNumber;
   TFile *npolOutFile;
   std::vector<NpolVertex *> *tracks;
   std::vector<NpolTagger *> *NPOLTaggedParticle;
