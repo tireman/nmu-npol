@@ -1,3 +1,15 @@
+# Update: 10-20-2015
+
+After several runs on the farm, some ROOT script work, and some after thought the following changes were made.
+
+SHMS H-bender magnet was throwing warnings on some tracks.  Investigated and found that an illegal operation between two surfaces or lines in the boolean subtraction volumes (not the HBCoil volume) is occuring.  Unable to resolve in the limited time available so the HBCoil is not placed in the world.  The rest of the H-Bender is placed which is the majority of the mass.  Little background in the polarimeter is expected from the SHMS.
+
+SHMS tagger has been added.  A thin air volume was placed right in front of the SHMS bore via the contstructor for th SHMS HBender magnet.  This allows for "tagging" particles entering the SHMS acceptance.  Could prove to be useful later.  This data is stored in a branch under the main tree.
+
+A new tree was added to track "statistics"  Since events that don't deposit any energy in the polarimeter are NOT recorded, it is necessary to check just how many are saved and how many are not for total calculations.  This is done in a new Tree which is only saved at the end of the run.  Other values can be added later that are run specific. There is also a version number added that should be changed when the NpolAnalysisManager undergoes changes that effect simulation output files.
+
+The ROOT files:  The ROOT files now contain Two trees.  The first Tree is saved at every "good" event with all the vertices and has three branches.  The second tree is only saved at the end of the run and contains run specific information or statistics.
+
 # Update: 10-3-2015
 
 Several Changes to the analysis section and steppingacton along with file naming "standard" ;).  Run scripts have been created as well.

@@ -51,21 +51,24 @@ int GetPlacementNumber(const std::string &volName) {
 void BasicTemplate() {
   gSystem->Load("NpolClass.so"); // Load up the user class lib
   
-  Double_t xpos, ypos, zpos;
+  Double_t xpos, ypos, zpos, xmom, ymom, zmom, totmom;
+  Double_t E_D913;
+
   std::vector<NpolVertex *> *anEntry = NULL;
-  std::vector<NpolTagger *> *tagEntry = NULL;
-  
+  std::vector<NpolTagger *> *npolEntry = NULL;
+  std::vector<NpolTagger *> *shmsEntry = NULL;
+
   // The TChain is very nice.
   TChain *npolTree = new TChain("T");
-  npolTree->Add("/data2/cgen/FirstRun/npolNpol_1_*.root");  
+  npolTree->Add("/data3/cgen/FirstRun/ProtonOnly/npolProton_*.root");  
   
-  npolTree->SetBranchAddress("tagger",&tagEntry);
+  //npolTree->SetBranchAddress("NPOL_Tagger",&npolEntry);
+  //npolTree->SetBranchAddress("SHMS_Tagger",&shmsEntry);
+  npolTree->SetBranchAddress("tagger",&npolEntry);
   npolTree->SetBranchAddress("tracks",&anEntry);
   
-  TFile *outFile = new TFile("CreativeName.root","RECREATE");
-  
   // this is a good place for your histograms to be created
-  TH1F *e_D103 = new TH1F("e_D103","Energy in Detector 103",500, 0., 500.);
+  TH1F *H_D913 = new TH1F("H_D913","Energy in Detector 913",200, 0., 100.);
   
   // loop over all entries (one per event)
   Int_t nentries = npolTree->GetEntries();
@@ -85,28 +88,41 @@ void BasicTemplate() {
       
       if(aVertex == NULL) continue;
       
-      
+      // enter code to analyze the tracks vertices
+      if(aVertex == NULL) continue;
+      if(!(aVertex->particle == "proton")) continue;
+      if(!(aVertex->daughterIds).empty()) continue;
+      if(aVertex->eMiss) continue;
+      std::string volName = aVertex->volume;
+      if(GetAVNumber(volName) == 9){
+	if(GetImprNumber(volName) == 1){
+	  if(GetPlacementNumber(volName) == 3){
+	    E_D913 = aVertex->energy;
+	  }
+	}
+      }
     }
     
     // loop over vector elements (one per vertex in the tagger branch)
-    if(tagEntry->empty()) continue;
-    nvertices = tagEntry->size();
+    if(npolEntry->empty()) continue;
+    nvertices = npolEntry->size();
     
     for (Int_t j = 0; j < nvertices; j++){
       
-      NpolTagger *aVertex2 = (*tagEntry)[j];
+      NpolTagger *aVertex2 = (*npolEntry)[j];
       
       if(aVertex2 == NULL) continue;
       
       // enter code to analyze the tagger vertex
     }
-    
+    H_D913->Fill(E_D913);
   }
   
   
-  // write histograms and other stuff to the ROOT outfile here
-  
-  outFile->Close();  // cose the root file
+  // open, write histograms and other stuff to the ROOT outfile here
+  TFile *outFile = new TFile("CreativeName.root","RECREATE");
+  H_D913->Write();   // Write object to ROOT file
+  outFile->Close();  // close the root file
   
 }
 

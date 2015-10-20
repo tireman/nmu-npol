@@ -28,7 +28,7 @@ installed.
     % ./cleanBuild
     % cd build
   ```
-  * If all goes well, then goto **Run the Simulation** below.
+  * If all goes well, then goto **Run the Simulation** below. Beware of differences between personal systems and JLAB.
 
 ### Details of the build (ie. what cleanBuild does)
 1.  Create a directory inside nmu-npol/ called build/ and cd into it:
@@ -63,13 +63,56 @@ installed.
     ```
 
 ### Run the simulation
-1.  You can run in batch mode by setting particle type, energy, and number of
-    events in the npol.mac file and run:
+1.  You can run in batch mode in one of two ways both on the Jlab Farm or on a
+    local machine.
+
+    1.A. You can run in batch mode on a local machine by setting particle 
+    	 type, energy, and number of events in the build/npol.mac file or in the
+    	 the npol.mac file in the base directory and type make in the build 
+	 directory.  Then run by: 
   ```
     % cd build             # if not already in this directory
-    % source script/NMUsetuprun.sh   # sets up output dir and name; change as needed
+    % source script/NMUsetuprun.sh   # sets up output dir and name; 
+      	     			     # change as needed
     % ./Npolapp npol.mac
   ```
+	If you want to run a set of runs on a muticore machine, use the script 
+	NMUjobsubmit.sh.  From the build directory:
+  ```
+    % cd build		# if not already in this directory
+    % ./scripts/NMUjobsubmit.sh i j 	 # 'i' is the first job number and 
+      				  	 # 'j' is the last job number
+					 # jobs will be put in the background
+  ```
+
+	Jobs will be placed in the background and run to completion.  If you 
+	use i=1 and j=1 only 1 job will start.  If you use i=11 and j = 16
+	then 6 jobs will start with JOBNUMBER set to 11 through 16.
+
+    1.B. If on the farm, one can run as above in interactive mode just 
+    	 remember to source the production.csh script on the Jlab farm system
+	 before attempting to compile and run.  Then NMUsetuprun.sh script 
+	 may need modified.
+
+	 If you wish to run on the batch farm nodes, then a job submission 
+	 script needs to create a jobsub file. You may need to modify the job
+	 submission script (JLABjobscript.csh) to generate jobsub files with 
+	 the correct information (name, job, etc.). Then modify the 
+	 JLABsetuprun.csh script which sets directorys and env. variables
+	 as necessary. Then, to submit a number of jobs to the farm nodes
+	 do the following:
+  ```
+    % cd build/scripts	# do this after you have completed a build
+    % ./JLABjobscript.csh i j
+  ```
+
+	This script will generate the jobsub file, submit the job, pause
+	for 2 seconds (take a breath), and then generate the next one and 
+	submit until all have been submitted between i and j where i is the 
+	first job number and j is the last job number with i < j.  Note that
+	these job numbers are used in the ROOT file identification so you 
+	MUST watch your file names and job numbers.  User beware!
+	 
 
 2.  For visualization, you can modify and run another ``*.mac`` file or run
     ``./Npolapp`` by itself on the command line.  You can rotate, move, and
