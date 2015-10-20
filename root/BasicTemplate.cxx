@@ -75,7 +75,7 @@ void BasicTemplate() {
   for(int i = 0; i < nentries; i++) {
     npolTree->GetEntry(i);
     
-    if(i % 100 == 0)
+    if(i % 1000 == 0)
       std::cout << "Processing event #" << i << std::endl;
     
     // loop over vector elements (one per vertex in the tracks branch)
@@ -86,17 +86,14 @@ void BasicTemplate() {
       
       NpolVertex *aVertex = (*anEntry)[j];
       
-      if(aVertex == NULL) continue;
-      
       // enter code to analyze the tracks vertices
       if(aVertex == NULL) continue;
-      if(!(aVertex->particle == "proton")) continue;
+      //if(!(aVertex->particle == "proton")) continue;
       if(!(aVertex->daughterIds).empty()) continue;
       if(aVertex->eMiss) continue;
-      std::string volName = aVertex->volume;
-      if(GetAVNumber(volName) == 9){
-	if(GetImprNumber(volName) == 1){
-	  if(GetPlacementNumber(volName) == 3){
+      if(GetAVNumber(aVertex->volume) == 9){
+	if(GetImprNumber(aVertex->volume) == 1){
+	  if(GetPlacementNumber(aVertex->volume) == 3){
 	    E_D913 = aVertex->energy;
 	  }
 	}

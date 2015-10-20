@@ -77,7 +77,7 @@ void NpolAnalysisManager::Initialize(){
 void NpolAnalysisManager::InitializeObjects() {
 
   statistics = new NpolStatistics();
-  statistics->version = 20151020;
+  statistics->version = 20151020;  // Determined by Date: YYYYMMDD
   statistics->totalEvents = 0;
   statistics->eventsSaved = 0;
   
@@ -286,13 +286,13 @@ void NpolAnalysisManager::InitializeFilenameVariables(){
   if(getenv("NPOLDIR")){
     dirName = getenv("NPOLDIR");
   }else{
-    dirName = "output"; // default directory location
+    dirName = "output"; // default directory location is build/output
   }
   
   if(getenv("JOBNUMBER")){
     jobNumber = getenv("JOBNUMBER");
   }else{
-    jobNumber = "99999";
+    jobNumber = "99999"; // default job number is 99999; anyone plan to submit more than this number of jobs?
   }
   
   RootFileNumber = 0;

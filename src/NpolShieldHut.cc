@@ -13,7 +13,6 @@
 // Polarimeter Shield hut construction file
 // Created: William Tireman - January 2015
 
-//#include "G4PhysicalConstants.hh"
 #include "G4Material.hh"
 #include "G4Box.hh"
 #include "G4Trd.hh"

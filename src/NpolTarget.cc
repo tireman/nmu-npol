@@ -14,7 +14,6 @@
 // Created: William Tireman - December 2014
 // Modified: Daniel Wilbern - December 2014
 
-#include "G4PhysicalConstants.hh"
 #include "G4Material.hh"
 #include "G4Tubs.hh"
 #include "G4LogicalVolume.hh"
