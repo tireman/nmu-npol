@@ -6,12 +6,14 @@
 #include <map>
 
 #include <TFile.h>
-#include <TTree.h>
 #include <TChain.h>
+#include <TTree.h>
 #include <TBranch.h>
 #include <TVector.h>
 #include <TH1.h>
+#include <TH1.h>
 #include <TSystem.h>
+#include <TInterpreter.h>
 
 #include "NpolVertex.hh"
 #include "NpolTagger.hh"
@@ -25,6 +27,27 @@ int GetAVNumber(const std::string &volName) {
   }
 }
 
+int GetImprNumber(const std::string &volName) {
+  if(volName.substr(0,3) == "av_") {
+    int underscorePos = volName.find_first_of("_",1+
+      volName.find_first_of("_",3));
+    return atoi(volName.substr(underscorePos+1,1).c_str());
+  } else
+    return 0;
+}
+
+int GetPlacementNumber(const std::string &volName) {
+  if(volName.substr(0,3) == "av_") {
+    int underscorePos = volName.find_first_of("_",1+
+      volName.find_first_of("_",1+
+      volName.find_first_of("_",1+
+      volName.find_first_of("_",1+
+      volName.find_first_of("_",3)))));
+    return atoi(volName.substr(underscorePos+1,std::string::npos).c_str());
+  } else
+    return 0;
+}
+
 void BasicTemplate() {
   gSystem->Load("NpolClass.so"); // Load up the user class lib
   
@@ -34,7 +57,6 @@ void BasicTemplate() {
   
   // The TChain is very nice.
   TChain *npolTree = new TChain("T");
-  //npolTree->Add("/data2/cgen/FirstRun/NoMagField/npolNoMagField_*.root");
   npolTree->Add("/data2/cgen/FirstRun/npolNpol_1_*.root");  
   
   npolTree->SetBranchAddress("tagger",&tagEntry);
@@ -43,6 +65,7 @@ void BasicTemplate() {
   TFile *outFile = new TFile("CreativeName.root","RECREATE");
   
   // this is a good place for your histograms to be created
+  TH1F *e_D103 = new TH1F("e_D103","Energy in Detector 103",500, 0., 500.);
   
   // loop over all entries (one per event)
   Int_t nentries = npolTree->GetEntries();
@@ -62,12 +85,12 @@ void BasicTemplate() {
       
       if(aVertex == NULL) continue;
       
-      // enter code to analyze the tracks vertex
+      
     }
     
     // loop over vector elements (one per vertex in the tagger branch)
     if(tagEntry->empty()) continue;
-    Int_t nvertices = tagEntry->size();
+    nvertices = tagEntry->size();
     
     for (Int_t j = 0; j < nvertices; j++){
       
