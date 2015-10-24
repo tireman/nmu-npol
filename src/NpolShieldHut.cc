@@ -42,7 +42,7 @@ G4String NpolShieldHut::GetName() {
 
 // Construct a lead shield for in front of the polarimeter
 void NpolShieldHut::ConstructLeadCurtain(){
-  G4double xlen = 0.70*m; G4double ylen = 0.45*m; G4double zlen = 0.100*m;
+  G4double xlen = 0.85*m; G4double ylen = 0.55*m; G4double zlen = 0.100*m;
 
   G4Box *LeadCurtain = new G4Box("LeadCurtain",xlen/2,ylen/2,zlen/2);
   LeadCurtainLV = new G4LogicalVolume(LeadCurtain,NpolMaterials::GetInstance()->GetPb(),"LeadCurtainLV",0,0,0);
@@ -52,7 +52,7 @@ void NpolShieldHut::ConstructLeadCurtain(){
 
 // Construct a thin air box so we can tag particles passing through the collimator.  Place it just a millimeter off the front steel wall
 void NpolShieldHut::ConstructNPOLTagger(){
-  G4double xlen = 1.0*m; G4double ylen = 0.80*m; G4double zlen = 0.010*cm;
+  G4double xlen = 0.98*m; G4double ylen = 0.600*m; G4double zlen = 0.010*cm;
 
   G4Box *NPOLTagger = new G4Box("NPOLTagger",xlen/2,ylen/2,zlen/2);
   NPOLTaggerLV = new G4LogicalVolume(NPOLTagger,NpolMaterials::GetInstance()->GetAir(),"NPOLTaggerLV",0,0,0);
@@ -65,9 +65,9 @@ void NpolShieldHut::ConstructNPOLTagger(){
 void NpolShieldHut::ConstructHutFrontWall() {
   // constants for sizing and positioning
   G4double xlen = 4.8768*m, ylen = 7.3152*m, zlen = 0.9144*m;
-  G4double xlen1 = 0.66854*m, xlen2 = 0.82618*m;
-  G4double ylen1 = 0.4012*m, ylen2 = 0.49574*m, VertOffSet = 0.3424*m;
-  
+  G4double xlen1 = 0.81854*m, xlen2 = 0.97618*m;
+  G4double ylen1 = 0.5012*m, ylen2 = 0.59574*m, VertOffSet = 0.3424*m;
+
   // Create the necessary solids
   G4Box *Sheet = new G4Box("Sheet",xlen/2, ylen/2, zlen/2);
   G4Trd *Collimator = new G4Trd("Collimator",xlen1/2, xlen2/2, ylen1/2, ylen2/2, (zlen+0.10*m)/2);
@@ -128,7 +128,7 @@ void NpolShieldHut::Place(G4LogicalVolume *motherLV) {
   G4double NpolAng = 28.0*deg, PosSide = 9.4025*m, AngSide = 14.0*deg;
   G4double VertOffSet = 0.3424*m, PosFront = 6.3739*m, PosBack = 11.8739*m; // PosFront = 6.2739*m, PosBack = 11.7739*m;
   G4double PosRoof = 9.1239*m, OffSetRoof = 3.7776*m;
-  G4double PosLead = PosFront - 0.53*m, PosTagger = PosFront + 0.46*m;
+  G4double PosLead = PosFront - 0.515*m, PosTagger = PosFront + 0.465*m;
 
   PlaceCylindrical(LeadCurtainLV, motherLV, "LeadCurtain", PosLead,-NpolAng, 0);
   PlaceCylindrical(NPOLTaggerLV, motherLV, "NPOLTagger", PosTagger, -NpolAng, 0);
