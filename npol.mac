@@ -17,14 +17,14 @@
 /tracking/verbose 0
 /tracking/storeTrajectory 1
 
-#/gun/particle proton 
+/gun/particle proton 
 #/gun/particle pi0 
 #/gun/particle mu- 
 #/gun/particle anti_proton 
 #/gun/particle neutron 
-#/gun/energy 2.1 GeV
+/gun/energy 2.1 GeV
 
-/gun/particle e-
-/gun/energy 4400 MeV
+#/gun/particle e-
+#/gun/energy 4400 MeV
 /run/printProgress 10000
-/run/beamOn 10000000
+/run/beamOn 100000000

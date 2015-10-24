@@ -42,7 +42,7 @@ G4String NpolShieldHut::GetName() {
 
 // Construct a lead shield for in front of the polarimeter
 void NpolShieldHut::ConstructLeadCurtain(){
-  G4double xlen = 0.70*m; G4double ylen = 0.45*m; G4double zlen = 0.025*m;
+  G4double xlen = 0.70*m; G4double ylen = 0.45*m; G4double zlen = 0.100*m;
 
   G4Box *LeadCurtain = new G4Box("LeadCurtain",xlen/2,ylen/2,zlen/2);
   LeadCurtainLV = new G4LogicalVolume(LeadCurtain,NpolMaterials::GetInstance()->GetPb(),"LeadCurtainLV",0,0,0);
@@ -64,7 +64,7 @@ void NpolShieldHut::ConstructNPOLTagger(){
 // will simplfy here to a 3 foot deep wall that is 16 feet wide and 15 feet high
 void NpolShieldHut::ConstructHutFrontWall() {
   // constants for sizing and positioning
-  G4double xlen = 4.8768*m, ylen = 7.3152*m, zlen = 0.7944*m;
+  G4double xlen = 4.8768*m, ylen = 7.3152*m, zlen = 0.9144*m;
   G4double xlen1 = 0.66854*m, xlen2 = 0.82618*m;
   G4double ylen1 = 0.4012*m, ylen2 = 0.49574*m, VertOffSet = 0.3424*m;
   
@@ -125,10 +125,10 @@ void NpolShieldHut::ConstructHutRoof() {
 
 void NpolShieldHut::Place(G4LogicalVolume *motherLV) {
   
-  G4double NpolAng = 28.0*deg, PosSide = 9.3025*m, AngSide = 14.0*deg;
-  G4double VertOffSet = 0.3424*m, PosFront = 6.2739*m, PosBack = 11.7739*m;
-  G4double PosRoof = 9.0239*m, OffSetRoof = 3.7776*m;
-  G4double PosLead = PosFront - 0.48*m, PosTagger = PosFront + 0.51*m;
+  G4double NpolAng = 28.0*deg, PosSide = 9.4025*m, AngSide = 14.0*deg;
+  G4double VertOffSet = 0.3424*m, PosFront = 6.3739*m, PosBack = 11.8739*m; // PosFront = 6.2739*m, PosBack = 11.7739*m;
+  G4double PosRoof = 9.1239*m, OffSetRoof = 3.7776*m;
+  G4double PosLead = PosFront - 0.53*m, PosTagger = PosFront + 0.46*m;
 
   PlaceCylindrical(LeadCurtainLV, motherLV, "LeadCurtain", PosLead,-NpolAng, 0);
   PlaceCylindrical(NPOLTaggerLV, motherLV, "NPOLTagger", PosTagger, -NpolAng, 0);

@@ -53,12 +53,12 @@ void NpolPrimaryGeneratorAction::GeneratePrimaries(G4Event* anEvent)
 
   //G4double x0 = 0.0*m;  //Default, right down the middle
   // G4double y0 = 0.0*m;
-  G4double r = (2.0* (2.0*G4UniformRand()-1))*mm;
-  G4double theta = (2*3.14159265 * (2.0*G4UniformRand()-1));
-  G4double x0 = r*cos(theta);
-  G4double y0 = r*sin(theta);
-  G4double z0 = -3.0*m;  // Start 3 meters upstream, just outside the target chamber
-  
+ G4double r = (2.0* (2.0*G4UniformRand()-1))*mm;
+ G4double theta = (2*3.14159265 * (2.0*G4UniformRand()-1));
+ G4double x0 = r*cos(theta);
+ G4double y0 = r*sin(theta);
+ G4double z0 = -3.0*m;  // Start 3 meters upstream, just outside the target chamber
+ 
   particleGun->SetParticlePosition(G4ThreeVector(x0,y0,z0));
   particleGun->GeneratePrimaryVertex(anEvent);
 }

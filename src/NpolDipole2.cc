@@ -143,7 +143,7 @@ void NpolDipole2::ConstructDipole2Field(){
   G4TransportationManager* tmanMagField = G4TransportationManager::GetTransportationManager();
   tmanMagField -> GetPropagatorInField() -> SetLargestAcceptableStep(1*mm);
   
-  dipole2FieldY = 1.639*tesla;
+  dipole2FieldY = 1.639*tesla; // 1 B.dl = 0.40984*tesla; 2 B.dl = 0.81967*tesla; 4 B.dl = 1.639*tesla;
   
   magField = new G4UniformMagField(G4ThreeVector(0., dipole2FieldY, 0.));
   fEqMagField = new G4Mag_UsualEqRhs(magField);
@@ -160,7 +160,7 @@ void NpolDipole2::ConstructDipole2Field(){
 void NpolDipole2::Place(G4LogicalVolume *motherLV) {
   G4double PosD2 = 4.6866*m, NpolAng = 28.0*deg, BarOffSet = +0.7730*m;
   G4double VertOffSet = 0.231/2*m, EndOffSet = +0.8235*m;
-  G4double ClampOffSet = 1.00*m;
+  G4double ClampOffSet = 1.05*m;
   
   // Place 4 copes of the Copper bars in the magnet
   PlaceRectangular(Dipole2CuBarLV, motherLV, "Dipole2CuBar", (BarOffSet*cos(NpolAng)-PosD2*sin(NpolAng)), VertOffSet, (BarOffSet*sin(NpolAng)+PosD2*cos(NpolAng)), 0*deg, -NpolAng, 0.0); 

@@ -54,47 +54,46 @@ G4String NpolHallShell::GetName() {
 
 // Construct the Hall Wall in the world; cylinder of concrete
 void NpolHallShell::ConstructHallShellWall() {
-
-	G4Tubs *Wall = new G4Tubs("Wall", insideRadius, floorRadius, shellHeight, 0.0*deg, 360.*deg);
-	G4Tubs *Hole = new G4Tubs("Hole", insideRadius-20.0*cm, floorRadius+20.0*cm, shellHeight/8, 76.0*deg, 5.5*deg);
-
-	G4RotationMatrix *Rot = new G4RotationMatrix;
-	G4ThreeVector zTrans(+0.0*m, 0.0*m, +3.0*m);
-
-	G4SubtractionSolid *HallShellWall = new G4SubtractionSolid("HallShellWall", Wall, Hole, Rot, zTrans);
-
-	HallShellWallLV = new G4LogicalVolume(HallShellWall,
-			NpolMaterials::GetInstance()->GetConcrete(),"HallShellWallLV",0,0,0);
-
-	//	G4VisAttributes *TopVisAtt= new G4VisAttributes(G4Colour(2.0,1.0,0.0));
-	//HallShellWallLV->SetVisAttributes(TopVisAtt);
-	HallShellWallLV->SetVisAttributes(G4VisAttributes::GetInvisible());
+  
+  G4Tubs *Wall = new G4Tubs("Wall", insideRadius, floorRadius, shellHeight, 0.0*deg, 360.*deg);
+  G4Tubs *Hole = new G4Tubs("Hole", insideRadius-20.0*cm, floorRadius+20.0*cm, shellHeight/8, 76.0*deg, 5.5*deg);
+  
+  G4RotationMatrix *Rot = new G4RotationMatrix;
+  G4ThreeVector zTrans(+0.0*m, 0.0*m, +3.0*m);
+  
+  G4SubtractionSolid *HallShellWall = new G4SubtractionSolid("HallShellWall", Wall, Hole, Rot, zTrans);
+  
+  HallShellWallLV = new G4LogicalVolume(HallShellWall,
+     NpolMaterials::GetInstance()->GetConcrete(),"HallShellWallLV",0,0,0);
+  
+  //G4VisAttributes *TopVisAtt= new G4VisAttributes(G4Colour(0.95, 0.9, 0.95)); //0.60,0.80,0.20));
+  //HallShellWallLV->SetVisAttributes(TopVisAtt);
+  HallShellWallLV->SetVisAttributes(G4VisAttributes::GetInvisible());
 }
 
 // Construct the Hall Floor in the world
 void NpolHallShell::ConstructHallShellFloor() {
-
-	G4Tubs *HallShellFloor = new G4Tubs("HallShellFloor",0.0*m, floorRadius, 
-			(creteThick/2), 0.0*deg, 360.*deg);
-	HallShellFloorLV = new G4LogicalVolume(HallShellFloor,
-			NpolMaterials::GetInstance()->GetConcrete(),"HallShellFloorLV",0,0,0);
-
-	//G4VisAttributes *TopVisAtt= new G4VisAttributes(G4Colour(1.0,1.0,1.0));
-	//HallShellFloorLV->SetVisAttributes(TopVisAtt);
-	HallShellFloorLV->SetVisAttributes(G4VisAttributes::GetInvisible());
+  
+  G4Tubs *HallShellFloor = new G4Tubs("HallShellFloor",0.0*m, floorRadius, 
+				      (creteThick/2), 0.0*deg, 360.*deg);
+  HallShellFloorLV = new G4LogicalVolume(HallShellFloor,
+      NpolMaterials::GetInstance()->GetConcrete(),"HallShellFloorLV",0,0,0);
+  
+  //G4VisAttributes *TopVisAtt= new G4VisAttributes(G4Colour( 0.25, 0.5, 0.25));//0.70,0.70,0.90));
+  //HallShellFloorLV->SetVisAttributes(TopVisAtt);
+  HallShellFloorLV->SetVisAttributes(G4VisAttributes::GetInvisible());
 }
 
 // Construct the Hall Roof in the world
 void NpolHallShell::ConstructHallShellRoof() {
 
-	G4Sphere *HallShellRoof = new G4Sphere("HallShellRoof",(roofRadius-creteThick), 
-			roofRadius, 0.0*deg, 360.0*deg, 0.0*deg, 37.0*deg);
-	HallShellRoofLV = new G4LogicalVolume(HallShellRoof,
-			NpolMaterials::GetInstance()->GetConcrete(),"HallShellRoofLV",0,0,0);
-
-	//G4VisAttributes *TopVisAtt= new G4VisAttributes(G4Colour(0.0,1.0,2.0));
-	//HallShellRoofLV->SetVisAttributes(TopVisAtt);
-	HallShellRoofLV->SetVisAttributes(G4VisAttributes::GetInvisible());
+  G4Sphere *HallShellRoof = new G4Sphere("HallShellRoof",(roofRadius-creteThick),roofRadius, 0.0*deg, 360.0*deg, 0.0*deg, 37.0*deg);
+  HallShellRoofLV = new G4LogicalVolume(HallShellRoof,
+     NpolMaterials::GetInstance()->GetConcrete(),"HallShellRoofLV",0,0,0);
+  
+  //G4VisAttributes *TopVisAtt= new G4VisAttributes(G4Colour(0.7,1.0,0.5));
+  //HallShellRoofLV->SetVisAttributes(TopVisAtt);
+  HallShellRoofLV->SetVisAttributes(G4VisAttributes::GetInvisible());
 }
 
 void NpolHallShell::Place(G4LogicalVolume *motherLV) {

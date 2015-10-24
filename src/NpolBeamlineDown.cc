@@ -103,7 +103,7 @@ G4int gnum = 60; // # of facets to circle for polygon
 	zsections); 
   BeamlineDownLV = new G4LogicalVolume(BeamlineDown,NpolMaterials::GetInstance()
        ->GetSSteel(), "BeamlineDownLV", 0,0,0);
-  G4VisAttributes *BeamlineVisAtt= new G4VisAttributes(G4Colour(1.0,1.5,0.5));
+  G4VisAttributes *BeamlineVisAtt= new G4VisAttributes(G4Colour(0.3,0.7,0.2));
   BeamlineDownLV->SetVisAttributes(BeamlineVisAtt);
 }
 
@@ -267,7 +267,7 @@ void NpolBeamlineDown::ConstructBeamlineSecA(){
   // Finally ...  create the logical volume and give it a pretty color
  SectionALV = new G4LogicalVolume(PipeFinalB, NpolMaterials::GetInstance()->GetAl(), "SectionALV", 0,0,0);
  
- G4VisAttributes *BeamlineVisAtt= new G4VisAttributes(G4Colour(1.0,0.5,1.5));
+ G4VisAttributes *BeamlineVisAtt= new G4VisAttributes(G4Colour(0.9,0.6,.8));
  SectionALV->SetVisAttributes(BeamlineVisAtt);
 }
 
@@ -279,7 +279,7 @@ void NpolBeamlineDown::ConstructSecA1Inner(){
 
   SecA1InLV = new G4LogicalVolume(SecA1In, NpolMaterials::GetInstance()->GetVacuum(),"SecA1InLV", 0,0,0);
   
-  G4VisAttributes *BeamlineVisAtt= new G4VisAttributes(G4Colour(1.0,0.0,1.0));
+  G4VisAttributes *BeamlineVisAtt= new G4VisAttributes(G4Colour(.8,0.7,.2));
   SecA1InLV->SetVisAttributes(BeamlineVisAtt);  
 }
 

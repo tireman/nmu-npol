@@ -60,11 +60,10 @@ void BasicTemplate() {
 
   // The TChain is very nice.
   TChain *npolTree = new TChain("T");
-  npolTree->Add("/data3/cgen/FirstRun/ProtonOnly/npolProton_*.root");  
+  npolTree->Add("/data3/cgen/FirstRun/test_*.root");  
   
-  //npolTree->SetBranchAddress("NPOL_Tagger",&npolEntry);
-  //npolTree->SetBranchAddress("SHMS_Tagger",&shmsEntry);
-  npolTree->SetBranchAddress("tagger",&npolEntry);
+  npolTree->SetBranchAddress("NPOL_Tagger",&npolEntry);
+  npolTree->SetBranchAddress("SHMS_Tagger",&shmsEntry);
   npolTree->SetBranchAddress("tracks",&anEntry);
   
   // this is a good place for your histograms to be created

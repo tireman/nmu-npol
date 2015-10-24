@@ -4,6 +4,9 @@
 
 # Use this open statement to create an OpenGL view:
 /vis/open OGLI 600x600-0+0
+#/vis/viewer/set/background 0.25 0.50 0.45
+/vis/viewer/set/background 1.0 .90 0.90
+#/vis/viewer/set/background 0.20 0.40 0.40
 #
 # Disable auto refresh and quieten vis messages whilst scene and
 # trajectories are established:
@@ -50,7 +53,7 @@
 #
 # Frame
 /vis/set/colour red
-/vis/set/lineWidth 2
+/vis/set/lineWidth 4 #2
 /vis/scene/add/frame   # Simple frame around the view
 /vis/set/colour        # Revert to default colour (white)
 /vis/set/lineWidth     # Revert to default line width (1.)

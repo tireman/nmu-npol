@@ -15,7 +15,7 @@
 #include <TClassTable.h>
 #include <TInterpreter.h>
 
-#include "../include/NpolVertex.hh"
+#include "NpolVertex.hh"
 
 #define MeV 1.0
 
