@@ -8,7 +8,7 @@ TRACK : simulation
 OS : centos65
 JOBNAME : CGEN-sim_$i
 MAIL: tireman@jlab.org
-TIME: 2880
+TIME: 4320
 MEMORY: 1100 MB
 COMMAND : source JLABsimRunCommands.csh $i
 OTHER_FILES : /u/home/tireman/simulation/e11_12_009/background/nmu-npol/build/scripts/JLABsimRunCommands.csh

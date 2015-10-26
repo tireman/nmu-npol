@@ -1,5 +1,5 @@
 #!/bin/tcsh
 
-setenv NPOLDIR /work/hallc/cgen
+setenv NPOLDIR /volatile/hallc/tireman/cgen
 setenv NPOLBASENAME npolMagField
 setenv JOBNUMBER $1
