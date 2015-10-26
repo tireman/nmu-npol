@@ -12,7 +12,7 @@ do
     fi
     echo "Starting up Job Number $i."
 
-    $BUILD_DIR/Npolapp $BUILD_DIR/npol.mac 1>$BUILD_DIR/output/Lead10cm_$i.out 2>$BUILD_DIR/output/Lead10cm_$1.err &
+    $BUILD_DIR/Npolapp $BUILD_DIR/npol.mac 1>$BUILD_DIR/output/Lead10cm_$i.out 2>$BUILD_DIR/output/Lead10cm_$i.err &
     sleep 5s
 
 done
