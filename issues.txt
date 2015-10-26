@@ -1,12 +1,11 @@
 %% issues.txt - used to track standing issues in the devlopment of Npol %%
 
-Update: Horizontal bender magnet: Checked the horizontal bender and narrowed the problem down to the HBcoil.  Namely, it has illegal operations when particles cross lines that two solids which are subtracted out of the coil in the GDML implementation are crossed.  This goes away when the coil is not included.  We are leaving out for now since background in the polarimeter is expected to be very small from the SHMS magnet but should be cleaned up in the future.
+Update 26-Oct-2015: Horizontal bender magnet: Checked the horizontal bender and narrowed the problem down to the HBcoil.  Namely, it has illegal operations when particles cross lines that two solids which are subtracted out of the coil in the GDML implementation are crossed.  This goes away when the coil is not included.  We are leaving out for now since background in the polarimeter is expected to be very small from the SHMS magnet but should be cleaned up in the future.  Suggestion is to simply move the code to a G4 construtor and dump the GDML implementation.
 
-Update: Beam Dump: Currently we don't build or use the beam dump but if desired in the future it needs checked. Same for the beam dump and beam dump pipe.  It doesn't make a lot of sense to me but it is low priority at this point as it doesn't add a lot to the background radiation. 
+Update 22-Oct-2015: Beam Dump: Currently we don't build or use the beam dump but if desired in the future it needs checked. Same for the beam dump and beam dump pipe.  It doesn't make a lot of sense to me but it is low priority at this point as it doesn't add a lot to the background radiation. If we go with an open polarimeter style then it will need to be added.
 	
-Mag Field for Horizontal Bender Magnet  -- Currently NOT implemented.  Do we even need it?
-	Use Geant4 built-in dipole fields for now (G4UniformMagField)
-
-Multi-Threading
+Update 1-Oct-2015: Mag Field for Horizontal Bender Magnet  -- Currently NOT implemented.  Do we even need it?  Hall C has a TOSCA map that can be used or we could use a G4UniformMagField if it is desired.
+	
+Update 1-Oct-2015: Multi-Threading implementation could be useful but it will have to be checked if it will be a better use of resources over the current setup.  In particular, the amount of use of RAM on the Jlab Farm versus the # of cores.  It will have to be extensively tested to make sure it doesn't result in errors.
 	VERY VERY Low priority
 

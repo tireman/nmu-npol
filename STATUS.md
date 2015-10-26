@@ -1,4 +1,10 @@
-# Update: 10-20-2015
+# Update: 26-Oct-2015
+
+Clean up of the NpolShieldHut.cc file was performed.  A better positioning of the shield hut so a proper 10 cm of lead curtain could be placed right at the entrance to the shield hut.  The collimator had to be changed to account for the change in position of the shield hut to fully illuminate the front array.  All done by visual inspection.  No hard numbers are available from C-GEN so best guess was employed. Polarimeter Tagger volume was moved to be as close to the exit from the collimator as possible and resized to be only as large as necessary.
+
+Checked the Scattering chamber to make sure the windows are large enough.  The basic check seemed to be okay, however, when specifics on the size of the chamber are available the file should be updated.
+
+# Update: 20-Oct-2015
 
 After several runs on the farm, some ROOT script work, and some after thought the following changes were made.
 
