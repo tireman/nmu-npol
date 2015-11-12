@@ -52,14 +52,14 @@ NpolPrimaryGeneratorActionFS::~NpolPrimaryGeneratorActionFS()
 // This function is called at the beginning of each event.
 void NpolPrimaryGeneratorActionFS::GeneratePrimaries(G4Event* anEvent)
 {
-	G4double ymax = 0.254*m, xzmax = 0.560*m, NpolAng = 28.0*deg;
-
-	G4double x0 = xzmax/2*sin(NpolAng) * (2.0*G4UniformRand()-1);
-	G4double y0 = ymax/2 * (2.0*G4UniformRand()-1);
-	G4double z0 = xzmax/2*cos(NpolAng) * (2.0*G4UniformRand()-1);
-		
-	particleGun->SetParticlePosition(G4ThreeVector(x0,y0,z0));
-	particleGun->GeneratePrimaryVertex(anEvent);
-
+  G4double ymax = 0.254*m, xzmax = 0.560*m, NpolAng = 28.0*deg;
+  
+  G4double x0 = xzmax/2*sin(NpolAng) * (2.0*G4UniformRand()-1);
+  G4double y0 = ymax/2 * (2.0*G4UniformRand()-1);
+  G4double z0 = xzmax/2*cos(NpolAng) * (2.0*G4UniformRand()-1);
+  
+  particleGun->SetParticlePosition(G4ThreeVector(x0,y0,z0));
+  particleGun->GeneratePrimaryVertex(anEvent);
+  
 }
 
