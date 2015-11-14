@@ -10,6 +10,7 @@
 #include <TChain.h>
 #include <TBranch.h>
 #include <TH1.h>
+#include <TH2.h>
 #include <TSystem.h>
 #include <TROOT.h>
 #include <TObject.h>
@@ -19,8 +20,38 @@
 #include "NpolTagger.hh"
 #include "NpolStatistics.hh"
 
-// Return a (dynamically allocated, remember to delete!) array of doubles that contain the boundaries
-// of the bins that make the histogram suitable for a loglog plot
+int GetAVNumber(const std::string &volName) {
+  if(volName.substr(0,3) == "av_") {
+    int underscoreLocation = volName.find_first_of("_",3);
+    return atoi(volName.substr(3,underscoreLocation-3).c_str());
+  } else{
+    return 0;
+  }
+}
+int GetImprNumber(const std::string &volName) {
+  if(volName.substr(0,3) == "av_") {
+    int underscorePos = volName.find_first_of("_",1+
+      volName.find_first_of("_",3));
+    return atoi(volName.substr(underscorePos+1,1).c_str());
+  } else
+    return 0;
+}
+
+int GetPlacementNumber(const std::string &volName) {
+  if(volName.substr(0,3) == "av_") {
+    int underscorePos = volName.find_first_of("_",1+
+      volName.find_first_of("_",1+
+      volName.find_first_of("_",1+
+      volName.find_first_of("_",1+
+      volName.find_first_of("_",3)))));
+    return atoi(volName.substr(underscorePos+1,std::string::npos).c_str());
+  } else
+    return 0;
+}
+
+// Return a (dynamically allocated, remember to delete!) array of doubles 
+// that contain the boundaries of the bins that make the histogram suitable 
+// for a loglog plot
 double *AntilogBins(const int nbins, const double xmin, const double xmax) {
   double logxmin = TMath::Log10(xmin);
   double logxmax = TMath::Log10(xmax);
@@ -43,9 +74,9 @@ void TaggedParticles3() {
   TChain *statsTree = new TChain("T2");
   
   //npolTree->Add("/data2/cgen/NMUSimData/Lead10cm/npol*.root");
-  //statsTree->Add("/data2/cgen/NMUSimData/Lead10cm/npol*.root");
-  npolTree->Add("/data2/cgen/JlabSimData/MagField_2Bdl/Lead10cm/npolLeadOn10cmMedMag_*.root");
-  statsTree->Add("/data2/cgen/JlabSimData/MagField_2Bdl/Lead10cm/npolLeadOn10cmMedMag_*.root");
+  // statsTree->Add("/data2/cgen/NMUSimData/Lead10cm/npol*.root");
+  npolTree->Add("/data2/cgen/JlabSimData/MagField_1Bdl/Lead0cm/npolLeadOn0cmLowMag_*.root");
+  statsTree->Add("/data2/cgen/JlabSimData/MagField_1Bdl/Lead0cm/npolLeadOn0cmLowMag_*.root");
   
   std::vector<NpolVertex *> *anEntry = NULL;
   std::vector<NpolTagger *> *npolEntry = NULL;
@@ -57,7 +88,8 @@ void TaggedParticles3() {
   npolTree->SetBranchAddress("tracks",&anEntry);
   statsTree->SetBranchAddress("stats",&aStat);
   
-  // Count the total number of electrons on target and total events saved to the files
+  // Count the total number of electrons on target and total events 
+  // saved to the files 
   Long_t TotalElectrons = 0;
   Long_t TotalEventsRecorded = 0;
   for(int i = 0; i < statsTree->GetEntries(); i++){
@@ -68,8 +100,8 @@ void TaggedParticles3() {
   
   std::cout << "Total electrons: " << TotalElectrons << std::endl;
   
-  // Scale to (electrons^-1)(cm^-2) = (electrons on target)^-1 * (area of NPOL collimator)^-1
-  Double_t fluxScaling = 1/((Double_t)TotalElectrons*98*60);
+  // Scale to (microAmp^-1)(cm^-2) 
+  Double_t fluxScaling = 1/((Double_t)TotalElectrons*1.609e-13*98*60);
     
   // The particle names as they will appear in the histogram titles
   std::map<std::string,std::string> fancyNames;
@@ -85,15 +117,21 @@ void TaggedParticles3() {
   
   const int nbins = 500;
   double *bins = AntilogBins(nbins,1e-1,1e4);
+  std::map<std::string,TH1 *> histograms;
   std::map<std::string,TH1F *> taggedParticleKE;
-  
-  // Allocate KE histograms
+  std::map<std::string,TH2F *> taggedParticlePOS;
+
+  // Allocate KE histograms and Position Histograms
   std::map<std::string,std::string>::iterator it;
   for(it = fancyNames.begin(); it != fancyNames.end(); it++) {
     std::string histoName = "h_" + it->first; 
-    std::string histoTitle = it->second + " KE in Tagger";
+    std::string histoTitle = it->second + " KE in Tagger"; 
+    std::string posHistoName = "pos_" + it->first;
+    std::string posHistoTitle = it->second + " Position in Tagger";
     taggedParticleKE[it->first] = new TH1F(
-					   histoName.c_str(), histoTitle.c_str(),nbins,bins);
+     histoName.c_str(), histoTitle.c_str(),nbins,bins);
+    taggedParticlePOS[it->first] = new TH2F(posHistoName.c_str(),
+     posHistoTitle.c_str(),120,-3.8,-2.6,160,-0.40,0.40);
   }
   
   // loop over all entries (one per event)
@@ -121,23 +159,62 @@ void TaggedParticles3() {
 	continue;
 
       (taggedParticleKE[particleName])->Fill(aVertex->energy,fluxScaling);
+      (taggedParticlePOS[particleName])->Fill(aVertex->posX,aVertex->posY,fluxScaling);
     }
+
+
+    // This section is designed to file up the histograms for hits in
+    // the Scintillator detectors
+    std::map<std::string, double> eDep;
+    
+    // loop over vector elements (one per vertex)
+    Int_t nvertices = anEntry->size();
+    for(int j = 0; j < nvertices; j++) {
+      NpolVertex *aVertex = (*anEntry)[j];
+      if(aVertex == NULL)
+	continue;
+      if(!(aVertex->daughterIds).empty())
+	continue;
+      if(aVertex->eMiss)
+	continue;
+      if(eDep.find(aVertex->volume) == eDep.end())
+	eDep[aVertex->volume] = 0;
+      eDep[aVertex->volume] += aVertex->energy;
+    }
+    
+    std::map<std::string,double>::iterator it;
+    for(it = eDep.begin(); it != eDep.end(); it++) {
+      if(histograms.find(it->first) == histograms.end()) {
+	histograms[it->first] = new TH1F((it->first).c_str(),(it->first).c_str(),500,0,10);
+      }
+      (histograms[it->first])->Fill(it->second);
+    }
+    
+    eDep.clear();
+		
   }
   
-  TFile *outFile = new TFile("JLABLead10cm_2Bdl_Histos.root","RECREATE");
+  //TFile *outFile = new TFile("NMULead10cm_4Bdl_Histos.root","RECREATE");  
+  TFile *outFile = new TFile("JLABLead0cm_1Bdl_Histos.root","RECREATE");
   TVectorD totalElectrons(1);
   totalElectrons[0] = TotalElectrons;
   totalElectrons.Write();
   std::map<std::string,TH1F *>::iterator it2;
   for(it2 = taggedParticleKE.begin(); it2 != taggedParticleKE.end(); it2++) {
-    
-    //fluxScaling = (it2->second->Integral())/(TotalElectrons*100*60);
-    //fluxScaling = 1/(TotalElectrons*100*60);
-    //fluxScaling = (it2->second->Integral())/1e6;
-    //it2->second->Scale(fluxScaling);
-    
     it2->second->Write();
   }
+
+  std::map<std::string,TH2F *>::iterator it3;
+  for(it3 = taggedParticlePOS.begin(); it3 != taggedParticlePOS.end(); it3++) {
+    it3->second->Write();
+  }
+
+  std::map<std::string, TH1 *>::iterator it4;
+  for(it4 = histograms.begin(); it4 != histograms.end(); it4++) {
+    it4->second->Write();
+  }
+
+  std::cout << "Total electrons: " << TotalElectrons << std::endl;
   delete outFile;
   
   delete bins;

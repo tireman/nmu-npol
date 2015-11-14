@@ -45,7 +45,7 @@ void SimulationFigures() {
   TCanvas *c1 = new TCanvas("c1","Polarimeter Angle 28.0 Deg, E = 4.4 GeV",1000,900);
  
   const Int_t Nx = 3, Ny =3, fillStyle = 1001;
-  Float_t lMargin = 0.12, rMargin = 0.05, bMargin = 0.15, tMargin = 0.05;
+  Float_t lMargin = 0.10, rMargin = 0.05, bMargin = 0.07, tMargin = 0.05;
   CanvasPartition(c1,Nx,Ny,lMargin,rMargin,bMargin,tMargin);
 
   TPad *pad[Nx][Ny];
@@ -74,14 +74,16 @@ void SimulationFigures() {
      //hFrame->Reset();
      hFrame->SetStats(false); 
      hFrame->SetFillColor(kBlue);
+     hFrame->SetTitleFont(16);
+     //hFrame->SetTitle("Proton");
      hFrame->SetFillStyle(fillStyle);
      hFrame->Draw();
   
      // y axis range
-     hFrame->GetYaxis()->SetRangeUser(0.001,1.2*hFrame->GetMaximum());
+     hFrame->GetYaxis()->SetRangeUser(0.001,3.0*hFrame->GetMaximum());
      
      // Format for y axis
-     hFrame->GetYaxis()->SetTitle("Events");
+     hFrame->GetYaxis()->SetTitle("#frac{Particles}{#muA #times cm^{2}}");
      hFrame->GetYaxis()->SetLabelFont(43);
      hFrame->GetYaxis()->SetLabelSize(16);
      hFrame->GetYaxis()->SetLabelOffset(0.02);
@@ -93,7 +95,7 @@ void SimulationFigures() {
      hFrame->GetYaxis()->SetNdivisions(505);
      
      // TICKS Y Axis
-     //hFrame->GetYaxis()->SetTickLength(xFactor*0.04/yFactor);
+     hFrame->GetYaxis()->SetTickLength(xFactor*0.04/yFactor);
      
      // Format for x axis
      hFrame->GetXaxis()->SetTitle("Kinetic Energy (MeV)");
@@ -109,12 +111,12 @@ void SimulationFigures() {
      // TICKS X Axis
      hFrame->GetXaxis()->SetTickLength(yFactor*0.06/xFactor);
      
-     //h->Draw("same");
    }
   }
 
 
   TFile *outFile = new TFile("JLABLead10cm_2Bdl_Fig21-23.root","RECREATE");
+  //TFile *outFile = new TFile("NMULead10cm_4Bdl_Fig21-23.root","RECREATE");
   c1->Write();
   outFile->Close();
   
