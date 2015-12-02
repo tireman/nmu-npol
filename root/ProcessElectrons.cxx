@@ -28,6 +28,7 @@ int GetAVNumber(const std::string &volName) {
     return 0;
   }
 }
+
 int GetImprNumber(const std::string &volName) {
   if(volName.substr(0,3) == "av_") {
     int underscorePos = volName.find_first_of("_",1+
@@ -65,18 +66,47 @@ double *AntilogBins(const int nbins, const double xmin, const double xmax) {
   return new_bins;
 }
 
+int partition(std::vector<NpolVertex*> *aVector, int p, int q){
+ 
+  double x = (*aVector)[p]->time;
+  int i = p;
+  int j;
+ 
+  for(j = p+1; j < q; j++){
+    if((*aVector)[j]->time <= x){
+      i = i +1;
+      swap((*aVector)[i],(*aVector)[j]);
+    }
+  }
+
+  swap((*aVector)[i],(*aVector)[p]);
+  return i;
+}
+
+void QSort(std::vector<NpolVertex*> *aVector, int p, int q){
+
+  if(aVector == NULL) return;
+  int r; 
+
+  if(p<q){
+    r = partition(aVector,p,q);
+    QSort(aVector,p,r);
+    QSort(aVector,r+1,q);
+  }
+}
+
 // Generate tagged particle KE  histograms with variable width bins suitable for a loglog plot
-void TaggedParticles3() {
+void ProcessElectrons() {
   gSystem->Load("NpolClass.so"); 
   
   // Set up the TTrees and their branch addresses
   TChain *npolTree = new TChain("T");
   TChain *statsTree = new TChain("T2");
   
-  //npolTree->Add("/data2/cgen/NMUSimData/Lead10cm/npol*.root");
-  // statsTree->Add("/data2/cgen/NMUSimData/Lead10cm/npol*.root");
-  npolTree->Add("/data2/cgen/JlabSimData/MagField_1Bdl/Lead0cm/npolLeadOn0cmLowMag_*.root");
-  statsTree->Add("/data2/cgen/JlabSimData/MagField_1Bdl/Lead0cm/npolLeadOn0cmLowMag_*.root");
+  npolTree->Add("/data2/cgen/NMUSimData/11GeV/4Bdl/Lead10cm/npol*.root");
+  statsTree->Add("/data2/cgen/NMUSimData/11GeV/4Bdl/Lead10cm/npol*.root");
+  //npolTree->Add("/data2/cgen/JlabSimData/MagField_4Bdl/Lead10cm/npolLeadOn10cmHighMag_*.root");
+  //statsTree->Add("/data2/cgen/JlabSimData/MagField_4Bdl/Lead10cm/npolLeadOn10cmHighMag_*.root");
   
   std::vector<NpolVertex *> *anEntry = NULL;
   std::vector<NpolTagger *> *npolEntry = NULL;
@@ -131,13 +161,19 @@ void TaggedParticles3() {
     taggedParticleKE[it->first] = new TH1F(
      histoName.c_str(), histoTitle.c_str(),nbins,bins);
     taggedParticlePOS[it->first] = new TH2F(posHistoName.c_str(),
-     posHistoTitle.c_str(),120,-3.8,-2.6,160,-0.40,0.40);
-  }
-  
+     posHistoTitle.c_str(),120,-3.8,-2.6,160,-0.40,0.40);     
+  }  
+
+  // Allocate the dTOF histogram
+  TH1F *delta_TOF = new TH1F("dToF", "Time of flight between Analyzer and Top/Bottom Detectors", 
+			     500, -15.0, 200.0);
+  delta_TOF->GetYaxis()->SetTitle("Events");
+  delta_TOF->GetXaxis()->SetTitle("Analyzer to Top/Bottom Array Time-of-Flight (ns)");
+
   // loop over all entries (one per event)
   Int_t nentries = npolTree->GetEntries();
+  //for(int i = 0; i < 10000; i++) {
   for(int i = 0; i < nentries; i++) {
-    //	for(int i = 0; i < 10000; i++) {
     npolTree->GetEntry(i);
     
     if(nentries > 1000){
@@ -166,21 +202,61 @@ void TaggedParticles3() {
     // This section is designed to file up the histograms for hits in
     // the Scintillator detectors
     std::map<std::string, double> eDep;
-    
+    std::map<std::string, double> hitTime;
+
     // loop over vector elements (one per vertex)
+    int p = 1;
+    int q = anEntry->size();
+    QSort(anEntry,p,q); // sort vertex vector in time!
+    int avNum, imprNum, pvNum;
+    
     Int_t nvertices = anEntry->size();
     for(int j = 0; j < nvertices; j++) {
       NpolVertex *aVertex = (*anEntry)[j];
-      if(aVertex == NULL)
-	continue;
-      if(!(aVertex->daughterIds).empty())
-	continue;
-      if(aVertex->eMiss)
-	continue;
+      double Ethreshold = 0.0;
+      
+      if(aVertex == NULL) continue;
+      if(!(aVertex->daughterIds).empty() || (aVertex->eMiss)) continue;
+      
       if(eDep.find(aVertex->volume) == eDep.end())
 	eDep[aVertex->volume] = 0;
       eDep[aVertex->volume] += aVertex->energy;
+      
+      avNum = GetAVNumber(aVertex->volume);
+      switch(avNum){
+      case 1: case 2: case 5: case 6:
+	Ethreshold = 5.0;
+	break;
+      case 3: case 4: case 7: case 8:
+	Ethreshold = 1.0;
+	break;
+      case 9: case 10:
+	Ethreshold = 4.0;
+	break;
+      default:
+	break;
+      }
+      
+      if(avNum != 0){
+	if(hitTime.find(aVertex->volume) == hitTime.end() && eDep[aVertex->volume] >= Ethreshold)
+	  hitTime[aVertex->volume] = aVertex->time;
+      }
     }
+
+    double t2 = 0.0, t1 = 0.0, dTOF = 0.0;
+    std::map<std::string,double>::iterator itt;
+    //if(hitTime.size() > 2) cout << "My Map size is: " << hitTime.size() << endl;
+    for(itt = hitTime.begin(); itt != hitTime.end(); itt++){
+      //if(hitTime.size() > 2) cout << " Volume: " << itt->first << " Time: " << itt->second << endl;
+      avNum = GetAVNumber(itt->first);
+      if((avNum == 1 || avNum == 2 || avNum == 5 || avNum == 6) && t2 == 0.0)
+	t2 = itt->second;
+      if((avNum == 9 || avNum == 10) && t1 == 0.0)
+	t1 = itt->second;
+    }
+    dTOF = (t2-t1)/(1e-9);
+    if(dTOF != 0.0) delta_TOF->Fill(dTOF);
+    
     
     std::map<std::string,double>::iterator it;
     for(it = eDep.begin(); it != eDep.end(); it++) {
@@ -193,9 +269,9 @@ void TaggedParticles3() {
     eDep.clear();
 		
   }
-  
-  //TFile *outFile = new TFile("NMULead10cm_4Bdl_Histos.root","RECREATE");  
-  TFile *outFile = new TFile("JLABLead0cm_1Bdl_Histos.root","RECREATE");
+ 
+  TFile *outFile = new TFile("NMU11GeV_Lead10cm_4Bdl_Histos.root","RECREATE");  
+  //TFile *outFile = new TFile("JLABLead10cm_4Bdl_Histos.root","RECREATE");
   TVectorD totalElectrons(1);
   totalElectrons[0] = TotalElectrons;
   totalElectrons.Write();
@@ -213,6 +289,8 @@ void TaggedParticles3() {
   for(it4 = histograms.begin(); it4 != histograms.end(); it4++) {
     it4->second->Write();
   }
+
+  delta_TOF->Write();
 
   std::cout << "Total electrons: " << TotalElectrons << std::endl;
   delete outFile;

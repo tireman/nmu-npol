@@ -52,7 +52,7 @@ NpolPrimaryGeneratorActionFS::~NpolPrimaryGeneratorActionFS()
 // This function is called at the beginning of each event.
 void NpolPrimaryGeneratorActionFS::GeneratePrimaries(G4Event* anEvent)
 {
-  G4double ymax = 0.254*m, xzmax = 0.560*m, NpolAng = 28.0*deg;
+  G4double ymax = 2*0.254*m, xzmax = 2*0.560*m, NpolAng = 28.0*deg;
   
   G4double x0 = xzmax/2*sin(NpolAng) * (2.0*G4UniformRand()-1);
   G4double y0 = ymax/2 * (2.0*G4UniformRand()-1);

@@ -51,6 +51,11 @@ void NpolSteppingAction::UserSteppingAction(const G4Step *aStep) {
 	aTrack->SetTrackStatus(fStopAndKill);
   }
 
+  analysisMan->AddStep(aStep, volName);
+  
+  if(volName == "av_9_impr_1_FrontDetLV_pv_3"){
+    G4cout << "Track ID: " << aTrack->GetTrackID() << "  Delta Energy = " << aStep->GetTotalEnergyDeposit()/MeV << " MeV   Time = " << aTrack->GetGlobalTime() << " ns " << G4endl;
+  }
   // Check if either tagger is hit and if so pass track to Vector
   if(volName == "NPOLTagger") {
     analysisMan->AddNPOLTaggedParticle(aTrack);

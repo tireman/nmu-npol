@@ -20,27 +20,65 @@
 #include <TROOT.h>
 #include <TObject.h>
 
-#define MeV 1.0
-
 void CanvasPartition(TCanvas *C,const Int_t Nx = 2,const Int_t Ny = 2, 
 		     Float_t lMargin = 0.15, Float_t rMargin = 0.05,
                      Float_t bMargin = 0.15, Float_t tMargin = 0.05,
 		     Float_t vSpacing = 0.0, Float_t hSpacing = 0.0);
 
-void SimulationFigures() {
+int GetAVNumber(const std::string &volName) {
+  if(volName.substr(0,3) == "av_") {
+    int underscoreLocation = volName.find_first_of("_",3);
+    return atoi(volName.substr(3,underscoreLocation-3).c_str());
+  } else{
+    return 0;
+  }
+}
+int GetImprNumber(const std::string &volName) {
+  if(volName.substr(0,3) == "av_") {
+    int underscorePos = volName.find_first_of("_",1+
+      volName.find_first_of("_",3));
+    return atoi(volName.substr(underscorePos+1,1).c_str());
+  } else
+    return 0;
+}
+
+int GetPlacementNumber(const std::string &volName) {
+  if(volName.substr(0,3) == "av_") {
+    int underscorePos = volName.find_first_of("_",1+
+      volName.find_first_of("_",1+
+      volName.find_first_of("_",1+
+      volName.find_first_of("_",1+
+      volName.find_first_of("_",3)))));
+    return atoi(volName.substr(underscorePos+1,std::string::npos).c_str());
+  } else
+    return 0;
+}
+
+void FrontTaggerCountRates() {
 
   Long_t TotalElectrons = 0, TotalEventsRecorded = 0; 
-  std::string histoNames[3][3]={{"pi-","mu+","gamma"},
-				{"neutron","mu-","e+"},
-				{"proton","pi+","e-"}};
+
+  std::string histoNames[3][2]={{"av_11_impr_1_FrontTagLV_pv_0","av_11_impr_1_FrontTagLV_pv_1"},{"av_11_impr_1_FrontTagLV_pv_2","av_11_impr_1_FrontTagLV_pv_3"},{"av_11_impr_1_FrontTagLV_pv_4","av_11_impr_1_FrontTagLV_pv_5"}};
+  
   TFile *inFile = TFile::Open("NMU11GeV_Lead10cm_4Bdl_Histos.root");
   //TFile *inFile = TFile::Open("JLABLead10cm_4Bdl_Histos.root");
+  
+  // Retrieve the object with the total number of electrons on target and calculate 
+  // effective electron time on target per micro amp of beam
+
+  TVectorD *v = (TVectorD*)inFile->Get("TVectorT<double>");
+  double totalElectrons = ((*v))[0];
+  double electronTime = totalElectrons/(6.242e12); //6.242e12 e-/s at 1 microAmp
+  cout << "Electron Time is " << electronTime << " s " << endl;
 
   TCanvas *c1 = new TCanvas("c1","Polarimeter Angle 28.0 Deg, E = 4.4 GeV",1000,900);
 
-  Int_t Nx = 3, Ny =3, fillStyle = 1001;
-  Float_t lMargin = 0.10, rMargin = 0.05, bMargin = 0.07, tMargin = 0.05;
+  Int_t Nx = 3, Ny = 2, fillStyle = 1001;
+  int pvNum, avNum, imprNum;
+  Float_t lMargin = 0.10, rMargin = 0.05, bMargin = 0.10, tMargin = 0.05;
   Float_t vSpacing = 0.0; Float_t hSpacing = 0.0;
+  double CTagger[Nx][Ny];
+
   CanvasPartition(c1,Nx,Ny,lMargin,rMargin,bMargin,tMargin,vSpacing,hSpacing);
 
   TPad *pad[Nx][Ny];
@@ -53,7 +91,6 @@ void SimulationFigures() {
      sprintf(pname,"pad_%i_%i",i,j);
      pad[i][j] = (TPad*) gROOT->FindObject(pname);
      pad[i][j]->Draw();
-     pad[i][j]->SetLogx();
      pad[i][j]->SetLogy();
      pad[i][j]->SetFillStyle(4000);
      pad[i][j]->SetFrameFillStyle(4000);
@@ -62,21 +99,29 @@ void SimulationFigures() {
      Float_t xFactor = pad[0][0]->GetAbsWNDC()/pad[i][j]->GetAbsWNDC();
      Float_t yFactor = pad[0][0]->GetAbsHNDC()/pad[i][j]->GetAbsHNDC();
 
-     char hname[16];
+     char hname[30];
      std::string str = histoNames[i][j];
-     sprintf(hname,"h_%s",histoNames[i][j].c_str());
+     sprintf(hname,"%s",histoNames[i][j].c_str());
      TH1F *hFrame = (TH1F*) inFile->Get(hname);
      hFrame->SetStats(false); 
      hFrame->SetFillColor(kBlue);
      hFrame->SetTitleFont(16);
      hFrame->SetFillStyle(fillStyle);
      hFrame->Draw();
+
+     // Set Good Histogram Title
+     avNum = GetAVNumber(hname);
+     imprNum = GetImprNumber(hname);
+     pvNum = GetPlacementNumber(hname);
+     char htitle[80];
+     sprintf(htitle,"#splitline{Energy Deposited}{Front Tagger %i, Layer %i}",pvNum+1, imprNum);
+     hFrame->SetTitle(htitle);     
   
      // y axis range
-     hFrame->GetYaxis()->SetRangeUser(0.001,3.0*hFrame->GetMaximum());
+     hFrame->GetYaxis()->SetRangeUser(0.1,1.5*hFrame->GetMaximum());
      
      // Format for y axis
-     hFrame->GetYaxis()->SetTitle("#frac{Particles}{#muA #times cm^{2}}");
+     hFrame->GetYaxis()->SetTitle("Events");
      hFrame->GetYaxis()->SetLabelFont(43);
      hFrame->GetYaxis()->SetLabelSize(16);
      hFrame->GetYaxis()->SetLabelOffset(0.02);
@@ -91,7 +136,7 @@ void SimulationFigures() {
      hFrame->GetYaxis()->SetTickLength(xFactor*0.04/yFactor);
      
      // Format for x axis
-     hFrame->GetXaxis()->SetTitle("Kinetic Energy (MeV)");
+     hFrame->GetXaxis()->SetTitle("Energy Deposited (MeV)");
      hFrame->GetXaxis()->SetLabelFont(43);
      hFrame->GetXaxis()->SetLabelSize(16);
      hFrame->GetXaxis()->SetLabelOffset(0.02);
@@ -104,88 +149,22 @@ void SimulationFigures() {
      // TICKS X Axis
      hFrame->GetXaxis()->SetTickLength(yFactor*0.06/xFactor);
      
+     // Count up events in Front layer of taggers above Threshold
+     int nBins = hFrame->GetNbinsX();
+     double binWidth = hFrame->GetXaxis()->GetBinWidth(10);
+     double Threshold = 1.0;
+
+     CTagger[i][j] = hFrame->Integral((Threshold/binWidth),nBins);    
+     cout << "First Tagger layer, detector " << pvNum << " counts/s for 1 microAmp of Beam " << CTagger[i][j]/electronTime/(1e6) << " MHz" << endl;
+     cout << "First Tagger layer, detector " << pvNum << " counts/s for 80 microAmp of Beam " << 80*CTagger[i][j]/electronTime/(1e6) << " MHz" << endl;    
+     cout << " " << endl;
    }
   }
-
-  TCanvas *c2 = new TCanvas("c2","Position in Tagger with Polarimeter Angle 28.0 Deg, E = 4.4 GeV",1000,900);
- 
-  lMargin = 0.07, rMargin = 0.03, bMargin = 0.08, tMargin = 0.05;
-  Nx = 3; Ny = 3;
-  vSpacing = 0.0; hSpacing = 0.0;
-  CanvasPartition(c2,Nx,Ny,lMargin,rMargin,bMargin,tMargin,vSpacing,hSpacing);
-
-  TPad *pad2[Nx][Ny];
-    
-  for(int i = 0; i < Nx; i++){
-   for(int j = 0; j < Ny; j++){
-     c2->cd(0);
-     // Get the pads previosly created.
-     char pname[16];
-     sprintf(pname,"pad_%i_%i",i,j);
-     pad[i][j] = (TPad*) gROOT->FindObject(pname);
-     pad[i][j]->Draw();
-     //pad[i][j]->SetLogz();
-     pad[i][j]->SetFillStyle(4000);
-     pad[i][j]->SetFrameFillStyle(4000);
-     pad[i][j]->cd();
-     // Size factors
-     Float_t xFactor = pad[0][0]->GetAbsWNDC()/pad[i][j]->GetAbsWNDC();
-     Float_t yFactor = pad[0][0]->GetAbsHNDC()/pad[i][j]->GetAbsHNDC();
-
-     char hname[16];
-     std::string str = histoNames[i][j];
-     sprintf(hname,"pos_%s",histoNames[i][j].c_str());
-     TH1F *hFrame = (TH1F*) inFile->Get(hname);
-     hFrame->SetStats(false); 
-     hFrame->SetFillColor(kBlue);
-     hFrame->SetTitleFont(16);
-     //hFrame->SetOption("lego2");
-     hFrame->SetFillStyle(fillStyle);
-     hFrame->Draw();
      
-     // Format for Z axis
-     hFrame->GetZaxis()->SetTitle("#frac{Particles}{#muA #times cm^{2}}");
-     
-     // Z axis range
-     hFrame->GetZaxis()->SetRangeUser(0.001,1.0*hFrame->GetMaximum());
-     
-     // Format for y axis
-     hFrame->GetYaxis()->SetTitle("Vertical Position (cm)");
-     hFrame->GetYaxis()->SetLabelFont(43);
-     hFrame->GetYaxis()->SetLabelSize(16);
-     hFrame->GetYaxis()->SetLabelOffset(0.02);
-     hFrame->GetYaxis()->SetTitleFont(43);
-     hFrame->GetYaxis()->SetTitleSize(16);
-     hFrame->GetYaxis()->SetTitleOffset(5);
-     
-     hFrame->GetYaxis()->CenterTitle();
-     hFrame->GetYaxis()->SetNdivisions(505);
-     
-     // TICKS Y Axis
-     hFrame->GetYaxis()->SetTickLength(xFactor*0.04/yFactor);
-     
-     // Format for x axis
-     hFrame->GetXaxis()->SetTitle("Horizontal Position (cm)");
-     hFrame->GetXaxis()->SetLabelFont(43);
-     hFrame->GetXaxis()->SetLabelSize(16);
-     hFrame->GetXaxis()->SetLabelOffset(0.02);
-     hFrame->GetXaxis()->SetTitleFont(43);
-     hFrame->GetXaxis()->SetTitleSize(16);
-     hFrame->GetXaxis()->SetTitleOffset(5);
-     hFrame->GetXaxis()->CenterTitle();
-     hFrame->GetXaxis()->SetNdivisions(505);
-     
-     // TICKS X Axis
-     hFrame->GetXaxis()->SetTickLength(yFactor*0.06/xFactor);
-     
-   }
-  }
-
-  //TFile *outFile = new TFile("JLABLead10cm_4Bdl_Fig21-23.root","RECREATE");
-  TFile *outFile = new TFile("NMU11GeV_Lead10cm_4Bdl_Fig21-23.root","RECREATE");
+  //TFile *outFile = new TFile("JLABLead10cm_4Bdl_TaggerRates.root","RECREATE");
+    TFile *outFile = new TFile("NMU11GeV_Lead10cm_4Bdl_TaggerRates.root","RECREATE");
   c1->Write();
-  outFile->Close();
-  
+  outFile->Close(); 
   //inFile->Close();
 
 }

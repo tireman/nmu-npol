@@ -13,6 +13,7 @@
 #include <sstream>
 
 #include <G4Track.hh>
+#include <G4Step.hh>
 #include <G4ThreeVector.hh>
 #include <G4String.hh>
 #include <G4ParticleDefinition.hh>
@@ -52,6 +53,7 @@ NpolAnalysisManager::NpolAnalysisManager(){
   tracks = NULL;
   NPOLTaggedParticle = NULL;
   SHMSTaggedParticle = NULL;
+  eDeposited = NULL;
   statistics = NULL;
   Initialize();
 
@@ -77,7 +79,7 @@ void NpolAnalysisManager::Initialize(){
 void NpolAnalysisManager::InitializeObjects() {
 
   statistics = new NpolStatistics();
-  statistics->version = 20151020;  // Determined by Date: YYYYMMDD
+  statistics->version = 20151202;  // Determined by Date: YYYYMMDD
   statistics->totalEvents = 0;
   statistics->eventsSaved = 0;
   
@@ -88,12 +90,15 @@ void NpolAnalysisManager::InitializeObjects() {
   
   SHMSTaggedParticle = new std::vector<NpolTagger *>();
   SHMSTaggedParticle->push_back(NULL);
+
+  eDeposited = new std::map<std::string,double>;  // making a map of energy deposited in volumes
   
   npolTree = new TTree("T","Per-event information from Npol simulation");
   npolTree->Branch("tracks","std::vector<NpolVertex *>",&tracks,32000,2);
   npolTree->Branch("NPOL_Tagger","std::vector<NpolTagger *>",&NPOLTaggedParticle,32000,2);
   npolTree->Branch("SHMS_Tagger","std::vector<NpolTagger *>",&SHMSTaggedParticle,32000,2);
-  
+  npolTree->Branch("EDeposit_Volume","std::map<std::string,double>*", &eDeposited,32000,2);
+
   statsTree = new TTree("T2","Per-run information from Npol simulation");
   statsTree->Branch("stats","NpolStatistics",&statistics,32000,2);
 }
@@ -121,11 +126,12 @@ void NpolAnalysisManager::PrepareNewEvent(const G4int evtID) {
   std::vector<NpolTagger *>::iterator it3;
   for(it3 = SHMSTaggedParticle->begin(); it3 != SHMSTaggedParticle->end(); it3++)
     delete *it3;
-  
+
   tracks->clear();
   NPOLTaggedParticle->clear();
   SHMSTaggedParticle->clear();
-  
+  eDeposited->clear();
+
   // maybe open a new root file
   if((evtID % eventsPerFile == 0)/* && (evtId != 0)*/) {
     if(npolOutFile != NULL) {
@@ -141,6 +147,17 @@ void NpolAnalysisManager::PrepareNewEvent(const G4int evtID) {
   
   (statistics->totalEvents)++;
 }
+
+void NpolAnalysisManager::AddStep(const G4Step *aStep, std::string volName){
+  std::map<std::string,double>::iterator it;
+  
+  if(eDeposited->find(volName) == eDeposited->end())
+    eDeposited->insert(std::pair<std::string,double>(volName, 0.0));
+  it = eDeposited->find(volName);
+  it->second +=aStep->GetTotalEnergyDeposit()/MeV;
+
+}
+
 
 void NpolAnalysisManager::AddTrack(const G4Track *aTrack) {
   NpolVertex *anNpolVertex = new NpolVertex();
@@ -273,6 +290,7 @@ void NpolAnalysisManager::ClearObjects(){
   tracks = NULL;
   NPOLTaggedParticle = NULL;
   SHMSTaggedParticle = NULL;
+  eDeposited = NULL;
   statistics = NULL;
 }
 

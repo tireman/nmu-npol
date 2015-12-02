@@ -18,7 +18,7 @@ bool isRootFile(char *filename) {
 
 void CleanOutBadFiles() {
   
-  std::string dirName = "/data2/cgen/JlabSimData/MagField_2Bdl/Lead10cm";
+  std::string dirName = "/data2/cgen/JlabSimData/MagField_4Bdl/Lead10cm";
   
   DIR *d = NULL;
   struct dirent *dir = NULL;
@@ -28,7 +28,7 @@ void CleanOutBadFiles() {
     std::cerr << "Cannot open directory " << dirName << std::endl;
     return;
   }
-  TFile.Recover 0;
+  //TFile.Recover 0;
   // For each file
   while((dir = readdir(d)) != NULL) {
     std::string filename = dirName + "/" + dir->d_name;

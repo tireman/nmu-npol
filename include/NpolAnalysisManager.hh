@@ -14,9 +14,11 @@
 #define Npol_Analysis_Manager_h
 
 #include <vector>
+#include <map>
 #include "G4SystemOfUnits.hh"
 
 class G4Track;
+class G4Step;
 class TFile;
 class TTree;
 class TBranch;
@@ -38,6 +40,7 @@ public:
   void SetTrackAsKilled(int trackID);
   void AddNPOLTaggedParticle(const G4Track *);
   void AddSHMSTaggedParticle(const G4Track *);
+  void AddStep(const G4Step *, std::string);
   void FillTree();
   void WriteObjectsToFile();
   void OpenRootFile();
@@ -62,6 +65,7 @@ private:
   std::vector<NpolVertex *> *tracks;
   std::vector<NpolTagger *> *NPOLTaggedParticle;
   std::vector<NpolTagger *> *SHMSTaggedParticle;
+  std::map<std::string,double> *eDeposited;
   NpolStatistics *statistics;
 };
 
