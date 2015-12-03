@@ -33,6 +33,7 @@
 #include "NpolAnalysisManager.hh"
 #include "NpolVertex.hh"
 #include "NpolTagger.hh"
+#include "NpolStep.hh"
 #include "NpolStatistics.hh"
 
 
@@ -53,7 +54,8 @@ NpolAnalysisManager::NpolAnalysisManager(){
   tracks = NULL;
   NPOLTaggedParticle = NULL;
   SHMSTaggedParticle = NULL;
-  eDeposited = NULL;
+  EventSteps = NULL;
+ 
   statistics = NULL;
   Initialize();
 
@@ -85,19 +87,21 @@ void NpolAnalysisManager::InitializeObjects() {
   
   tracks = new std::vector<NpolVertex *>();
   tracks->push_back(NULL);
+
   NPOLTaggedParticle = new std::vector<NpolTagger *>();
   NPOLTaggedParticle->push_back(NULL);
   
   SHMSTaggedParticle = new std::vector<NpolTagger *>();
   SHMSTaggedParticle->push_back(NULL);
 
-  eDeposited = new std::map<std::string,double>;  // making a map of energy deposited in volumes
+  EventSteps = new std::vector<NpolStep *>();
+  EventSteps ->push_back(NULL);
   
   npolTree = new TTree("T","Per-event information from Npol simulation");
   npolTree->Branch("tracks","std::vector<NpolVertex *>",&tracks,32000,2);
   npolTree->Branch("NPOL_Tagger","std::vector<NpolTagger *>",&NPOLTaggedParticle,32000,2);
   npolTree->Branch("SHMS_Tagger","std::vector<NpolTagger *>",&SHMSTaggedParticle,32000,2);
-  npolTree->Branch("EDeposit_Volume","std::map<std::string,double>*", &eDeposited,32000,2);
+  npolTree->Branch("Event_Steps","std::vector<NpolStep *>",&EventSteps,32000,2);
 
   statsTree = new TTree("T2","Per-run information from Npol simulation");
   statsTree->Branch("stats","NpolStatistics",&statistics,32000,2);
@@ -126,11 +130,15 @@ void NpolAnalysisManager::PrepareNewEvent(const G4int evtID) {
   std::vector<NpolTagger *>::iterator it3;
   for(it3 = SHMSTaggedParticle->begin(); it3 != SHMSTaggedParticle->end(); it3++)
     delete *it3;
+  
+  std::vector<NpolStep *>::iterator it4;
+  for(it4 = EventSteps->begin(); it4 != EventSteps->end(); it4++)
+    delete *it4;
 
   tracks->clear();
   NPOLTaggedParticle->clear();
   SHMSTaggedParticle->clear();
-  eDeposited->clear();
+  EventSteps->clear();
 
   // maybe open a new root file
   if((evtID % eventsPerFile == 0)/* && (evtId != 0)*/) {
@@ -149,13 +157,13 @@ void NpolAnalysisManager::PrepareNewEvent(const G4int evtID) {
 }
 
 void NpolAnalysisManager::AddStep(const G4Step *aStep, std::string volName){
-  std::map<std::string,double>::iterator it;
-  
-  if(eDeposited->find(volName) == eDeposited->end())
-    eDeposited->insert(std::pair<std::string,double>(volName, 0.0));
-  it = eDeposited->find(volName);
-  it->second +=aStep->GetTotalEnergyDeposit()/MeV;
+  NpolStep *Step = new NpolStep();
+  G4Track *aTrack = aStep->GetTrack();
+  Step->time = (aTrack->GetGlobalTime())/ns;
+  Step->eDep = (aStep->GetTotalEnergyDeposit())/MeV;
+  Step->volume = volName;
 
+  EventSteps->push_back(Step);
 }
 
 
@@ -166,13 +174,13 @@ void NpolAnalysisManager::AddTrack(const G4Track *aTrack) {
   
   anNpolVertex->trackId = trackId;
   anNpolVertex->parentId = parentId;
-  anNpolVertex->posX = (aTrack->GetPosition()).x()/m;
-  anNpolVertex->posY = (aTrack->GetPosition()).y()/m;
-  anNpolVertex->posZ = (aTrack->GetPosition()).z()/m;
+  anNpolVertex->posX = (aTrack->GetPosition()).x()/cm;
+  anNpolVertex->posY = (aTrack->GetPosition()).y()/cm;
+  anNpolVertex->posZ = (aTrack->GetPosition()).z()/cm;
   anNpolVertex->momX = (aTrack->GetMomentum()).x()/MeV;
   anNpolVertex->momY = (aTrack->GetMomentum()).y()/MeV;
   anNpolVertex->momZ = (aTrack->GetMomentum()).z()/MeV;
-  anNpolVertex->time = (aTrack->GetGlobalTime())/s;
+  anNpolVertex->time = (aTrack->GetGlobalTime())/ns;
   anNpolVertex->energy = aTrack->GetKineticEnergy()/MeV;
   anNpolVertex->eMiss = false;
   anNpolVertex->particle = (aTrack->GetDefinition()->GetParticleName()).data();
@@ -201,13 +209,13 @@ void NpolAnalysisManager::AddNPOLTaggedParticle(const G4Track *aTrack) {
   NpolTagger *anNpolTaggedParticle = new NpolTagger();
   
   anNpolTaggedParticle->trackId = aTrack->GetTrackID();
-  anNpolTaggedParticle->posX = (aTrack->GetPosition()).x()/m;
-  anNpolTaggedParticle->posY = (aTrack->GetPosition()).y()/m;
-  anNpolTaggedParticle->posZ = (aTrack->GetPosition()).z()/m;
+  anNpolTaggedParticle->posX = (aTrack->GetPosition()).x()/cm;
+  anNpolTaggedParticle->posY = (aTrack->GetPosition()).y()/cm;
+  anNpolTaggedParticle->posZ = (aTrack->GetPosition()).z()/cm;
   anNpolTaggedParticle->momX = (aTrack->GetMomentum()).x()/MeV;
   anNpolTaggedParticle->momY = (aTrack->GetMomentum()).y()/MeV;
   anNpolTaggedParticle->momZ = (aTrack->GetMomentum()).z()/MeV;
-  anNpolTaggedParticle->time = (aTrack->GetGlobalTime())/s;
+  anNpolTaggedParticle->time = (aTrack->GetGlobalTime())/ns;
   anNpolTaggedParticle->energy = aTrack->GetKineticEnergy()/MeV;
   anNpolTaggedParticle->particle = (aTrack->GetDefinition()->GetParticleName()).data();
   anNpolTaggedParticle->particleId = (aTrack->GetDefinition()->GetPDGEncoding());
@@ -219,13 +227,13 @@ void NpolAnalysisManager::AddSHMSTaggedParticle(const G4Track *aTrack) {
   NpolTagger *anSHMSTaggedParticle = new NpolTagger();
   
   anSHMSTaggedParticle->trackId = aTrack->GetTrackID();
-  anSHMSTaggedParticle->posX = (aTrack->GetPosition()).x()/m;
-  anSHMSTaggedParticle->posY = (aTrack->GetPosition()).y()/m;
-  anSHMSTaggedParticle->posZ = (aTrack->GetPosition()).z()/m;
+  anSHMSTaggedParticle->posX = (aTrack->GetPosition()).x()/cm;
+  anSHMSTaggedParticle->posY = (aTrack->GetPosition()).y()/cm;
+  anSHMSTaggedParticle->posZ = (aTrack->GetPosition()).z()/cm;
   anSHMSTaggedParticle->momX = (aTrack->GetMomentum()).x()/MeV;
   anSHMSTaggedParticle->momY = (aTrack->GetMomentum()).y()/MeV;
   anSHMSTaggedParticle->momZ = (aTrack->GetMomentum()).z()/MeV;
-  anSHMSTaggedParticle->time = (aTrack->GetGlobalTime())/s;
+  anSHMSTaggedParticle->time = (aTrack->GetGlobalTime())/ns;
   anSHMSTaggedParticle->energy = aTrack->GetKineticEnergy()/MeV;
   anSHMSTaggedParticle->particle = (aTrack->GetDefinition()->GetParticleName()).data();
   anSHMSTaggedParticle->particleId = (aTrack->GetDefinition()->GetPDGEncoding());
@@ -252,9 +260,10 @@ void NpolAnalysisManager::FillTree() {
     if(!((*it)->daughterIds).empty()){
       G4String subVolName = volName.substr(0,3).c_str();
       if(subVolName == "av_"){
-		npolTree->Fill();
-		(statistics->eventsSaved)++;
-		break;
+	if(EventSteps != NULL) QSort(EventSteps,1,EventSteps->size());
+	npolTree->Fill();
+	(statistics->eventsSaved)++;
+	break;
       }
     }
   }
@@ -290,7 +299,7 @@ void NpolAnalysisManager::ClearObjects(){
   tracks = NULL;
   NPOLTaggedParticle = NULL;
   SHMSTaggedParticle = NULL;
-  eDeposited = NULL;
+  EventSteps = NULL;
   statistics = NULL;
 }
 
@@ -316,3 +325,31 @@ void NpolAnalysisManager::InitializeFilenameVariables(){
   RootFileNumber = 0;
 }
 
+int NpolAnalysisManager::partition(std::vector<NpolStep*> *aVector, int p, int q){
+ 
+  double x = (*aVector)[p]->time;
+  int i = p;
+  int j;
+ 
+  for(j = p+1; j < q; j++){
+    if((*aVector)[j]->time <= x){
+      i = i +1;
+      std::swap((*aVector)[i],(*aVector)[j]);
+    }
+  }
+
+  std::swap((*aVector)[i],(*aVector)[p]);
+  return i;
+}
+
+void NpolAnalysisManager::QSort(std::vector<NpolStep*> *aVector, int p, int q){
+
+  if(aVector == NULL) return;
+  int r; 
+
+  if(p<q){
+    r = partition(aVector,p,q);
+    QSort(aVector,p,r);
+    QSort(aVector,r+1,q);
+  }
+}

@@ -18,7 +18,7 @@ message("    -> GEANT4 Include directory is: ${Geant4_INCLUDE_DIR}")
 
 if(useROOT)
   add_definitions(-DG4ANALYSIS_USE_ROOT=1)
-  set(myROOTclasses ${PROJECT_SOURCE_DIR}/include/NpolTagger.hh ${PROJECT_SOURCE_DIR}/include/NpolVertex.hh ${PROJECT_SOURCE_DIR}/include/NpolStatistics.hh)
+  set(myROOTclasses ${PROJECT_SOURCE_DIR}/include/NpolTagger.hh ${PROJECT_SOURCE_DIR}/include/NpolVertex.hh ${PROJECT_SOURCE_DIR}/include/NpolStep.hh ${PROJECT_SOURCE_DIR}/include/NpolStatistics.hh)
 
   # Load ROOT and setup include directory
   #set(CMAKE_MODULE_PATH /usr/local/lib/Geant4-10.0.1/Modules)

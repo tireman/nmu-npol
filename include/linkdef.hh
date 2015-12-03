@@ -8,10 +8,12 @@
 
 #pragma link C++ class NpolTagger+ ;
 #pragma link C++ class NpolVertex+ ;
+#pragma link C++ class NpolStep+;
 #pragma link C++ class NpolStatistics+;
 
 #pragma link C++ class vector<NpolVertex*>+;
 #pragma link C++ class vector<NpolTagger*>+;
+#pragma link C++ class vector<NpolStep*>+;
 #pragma link C++ all_datamember <NpolStatistics>+;
 
 

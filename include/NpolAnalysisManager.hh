@@ -24,12 +24,14 @@ class TTree;
 class TBranch;
 class NpolVertex;
 class NpolTagger;
+class NpolStep;
 class NpolStatistics;
 class NpolAnalysisMessenger;
 
 class NpolAnalysisManager {
 
 public:
+   
   static NpolAnalysisManager *GetInstance();
   void BeginOfRun();
   void EndOfRun();
@@ -47,6 +49,8 @@ public:
   void setFileName(const G4String& nam);
   void ClearObjects();
   void InitializeFilenameVariables();
+  int partition(std::vector<NpolStep*> *aVector, int p, int q);
+  void QSort(std::vector<NpolStep*> *aVector, int p, int q);
 
 private:
   NpolAnalysisManager();
@@ -65,7 +69,9 @@ private:
   std::vector<NpolVertex *> *tracks;
   std::vector<NpolTagger *> *NPOLTaggedParticle;
   std::vector<NpolTagger *> *SHMSTaggedParticle;
-  std::map<std::string,double> *eDeposited;
+  std::vector<NpolStep *> *EventSteps;
+  //std::map<std::string,double> *eDeposited;
+
   NpolStatistics *statistics;
 };
 
