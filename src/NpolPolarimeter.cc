@@ -37,6 +37,7 @@ NpolPolarimeter::NpolPolarimeter() {
   G4VSolid *PolarimeterBox = new G4Box("PolarimeterBox",1.30*m,1.45*m,1.85*m);
   PolarimeterLV = new G4LogicalVolume(PolarimeterBox,
       NpolMaterials::GetInstance()->GetAir(), "PolarimeterLV",0,0,0);
+      //NpolMaterials::GetInstance()->GetVacuum(), "PolarimeterLV", 0,0,0);	
   //G4VisAttributes* PolarimeterVisAtt= new G4VisAttributes(G4Colour(1.0,1.0,0.0));
   //PolarimeterLV->SetVisAttributes(PolarimeterVisAtt);
   PolarimeterLV->SetVisAttributes(G4VisAttributes::GetInvisible());

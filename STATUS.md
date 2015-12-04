@@ -1,3 +1,7 @@
+# Update: 3-Dec-2015
+
+A philosophy error was made with the energy.  The scheme didn't work to find the total energy deposited in a volume.  A change was made to save any event to the ROOT file that has at least 1 step in the polarimeter.  Also, step information such as volume, energy deposit in the volume, and the global time are stored in a new branch vector.  We can now sum up the total energy in each volume and determine the time at which detector fired.  This vector is sorted in time from smallest to largest before the vector is saved.  
+
 # Update: 26-Oct-2015
 
 Clean up of the NpolShieldHut.cc file was performed.  A better positioning of the shield hut so a proper 10 cm of lead curtain could be placed right at the entrance to the shield hut.  The collimator had to be changed to account for the change in position of the shield hut to fully illuminate the front array.  All done by visual inspection.  No hard numbers are available from C-GEN so best guess was employed. Polarimeter Tagger volume was moved to be as close to the exit from the collimator as possible and resized to be only as large as necessary.

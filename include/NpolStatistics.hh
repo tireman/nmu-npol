@@ -15,15 +15,15 @@
 
 class NpolStatistics: public TObject {
 
-	public:
-		int version;
-		int totalEvents;
-		int eventsSaved;
-
-		inline NpolStatistics() {};
-		virtual ~NpolStatistics() {};
-
-		ClassDef(NpolStatistics, 1);
+public:
+  int version;
+  int totalEvents;
+  int eventsSaved;
+  
+  inline NpolStatistics() {};
+  virtual ~NpolStatistics() {};
+  
+  ClassDef(NpolStatistics, 1);
 };
 
 #endif

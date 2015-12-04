@@ -179,7 +179,7 @@ void NpolDipole1::ConstructDipole1Field(){
   G4TransportationManager* tmanMagField = G4TransportationManager::GetTransportationManager();
   tmanMagField -> GetPropagatorInField() -> SetLargestAcceptableStep(1*mm);
   
-  dipole1FieldY = 1.639*tesla; // 1 B.dl = 0.40984*tesla; 2 B.dl = 0.81967*tesla; 4 B.dl = 1.639*tesla;
+  dipole1FieldY = 4*0.40984*tesla; // 1 B.dl = 0.40984*tesla; 2 B.dl = 0.81967*tesla; 4 B.dl = 1.639*tesla;
 
   magField = new G4UniformMagField(G4ThreeVector(0., dipole1FieldY, 0.));
   fEqMagField = new G4Mag_UsualEqRhs(magField);

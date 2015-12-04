@@ -19,7 +19,6 @@ class NpolTagger : public TObject {
 
 public:
   G4int trackId;
-  //G4int parentId;
   double posX;
   double posY;
   double posZ;
@@ -30,8 +29,6 @@ public:
   double energy;
   G4int  particleId;
   std::string particle;
-  //std::string process;
-  //std::string volume;
 
   inline NpolTagger() {};
   virtual ~NpolTagger() {};

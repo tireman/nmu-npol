@@ -58,6 +58,7 @@ private:
   
 private:
   bool singletonInitialized;
+  bool eventFlag;
   G4int eventsPerFile;
   G4String rootName; 
   G4String dirName;
@@ -70,9 +71,7 @@ private:
   std::vector<NpolTagger *> *NPOLTaggedParticle;
   std::vector<NpolTagger *> *SHMSTaggedParticle;
   std::vector<NpolStep *> *EventSteps;
-  //std::map<std::string,double> *eDeposited;
-
-  NpolStatistics *statistics;
+  std::vector<NpolStatistics *> *statistics;
 };
 
 #endif

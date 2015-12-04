@@ -54,8 +54,7 @@ NpolAnalysisManager::NpolAnalysisManager(){
   tracks = NULL;
   NPOLTaggedParticle = NULL;
   SHMSTaggedParticle = NULL;
-  EventSteps = NULL;
- 
+  EventSteps = NULL; 
   statistics = NULL;
   Initialize();
 
@@ -71,7 +70,8 @@ void NpolAnalysisManager::Initialize(){
     std::cout << "WARNING: NpolAnalysisManager is already initialized and is being initialized again." << std::endl;
   
   InitializeFilenameVariables();
-  eventsPerFile = 1000000; // the number of primary events that will be simulated before the output file is changed
+  eventsPerFile = 1000000; // the number of primary events that will be 
+                           //simulated before the output file is changed
   
   InitializeObjects();
   
@@ -80,11 +80,12 @@ void NpolAnalysisManager::Initialize(){
 
 void NpolAnalysisManager::InitializeObjects() {
 
-  statistics = new NpolStatistics();
-  statistics->version = 20151202;  // Determined by Date: YYYYMMDD
-  statistics->totalEvents = 0;
-  statistics->eventsSaved = 0;
-  
+  statistics = new std::vector<NpolStatistics *>();
+  statistics->push_back(new NpolStatistics());
+  ((*statistics)[0])->version = 20151203;  // Determined by Date: YYYYMMDD
+  ((*statistics)[0])->totalEvents = 0;
+  ((*statistics)[0])->eventsSaved = 0;
+
   tracks = new std::vector<NpolVertex *>();
   tracks->push_back(NULL);
 
@@ -104,7 +105,7 @@ void NpolAnalysisManager::InitializeObjects() {
   npolTree->Branch("Event_Steps","std::vector<NpolStep *>",&EventSteps,32000,2);
 
   statsTree = new TTree("T2","Per-run information from Npol simulation");
-  statsTree->Branch("stats","NpolStatistics",&statistics,32000,2);
+  statsTree->Branch("stats","std::vector<NpolStatistics *>",&statistics,32000,2);
 }
 
 void NpolAnalysisManager::BeginOfRun(){}
@@ -117,7 +118,8 @@ void NpolAnalysisManager::EndOfRun(){
 }
 
 void NpolAnalysisManager::PrepareNewEvent(const G4int evtID) {
-  
+  eventFlag = false;
+
   // clean out the vectors from last event
   std::vector<NpolVertex *>::iterator it;
   for(it = tracks->begin(); it != tracks->end(); it++)
@@ -134,7 +136,7 @@ void NpolAnalysisManager::PrepareNewEvent(const G4int evtID) {
   std::vector<NpolStep *>::iterator it4;
   for(it4 = EventSteps->begin(); it4 != EventSteps->end(); it4++)
     delete *it4;
-
+ 
   tracks->clear();
   NPOLTaggedParticle->clear();
   SHMSTaggedParticle->clear();
@@ -153,7 +155,7 @@ void NpolAnalysisManager::PrepareNewEvent(const G4int evtID) {
     InitializeObjects();
   }
   
-  (statistics->totalEvents)++;
+  ((*statistics)[0])->totalEvents++;
 }
 
 void NpolAnalysisManager::AddStep(const G4Step *aStep, std::string volName){
@@ -162,6 +164,11 @@ void NpolAnalysisManager::AddStep(const G4Step *aStep, std::string volName){
   Step->time = (aTrack->GetGlobalTime())/ns;
   Step->eDep = (aStep->GetTotalEnergyDeposit())/MeV;
   Step->volume = volName;
+
+  G4String subVolName = volName.substr(0,3).c_str();
+  if(subVolName == "av_"){
+    eventFlag = true;
+  }
 
   EventSteps->push_back(Step);
 }
@@ -243,35 +250,17 @@ void NpolAnalysisManager::AddSHMSTaggedParticle(const G4Track *aTrack) {
 
 void NpolAnalysisManager::FillTree() {
 
-  // This portion of code checks to see if the vector has any daughters at
-  // all if it doesn't it does not fill the tree.  If it does then it 
-  // checks to see if at least one is in an assembly volume which is 
-  // part of the polarimeter.  If it is then it fills the tree, otherwise,
-  // it skips filling and the next event is generated.  Cuts down on space 
-  // used in the files since the majority of events do not produce hits
-  // in the polarimeter.
-  
-  std::vector<NpolVertex *>::iterator it;
-  for(it = tracks->begin(); it != tracks->end(); it++){
-    
-    if(*it == NULL) continue;
-    G4String volName = (*it)->volume;
-    
-    if(!((*it)->daughterIds).empty()){
-      G4String subVolName = volName.substr(0,3).c_str();
-      if(subVolName == "av_"){
-	if(EventSteps != NULL) QSort(EventSteps,1,EventSteps->size());
-	npolTree->Fill();
-	(statistics->eventsSaved)++;
-	break;
-      }
-    }
+  if(eventFlag){
+    if(EventSteps != NULL) QSort(EventSteps,1,EventSteps->size());
+    npolTree->Fill();
+    ((*statistics)[0])->eventsSaved++;
   }
 }
 
+
 void NpolAnalysisManager::WriteObjectsToFile() {
-  npolTree->Write();
   statsTree->Fill();
+  npolTree->Write(); 
   statsTree->Write();
 }
 
@@ -293,6 +282,19 @@ void NpolAnalysisManager::setFileName(const G4String& nam) {
 }
 
 void NpolAnalysisManager::ClearObjects(){
+
+  std::vector<NpolStatistics *>::iterator it;
+  for(it = statistics->begin(); it != statistics->end(); it++)
+    delete *it;
+  statistics->clear();
+
+  delete npolOutFile;
+  delete tracks;
+  delete NPOLTaggedParticle;
+  delete SHMSTaggedParticle;
+  delete EventSteps;
+  delete statistics;
+
   npolOutFile = NULL;
   npolTree = NULL;
   statsTree = NULL;
