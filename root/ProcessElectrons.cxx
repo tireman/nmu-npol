@@ -19,6 +19,7 @@
 #include "NpolVertex.hh"
 #include "NpolTagger.hh"
 #include "NpolStatistics.hh"
+#include "NpolStep.hh"
 
 int GetAVNumber(const std::string &volName) {
   if(volName.substr(0,3) == "av_") {
@@ -66,66 +67,42 @@ double *AntilogBins(const int nbins, const double xmin, const double xmax) {
   return new_bins;
 }
 
-int partition(std::vector<NpolVertex*> *aVector, int p, int q){
- 
-  double x = (*aVector)[p]->time;
-  int i = p;
-  int j;
- 
-  for(j = p+1; j < q; j++){
-    if((*aVector)[j]->time <= x){
-      i = i +1;
-      swap((*aVector)[i],(*aVector)[j]);
-    }
-  }
-
-  swap((*aVector)[i],(*aVector)[p]);
-  return i;
-}
-
-void QSort(std::vector<NpolVertex*> *aVector, int p, int q){
-
-  if(aVector == NULL) return;
-  int r; 
-
-  if(p<q){
-    r = partition(aVector,p,q);
-    QSort(aVector,p,r);
-    QSort(aVector,r+1,q);
-  }
-}
-
-// Generate tagged particle KE  histograms with variable width bins suitable for a loglog plot
 void ProcessElectrons() {
   gSystem->Load("NpolClass.so"); 
   
   // Set up the TTrees and their branch addresses
   TChain *npolTree = new TChain("T");
   TChain *statsTree = new TChain("T2");
-  
-  npolTree->Add("/data2/cgen/NMUSimData/11GeV/4Bdl/Lead10cm/npol*.root");
-  statsTree->Add("/data2/cgen/NMUSimData/11GeV/4Bdl/Lead10cm/npol*.root");
-  //npolTree->Add("/data2/cgen/JlabSimData/MagField_4Bdl/Lead10cm/npolLeadOn10cmHighMag_*.root");
-  //statsTree->Add("/data2/cgen/JlabSimData/MagField_4Bdl/Lead10cm/npolLeadOn10cmHighMag_*.root");
-  
+
+  npolTree->Add("/data2/cgen/NMUSimData/4.4GeV/4Bdl/Lead10cm/npolLead10cm_4-4GeV_*.root");
+  statsTree->Add("/data2/cgen/NMUSimData/4.4GeV/4Bdl/Lead10cm/npolLead10cm_4-4GeV_*.root");
+
+  //npolTree->Add("/data2/cgen/JlabSimData/MagField_4Bdl/Lead10cm/npolLeadOn10cmHighMag_1_*.root");
+  //statsTree->Add("/data2/cgen/JlabSimData/MagField_4Bdl/Lead10cm/npolLeadOn10cmHighMag_1_*.root");
+
   std::vector<NpolVertex *> *anEntry = NULL;
   std::vector<NpolTagger *> *npolEntry = NULL;
   std::vector<NpolTagger *> *shmsEntry = NULL;
-  NpolStatistics *aStat = NULL;
-  
+  std::vector<NpolStatistics *> *anStat = NULL;
+  std::vector<NpolStep *> *anStep = NULL;
+
   npolTree->SetBranchAddress("NPOL_Tagger",&npolEntry);
   npolTree->SetBranchAddress("SHMS_Tagger",&shmsEntry);
   npolTree->SetBranchAddress("tracks",&anEntry);
-  statsTree->SetBranchAddress("stats",&aStat);
-  
+  npolTree->SetBranchAddress("Event_Steps",&anStep);
+  statsTree->SetBranchAddress("stats",&anStat);
+
   // Count the total number of electrons on target and total events 
   // saved to the files 
   Long_t TotalElectrons = 0;
   Long_t TotalEventsRecorded = 0;
-  for(int i = 0; i < statsTree->GetEntries(); i++){
-    statsTree->GetEntry(i);
-    TotalElectrons += aStat->totalEvents;
-    TotalEventsRecorded += aStat->eventsSaved;
+  cout << "Number of enteries " << statsTree->GetEntries() <<endl;
+  for(int i = 0; i < statsTree->GetEntries(); i++){ 
+    statsTree->GetEntry(i); 
+   
+    cout << "Got to this point" << endl;
+    TotalElectrons += ((*anStat)[0])->totalEvents;
+    TotalEventsRecorded += ((*anStat)[0])->eventsSaved;   
   }
   
   std::cout << "Total electrons: " << TotalElectrons << std::endl;
@@ -161,12 +138,11 @@ void ProcessElectrons() {
     taggedParticleKE[it->first] = new TH1F(
      histoName.c_str(), histoTitle.c_str(),nbins,bins);
     taggedParticlePOS[it->first] = new TH2F(posHistoName.c_str(),
-     posHistoTitle.c_str(),120,-3.8,-2.6,160,-0.40,0.40);     
+     posHistoTitle.c_str(),120,-380,-260,160,-40,40);     
   }  
 
   // Allocate the dTOF histogram
-  TH1F *delta_TOF = new TH1F("dToF", "Time of flight between Analyzer and Top/Bottom Detectors", 
-			     500, -15.0, 200.0);
+  TH1F *delta_TOF = new TH1F("dToF", "Time of flight between Analyzer and Top/Bottom Detectors", 500, -15.0, 200.0);
   delta_TOF->GetYaxis()->SetTitle("Events");
   delta_TOF->GetXaxis()->SetTitle("Analyzer to Top/Bottom Array Time-of-Flight (ns)");
 
@@ -179,8 +155,11 @@ void ProcessElectrons() {
     if(nentries > 1000){
       if(i%1000 == 0)
 	std::cout << "Processing event no. " << i << std::endl;
-    }else{
+    }else if(nentries >100){
       if(i%100 == 0)
+	std::cout << "Processing event no. " << i << std::endl;
+    }else{
+      if(i%1 == 0)
 	std::cout << "Processing event no. " << i << std::endl;
     }
     
@@ -205,24 +184,23 @@ void ProcessElectrons() {
     std::map<std::string, double> hitTime;
 
     // loop over vector elements (one per vertex)
-    int p = 1;
-    int q = anEntry->size();
-    QSort(anEntry,p,q); // sort vertex vector in time!
+    //int p = 1;
+    //int q = anEntry->size();
+    //QSort(anEntry,p,q); // sort vertex vector in time!
     int avNum, imprNum, pvNum;
     
-    Int_t nvertices = anEntry->size();
+    Int_t nvertices = anStep->size();
     for(int j = 0; j < nvertices; j++) {
-      NpolVertex *aVertex = (*anEntry)[j];
+      NpolStep *aStep = (*anStep)[j];
       double Ethreshold = 0.0;
       
-      if(aVertex == NULL) continue;
-      if(!(aVertex->daughterIds).empty() || (aVertex->eMiss)) continue;
+      if(aStep == NULL) continue;
+            
+      if(eDep.find(aStep->volume) == eDep.end())
+	eDep[aStep->volume] = 0;
+      eDep[aStep->volume] += aStep->eDep;
       
-      if(eDep.find(aVertex->volume) == eDep.end())
-	eDep[aVertex->volume] = 0;
-      eDep[aVertex->volume] += aVertex->energy;
-      
-      avNum = GetAVNumber(aVertex->volume);
+      avNum = GetAVNumber(aStep->volume);
       switch(avNum){
       case 1: case 2: case 5: case 6:
 	Ethreshold = 5.0;
@@ -238,8 +216,8 @@ void ProcessElectrons() {
       }
       
       if(avNum != 0){
-	if(hitTime.find(aVertex->volume) == hitTime.end() && eDep[aVertex->volume] >= Ethreshold)
-	  hitTime[aVertex->volume] = aVertex->time;
+	if(hitTime.find(aStep->volume) == hitTime.end() && eDep[aStep->volume] >= Ethreshold)
+	  hitTime[aStep->volume] = aStep->time;
       }
     }
 
@@ -254,14 +232,14 @@ void ProcessElectrons() {
       if((avNum == 9 || avNum == 10) && t1 == 0.0)
 	t1 = itt->second;
     }
-    dTOF = (t2-t1)/(1e-9);
+    dTOF = (t2-t1);
     if(dTOF != 0.0) delta_TOF->Fill(dTOF);
     
     
     std::map<std::string,double>::iterator it;
     for(it = eDep.begin(); it != eDep.end(); it++) {
       if(histograms.find(it->first) == histograms.end()) {
-	histograms[it->first] = new TH1F((it->first).c_str(),(it->first).c_str(),500,0,10);
+	histograms[it->first] = new TH1F((it->first).c_str(),(it->first).c_str(),500,0,200);
       }
       (histograms[it->first])->Fill(it->second);
     }
@@ -270,7 +248,7 @@ void ProcessElectrons() {
 		
   }
  
-  TFile *outFile = new TFile("NMU11GeV_Lead10cm_4Bdl_Histos.root","RECREATE");  
+  TFile *outFile = new TFile("NMU4-4GeV_Lead10cm_4Bdl_Histos.root","RECREATE");  
   //TFile *outFile = new TFile("JLABLead10cm_4Bdl_Histos.root","RECREATE");
   TVectorD totalElectrons(1);
   totalElectrons[0] = TotalElectrons;
