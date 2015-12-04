@@ -8,37 +8,23 @@
 //* include a list of copyright holders.     		      	*
 //********************************************************************
 
-#ifndef Npol_Vertex_h
-#define Npol_Vertex_h
+#ifndef Npol_Step_h
+#define Npol_Step_h
 
 #include <string>
-#include <vector>
 #include "TObject.h"
 
-class NpolVertex : public TObject {
+class NpolStep : public TObject {
 
 public:
-  int trackId;
-  int parentId;
-  double posX;
-  double posY;
-  double posZ;
-  double momX;
-  double momY;
-  double momZ;
   double time;
-  double energy;
-  bool eMiss;
-  int  particleId;
-  std::string particle;
-  std::string process;
+  double eDep;
   std::string volume;
-  std::vector<int> daughterIds;
 
-  inline NpolVertex() {};
-  virtual ~NpolVertex() {};
+  inline NpolStep() {};
+  virtual ~NpolStep() {};
 
-  ClassDef(NpolVertex, 1);
+  ClassDef(NpolStep, 1);
 };
 
 #endif

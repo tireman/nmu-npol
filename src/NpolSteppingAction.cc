@@ -50,7 +50,10 @@ void NpolSteppingAction::UserSteppingAction(const G4Step *aStep) {
 	analysisMan->SetTrackAsKilled(aTrack->GetTrackID());
 	aTrack->SetTrackStatus(fStopAndKill);
   }
-
+  
+  // All Stepping information is saved to a vector for analysis later
+  analysisMan->AddStep(aStep, volName);
+ 
   // Check if either tagger is hit and if so pass track to Vector
   if(volName == "NPOLTagger") {
     analysisMan->AddNPOLTaggedParticle(aTrack);

@@ -14,20 +14,24 @@
 #define Npol_Analysis_Manager_h
 
 #include <vector>
+#include <map>
 #include "G4SystemOfUnits.hh"
 
 class G4Track;
+class G4Step;
 class TFile;
 class TTree;
 class TBranch;
 class NpolVertex;
 class NpolTagger;
+class NpolStep;
 class NpolStatistics;
 class NpolAnalysisMessenger;
 
 class NpolAnalysisManager {
 
 public:
+   
   static NpolAnalysisManager *GetInstance();
   void BeginOfRun();
   void EndOfRun();
@@ -38,12 +42,15 @@ public:
   void SetTrackAsKilled(int trackID);
   void AddNPOLTaggedParticle(const G4Track *);
   void AddSHMSTaggedParticle(const G4Track *);
+  void AddStep(const G4Step *, std::string);
   void FillTree();
   void WriteObjectsToFile();
   void OpenRootFile();
   void setFileName(const G4String& nam);
   void ClearObjects();
   void InitializeFilenameVariables();
+  int partition(std::vector<NpolStep*> *aVector, int p, int q);
+  void QSort(std::vector<NpolStep*> *aVector, int p, int q);
 
 private:
   NpolAnalysisManager();
@@ -51,6 +58,7 @@ private:
   
 private:
   bool singletonInitialized;
+  bool eventFlag;
   G4int eventsPerFile;
   G4String rootName; 
   G4String dirName;
@@ -62,7 +70,8 @@ private:
   std::vector<NpolVertex *> *tracks;
   std::vector<NpolTagger *> *NPOLTaggedParticle;
   std::vector<NpolTagger *> *SHMSTaggedParticle;
-  NpolStatistics *statistics;
+  std::vector<NpolStep *> *EventSteps;
+  std::vector<NpolStatistics *> *statistics;
 };
 
 #endif

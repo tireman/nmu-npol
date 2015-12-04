@@ -13,12 +13,11 @@
 
 #include <string>
 #include "TObject.h"
-#include "globals.hh"
 
 class NpolTagger : public TObject {
 
 public:
-  G4int trackId;
+  int trackId;
   //G4int parentId;
   double posX;
   double posY;
@@ -28,7 +27,7 @@ public:
   double momZ;
   double time;
   double energy;
-  G4int  particleId;
+  int  particleId;
   std::string particle;
   //std::string process;
   //std::string volume;
