@@ -41,8 +41,8 @@ void NpolActionInitialization::Build() const {
   // in the xz plane and rotates it and then fires the particle at a 
   // vector relative to z-axis (NpolAng) all parallel.
   
-//  SetUserAction(new NpolPrimaryGeneratorAction);
-  SetUserAction(new NpolPrimaryGeneratorActionPS);
+  SetUserAction(new NpolPrimaryGeneratorAction);
+//  SetUserAction(new NpolPrimaryGeneratorActionPS);
 //  SetUserAction(new NpolPrimaryGeneratorActionFS);
   
   NpolEventAction* event_action = new NpolEventAction();
