@@ -38,7 +38,44 @@ int GetImprNumber(const std::string &volName) {
   } else
     return 0;
 }
+void EDepSum() {
+	gSystem->Load("NpolClasses.so");
 
+	std::vector<NpolStep *> *anEntry = NULL;
+	std::map<std::string,TH1 *> histograms;
+
+	//	TTree *npolTree = OpenFileAndGetTTree("/data3/cgen/FirstRun/ProtonOnly/npolProton_1_0001.root");
+	// TChain loads a list of root files with the small tree structure
+	// To add more use the "Add" function.  Wildcards are accepted.
+	TChain *npolTree = new TChain("T");
+	npolTree->Add("/home/dwilbern/output/*.root");
+//	npolTree->Add("../build/output/*");
+
+	npolTree->SetBranchAddress("steps",&anEntry);
+	npolTree->Print();
+
+	// loop over all entries (one per event)
+	Int_t nentries = npolTree->GetEntries();
+	std::cout << "Total Events: " << nentries << std::endl;
+	for(int i = 0; i < npolTree->GetEntries(); i++) {
+		npolTree->GetEntry(i);
+
+		if(i % 1000 == 0)
+			std::cout << "Processing event #" << i << std::endl;
+
+		std::map<std::string, double> eDep;
+
+		// loop over vector elements (one per step)
+		Int_t nvertices = anEntry->size();
+		for(int j = 0; j < nvertices; j++) {
+			NpolStep *aStep = (*anEntry)[j];
+			if(aStep == NULL)
+				continue;
+			
+			if(eDep.find(aStep->volume) == eDep.end())
+				eDep[aStep->volume] = 0;
+			eDep[aStep->volume] += aStep->eDep;
+		}
 int GetPlacementNumber(const std::string &volName) {
   if(volName.substr(0,3) == "av_") {
     int underscorePos = volName.find_first_of("_",1+

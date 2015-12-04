@@ -100,6 +100,7 @@ void NpolAnalysisManager::InitializeObjects() {
   
   npolTree = new TTree("T","Per-event information from Npol simulation");
   npolTree->Branch("tracks","std::vector<NpolVertex *>",&tracks,32000,2);
+  npolTree->Branch("steps","std::vector<NpolStep *>",&EventSteps,32000,2);
   npolTree->Branch("NPOL_Tagger","std::vector<NpolTagger *>",&NPOLTaggedParticle,32000,2);
   npolTree->Branch("SHMS_Tagger","std::vector<NpolTagger *>",&SHMSTaggedParticle,32000,2);
   npolTree->Branch("Event_Steps","std::vector<NpolStep *>",&EventSteps,32000,2);
