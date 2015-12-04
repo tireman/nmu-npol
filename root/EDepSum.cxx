@@ -99,8 +99,7 @@ void EDepSum() {
     for(int j = 0; j < nvertices; j++) { 
       NpolStep *aStep = (*EventSteps)[j];
       if(aStep == NULL) continue;
-      std::string volName = aStep->volume;
-      if(eDep.find(volName) == eDep.end()){
+      if(eDep.find(aStep->volume) == eDep.end()){
 	eDep.insert(std::pair<std::string,double>(aStep->volume,0.0));
       }
       it = eDep.find(aStep->volume);
