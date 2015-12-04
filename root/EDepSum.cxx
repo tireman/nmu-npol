@@ -15,7 +15,7 @@
 #include <TClassTable.h>
 #include <TInterpreter.h>
 
-#include "NpolVertex.hh"
+#include "NpolStep.hh"
 
 #define MeV 1.0
 
@@ -33,19 +33,19 @@ TTree *OpenFileAndGetTTree(const char *filename) {
 }
 
 void EDepSum() {
-	gSystem->Load("NpolClass.so");
+	gSystem->Load("NpolClasses.so");
 
-	std::vector<NpolVertex *> *anEntry = NULL;
+	std::vector<NpolStep *> *anEntry = NULL;
 	std::map<std::string,TH1 *> histograms;
 
 	//	TTree *npolTree = OpenFileAndGetTTree("/data3/cgen/FirstRun/ProtonOnly/npolProton_1_0001.root");
 	// TChain loads a list of root files with the small tree structure
 	// To add more use the "Add" function.  Wildcards are accepted.
 	TChain *npolTree = new TChain("T");
-	npolTree->Add("/data3/cgen/FirstRun/ProtonOnly/*");
+	npolTree->Add("/home/dwilbern/output/*.root");
 //	npolTree->Add("../build/output/*");
 
-	npolTree->SetBranchAddress("tracks",&anEntry);
+	npolTree->SetBranchAddress("steps",&anEntry);
 	npolTree->Print();
 
 	// loop over all entries (one per event)
@@ -59,19 +59,16 @@ void EDepSum() {
 
 		std::map<std::string, double> eDep;
 
-		// loop over vector elements (one per vertex)
+		// loop over vector elements (one per step)
 		Int_t nvertices = anEntry->size();
 		for(int j = 0; j < nvertices; j++) {
-			NpolVertex *aVertex = (*anEntry)[j];
-			if(aVertex == NULL)
+			NpolStep *aStep = (*anEntry)[j];
+			if(aStep == NULL)
 				continue;
-			if(!(aVertex->daughterIds).empty())
-				continue;
-			if(aVertex->eMiss)
-				continue;
-			if(eDep.find(aVertex->volume) == eDep.end())
-				eDep[aVertex->volume] = 0;
-			eDep[aVertex->volume] += aVertex->energy;
+			
+			if(eDep.find(aStep->volume) == eDep.end())
+				eDep[aStep->volume] = 0;
+			eDep[aStep->volume] += aStep->eDep;
 		}
 
 		std::map<std::string,double>::iterator it;
