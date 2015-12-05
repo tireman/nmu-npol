@@ -46,7 +46,7 @@ int main(int argc,char *argv[]) {
   //
  
   G4long seeds[2];
-  G4long systime; 
+  G4long systime;	
   if(getenv("SEED")){
     systime = atoi(getenv("SEED"));
   }else{
@@ -63,7 +63,7 @@ int main(int argc,char *argv[]) {
 #ifdef G4MULTITHREADED
   G4RunManager *runManager = new G4RunManager;
   //G4MTRunManager *runManager = new G4MTRunManager;
-  //runManager->SetNumberOfThreads(G4Threading::G4GetNumberOfCores()-6);
+  //runManager->SetNumberOfThreads(4);
 #else
   G4RunManager *runManager = new G4RunManager;
 #endif
