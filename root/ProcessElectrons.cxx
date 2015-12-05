@@ -99,8 +99,6 @@ void ProcessElectrons() {
   cout << "Number of enteries " << statsTree->GetEntries() <<endl;
   for(int i = 0; i < statsTree->GetEntries(); i++){ 
     statsTree->GetEntry(i); 
-   
-    cout << "Got to this point" << endl;
     TotalElectrons += ((*anStat)[0])->totalEvents;
     TotalEventsRecorded += ((*anStat)[0])->eventsSaved;   
   }
@@ -233,19 +231,28 @@ void ProcessElectrons() {
 	t1 = itt->second;
     }
     dTOF = (t2-t1);
-    if(dTOF != 0.0) delta_TOF->Fill(dTOF);
-    
+    if(dTOF != 0.0) delta_TOF->Fill(dTOF);   
     
     std::map<std::string,double>::iterator it;
     for(it = eDep.begin(); it != eDep.end(); it++) {
       if(histograms.find(it->first) == histograms.end()) {
-	histograms[it->first] = new TH1F((it->first).c_str(),(it->first).c_str(),500,0,200);
+	avNum = GetAVNumber(it->first);
+	if((avNum == 1 || avNum == 2 || avNum == 5 || avNum == 6 || 
+	    avNum == 9 || avNum == 10)){
+	  histograms[it->first] = 
+	    new TH1F((it->first).c_str(),(it->first).c_str(),1000,0,200);
+	}else if((avNum == 3 || avNum == 4 || avNum == 7 || avNum == 8 || 
+		   avNum == 11 || avNum == 12)){
+	    histograms[it->first] = 
+	       new TH1F((it->first).c_str(),(it->first).c_str(),100,0,20);
+	}else if(avNum == 0){
+	  histograms[it->first] = 
+	    new TH1F((it->first).c_str(),(it->first).c_str(),1000,0,200);
+	}
       }
       (histograms[it->first])->Fill(it->second);
-    }
-    
-    eDep.clear();
-		
+    } 
+    eDep.clear();		
   }
  
   TFile *outFile = new TFile("NMU4-4GeV_Lead10cm_4Bdl_Histos.root","RECREATE");  

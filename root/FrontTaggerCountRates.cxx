@@ -60,7 +60,7 @@ void FrontTaggerCountRates() {
 
   std::string histoNames[3][2]={{"av_11_impr_1_FrontTagLV_pv_0","av_11_impr_1_FrontTagLV_pv_1"},{"av_11_impr_1_FrontTagLV_pv_2","av_11_impr_1_FrontTagLV_pv_3"},{"av_11_impr_1_FrontTagLV_pv_4","av_11_impr_1_FrontTagLV_pv_5"}};
   
-  TFile *inFile = TFile::Open("NMU11GeV_Lead10cm_4Bdl_Histos.root");
+  TFile *inFile = TFile::Open("NMU4-4GeV_Lead10cm_4Bdl_Histos.root");
   //TFile *inFile = TFile::Open("JLABLead10cm_4Bdl_Histos.root");
   
   // Retrieve the object with the total number of electrons on target and calculate 
@@ -162,7 +162,7 @@ void FrontTaggerCountRates() {
   }
      
   //TFile *outFile = new TFile("JLABLead10cm_4Bdl_TaggerRates.root","RECREATE");
-    TFile *outFile = new TFile("NMU11GeV_Lead10cm_4Bdl_TaggerRates.root","RECREATE");
+    TFile *outFile = new TFile("NMU4-4GeV_Lead10cm_4Bdl_TaggerRates.root","RECREATE");
   c1->Write();
   outFile->Close(); 
   //inFile->Close();
