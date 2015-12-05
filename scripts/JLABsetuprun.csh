@@ -1,5 +1,9 @@
 #!/bin/tcsh
 
-setenv NPOLDIR /volatile/hallc/tireman/cgen
-setenv NPOLBASENAME npolMagField
+@ NUM = 187892378 + $1
+
+setenv NPOLDIR /volatile/hallc/cgen/tireman/4.4GeV/MagField_4Bdl
+setenv NPOLBASENAME npolLead10cm_4.4GeV_4Bdl
 setenv JOBNUMBER $1
+setenv SEED $NUM
+
