@@ -169,7 +169,6 @@ void NpolAnalysisManager::AddStep(const G4Step *aStep, std::string volName){
   G4String subVolName = volName.substr(0,3).c_str();
   if(subVolName == "av_"){
     eventFlag = true;
-    G4cout <<"Step marked" << G4endl;
   }
 
   EventSteps->push_back(Step);
