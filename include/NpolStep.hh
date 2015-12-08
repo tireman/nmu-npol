@@ -13,7 +13,6 @@
 
 #include <string>
 #include "TObject.h"
-#include "globals.hh"
 
 class NpolStep : public TObject {
 
