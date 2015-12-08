@@ -82,7 +82,7 @@ void NpolAnalysisManager::InitializeObjects() {
 
   statistics = new std::vector<NpolStatistics *>();
   statistics->push_back(new NpolStatistics());
-  ((*statistics)[0])->version = 20151203;  // Determined by Date: YYYYMMDD
+  ((*statistics)[0])->version = 20151208;  // Determined by Date: YYYYMMDD
   ((*statistics)[0])->totalEvents = 0;
   ((*statistics)[0])->eventsSaved = 0;
 
@@ -103,7 +103,6 @@ void NpolAnalysisManager::InitializeObjects() {
   npolTree->Branch("steps","std::vector<NpolStep *>",&EventSteps,32000,2);
   npolTree->Branch("NPOL_Tagger","std::vector<NpolTagger *>",&NPOLTaggedParticle,32000,2);
   npolTree->Branch("SHMS_Tagger","std::vector<NpolTagger *>",&SHMSTaggedParticle,32000,2);
-  npolTree->Branch("Event_Steps","std::vector<NpolStep *>",&EventSteps,32000,2);
 
   statsTree = new TTree("T2","Per-run information from Npol simulation");
   statsTree->Branch("stats","std::vector<NpolStatistics *>",&statistics,32000,2);

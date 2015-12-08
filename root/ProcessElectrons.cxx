@@ -89,7 +89,7 @@ void ProcessElectrons() {
   npolTree->SetBranchAddress("NPOL_Tagger",&npolEntry);
   npolTree->SetBranchAddress("SHMS_Tagger",&shmsEntry);
   npolTree->SetBranchAddress("tracks",&anEntry);
-  npolTree->SetBranchAddress("Event_Steps",&anStep);
+  npolTree->SetBranchAddress("steps",&anStep);
   statsTree->SetBranchAddress("stats",&anStat);
 
   // Count the total number of electrons on target and total events 
