@@ -84,7 +84,7 @@ bool EventRequirementsPassed(const std::map<std::string,double> &eDep) {
 }
 
 void dEoverE() {
-	gSystem->Load("NpolClasses.so");
+	gSystem->Load("NpolClass.so");
 	std::vector<NpolVertex *> *aVertexEntry = NULL;
 	std::vector<NpolStep *> *aStepEntry = NULL;
 	std::vector<NpolStatistics *> *aStatsEntry = NULL;
@@ -92,27 +92,38 @@ void dEoverE() {
 
 	// The TChain is very nice.
 	TChain *npolTree = new TChain("T");
-	npolTree->Add("/home/dwilbern/output/*.root");
+	npolTree->Add("/data3/cgen/FirstRun/NeutronOnly/*.root");
 	TChain *statsTree = new TChain("T2");
-	npolTree->Add("/home/dwilbern/output/*.root");
+	statsTree->Add("/data3/cgen/FirstRun/NeutronOnly/*.root");
 
 	npolTree->SetBranchAddress("tracks",&aVertexEntry);
 	npolTree->SetBranchAddress("steps",&aStepEntry);
 	statsTree->SetBranchAddress("stats",&aStatsEntry);
 
-	TFile *outFile = new TFile("dEoverE.root","RECREATE");
+	// loop over all stats branches (one per file)
+	Long_t totalNeutrons = 0;
+	Long_t totalNeturonsRecorded = 0;
+	for(int i = 0; i < statsTree->GetEntries(); i++) {
+		statsTree->GetEntry(i);
+		totalNeutrons += ((*aStatsEntry)[0])->totalEvents;
+		totalNeturonsRecorded += ((*aStatsEntry)[0])->eventsSaved;
+	}
+	std::cout << "Total neutrons on polarimeter: " << totalNeutrons << std::endl
+		<< "Total neutrons striking polarimeter: " << totalNeturonsRecorded << std::endl;
+
+	TFile *outFile = new TFile("dEoverE_elasticequirement.root","RECREATE");
 	TH2F *h_dEoverEtop = new TH2F("dEoverEtop","dE over E",200,0,150,400,0,20);
 	TH2F *h_dEoverEbot = new TH2F("dEoverEbot","dE over E",200,0,150,400,0,20);
 
 	// loop over all entries (one per event)
 	Int_t nentries = npolTree->GetEntries();
-	for(int i = 0; i < nentries; i++) {
-//	for(int i = 0; i < 5000; i++) {
+       	for(int i = 0; i < nentries; i++) {
+	  //for(int i = 0; i < 100000; i++) {
 		npolTree->GetEntry(i);
 
 		if(i % 1000 == 0)
 			std::cout << "Processing event #" << i << std::endl;
-	
+
 		// loop over all vertices, determine if there was a proton created by hadElastic
 		bool elasticFlag = false;
 		std::vector<NpolVertex *>::iterator v_it;
@@ -123,14 +134,14 @@ void dEoverE() {
 
 			int avNum = GetAVNumber(aVertex->volume);
 			if(avNum == 9 || avNum == 10)
-				if(aVertex->parentId == 1 && !(aVertex->eMiss) && aVertex->process == "hadElastic" && aVertex->particle == "proton") {
+				if(aVertex->parentId == 1 && aVertex->process == "hadElastic" && aVertex->particle == "proton") {
 					elasticFlag = true;
 					break;
 				}
 		}
 
-//		if(!elasticFlag)
-//			continue;
+		if(!elasticFlag)
+			continue;
 
 		std::map<std::string,double> eDep;
 

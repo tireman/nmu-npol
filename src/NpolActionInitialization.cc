@@ -42,8 +42,8 @@ void NpolActionInitialization::Build() const {
   // vector relative to z-axis (NpolAng) all parallel.
   
   SetUserAction(new NpolPrimaryGeneratorAction);
-//  SetUserAction(new NpolPrimaryGeneratorActionPS);
-//  SetUserAction(new NpolPrimaryGeneratorActionFS);
+  //SetUserAction(new NpolPrimaryGeneratorActionPS);
+  //SetUserAction(new NpolPrimaryGeneratorActionFS);
   
   NpolEventAction* event_action = new NpolEventAction();
   SetUserAction(event_action);

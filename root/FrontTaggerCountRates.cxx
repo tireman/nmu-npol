@@ -11,6 +11,7 @@
 #include <TFile.h>
 #include <TTree.h>
 #include <TChain.h>
+#include <TGraph.h>
 #include <TCanvas.h>
 #include <TBranch.h>
 #include <TVector.h>
@@ -58,7 +59,7 @@ void FrontTaggerCountRates() {
 
   Long_t TotalElectrons = 0, TotalEventsRecorded = 0; 
 
-  std::string histoNames[3][2]={{"av_11_impr_1_FrontTagLV_pv_0","av_11_impr_1_FrontTagLV_pv_1"},{"av_11_impr_1_FrontTagLV_pv_2","av_11_impr_1_FrontTagLV_pv_3"},{"av_11_impr_1_FrontTagLV_pv_4","av_11_impr_1_FrontTagLV_pv_5"}};
+  std::string histoNames[3][2]={{"av_11_impr_1_FrontTagLV_pv_1","av_11_impr_1_FrontTagLV_pv_0"},{"av_11_impr_1_FrontTagLV_pv_3","av_11_impr_1_FrontTagLV_pv_2"},{"av_11_impr_1_FrontTagLV_pv_5","av_11_impr_1_FrontTagLV_pv_4"}};
   
   TFile *inFile = TFile::Open("NMU4-4GeV_Lead10cm_4Bdl_Histos.root");
   //TFile *inFile = TFile::Open("JLABLead10cm_4Bdl_Histos.root");
@@ -69,19 +70,24 @@ void FrontTaggerCountRates() {
   TVectorD *v = (TVectorD*)inFile->Get("TVectorT<double>");
   double totalElectrons = ((*v))[0];
   double electronTime = totalElectrons/(6.242e12); //6.242e12 e-/s at 1 microAmp
-  cout << "Electron Time is " << electronTime << " s " << endl;
+  cout << "Electron beam time at 1 micro-amp is " << electronTime << " s " << endl;
 
   TCanvas *c1 = new TCanvas("c1","Polarimeter Angle 28.0 Deg, E = 4.4 GeV",1000,900);
+  TCanvas *c2 = new TCanvas("c2","Front Taggger Threshold plots",1000,900);
 
-  Int_t Nx = 3, Ny = 2, fillStyle = 1001;
+  Int_t Nx = 3, Ny = 2, nThresh = 10, fillStyle = 1001;
   int pvNum, avNum, imprNum;
   Float_t lMargin = 0.10, rMargin = 0.05, bMargin = 0.10, tMargin = 0.05;
   Float_t vSpacing = 0.0; Float_t hSpacing = 0.0;
   double CTagger[Nx][Ny];
+  double Thresholds[10]={0.5,1.0,1.5,2.0,2.5,3.0,3.5,4.0,4.5,5.0};
+  double CountRates [nThresh][Nx][Ny];
 
   CanvasPartition(c1,Nx,Ny,lMargin,rMargin,bMargin,tMargin,vSpacing,hSpacing);
+  CanvasPartition(c2,Nx,Ny,lMargin,rMargin,bMargin,tMargin,vSpacing,hSpacing);
 
   TPad *pad[Nx][Ny];
+  TPad *pad1[Nx][Ny];
     
   for(int i = 0; i < Nx; i++){
    for(int j = 0; j < Ny; j++){
@@ -118,7 +124,7 @@ void FrontTaggerCountRates() {
      hFrame->SetTitle(htitle);     
   
      // y axis range
-     hFrame->GetYaxis()->SetRangeUser(0.1,1.5*hFrame->GetMaximum());
+     hFrame->GetYaxis()->SetRangeUser(0.05,25000);
      
      // Format for y axis
      hFrame->GetYaxis()->SetTitle("Events");
@@ -127,8 +133,7 @@ void FrontTaggerCountRates() {
      hFrame->GetYaxis()->SetLabelOffset(0.02);
      hFrame->GetYaxis()->SetTitleFont(43);
      hFrame->GetYaxis()->SetTitleSize(16);
-     hFrame->GetYaxis()->SetTitleOffset(5);
-     
+     hFrame->GetYaxis()->SetTitleOffset(5);  
      hFrame->GetYaxis()->CenterTitle();
      hFrame->GetYaxis()->SetNdivisions(505);
      
@@ -142,25 +147,78 @@ void FrontTaggerCountRates() {
      hFrame->GetXaxis()->SetLabelOffset(0.02);
      hFrame->GetXaxis()->SetTitleFont(43);
      hFrame->GetXaxis()->SetTitleSize(16);
-     hFrame->GetXaxis()->SetTitleOffset(5);
+     hFrame->GetXaxis()->SetTitleOffset(3);
      hFrame->GetXaxis()->CenterTitle();
      hFrame->GetXaxis()->SetNdivisions(505);
-     
+
+     // Set X axis range
+     hFrame->GetXaxis()->SetRangeUser(0.0,24);
+
      // TICKS X Axis
      hFrame->GetXaxis()->SetTickLength(yFactor*0.06/xFactor);
      
      // Count up events in Front layer of taggers above Threshold
      int nBins = hFrame->GetNbinsX();
      double binWidth = hFrame->GetXaxis()->GetBinWidth(10);
-     double Threshold = 1.0;
+     
 
-     CTagger[i][j] = hFrame->Integral((Threshold/binWidth),nBins);    
-     cout << "First Tagger layer, detector " << pvNum << " counts/s for 1 microAmp of Beam " << CTagger[i][j]/electronTime/(1e6) << " MHz" << endl;
-     cout << "First Tagger layer, detector " << pvNum << " counts/s for 80 microAmp of Beam " << 80*CTagger[i][j]/electronTime/(1e6) << " MHz" << endl;    
-     cout << " " << endl;
+     for(int k = 0; k < nThresh; k++){
+       double Threshold = Thresholds[k];
+       
+       CTagger[i][j] = hFrame->Integral((Threshold/binWidth),nBins);    
+       CountRates[k][i][j] = CTagger[i][j];
+       cout << "First Tagger layer, detector " << pvNum << " counts/s for 1 microAmp of Beam " 
+	    << CTagger[i][j]/electronTime/(1e6) << " MHz" << endl;
+       cout << "First Tagger layer, detector " << pvNum << " counts/s for 80 microAmp of Beam " 
+	    << 80*CTagger[i][j]/electronTime/(1e6) << " MHz" << endl;    
+       cout << " " << endl;
+     }
+
+     Double_t x[nThresh], y[nThresh];
+     c2->cd(0);
+     char pname2[16];
+     sprintf(pname2,"pad_%i_%i",i,j);
+     pad1[i][j] = (TPad*) gROOT->FindObject(pname2);
+     pad1[i][j]->Draw();
+     pad1[i][j]->cd();
+     for(int k = 0; k < nThresh; k++){
+       x[k] = Thresholds[k];
+       y[k] = CountRates[k][i][j]/electronTime/(1e6);
+     }
+     TGraph *gr = new TGraph(nThresh,x,y); 
+     // Set Good Graph Title
+     char gtitle[80];
+     sprintf(gtitle,"#splitline{Count Rate VS. Threshold}{Front Tagger %i, Layer %i}",pvNum+1, imprNum);
+     gr->SetTitle(gtitle);   
+
+     // Clean up Y axis
+     gr->GetYaxis()->SetTitle("Count Rate at 1 #muA Beam (MHz)");   
+     gr->GetYaxis()->SetLabelFont(43);
+     gr->GetYaxis()->SetLabelSize(16);
+     gr->GetYaxis()->SetLabelOffset(0.02);
+     gr->GetYaxis()->SetTitleFont(43);
+     gr->GetYaxis()->SetTitleSize(16);
+     gr->GetYaxis()->SetTitleOffset(5);
+     gr->GetYaxis()->CenterTitle(); 
+     gr->GetYaxis()->SetRangeUser(-0.005,.15);
+
+     // Clean up X axis
+     gr->GetXaxis()->SetTitle("Threshold Energy (MeV)");
+     gr->GetXaxis()->SetLabelFont(43);
+     gr->GetXaxis()->SetLabelSize(16);
+     gr->GetXaxis()->SetLabelOffset(0.02);
+     gr->GetXaxis()->SetTitleFont(43);
+     gr->GetXaxis()->SetTitleSize(16);
+     gr->GetXaxis()->SetTitleOffset(3);
+     gr->GetXaxis()->CenterTitle();
+
+     // Go for the plot
+     gr->SetMarkerStyle(21);
+     gr->Draw("APC");
+     
    }
   }
-     
+  
   //TFile *outFile = new TFile("JLABLead10cm_4Bdl_TaggerRates.root","RECREATE");
     TFile *outFile = new TFile("NMU4-4GeV_Lead10cm_4Bdl_TaggerRates.root","RECREATE");
   c1->Write();

@@ -74,11 +74,14 @@ void ProcessElectrons() {
   TChain *npolTree = new TChain("T");
   TChain *statsTree = new TChain("T2");
 
+  TFile *outFile = new TFile("NMU4-4GeV_Lead10cm_4Bdl_Histos.root","RECREATE");  
+  //TFile *outFile = new TFile("JLABLead10cm_4Bdl_Histos.root","RECREATE");
+
   npolTree->Add("/data2/cgen/NMUSimData/4.4GeV/4Bdl/Lead10cm/npolLead10cm_4-4GeV_*.root");
   statsTree->Add("/data2/cgen/NMUSimData/4.4GeV/4Bdl/Lead10cm/npolLead10cm_4-4GeV_*.root");
 
-  //npolTree->Add("/data2/cgen/JlabSimData/MagField_4Bdl/Lead10cm/npolLeadOn10cmHighMag_1_*.root");
-  //statsTree->Add("/data2/cgen/JlabSimData/MagField_4Bdl/Lead10cm/npolLeadOn10cmHighMag_1_*.root");
+  npolTree->Add("/data2/cgen/JlabSimData/4.4GeV/4Bdl/Lead10cm/npolLead10cm_4.4GeV_4Bdl_*.root");
+  statsTree->Add("/data2/cgen/JlabSimData/4.4GeV/4Bdl/Lead10cm/npolLead10cm_4.4GeV_4Bdl_*.root");
 
   std::vector<NpolVertex *> *anEntry = NULL;
   std::vector<NpolTagger *> *npolEntry = NULL;
@@ -182,9 +185,7 @@ void ProcessElectrons() {
     std::map<std::string, double> hitTime;
 
     // loop over vector elements (one per vertex)
-    //int p = 1;
-    //int q = anEntry->size();
-    //QSort(anEntry,p,q); // sort vertex vector in time!
+    
     int avNum, imprNum, pvNum;
     
     Int_t nvertices = anStep->size();
@@ -221,9 +222,8 @@ void ProcessElectrons() {
 
     double t2 = 0.0, t1 = 0.0, dTOF = 0.0;
     std::map<std::string,double>::iterator itt;
-    //if(hitTime.size() > 2) cout << "My Map size is: " << hitTime.size() << endl;
+
     for(itt = hitTime.begin(); itt != hitTime.end(); itt++){
-      //if(hitTime.size() > 2) cout << " Volume: " << itt->first << " Time: " << itt->second << endl;
       avNum = GetAVNumber(itt->first);
       if((avNum == 1 || avNum == 2 || avNum == 5 || avNum == 6) && t2 == 0.0)
 	t2 = itt->second;
@@ -244,19 +244,17 @@ void ProcessElectrons() {
 	}else if((avNum == 3 || avNum == 4 || avNum == 7 || avNum == 8 || 
 		   avNum == 11 || avNum == 12)){
 	    histograms[it->first] = 
-	       new TH1F((it->first).c_str(),(it->first).c_str(),100,0,20);
+	       new TH1F((it->first).c_str(),(it->first).c_str(),200,0,20);
 	}else if(avNum == 0){
 	  histograms[it->first] = 
 	    new TH1F((it->first).c_str(),(it->first).c_str(),1000,0,200);
 	}
       }
-      (histograms[it->first])->Fill(it->second);
+      if(it->second != 0.0) (histograms[it->first])->Fill(it->second);
     } 
     eDep.clear();		
   }
  
-  TFile *outFile = new TFile("NMU4-4GeV_Lead10cm_4Bdl_Histos.root","RECREATE");  
-  //TFile *outFile = new TFile("JLABLead10cm_4Bdl_Histos.root","RECREATE");
   TVectorD totalElectrons(1);
   totalElectrons[0] = TotalElectrons;
   totalElectrons.Write();

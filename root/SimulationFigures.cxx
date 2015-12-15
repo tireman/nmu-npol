@@ -73,7 +73,7 @@ void SimulationFigures() {
      hFrame->Draw();
   
      // y axis range
-     hFrame->GetYaxis()->SetRangeUser(0.001,3.0*hFrame->GetMaximum());
+     hFrame->GetYaxis()->SetRangeUser(0.005,200);
      
      // Format for y axis
      hFrame->GetYaxis()->SetTitle("#frac{Particles}{#muA #times cm^{2}}");
@@ -139,7 +139,7 @@ void SimulationFigures() {
      hFrame->SetStats(false); 
      hFrame->SetFillColor(kBlue);
      hFrame->SetTitleFont(16);
-     //hFrame->SetOption("lego2");
+     hFrame->SetOption("Cont1");
      hFrame->SetFillStyle(fillStyle);
      hFrame->Draw();
      
@@ -156,7 +156,7 @@ void SimulationFigures() {
      hFrame->GetYaxis()->SetLabelOffset(0.02);
      hFrame->GetYaxis()->SetTitleFont(43);
      hFrame->GetYaxis()->SetTitleSize(16);
-     hFrame->GetYaxis()->SetTitleOffset(5);
+     hFrame->GetYaxis()->SetTitleOffset(4);
      
      hFrame->GetYaxis()->CenterTitle();
      hFrame->GetYaxis()->SetNdivisions(505);
@@ -171,7 +171,7 @@ void SimulationFigures() {
      hFrame->GetXaxis()->SetLabelOffset(0.02);
      hFrame->GetXaxis()->SetTitleFont(43);
      hFrame->GetXaxis()->SetTitleSize(16);
-     hFrame->GetXaxis()->SetTitleOffset(5);
+     hFrame->GetXaxis()->SetTitleOffset(4);
      hFrame->GetXaxis()->CenterTitle();
      hFrame->GetXaxis()->SetNdivisions(505);
      

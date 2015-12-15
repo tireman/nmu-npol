@@ -18,7 +18,7 @@ bool isRootFile(char *filename) {
 
 void CleanOutBadFiles() {
   
-  std::string dirName = "/data2/cgen/JlabSimData/MagField_4Bdl/Lead10cm";
+  std::string dirName = "/data2/cgen/JlabSimData/4.4GeV/4Bdl/Lead10cm";
   
   DIR *d = NULL;
   struct dirent *dir = NULL;
@@ -39,9 +39,9 @@ void CleanOutBadFiles() {
 	remove(filename.c_str());
 	cout << "Removed File --> " << filename.c_str() << endl;
       }
-      if (f->TestBit(TFile::kRecovered)){
-	cout << "Recovered File --> " << filename.c_str() << endl;
-      }
+      //if (f->TestBit(TFile::kRecovered)){
+      //cout << "Recovered File --> " << filename.c_str() << endl;
+      //}
 	delete f;
     }
   }
