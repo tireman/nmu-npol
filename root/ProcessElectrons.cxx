@@ -74,14 +74,14 @@ void ProcessElectrons() {
   TChain *npolTree = new TChain("T");
   TChain *statsTree = new TChain("T2");
 
-  TFile *outFile = new TFile("NMU4-4GeV_Lead10cm_4Bdl_Histos.root","RECREATE");  
-  //TFile *outFile = new TFile("JLABLead10cm_4Bdl_Histos.root","RECREATE");
+  TFile *outFile = new TFile("JLAB4.4GeV_Lead10cm_4Bdl_Histos_CombineTest.root","RECREATE");  
+  //npolTree->Add("/data2/cgen/NMUSimData/4.4GeV/4Bdl/Lead10cm/npolLead10cm_4-4GeV_*.root");
+  //statsTree->Add("/data2/cgen/NMUSimData/4.4GeV/4Bdl/Lead10cm/npolLead10cm_4-4GeV_*.root");
 
-  npolTree->Add("/data2/cgen/NMUSimData/4.4GeV/4Bdl/Lead10cm/npolLead10cm_4-4GeV_*.root");
-  statsTree->Add("/data2/cgen/NMUSimData/4.4GeV/4Bdl/Lead10cm/npolLead10cm_4-4GeV_*.root");
-
-  npolTree->Add("/data2/cgen/JlabSimData/4.4GeV/4Bdl/Lead10cm/npolLead10cm_4.4GeV_4Bdl_*.root");
-  statsTree->Add("/data2/cgen/JlabSimData/4.4GeV/4Bdl/Lead10cm/npolLead10cm_4.4GeV_4Bdl_*.root");
+  //npolTree->Add("/data2/cgen/JlabSimData/4.4GeV/4Bdl/Lead10cm/npolLead10cm_4.4GeV_4Bdl_*.root");
+  //statsTree->Add("/data2/cgen/JlabSimData/4.4GeV/4Bdl/Lead10cm/npolLead10cm_4.4GeV_4Bdl_*.root");
+  npolTree->Add("/data2/cgen/JlabSimData/4.4GeV/4Bdl/Lead10cm/npolLead10cm_4.4GeV_combined.root");
+  statsTree->Add("/data2/cgen/JlabSimData/4.4GeV/4Bdl/Lead10cm/npolLead10cm_4.4GeV_combined.root");
 
   std::vector<NpolVertex *> *anEntry = NULL;
   std::vector<NpolTagger *> *npolEntry = NULL;
@@ -191,7 +191,7 @@ void ProcessElectrons() {
     Int_t nvertices = anStep->size();
     for(int j = 0; j < nvertices; j++) {
       NpolStep *aStep = (*anStep)[j];
-      double Ethreshold = 0.0;
+      double Ethreshold;
       
       if(aStep == NULL) continue;
             
@@ -202,13 +202,13 @@ void ProcessElectrons() {
       avNum = GetAVNumber(aStep->volume);
       switch(avNum){
       case 1: case 2: case 5: case 6:
-	Ethreshold = 5.0;
+	Ethreshold = 1.0;
 	break;
       case 3: case 4: case 7: case 8:
 	Ethreshold = 1.0;
 	break;
       case 9: case 10:
-	Ethreshold = 4.0;
+	Ethreshold = 1.0;
 	break;
       default:
 	break;

@@ -61,9 +61,9 @@ void FrontTaggerCountRates() {
 
   std::string histoNames[3][2]={{"av_11_impr_1_FrontTagLV_pv_1","av_11_impr_1_FrontTagLV_pv_0"},{"av_11_impr_1_FrontTagLV_pv_3","av_11_impr_1_FrontTagLV_pv_2"},{"av_11_impr_1_FrontTagLV_pv_5","av_11_impr_1_FrontTagLV_pv_4"}};
   
-  TFile *inFile = TFile::Open("NMU4-4GeV_Lead10cm_4Bdl_Histos.root");
-  //TFile *inFile = TFile::Open("JLABLead10cm_4Bdl_Histos.root");
-  
+  TFile *inFile = TFile::Open("JLAB4.4GeV_Lead5cm_4Bdl_Histos.root");
+  TFile *outFile = new TFile("JALB4.4GeV_Lead5cm_4Bdl_TaggerRates.root","RECREATE");
+
   // Retrieve the object with the total number of electrons on target and calculate 
   // effective electron time on target per micro amp of beam
 
@@ -200,7 +200,7 @@ void FrontTaggerCountRates() {
      gr->GetYaxis()->SetTitleSize(16);
      gr->GetYaxis()->SetTitleOffset(5);
      gr->GetYaxis()->CenterTitle(); 
-     gr->GetYaxis()->SetRangeUser(-0.005,.15);
+     gr->GetYaxis()->SetRangeUser(-0.005,.17);
 
      // Clean up X axis
      gr->GetXaxis()->SetTitle("Threshold Energy (MeV)");
@@ -219,9 +219,9 @@ void FrontTaggerCountRates() {
    }
   }
   
-  //TFile *outFile = new TFile("JLABLead10cm_4Bdl_TaggerRates.root","RECREATE");
-    TFile *outFile = new TFile("NMU4-4GeV_Lead10cm_4Bdl_TaggerRates.root","RECREATE");
+  
   c1->Write();
+  c2->Write();
   outFile->Close(); 
   //inFile->Close();
 

@@ -28,6 +28,7 @@
 #include "NpolShieldHut.hh"
 #include "NpolHBender.hh"
 #include "NpolBDump.hh"
+#include "NpolParticleFluxTagger.hh"
 #include "NpolAnalysisManager.hh"
 
 NpolDetectorConstruction::NpolDetectorConstruction() {
@@ -43,6 +44,7 @@ NpolDetectorConstruction::NpolDetectorConstruction() {
   detectors.insert(new NpolDipole2);
   detectors.insert(new NpolShieldHut);
   detectors.insert(new NpolHBender);
+  detectors.insert(new NpolParticleFluxTagger);
 //  detectors.insert(new NpolBDump);
 }
 

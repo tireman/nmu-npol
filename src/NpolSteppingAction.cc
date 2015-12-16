@@ -55,12 +55,15 @@ void NpolSteppingAction::UserSteppingAction(const G4Step *aStep) {
   // All Stepping information is saved to a vector for analysis later
   analysisMan->AddStep(aStep, volName);
  
-  // Check if either tagger is hit and if so pass track to Vector
+  // Check if any tagger is hit and if so pass track to the Vector
   if(volName == "NPOLTagger") {
     analysisMan->AddNPOLTaggedParticle(aTrack);
   }
   if(volName == "SHMSTagger") {
     analysisMan->AddSHMSTaggedParticle(aTrack);
+  }
+  if(volName == "ParticleTagger") {
+    analysisMan->AddTargetTaggedParticle(aTrack);
   }
 }
 
