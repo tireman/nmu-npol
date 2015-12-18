@@ -36,7 +36,7 @@ G4String NpolParticleFluxTagger::GetName() {
 // Construct a thin air box so we can tag particles before entering the first magnet.  
 // Place it just a millimeter off the front steel wall
 void NpolParticleFluxTagger::ConstructParticleTagger(){
-  G4double xlen = 0.500*m; G4double ylen = 0.275*m; G4double zlen = 0.010*cm;
+  G4double xlen = 0.800*m; G4double ylen = 0.400*m; G4double zlen = 0.010*cm;
 
   G4Box *ParticleTagger = new G4Box("ParticleTagger",xlen/2,ylen/2,zlen/2);
   ParticleTaggerLV = new G4LogicalVolume(ParticleTagger,NpolMaterials::GetInstance()->GetAir(),"NPOLTaggerLV",0,0,0);
@@ -46,7 +46,7 @@ void NpolParticleFluxTagger::ConstructParticleTagger(){
 
 void NpolParticleFluxTagger::Place(G4LogicalVolume *motherLV) {
   
-  G4double NpolAng = 28.0*deg, PosTagger =  0.550*m;
+  G4double NpolAng = 28.0*deg, PosTagger =  1.500*m;
 
   PlaceCylindrical(ParticleTaggerLV, motherLV, "ParticleTagger", PosTagger, -NpolAng, 0);
 

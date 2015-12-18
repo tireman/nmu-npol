@@ -74,23 +74,29 @@ void ProcessElectrons() {
   TChain *npolTree = new TChain("T");
   TChain *statsTree = new TChain("T2");
 
-  TFile *outFile = new TFile("JLAB4.4GeV_Lead10cm_4Bdl_Histos_CombineTest.root","RECREATE");  
-  //npolTree->Add("/data2/cgen/NMUSimData/4.4GeV/4Bdl/Lead10cm/npolLead10cm_4-4GeV_*.root");
-  //statsTree->Add("/data2/cgen/NMUSimData/4.4GeV/4Bdl/Lead10cm/npolLead10cm_4-4GeV_*.root");
+  //TFile *outFile = new TFile("JLAB4.4GeV_Lead5cm_4Bdl_HistosCombined.root","RECREATE"); 
+  TFile *outFile = new TFile("NMU4.4GeV_Lead10cm_4Bdl_HistosTest.root","RECREATE");
+  //npolTree->Add("/data2/cgen/NMUSimData/4.4GeV/4Bdl/Lead10cm/npolLead10cm_4.4GeV_4Bdl_*.root");
+  //statsTree->Add("/data2/cgen/NMUSimData/4.4GeV/4Bdl/Lead10cm/npolLead10cm_4.4GeV_4Bdl_*.root");
 
+  npolTree->Add("../build/output/npol_99999_00*.root");
+  statsTree->Add("../build/output/npol_99999_00*.root");
+  
   //npolTree->Add("/data2/cgen/JlabSimData/4.4GeV/4Bdl/Lead10cm/npolLead10cm_4.4GeV_4Bdl_*.root");
   //statsTree->Add("/data2/cgen/JlabSimData/4.4GeV/4Bdl/Lead10cm/npolLead10cm_4.4GeV_4Bdl_*.root");
-  npolTree->Add("/data2/cgen/JlabSimData/4.4GeV/4Bdl/Lead10cm/npolLead10cm_4.4GeV_combined.root");
-  statsTree->Add("/data2/cgen/JlabSimData/4.4GeV/4Bdl/Lead10cm/npolLead10cm_4.4GeV_combined.root");
+  //npolTree->Add("/data2/cgen/JlabSimData/4.4GeV/4Bdl/Lead5cm/npolLead5cm_4.4GeV_combined.root");
+  //statsTree->Add("/data2/cgen/JlabSimData/4.4GeV/4Bdl/Lead5cm/npolLead5cm_4.4GeV_combined.root");
 
   std::vector<NpolVertex *> *anEntry = NULL;
   std::vector<NpolTagger *> *npolEntry = NULL;
+  std::vector<NpolTagger *> *targetEntry = NULL;
   std::vector<NpolTagger *> *shmsEntry = NULL;
   std::vector<NpolStatistics *> *anStat = NULL;
   std::vector<NpolStep *> *anStep = NULL;
 
   npolTree->SetBranchAddress("NPOL_Tagger",&npolEntry);
   npolTree->SetBranchAddress("SHMS_Tagger",&shmsEntry);
+  npolTree->SetBranchAddress("Target_Tagger",&targetEntry);
   npolTree->SetBranchAddress("tracks",&anEntry);
   npolTree->SetBranchAddress("steps",&anStep);
   statsTree->SetBranchAddress("stats",&anStat);
@@ -126,30 +132,43 @@ void ProcessElectrons() {
   const int nbins = 500;
   double *bins = AntilogBins(nbins,1e-1,1e4);
   std::map<std::string,TH1 *> histograms;
-  std::map<std::string,TH1F *> taggedParticleKE;
-  std::map<std::string,TH2F *> taggedParticlePOS;
+  std::map<std::string,TH1F *> targetParticleKE;
+  std::map<std::string,TH1F *> npolParticleKE;
+  std::map<std::string,TH2F *> targetParticlePOS;
+  std::map<std::string,TH2F *> npolParticlePOS;
 
   // Allocate KE histograms and Position Histograms
   std::map<std::string,std::string>::iterator it;
   for(it = fancyNames.begin(); it != fancyNames.end(); it++) {
-    std::string histoName = "h_" + it->first; 
-    std::string histoTitle = it->second + " KE in Tagger"; 
-    std::string posHistoName = "pos_" + it->first;
-    std::string posHistoTitle = it->second + " Position in Tagger";
-    taggedParticleKE[it->first] = new TH1F(
-     histoName.c_str(), histoTitle.c_str(),nbins,bins);
-    taggedParticlePOS[it->first] = new TH2F(posHistoName.c_str(),
-     posHistoTitle.c_str(),120,-380,-260,160,-40,40);     
+    std::string targetHistoName = "TargetFlux_" + it->first; 
+    std::string targetHistoTitle = it->second + " Flux vs. KE in Target Tagger"; 
+    std::string npolHistoName = "NpolFlux_" + it->first; 
+    std::string npolHistoTitle = it->second + " Flux vs. KE in NPOL Tagger";
+    std::string targetXYHistoName = "targetXY_" + it->first;
+    std::string npolXYHistoName = "npolXY_" + it->first;
+    std::string targetXYHistoTitle = it->second + " XY Position in Target Tagger";
+    std::string npolXYHistoTitle = it->second + " XY Position in NPOL Tagger";
+
+    targetParticleKE[it->first] = new TH1F(
+     targetHistoName.c_str(), targetHistoTitle.c_str(),nbins,bins);
+    targetParticlePOS[it->first] = new TH2F(targetXYHistoName.c_str(),
+     targetXYHistoTitle.c_str(),120,-80.0,-30.0,160,-15,15);  
+
+    npolParticleKE[it->first] = new TH1F(
+     npolHistoName.c_str(), npolHistoTitle.c_str(),nbins,bins);
+    npolParticlePOS[it->first] = new TH2F(npolXYHistoName.c_str(),
+     npolXYHistoTitle.c_str(),120,-380.0,-250.0,160,-35,35);
   }  
 
   // Allocate the dTOF histogram
-  TH1F *delta_TOF = new TH1F("dToF", "Time of flight between Analyzer and Top/Bottom Detectors", 500, -15.0, 200.0);
+  TH1F *delta_TOF = new TH1F("dToF", "Time of flight between Analyzer and Top/Bottom Detectors", 
+			     500, -15.0, 200.0);
   delta_TOF->GetYaxis()->SetTitle("Events");
   delta_TOF->GetXaxis()->SetTitle("Analyzer to Top/Bottom Array Time-of-Flight (ns)");
 
   // loop over all entries (one per event)
   Int_t nentries = npolTree->GetEntries();
-  //for(int i = 0; i < 10000; i++) {
+  //for(int i = 0; i < 1000000; i++) {
   for(int i = 0; i < nentries; i++) {
     npolTree->GetEntry(i);
     
@@ -163,22 +182,42 @@ void ProcessElectrons() {
       if(i%1 == 0)
 	std::cout << "Processing event no. " << i << std::endl;
     }
-    
-    // loop over all tagged particles (one per step in tagger volume)
-    int nTaggedParticles = npolEntry->size();
-    for (Int_t j = 0; j < nTaggedParticles; j++){
-      NpolTagger *aVertex = (*npolEntry)[j];
+
+    // loop over all tagged particles (one step in target tagger volume)
+    int nTaggedParticles = targetEntry->size();    
+    for (Int_t j = 0; j < 1; j++){
+      //for (Int_t j = 0; j < nTaggedParticles; j++){
+      NpolTagger *aVertex = (*targetEntry)[j];
       if(aVertex == NULL)
-	continue;
+	continue;  
+
       std::string particleName = aVertex->particle;
-      if(taggedParticleKE.find(particleName) == taggedParticleKE.end())
+      if(targetParticleKE.find(particleName) == targetParticleKE.end())
 	continue;
 
-      (taggedParticleKE[particleName])->Fill(aVertex->energy,fluxScaling);
-      (taggedParticlePOS[particleName])->Fill(aVertex->posX,aVertex->posY,fluxScaling);
+      (targetParticleKE[particleName])->Fill(aVertex->energy,fluxScaling);
+      (targetParticlePOS[particleName])->Fill(aVertex->posX,aVertex->posY,fluxScaling);
     }
+      
+   // loop over all tagged particles (one step in NPOL tagger volume)
+    int npolNum = npolEntry->size();
+    if (npolNum > 0){
+      for (Int_t k = 0; k < 1; k++){
+	
+	//for (Int_t k = 0; k < npolNum; k++){
+	NpolTagger *aVertex2 = (*npolEntry)[k];
+	cout << "Got to this point!"<< endl;
+	if(aVertex2 == NULL)
+	  continue;
+	std::string particleName = aVertex2->particle;
+	if(npolParticleKE.find(particleName) == npolParticleKE.end())
+	  continue;
 
-
+	(npolParticleKE[particleName])->Fill(aVertex2->energy,fluxScaling);
+	(npolParticlePOS[particleName])->Fill(aVertex2->posX,aVertex2->posY,fluxScaling);
+      }
+    }
+    
     // This section is designed to file up the histograms for hits in
     // the Scintillator detectors
     std::map<std::string, double> eDep;
@@ -254,23 +293,35 @@ void ProcessElectrons() {
     } 
     eDep.clear();		
   }
- 
+  
+  // Write it all out to the ROOT file.
+
   TVectorD totalElectrons(1);
   totalElectrons[0] = TotalElectrons;
   totalElectrons.Write();
   std::map<std::string,TH1F *>::iterator it2;
-  for(it2 = taggedParticleKE.begin(); it2 != taggedParticleKE.end(); it2++) {
+  for(it2 = targetParticleKE.begin(); it2 != targetParticleKE.end(); it2++) {
     it2->second->Write();
   }
 
   std::map<std::string,TH2F *>::iterator it3;
-  for(it3 = taggedParticlePOS.begin(); it3 != taggedParticlePOS.end(); it3++) {
+  for(it3 = targetParticlePOS.begin(); it3 != targetParticlePOS.end(); it3++) {
     it3->second->Write();
   }
 
-  std::map<std::string, TH1 *>::iterator it4;
-  for(it4 = histograms.begin(); it4 != histograms.end(); it4++) {
+  std::map<std::string,TH1F *>::iterator it4;
+  for(it4 = npolParticleKE.begin(); it4 != npolParticleKE.end(); it4++) {
     it4->second->Write();
+  }
+
+  std::map<std::string,TH2F *>::iterator it5;
+  for(it5 = npolParticlePOS.begin(); it5 != npolParticlePOS.end(); it5++) {
+    it5->second->Write();
+  }
+
+  std::map<std::string, TH1 *>::iterator it6;
+  for(it6 = histograms.begin(); it6 != histograms.end(); it6++) {
+    it6->second->Write();
   }
 
   delta_TOF->Write();
