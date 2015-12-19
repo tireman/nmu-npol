@@ -38,10 +38,12 @@
 #include "NpolBeamlineDown.hh"
 #include "NpolDetectorConstruction.hh"
 
-G4double NpolDipole1::yokeLength = 0.6096*m;
+G4double NpolDipole1::yokeLength = 1.22*m;
 G4double NpolDipole1::gapWidth = 0.56*m;
 G4double NpolDipole1::gapLength = 1.22*m;
-G4double NpolDipole1::gapHeight = 0.1890*m;
+G4double NpolDipole1::gapHeight = 0.20965*m;  // using 8.25 inch gap
+G4double NpolDipole1::yokeGap = 0.1016*m;
+G4double NpolDipole1::dipole1FieldY = 4*0.40984*tesla; // 1 B.dl = 0.40984*tesla 4 B.dl = 1.639*tesla
 
 NpolDipole1::NpolDipole1() {
   ConstructDipole1Yoke();
@@ -63,20 +65,20 @@ void NpolDipole1::ConstructDipole1Yoke() {
   
   // define the polygon to be extruded
   std::vector<G4TwoVector> polygon(12); 
-  polygon[0] = G4TwoVector(-1.17475*m, 0.0*m);
-  polygon[1] = G4TwoVector(-1.17475*m, 0.7112*m);
-  polygon[2] = G4TwoVector(1.17475*m, 0.7112*m);
-  polygon[3] = G4TwoVector(1.17475*m, 0.0*m);
-  polygon[4] = G4TwoVector(0.67*m, 0.0*m);
-  polygon[5] = G4TwoVector(0.67*m, 0.1778*m);
-  polygon[6] = G4TwoVector(0.27*m, 0.1778*m);
-  polygon[7] = G4TwoVector(0.23*m, 0.0762*m);
-  polygon[8] = G4TwoVector(-0.23*m,0.0762*m);
-  polygon[9] = G4TwoVector(-0.27*m, 0.1778*m);
-  polygon[10] = G4TwoVector(-0.67*m, 0.1778*m);
-  polygon[11] = G4TwoVector(-0.67*m, 0.0*m);
+  polygon[0] = G4TwoVector(1.17475*m, 0.0*m);
+  polygon[1] = G4TwoVector(1.17475*m, 0.7112*m);
+  polygon[2] = G4TwoVector(-1.17475*m, 0.7112*m);
+  polygon[3] = G4TwoVector(-1.17475*m, 0.0*m);
+  polygon[4] = G4TwoVector(-0.67*m, 0.0*m);
+  polygon[5] = G4TwoVector(-0.67*m, 0.1778*m);
+  polygon[6] = G4TwoVector(-gapWidth/2, 0.1778*m);
+  polygon[7] = G4TwoVector(-gapWidth/2, 0.0545*m);
+  polygon[8] = G4TwoVector(+gapWidth/2, 0.0545*m);
+  polygon[9] = G4TwoVector(+gapWidth/2, 0.1778*m);
+  polygon[10] = G4TwoVector(0.67*m, 0.1778*m);
+  polygon[11] = G4TwoVector(0.67*m, 0.0*m);
   
-  G4ExtrudedSolid *Dipole1Yoke = new G4ExtrudedSolid("Dipole1Yoke",polygon, yokeLength, G4TwoVector(0, 0), 1.0, G4TwoVector(0, 0), 1.0);
+  G4ExtrudedSolid *Dipole1Yoke = new G4ExtrudedSolid("Dipole1Yoke",polygon, yokeLength/2, G4TwoVector(0, 0), 1.0, G4TwoVector(0, 0), 1.0);
   Dipole1YokeLV = new G4LogicalVolume(Dipole1Yoke,
        NpolMaterials::GetInstance()->GetFe(),"Dipole1YokeLV",0,0,0);
 
@@ -179,8 +181,6 @@ void NpolDipole1::ConstructDipole1Field(){
   G4TransportationManager* tmanMagField = G4TransportationManager::GetTransportationManager();
   tmanMagField -> GetPropagatorInField() -> SetLargestAcceptableStep(1*mm);
   
-  dipole1FieldY = 4*0.40984*tesla; // 1 B.dl = 0.40984*tesla; 2 B.dl = 0.81967*tesla; 4 B.dl = 1.639*tesla;
-
   magField = new G4UniformMagField(G4ThreeVector(0., dipole1FieldY, 0.));
   fEqMagField = new G4Mag_UsualEqRhs(magField);
   minStepMagneticField = 0.0025*mm;
@@ -199,7 +199,7 @@ void NpolDipole1::Place(G4LogicalVolume *motherLV) {
   G4double EndOffSet = +0.735*m, ClampOffSet = 0.9398*m;
    
   // Place 4 of the Copper bars in the magnet
-  PlaceRectangular(Dipole1CuBarLV, motherLV, "Dipole1CuBar", (BarOffSet*cos(NpolAng)-PosD1*sin(NpolAng)), +0.125*m, (BarOffSet*sin(NpolAng)+PosD1*cos(NpolAng)), 0*deg, -NpolAng, 0.0); 
+  PlaceRectangular(Dipole1CuBarLV, motherLV, "Dipole1CuBar", (BarOffSet*cos(NpolAng)-PosD1*sin(NpolAng)), +0.150*m, (BarOffSet*sin(NpolAng)+PosD1*cos(NpolAng)), 0*deg, -NpolAng, 0.0); 
   PlaceRectangular(Dipole1CuBarLV, motherLV, "Dipole1CuBar", (BarOffSet*cos(NpolAng)-PosD1*sin(NpolAng)), -0.125*m, (BarOffSet*sin(NpolAng)+PosD1*cos(NpolAng)), 0*deg, -NpolAng, 0.0); 
   PlaceRectangular(Dipole1CuBarLV, motherLV, "Dipole1CuBar", (-BarOffSet*cos(NpolAng)-PosD1*sin(NpolAng)), +0.125*m, (-BarOffSet*sin(NpolAng)+PosD1*cos(NpolAng)), 0*deg, -NpolAng, 0.0); 
   PlaceRectangular(Dipole1CuBarLV, motherLV, "Dipole1CuBar", (-BarOffSet*cos(NpolAng)-PosD1*sin(NpolAng)), -0.125*m, (-BarOffSet*sin(NpolAng)+PosD1*cos(NpolAng)), 0*deg, -NpolAng, 0.0); 
@@ -215,9 +215,9 @@ void NpolDipole1::Place(G4LogicalVolume *motherLV) {
   PlaceCylindrical(FieldClamp2LV, motherLV, "FieldClamp2", (PosD1+ClampOffSet), -NpolAng, 0.0*m);
   
   // Place upper yoke piece
-  PlaceCylindrical(Dipole1YokeLV, motherLV, "Dipole1", PosD1,-NpolAng,+5.08*cm); 
+  PlaceCylindrical(Dipole1YokeLV, motherLV, "Dipole1", PosD1,-NpolAng,+yokeGap/2); 
   // Place lower yoke piece 
-  PlaceRectangular(Dipole1YokeLV, motherLV, "Dipole1", (-PosD1*sin(NpolAng)), -5.08*cm,(PosD1*cos(NpolAng)), 0*deg, NpolAng, 180*deg); 
+  PlaceRectangular(Dipole1YokeLV, motherLV, "Dipole1", (-PosD1*sin(NpolAng)), -yokeGap/2,(PosD1*cos(NpolAng)), 0*deg, NpolAng, 180*deg); 
   
   // Place the magnetic field volume
   PlaceCylindrical(Dipole1FieldLV, motherLV, "Field1", PosD1,-NpolAng,0.0*cm);

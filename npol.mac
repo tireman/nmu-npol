@@ -28,4 +28,4 @@
 /gun/particle e-
 /gun/energy 4400 MeV
 /run/printProgress 10000
-/run/beamOn 10000000
+/run/beamOn 50000000

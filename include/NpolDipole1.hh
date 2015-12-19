@@ -50,12 +50,14 @@ public:
   static G4double gapWidth;
   static G4double gapHeight;
   static G4double gapLength;
+  static G4double yokeGap;
+  static G4double dipole1FieldY;
   
 private: 
   G4LogicalVolume *Dipole1YokeLV, *Dipole1CuBarLV, *Dipole1CuEndLV;
   G4LogicalVolume *FieldClamp1LV, *FieldClamp2LV, * Dipole1FieldLV;
 
-  G4double dipole1FieldY, minStepMagneticField;
+  G4double minStepMagneticField;
 
   G4UniformMagField* magField;
   G4Mag_EqRhs *fEqMagField;

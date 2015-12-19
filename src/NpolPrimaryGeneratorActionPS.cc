@@ -55,10 +55,10 @@ void NpolPrimaryGeneratorActionPS::GeneratePrimaries(G4Event* anEvent)
 	// Theta is the azimulthal angle and phi is the rotation angle 
 
 	// Generate random angles between maximum and minimum angles
-	G4double NpolAng = 28.0, dTheta = 3.975, dPhi = 3.975; //28
+	G4double NpolAng = 28.0*deg, dTheta = 3.975*deg, dPhi = 3.975*deg; //28
 
-	G4double theta = -(NpolAng+dTheta*(2*G4UniformRand()-1))*deg;
-	G4double phi = (dPhi*(2*G4UniformRand()-1))*deg;
+	G4double theta = -(NpolAng+dTheta*(2*G4UniformRand()-1));
+	G4double phi = (dPhi*(2*G4UniformRand()-1));
 
 	// Generate the momentum three vector and set the particle momentum
 	// direction and energy (energy can be changed from macro file).

@@ -17,10 +17,10 @@
 #include <TClassTable.h>
 #include <TInterpreter.h>
 
-#include "NpolVertex.hh"
-#include "NpolStatistics.hh"
-#include "NpolStep.hh"
-#include "NpolTagger.hh"
+#include "../include/NpolVertex.hh"
+#include "../include/NpolTagger.hh"
+#include "../include/NpolStatistics.hh"
+#include "../include/NpolStep.hh"
 
 struct polarimeter_edep_info {
   bool analyzerSectionsHit[4];

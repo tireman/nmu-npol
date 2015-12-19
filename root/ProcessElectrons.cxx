@@ -16,10 +16,10 @@
 #include <TObject.h>
 #include <TVectorD.h>
 
-#include "NpolVertex.hh"
-#include "NpolTagger.hh"
-#include "NpolStatistics.hh"
-#include "NpolStep.hh"
+#include "../include/NpolVertex.hh"
+#include "../include/NpolTagger.hh"
+#include "../include/NpolStatistics.hh"
+#include "../include/NpolStep.hh"
 
 int GetAVNumber(const std::string &volName) {
   if(volName.substr(0,3) == "av_") {
@@ -75,12 +75,12 @@ void ProcessElectrons() {
   TChain *statsTree = new TChain("T2");
 
   //TFile *outFile = new TFile("JLAB4.4GeV_Lead5cm_4Bdl_HistosCombined.root","RECREATE"); 
-  TFile *outFile = new TFile("NMU4.4GeV_Lead10cm_4Bdl_HistosTest.root","RECREATE");
-  //npolTree->Add("/data2/cgen/NMUSimData/4.4GeV/4Bdl/Lead10cm/npolLead10cm_4.4GeV_4Bdl_*.root");
-  //statsTree->Add("/data2/cgen/NMUSimData/4.4GeV/4Bdl/Lead10cm/npolLead10cm_4.4GeV_4Bdl_*.root");
+  TFile *outFile = new TFile("NMU4.4GeV_Lead10cm_4Bdl_HistosClose.root","RECREATE");
+  npolTree->Add("/data2/cgen/NMUSimData/4.4GeV/4Bdl/Lead10cm/simTestClose.root");
+  statsTree->Add("/data2/cgen/NMUSimData/4.4GeV/4Bdl/Lead10cm/simTestClose.root");
 
-  npolTree->Add("../build/output/npol_99999_00*.root");
-  statsTree->Add("../build/output/npol_99999_00*.root");
+  //npolTree->Add("../build/output/npol_99999_00*.root");
+  //statsTree->Add("../build/output/npol_99999_00*.root");
   
   //npolTree->Add("/data2/cgen/JlabSimData/4.4GeV/4Bdl/Lead10cm/npolLead10cm_4.4GeV_4Bdl_*.root");
   //statsTree->Add("/data2/cgen/JlabSimData/4.4GeV/4Bdl/Lead10cm/npolLead10cm_4.4GeV_4Bdl_*.root");
@@ -152,7 +152,7 @@ void ProcessElectrons() {
     targetParticleKE[it->first] = new TH1F(
      targetHistoName.c_str(), targetHistoTitle.c_str(),nbins,bins);
     targetParticlePOS[it->first] = new TH2F(targetXYHistoName.c_str(),
-     targetXYHistoTitle.c_str(),120,-80.0,-30.0,160,-15,15);  
+     targetXYHistoTitle.c_str(),120,-40.0,0.0,160,-25,25);  
 
     npolParticleKE[it->first] = new TH1F(
      npolHistoName.c_str(), npolHistoTitle.c_str(),nbins,bins);

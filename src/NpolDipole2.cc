@@ -38,6 +38,7 @@ G4double NpolDipole2::yokeLength = 0.6096*m;
 G4double NpolDipole2::gapWidth = 1.22*m;
 G4double NpolDipole2::gapLength = 1.22*m;
 G4double NpolDipole2::gapHeight = 0.4699*m;
+G4double NpolDipole2::dipole2FieldY = 4*0.40984*tesla; // 1 B.dl = 0.40984*tesla 4 B.dl = 1.639*tesla
 
 NpolDipole2::NpolDipole2() {
   ConstructDipole2Yoke();
@@ -142,8 +143,6 @@ void NpolDipole2::ConstructDipole2Field(){
   // Generate the Magnetic Field for Charybdis
   G4TransportationManager* tmanMagField = G4TransportationManager::GetTransportationManager();
   tmanMagField -> GetPropagatorInField() -> SetLargestAcceptableStep(1*mm);
-  
-  dipole2FieldY = 4*0.40984*tesla; // 1 B.dl = 0.40984*tesla; 2 B.dl = 0.81967*tesla; 4 B.dl = 1.639*tesla;
   
   magField = new G4UniformMagField(G4ThreeVector(0., dipole2FieldY, 0.));
   fEqMagField = new G4Mag_UsualEqRhs(magField);

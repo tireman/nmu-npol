@@ -111,9 +111,12 @@ void NpolScatteringChamber::ConstructChamber() {
   // Boolean operations to form the final scattering champer
   G4SubtractionSolid *chamberWall = new G4SubtractionSolid("ChamberWall",solidChamber,innerChamber);
   G4Tubs *beamPipeHoles = new G4Tubs("BeamPipeHoles", 0*m, holeRadius, insideRadius+1*m, 0*deg, 360*deg);
-  G4SubtractionSolid *chamberWallWithHoles = new G4SubtractionSolid("ChamberWallWithHoles",chamberWall, beamPipeHoles, transform);
-  G4SubtractionSolid *chamberWallWithWindow = new G4SubtractionSolid("ChamberWallWithWindow", chamberWallWithHoles, npolWindow);
-  G4SubtractionSolid *chamberWallWithSHMS = new G4SubtractionSolid("ChamberWallWithSHMS", chamberWallWithWindow, shmsWindow);
+  G4SubtractionSolid *chamberWallWithHoles = 
+    new G4SubtractionSolid("ChamberWallWithHoles",chamberWall, beamPipeHoles, transform);
+  G4SubtractionSolid *chamberWallWithWindow = 
+    new G4SubtractionSolid("ChamberWallWithWindow", chamberWallWithHoles, npolWindow);
+  G4SubtractionSolid *chamberWallWithSHMS = new 
+    G4SubtractionSolid("ChamberWallWithSHMS", chamberWallWithWindow, shmsWindow);
   
   innerChamberLV = new G4LogicalVolume(innerChamber,
        NpolMaterials::GetInstance()->GetVacuum(), "InnerChamberLV, 0,0,0");

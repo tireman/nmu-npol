@@ -23,6 +23,11 @@
 #include "NpolMaterials.hh"
 #include "NpolParticleFluxTagger.hh"
 
+G4double NpolParticleFluxTagger::vertAngle = 4.927*deg;  // 1 degree more than gap height
+G4double NpolParticleFluxTagger::horAngle =  10.385*deg; // 2 degree more than gap width
+G4double NpolParticleFluxTagger::taggerPos = 1.500*m; 
+G4double NpolParticleFluxTagger::NpolAng = 28.0*deg;
+
 NpolParticleFluxTagger::NpolParticleFluxTagger() {
   ConstructParticleTagger();
 }
@@ -35,8 +40,13 @@ G4String NpolParticleFluxTagger::GetName() {
 
 // Construct a thin air box so we can tag particles before entering the first magnet.  
 // Place it just a millimeter off the front steel wall
-void NpolParticleFluxTagger::ConstructParticleTagger(){
-  G4double xlen = 0.800*m; G4double ylen = 0.400*m; G4double zlen = 0.010*cm;
+// Vertical and horizontal angles are calculated by taking the Dipole 1 specs and the distance
+// to the front face of the magnet, then add 1 degree to that result so the solid angle of the
+// target tagger will encompass more than just the opening.
+void NpolParticleFluxTagger::ConstructParticleTagger(){  
+
+  G4double xlen = 2*taggerPos*tan(horAngle); G4double ylen = 2*taggerPos*tan(vertAngle); G4double zlen = 0.010*cm;
+
 
   G4Box *ParticleTagger = new G4Box("ParticleTagger",xlen/2,ylen/2,zlen/2);
   ParticleTaggerLV = new G4LogicalVolume(ParticleTagger,NpolMaterials::GetInstance()->GetAir(),"NPOLTaggerLV",0,0,0);
@@ -46,9 +56,7 @@ void NpolParticleFluxTagger::ConstructParticleTagger(){
 
 void NpolParticleFluxTagger::Place(G4LogicalVolume *motherLV) {
   
-  G4double NpolAng = 28.0*deg, PosTagger =  1.500*m;
-
-  PlaceCylindrical(ParticleTaggerLV, motherLV, "ParticleTagger", PosTagger, -NpolAng, 0);
+  PlaceCylindrical(ParticleTaggerLV, motherLV, "ParticleTagger",  taggerPos, -NpolAng, 0);
 
 }
 

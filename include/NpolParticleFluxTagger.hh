@@ -32,6 +32,11 @@ public:
   virtual G4String GetName();
   virtual void Place(G4LogicalVolume *motherLV);
   
+  static G4double vertAngle;
+  static G4double horAngle;
+  static G4double taggerPos; 
+  static G4double NpolAng;
+  
 private: 
   G4LogicalVolume *ParticleTaggerLV;
 

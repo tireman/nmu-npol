@@ -14,9 +14,10 @@
 #include <TClassTable.h>
 #include <TInterpreter.h>
 
-#include "NpolStatistics.hh"
-#include "NpolVertex.hh"
-#include "NpolStep.hh"
+#include "../include/NpolVertex.hh"
+#include "../include/NpolTagger.hh"
+#include "../include/NpolStatistics.hh"
+#include "../include/NpolStep.hh"
 
 #define MeV 1.0
 
