@@ -174,8 +174,8 @@ void NpolDipole2::Place(G4LogicalVolume *motherLV) {
   PlaceRectangular(Dipole2CuEndLV, motherLV, "Dipole2CuEnd", (-(PosD2+EndOffSet)*sin(NpolAng)), 0.0*m, ((PosD2+EndOffSet)*cos(NpolAng)), 0.0*deg, NpolAng, 180.*deg);
 
   // Place 2 copies of the field clamps for BNL 48D48
-  PlaceCylindrical(FieldClampLV, motherLV, "FieldClamp", (PosD2-ClampOffSet), -NpolAng, 0.0*m);
-  PlaceCylindrical(FieldClampLV, motherLV, "FieldClamp", (PosD2+ClampOffSet), -NpolAng, 0.0*m);
+    PlaceCylindrical(FieldClampLV, motherLV, "FieldClamp", (PosD2-ClampOffSet), -NpolAng, 0.0*m);
+    PlaceCylindrical(FieldClampLV, motherLV, "FieldClamp", (PosD2+ClampOffSet), -NpolAng, 0.0*m);
 
   // Place the two copies of the yokes with 2nd one flipped over
   PlaceCylindrical(Dipole2YokeLV, motherLV, "Dipole2", 

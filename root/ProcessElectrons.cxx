@@ -74,14 +74,11 @@ void ProcessElectrons() {
   TChain *npolTree = new TChain("T");
   TChain *statsTree = new TChain("T2");
 
-  //TFile *outFile = new TFile("JLAB4.4GeV_Lead5cm_4Bdl_HistosCombined.root","RECREATE"); 
-  TFile *outFile = new TFile("NMU4.4GeV_Lead10cm_4Bdl_HistosClose.root","RECREATE");
-  npolTree->Add("/data2/cgen/NMUSimData/4.4GeV/4Bdl/Lead10cm/simTestClose.root");
-  statsTree->Add("/data2/cgen/NMUSimData/4.4GeV/4Bdl/Lead10cm/simTestClose.root");
+  //TFile *outFile = new TFile("JLAB4.4GeV_Lead5cm_4Bdl_Histos.root","RECREATE"); 
+  TFile *outFile = new TFile("NMU4.4GeV_Lead10cm_4Bdl_Histos.root","RECREATE");
+  npolTree->Add("/data2/cgen/NMUSimData/4.4GeV/4Bdl/Lead10cm/npolLead10cm_4.4GeV_4Bdl_*.root");
+  statsTree->Add("/data2/cgen/NMUSimData/4.4GeV/4Bdl/Lead10cm/npolLead10cm_4.4GeV_4Bdl_*.root");
 
-  //npolTree->Add("../build/output/npol_99999_00*.root");
-  //statsTree->Add("../build/output/npol_99999_00*.root");
-  
   //npolTree->Add("/data2/cgen/JlabSimData/4.4GeV/4Bdl/Lead10cm/npolLead10cm_4.4GeV_4Bdl_*.root");
   //statsTree->Add("/data2/cgen/JlabSimData/4.4GeV/4Bdl/Lead10cm/npolLead10cm_4.4GeV_4Bdl_*.root");
   //npolTree->Add("/data2/cgen/JlabSimData/4.4GeV/4Bdl/Lead5cm/npolLead5cm_4.4GeV_combined.root");
@@ -112,7 +109,7 @@ void ProcessElectrons() {
     TotalEventsRecorded += ((*anStat)[0])->eventsSaved;   
   }
   
-  std::cout << "Total electrons: " << TotalElectrons << std::endl;
+  std::cout << "Total electrons: " << TotalElectrons/1e6 << " Million" << std::endl;
   
   // Scale to (microAmp^-1)(cm^-2) 
   Double_t fluxScaling = 1/((Double_t)TotalElectrons*1.609e-13*98*60);
@@ -152,7 +149,7 @@ void ProcessElectrons() {
     targetParticleKE[it->first] = new TH1F(
      targetHistoName.c_str(), targetHistoTitle.c_str(),nbins,bins);
     targetParticlePOS[it->first] = new TH2F(targetXYHistoName.c_str(),
-     targetXYHistoTitle.c_str(),120,-40.0,0.0,160,-25,25);  
+     targetXYHistoTitle.c_str(),120,-10.0,-40.0,160,-15,15);  
 
     npolParticleKE[it->first] = new TH1F(
      npolHistoName.c_str(), npolHistoTitle.c_str(),nbins,bins);
@@ -161,63 +158,61 @@ void ProcessElectrons() {
   }  
 
   // Allocate the dTOF histogram
-  TH1F *delta_TOF = new TH1F("dToF", "Time of flight between Analyzer and Top/Bottom Detectors", 
-			     500, -15.0, 200.0);
+  TH1F *delta_TOF = 
+    new TH1F("dToF", "Time of flight between Analyzer and Top/Bottom Detectors", 
+	     500, -15.0, 200.0);
   delta_TOF->GetYaxis()->SetTitle("Events");
   delta_TOF->GetXaxis()->SetTitle("Analyzer to Top/Bottom Array Time-of-Flight (ns)");
 
   // loop over all entries (one per event)
   Int_t nentries = npolTree->GetEntries();
-  //for(int i = 0; i < 1000000; i++) {
+  //for(int i = 0; i < 100000; i++) {
   for(int i = 0; i < nentries; i++) {
     npolTree->GetEntry(i);
     
-    if(nentries > 1000){
+    if(nentries > 10000){
+      if(i%10000 == 0)
+	std::cout << "Processing event no. " << i << std::endl;
+    }else if(nentries > 1000){
       if(i%1000 == 0)
 	std::cout << "Processing event no. " << i << std::endl;
-    }else if(nentries >100){
+    }else if (nentries > 100){
       if(i%100 == 0)
 	std::cout << "Processing event no. " << i << std::endl;
-    }else{
-      if(i%1 == 0)
+    }else {
+      if(i%10 == 0)
 	std::cout << "Processing event no. " << i << std::endl;
     }
 
     // loop over all tagged particles (one step in target tagger volume)
-    int nTaggedParticles = targetEntry->size();    
-    for (Int_t j = 0; j < 1; j++){
-      //for (Int_t j = 0; j < nTaggedParticles; j++){
-      NpolTagger *aVertex = (*targetEntry)[j];
-      if(aVertex == NULL)
-	continue;  
-
+    std::vector<NpolTagger *>::iterator t_it;
+    for(t_it = targetEntry->begin(); t_it != targetEntry->end(); t_it++){
+      NpolTagger *aVertex = *t_it;
+      if(aVertex == NULL) continue;  
       std::string particleName = aVertex->particle;
       if(targetParticleKE.find(particleName) == targetParticleKE.end())
 	continue;
 
-      (targetParticleKE[particleName])->Fill(aVertex->energy,fluxScaling);
-      (targetParticlePOS[particleName])->Fill(aVertex->posX,aVertex->posY,fluxScaling);
-    }
-      
-   // loop over all tagged particles (one step in NPOL tagger volume)
-    int npolNum = npolEntry->size();
-    if (npolNum > 0){
-      for (Int_t k = 0; k < 1; k++){
-	
-	//for (Int_t k = 0; k < npolNum; k++){
-	NpolTagger *aVertex2 = (*npolEntry)[k];
-	cout << "Got to this point!"<< endl;
-	if(aVertex2 == NULL)
-	  continue;
-	std::string particleName = aVertex2->particle;
-	if(npolParticleKE.find(particleName) == npolParticleKE.end())
-	  continue;
-
-	(npolParticleKE[particleName])->Fill(aVertex2->energy,fluxScaling);
-	(npolParticlePOS[particleName])->Fill(aVertex2->posX,aVertex2->posY,fluxScaling);
-      }
+      (targetParticleKE[particleName])->
+	Fill(aVertex->energy,fluxScaling);
+      (targetParticlePOS[particleName])->
+	Fill(aVertex->posX,aVertex->posY,fluxScaling);
     }
     
+    // loop over all tagged particles (one step in NPOL tagger volume)
+    std::vector<NpolTagger *>::iterator n_it;
+    for(n_it = npolEntry->begin(); n_it != npolEntry->end(); n_it++){
+      NpolTagger *aVertex = *n_it;
+      if(aVertex == NULL)  continue;
+      std::string particleName = aVertex->particle;
+      if(npolParticleKE.find(particleName) == npolParticleKE.end())
+	continue;
+      (npolParticleKE[particleName])->
+	Fill(aVertex->energy,fluxScaling);
+      (npolParticlePOS[particleName])->
+	Fill(aVertex->posX,aVertex->posY,fluxScaling);
+    }
+  
     // This section is designed to file up the histograms for hits in
     // the Scintillator detectors
     std::map<std::string, double> eDep;
@@ -226,10 +221,9 @@ void ProcessElectrons() {
     // loop over vector elements (one per vertex)
     
     int avNum, imprNum, pvNum;
-    
-    Int_t nvertices = anStep->size();
-    for(int j = 0; j < nvertices; j++) {
-      NpolStep *aStep = (*anStep)[j];
+    std::vector<NpolStep *>::iterator s_it;
+    for(s_it = anStep->begin(); s_it != anStep->end(); s_it++){
+      NpolStep *aStep = *s_it;
       double Ethreshold;
       
       if(aStep == NULL) continue;
@@ -326,7 +320,7 @@ void ProcessElectrons() {
 
   delta_TOF->Write();
 
-  std::cout << "Total electrons: " << TotalElectrons << std::endl;
+  std::cout << "Total electrons: " << TotalElectrons/1e6 << " Million"  << std::endl;
   delete outFile;
   
   delete bins;
