@@ -33,8 +33,8 @@ void SimulationFigures() {
   std::string histoNames[3][3]={{"pi-","mu+","gamma"},
 				{"neutron","mu-","e+"},
 				{"proton","pi+","e-"}};
-  TFile *inFile = TFile::Open("JLAB4.4GeV_Lead5cm_4Bdl_Histos.root");
-  TFile *outFile = new TFile("JLAB4.4GeV_Lead5cm_4Bdl_Fig21-23.root","RECREATE");
+  TFile *inFile = TFile::Open("NMU4.4GeV_Lead10cm_4Bdl_Histos.root");
+  TFile *outFile = new TFile("NMU4.4GeV_Lead10cm_4Bdl_Fig21-23.root","RECREATE");
 
   TCanvas *c1 = new TCanvas("c1","Polarimeter Angle 28.0 Deg, E = 4.4 GeV",1000,900);
 
@@ -49,7 +49,7 @@ void SimulationFigures() {
    for(int j = 0; j < Ny; j++){
      c1->cd(0);
      // Get the pads previosly created.
-     char pname[16];
+     char pname[24];
      sprintf(pname,"pad_%i_%i",i,j);
      pad[i][j] = (TPad*) gROOT->FindObject(pname);
      pad[i][j]->Draw();
@@ -62,9 +62,9 @@ void SimulationFigures() {
      Float_t xFactor = pad[0][0]->GetAbsWNDC()/pad[i][j]->GetAbsWNDC();
      Float_t yFactor = pad[0][0]->GetAbsHNDC()/pad[i][j]->GetAbsHNDC();
 
-     char hname[16];
+     char hname[24];
      std::string str = histoNames[i][j];
-     sprintf(hname,"h_%s",histoNames[i][j].c_str());
+     sprintf(hname,"NpolFlux_%s",histoNames[i][j].c_str());
      TH1F *hFrame = (TH1F*) inFile->Get(hname);
      hFrame->SetStats(false); 
      hFrame->SetFillColor(kBlue);
@@ -134,7 +134,7 @@ void SimulationFigures() {
 
      char hname[16];
      std::string str = histoNames[i][j];
-     sprintf(hname,"pos_%s",histoNames[i][j].c_str());
+     sprintf(hname,"npolXY_%s",histoNames[i][j].c_str());
      TH1F *hFrame = (TH1F*) inFile->Get(hname);
      hFrame->SetStats(false); 
      hFrame->SetFillColor(kBlue);

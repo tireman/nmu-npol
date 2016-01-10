@@ -61,8 +61,8 @@ void FrontTaggerCountRates() {
 
   std::string histoNames[3][2]={{"av_11_impr_1_FrontTagLV_pv_1","av_11_impr_1_FrontTagLV_pv_0"},{"av_11_impr_1_FrontTagLV_pv_3","av_11_impr_1_FrontTagLV_pv_2"},{"av_11_impr_1_FrontTagLV_pv_5","av_11_impr_1_FrontTagLV_pv_4"}};
   
-  TFile *inFile = TFile::Open("JLAB4.4GeV_Lead5cm_4Bdl_Histos.root");
-  TFile *outFile = new TFile("JALB4.4GeV_Lead5cm_4Bdl_TaggerRates.root","RECREATE");
+  TFile *inFile = TFile::Open("NMU4.4GeV_Lead10cm_4Bdl_Histos.root");
+  TFile *outFile = new TFile("NMU4.4GeV_Lead10cm_4Bdl_TaggerRates.root","RECREATE");
 
   // Retrieve the object with the total number of electrons on target and calculate 
   // effective electron time on target per micro amp of beam
