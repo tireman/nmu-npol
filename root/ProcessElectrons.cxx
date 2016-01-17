@@ -299,8 +299,9 @@ void ProcessElectrons() {
   
   // Write it all out to the ROOT file.
 
-  TVectorD totalElectrons(1);
+  TVectorD totalElectrons(2);
   totalElectrons[0] = TotalElectrons;
+  totalElectrons[1] = TotalEventsRecorded;
   totalElectrons.Write();
   std::map<std::string,TH1F *>::iterator it2;
   for(it2 = targetParticleKE.begin(); it2 != targetParticleKE.end(); it2++) {
