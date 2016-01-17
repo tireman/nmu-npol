@@ -15,6 +15,7 @@
 #include <TROOT.h>
 #include <TObject.h>
 #include <TVectorD.h>
+#include <TString.h>
 
 #include "../include/NpolVertex.hh"
 #include "../include/NpolTagger.hh"
@@ -74,15 +75,23 @@ void ProcessElectrons() {
   TChain *npolTree = new TChain("T");
   TChain *statsTree = new TChain("T2");
 
-  //TFile *outFile = new TFile("JLAB4.4GeV_Lead5cm_4Bdl_Histos.root","RECREATE"); 
-  TFile *outFile = new TFile("NMU4.4GeV_Lead10cm_4Bdl_Histos.root","RECREATE");
-  npolTree->Add("/data2/cgen/NMUSimData/4.4GeV/4Bdl/Lead10cm/npolLead10cm_4.4GeV_4Bdl_*.root");
-  statsTree->Add("/data2/cgen/NMUSimData/4.4GeV/4Bdl/Lead10cm/npolLead10cm_4.4GeV_4Bdl_*.root");
+  TString JobNum = "";
+  if(getenv("JOBNUMBER")){
+    JobNum = getenv("JOBNUMBER");
+  }else{
+    JobNum = "99999"; // default job number is 99999; anyone plan to submit more than this number of jobs?
+  }
 
-  //npolTree->Add("/data2/cgen/JlabSimData/4.4GeV/4Bdl/Lead10cm/npolLead10cm_4.4GeV_4Bdl_*.root");
-  //statsTree->Add("/data2/cgen/JlabSimData/4.4GeV/4Bdl/Lead10cm/npolLead10cm_4.4GeV_4Bdl_*.root");
-  //npolTree->Add("/data2/cgen/JlabSimData/4.4GeV/4Bdl/Lead5cm/npolLead5cm_4.4GeV_combined.root");
-  //statsTree->Add("/data2/cgen/JlabSimData/4.4GeV/4Bdl/Lead5cm/npolLead5cm_4.4GeV_combined.root");
+  TString OutputDir = "Output/";
+  TString InputDir = "/data2/cgen/NMUSimData/4.4GeV/4Bdl/Lead10cm/";
+  
+  TString OutputFile = OutputDir + "NMU4.4GeV_Lead10cm_4Bdl_Histos_" + JobNum + ".root";
+  TString InputFile = InputDir + "npolLead10cm_4.4GeV_4Bdl_" + JobNum + "_*.root";
+
+  TFile *outFile = new TFile(OutputFile,"RECREATE"); 
+
+  npolTree->Add(InputFile);
+  statsTree->Add(InputFile);
 
   std::vector<NpolVertex *> *anEntry = NULL;
   std::vector<NpolTagger *> *npolEntry = NULL;
@@ -154,7 +163,7 @@ void ProcessElectrons() {
     npolParticleKE[it->first] = new TH1F(
      npolHistoName.c_str(), npolHistoTitle.c_str(),nbins,bins);
     npolParticlePOS[it->first] = new TH2F(npolXYHistoName.c_str(),
-     npolXYHistoTitle.c_str(),120,-380.0,-250.0,160,-35,35);
+     npolXYHistoTitle.c_str(),120,-380.0,-270.0,160,-35,35);
   }  
 
   // Allocate the dTOF histogram

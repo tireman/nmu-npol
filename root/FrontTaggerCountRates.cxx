@@ -61,7 +61,7 @@ void FrontTaggerCountRates() {
   Long_t TotalElectrons = 0, TotalEventsRecorded = 0; 
 
   std::string histoNames[3][2]={{"av_11_impr_1_FrontTagLV_pv_1","av_11_impr_1_FrontTagLV_pv_0"},{"av_11_impr_1_FrontTagLV_pv_3","av_11_impr_1_FrontTagLV_pv_2"},{"av_11_impr_1_FrontTagLV_pv_5","av_11_impr_1_FrontTagLV_pv_4"}};
- 
+
   TString OutputDir = "/work/hallc/cgen/tireman/MagFieldOn/MagField_4Bdl/LeadOn10cm/";
   TString InputDir = "/work/hallc/cgen/tireman/MagFieldOn/MagField_4Bdl/LeadOn10cm/";
 
@@ -123,7 +123,6 @@ void FrontTaggerCountRates() {
 //     hFrame->SetTitleFont(16);
 //     hFrame->SetFillStyle(fillStyle);
 //     hFrame->Draw();
-std::cout << "I want out" << std::endl;
      // Set Good Histogram Title
      avNum = GetAVNumber(hname);
      imprNum = GetImprNumber(hname);
@@ -131,7 +130,6 @@ std::cout << "I want out" << std::endl;
      char htitle[80];
      sprintf(htitle,"#splitline{Energy Deposited}{Front Tagger %i, Layer %i}",pvNum+1, imprNum);
      hFrame->SetTitle(htitle);     
-std::cout << "I want out" << std::endl;  
      // y axis range
      hFrame->GetYaxis()->SetRangeUser(0.05,25000);
      
