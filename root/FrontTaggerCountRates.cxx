@@ -61,13 +61,12 @@ void FrontTaggerCountRates() {
   Long_t TotalElectrons = 0, TotalEventsRecorded = 0; 
 
   std::string histoNames[3][2]={{"av_11_impr_1_FrontTagLV_pv_1","av_11_impr_1_FrontTagLV_pv_0"},{"av_11_impr_1_FrontTagLV_pv_3","av_11_impr_1_FrontTagLV_pv_2"},{"av_11_impr_1_FrontTagLV_pv_5","av_11_impr_1_FrontTagLV_pv_4"}};
-  
-  TString OutputDir = "/work/hallc/cgen/tireman/MagFieldOn/MagField_4Bdl/LeadOn10cm/";
-  TString InputDir = "/work/hallc/cgen/tireman/MagFieldOn/MagField_4Bdl/LeadOn10cm/";
+   
+  TString OutputDir = "Plots/";
+  TString InputDir = "Output/";
 
- 
-  TString OutputFile = OutputDir + "JLAB4.4GeV_Lead10cm_4Bdl_Histos.root";
-  TString InputFile = InputDir + "JLAB4.4GeV_Lead10cm_4Bdl_Histos_2.root";
+  TString OutputFile = OutputDir + "JLAB4.4GeV_Lead10cm_4Bdl_FrontTaggerRates.root";
+  TString InputFile = InputDir + "JLAB4.4GeV_Lead10cm_4Bdl_Histos.root";
 
   TFile *inFile = TFile::Open(InputFile);
   TFile *outFile = new TFile(OutputFile,"RECREATE");
@@ -76,9 +75,11 @@ void FrontTaggerCountRates() {
   // effective electron time on target per micro amp of beam
 
   TVectorD *v = (TVectorD*)inFile->Get("TVectorT<double>");
-  double totalElectrons = ((*v))[0];
-  double electronTime = totalElectrons/(6.242e12); //6.242e12 e-/s at 1 microAmp
-  cout << "Electron beam time at 1 micro-amp is " << electronTime << " s " << endl;
+  Double_t totalElectrons = ((*v))[0];
+  Double_t electronTime = totalElectrons/(6.242e12); //6.242e12 e-/s at 1 microAmp
+  Double_t fluxscaling = 1/(totalElectrons*1.602e-13*(98*60));
+  std::cout << "Electron beam time at 1 micro-amp is " << electronTime << " s " << std::endl;
+  std::cout << "Total electrons on target: " << totalElectrons/1e6 << " Million" << std::endl;
 
   TCanvas *c1 = new TCanvas("c1","Polarimeter Angle 28.0 Deg, E = 4.4 GeV",1000,900);
   TCanvas *c2 = new TCanvas("c2","Front Taggger Threshold plots",1000,900);
@@ -113,26 +114,21 @@ void FrontTaggerCountRates() {
      Float_t xFactor = pad[0][0]->GetAbsWNDC()/pad[i][j]->GetAbsWNDC();
      Float_t yFactor = pad[0][0]->GetAbsHNDC()/pad[i][j]->GetAbsHNDC();
 
-<<<<<<< HEAD
-     char hname[300];
-     std::string str = histoNames[i][j];
-=======
      char hname[60];
-     TString str = histoNames[i][j];
->>>>>>> eab35cc2dace6b00d39ff8eb64049afb226292c9
+     //TString str = histoNames[i][j];
      sprintf(hname,"%s",histoNames[i][j].c_str());
      std::cout << "Name is: " << hname << std::endl;
       TH1F *hFrame = (TH1F*) inFile->Get(hname);
-//     hFrame->SetStats(false); 
-//     hFrame->SetFillColor(kBlue);
-//     hFrame->SetTitleFont(16);
-//     hFrame->SetFillStyle(fillStyle);
-//     hFrame->Draw();
+     hFrame->SetStats(false); 
+     hFrame->SetFillColor(kBlue);
+     hFrame->SetTitleFont(16);
+     hFrame->SetFillStyle(fillStyle);
+     hFrame->Draw();
      // Set Good Histogram Title
      avNum = GetAVNumber(hname);
      imprNum = GetImprNumber(hname);
      pvNum = GetPlacementNumber(hname);
-     char htitle[800];
+     char htitle[80];
      sprintf(htitle,"#splitline{Energy Deposited}{Front Tagger %i, Layer %i}",pvNum+1, imprNum);
      hFrame->SetTitle(htitle);     
      // y axis range

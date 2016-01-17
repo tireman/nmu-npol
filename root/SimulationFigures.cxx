@@ -33,16 +33,23 @@ void SimulationFigures() {
 				{"neutron","mu-","e+"},
 				{"proton","pi+","e-"}};
   
-  TString OutputDir = "/work/hallc/cgen/tireman/MagFieldOn/MagField_4Bdl/LeadOn10cm/";
-  TString InputDir = "/work/hallc/cgen/tireman/MagFieldOn/MagField_4Bdl/LeadOn10cm/";
+  TString OutputDir = "Plots/";
+  TString InputDir = "Output/";
 
-  TString OutputFile = OutputDir + "JLAB4.4GeV_Lead10cm_4Bdl_Histos.root";
-  TString InputFile = InputDir + "JLAB4.4GeV_Lead10cm_4Bdl_Histos_2.root";
+  TString OutputFile = OutputDir + "JLAB4.4GeV_Lead10cm_4Bdl_Fig21-23.root";
+  TString InputFile = InputDir + "JLAB4.4GeV_Lead10cm_4Bdl_Histos.root";
 
   TFile *inFile = TFile::Open(InputFile);
   TFile *outFile = new TFile(OutputFile,"RECREATE");
 
   TCanvas *c1 = new TCanvas("c1","Polarimeter Angle 28.0 Deg, E = 4.4 GeV",1000,900);
+
+  TVectorD *v = (TVectorD*)inFile->Get("TVectorT<double>");
+  Double_t totalElectrons = ((*v))[0];
+  Double_t electronTime = totalElectrons/(6.242e12); //6.242e12 e-/s at 1 microAmp
+  Double_t fluxscaling = 1/(totalElectrons*1.602e-13*(98*60));
+  std::cout << "Electron beam time at 1 micro-amp is " << electronTime << " s " << std::endl;
+  std::cout << "Total electrons on target: " << totalElectrons/1e6 << " Million" << std::endl;
 
   Int_t Nx = 3, Ny =3, fillStyle = 1001;
   Float_t lMargin = 0.10, rMargin = 0.05, bMargin = 0.07, tMargin = 0.05;
@@ -76,6 +83,7 @@ void SimulationFigures() {
      hFrame->SetFillColor(kBlue);
      hFrame->SetTitleFont(16);
      hFrame->SetFillStyle(fillStyle);
+     hFrame->Scale(fluxscaling);
      hFrame->Draw();
   
      // y axis range
