@@ -20,6 +20,7 @@
 #include <TSystem.h>
 #include <TROOT.h>
 #include <TObject.h>
+#include <TString.h>
 
 void CanvasPartition(TCanvas *C,const Int_t Nx = 2,const Int_t Ny = 2, 
 		     Float_t lMargin = 0.15, Float_t rMargin = 0.05,
@@ -61,8 +62,18 @@ void FrontTaggerCountRates() {
 
   std::string histoNames[3][2]={{"av_11_impr_1_FrontTagLV_pv_1","av_11_impr_1_FrontTagLV_pv_0"},{"av_11_impr_1_FrontTagLV_pv_3","av_11_impr_1_FrontTagLV_pv_2"},{"av_11_impr_1_FrontTagLV_pv_5","av_11_impr_1_FrontTagLV_pv_4"}};
   
-  TFile *inFile = TFile::Open("NMU4.4GeV_Lead10cm_4Bdl_Histos.root");
-  TFile *outFile = new TFile("NMU4.4GeV_Lead10cm_4Bdl_TaggerRates.root","RECREATE");
+  TString OutputDir = "Plots/";
+  TString InputDir = "Output/";
+
+
+  TString OutputFile = OutputDir + "JLAB4.4GeV_Lead10cm_4Bdl_HistosOutput.root";
+  TString InputFile = InputDir + "JLAB4.4GeV_Lead10cm_4Bdl_Histos.root";
+
+  TFile *inFile = TFile::Open(InputFile);
+  TFile *outFile = new TFile(OutputFile,"RECREATE");
+
+  //TFile *inFile = TFile::Open("Output/NMU4.4GeV_Lead10cm_4Bdl_Histos.root");
+  //TFile *outFile = new TFile("Plots/NMU4.4GeV_Lead10cm_4Bdl_TaggerRates.root","RECREATE");
 
   // Retrieve the object with the total number of electrons on target and calculate 
   // effective electron time on target per micro amp of beam
@@ -105,7 +116,7 @@ void FrontTaggerCountRates() {
      Float_t xFactor = pad[0][0]->GetAbsWNDC()/pad[i][j]->GetAbsWNDC();
      Float_t yFactor = pad[0][0]->GetAbsHNDC()/pad[i][j]->GetAbsHNDC();
 
-     char hname[30];
+     char hname[300];
      std::string str = histoNames[i][j];
      sprintf(hname,"%s",histoNames[i][j].c_str());
      TH1F *hFrame = (TH1F*) inFile->Get(hname);
@@ -119,7 +130,7 @@ void FrontTaggerCountRates() {
      avNum = GetAVNumber(hname);
      imprNum = GetImprNumber(hname);
      pvNum = GetPlacementNumber(hname);
-     char htitle[80];
+     char htitle[800];
      sprintf(htitle,"#splitline{Energy Deposited}{Front Tagger %i, Layer %i}",pvNum+1, imprNum);
      hFrame->SetTitle(htitle);     
   

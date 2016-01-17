@@ -33,8 +33,8 @@ void SimulationFigures() {
   std::string histoNames[3][3]={{"pi-","mu+","gamma"},
 				{"neutron","mu-","e+"},
 				{"proton","pi+","e-"}};
-  TFile *inFile = TFile::Open("NMU4.4GeV_Lead10cm_4Bdl_Histos.root");
-  TFile *outFile = new TFile("NMU4.4GeV_Lead10cm_4Bdl_Fig21-23.root","RECREATE");
+  TFile *inFile = TFile::Open("Output/NMU4.4GeV_Lead10cm_4Bdl_Histos.root");
+  TFile *outFile = new TFile("Plots/NMU4.4GeV_Lead10cm_4Bdl_Fig21-23.root","RECREATE");
 
   TCanvas *c1 = new TCanvas("c1","Polarimeter Angle 28.0 Deg, E = 4.4 GeV",1000,900);
 
