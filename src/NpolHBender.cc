@@ -61,7 +61,7 @@ G4String NpolHBender::GetName() {
 }
 
 void NpolHBender::Place(G4LogicalVolume *motherLV) {
-  G4double ShmsAng = 16.79*deg; // Angle at 4.4 GeV/c 36.53*deg; at 11 GeV/c 16.79; 
+  G4double ShmsAng = 36.53*deg; // Angle at 4.4 GeV/c 36.53*deg; at 11 GeV/c 16.79; 
   G4double PosHB = 1.76*m, PosTagger = 1.195*m;
   
   PlaceCylindrical(HBBoreLogicLV, motherLV, "HBBore", PosHB, ShmsAng, 0);

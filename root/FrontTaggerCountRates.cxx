@@ -20,6 +20,7 @@
 #include <TSystem.h>
 #include <TROOT.h>
 #include <TObject.h>
+#include <TString.h>
 
 void CanvasPartition(TCanvas *C,const Int_t Nx = 2,const Int_t Ny = 2, 
 		     Float_t lMargin = 0.15, Float_t rMargin = 0.05,
@@ -60,9 +61,16 @@ void FrontTaggerCountRates() {
   Long_t TotalElectrons = 0, TotalEventsRecorded = 0; 
 
   std::string histoNames[3][2]={{"av_11_impr_1_FrontTagLV_pv_1","av_11_impr_1_FrontTagLV_pv_0"},{"av_11_impr_1_FrontTagLV_pv_3","av_11_impr_1_FrontTagLV_pv_2"},{"av_11_impr_1_FrontTagLV_pv_5","av_11_impr_1_FrontTagLV_pv_4"}};
-  
-  TFile *inFile = TFile::Open("JLAB4.4GeV_Lead5cm_4Bdl_Histos.root");
-  TFile *outFile = new TFile("JALB4.4GeV_Lead5cm_4Bdl_TaggerRates.root","RECREATE");
+ 
+  TString OutputDir = "/work/hallc/cgen/tireman/MagFieldOn/MagField_4Bdl/LeadOn10cm/";
+  TString InputDir = "/work/hallc/cgen/tireman/MagFieldOn/MagField_4Bdl/LeadOn10cm/";
+
+ 
+  TString OutputFile = OutputDir + "JLAB4.4GeV_Lead10cm_4Bdl_Histos.root";
+  TString InputFile = InputDir + "JLAB4.4GeV_Lead10cm_4Bdl_Histos_2.root";
+
+  TFile *inFile = TFile::Open(InputFile);
+  TFile *outFile = new TFile(OutputFile,"RECREATE");
 
   // Retrieve the object with the total number of electrons on target and calculate 
   // effective electron time on target per micro amp of beam
@@ -105,16 +113,17 @@ void FrontTaggerCountRates() {
      Float_t xFactor = pad[0][0]->GetAbsWNDC()/pad[i][j]->GetAbsWNDC();
      Float_t yFactor = pad[0][0]->GetAbsHNDC()/pad[i][j]->GetAbsHNDC();
 
-     char hname[30];
-     std::string str = histoNames[i][j];
+     char hname[60];
+     TString str = histoNames[i][j];
      sprintf(hname,"%s",histoNames[i][j].c_str());
-     TH1F *hFrame = (TH1F*) inFile->Get(hname);
-     hFrame->SetStats(false); 
-     hFrame->SetFillColor(kBlue);
-     hFrame->SetTitleFont(16);
-     hFrame->SetFillStyle(fillStyle);
-     hFrame->Draw();
-
+     std::cout << "Name is: " << hname << std::endl;
+      TH1F *hFrame = (TH1F*) inFile->Get(hname);
+//     hFrame->SetStats(false); 
+//     hFrame->SetFillColor(kBlue);
+//     hFrame->SetTitleFont(16);
+//     hFrame->SetFillStyle(fillStyle);
+//     hFrame->Draw();
+std::cout << "I want out" << std::endl;
      // Set Good Histogram Title
      avNum = GetAVNumber(hname);
      imprNum = GetImprNumber(hname);
@@ -122,7 +131,7 @@ void FrontTaggerCountRates() {
      char htitle[80];
      sprintf(htitle,"#splitline{Energy Deposited}{Front Tagger %i, Layer %i}",pvNum+1, imprNum);
      hFrame->SetTitle(htitle);     
-  
+std::cout << "I want out" << std::endl;  
      // y axis range
      hFrame->GetYaxis()->SetRangeUser(0.05,25000);
      

@@ -19,8 +19,7 @@
 #include <TSystem.h>
 #include <TROOT.h>
 #include <TObject.h>
-
-#define MeV 1.0
+#include <TString.h>
 
 void CanvasPartition(TCanvas *C,const Int_t Nx = 2,const Int_t Ny = 2, 
 		     Float_t lMargin = 0.15, Float_t rMargin = 0.05,
@@ -33,8 +32,15 @@ void SimulationFigures() {
   std::string histoNames[3][3]={{"pi-","mu+","gamma"},
 				{"neutron","mu-","e+"},
 				{"proton","pi+","e-"}};
-  TFile *inFile = TFile::Open("JLAB4.4GeV_Lead5cm_4Bdl_Histos.root");
-  TFile *outFile = new TFile("JLAB4.4GeV_Lead5cm_4Bdl_Fig21-23.root","RECREATE");
+  
+  TString OutputDir = "/work/hallc/cgen/tireman/MagFieldOn/MagField_4Bdl/LeadOn10cm/";
+  TString InputDir = "/work/hallc/cgen/tireman/MagFieldOn/MagField_4Bdl/LeadOn10cm/";
+
+  TString OutputFile = OutputDir + "JLAB4.4GeV_Lead10cm_4Bdl_Histos.root";
+  TString InputFile = InputDir + "JLAB4.4GeV_Lead10cm_4Bdl_Histos_2.root";
+
+  TFile *inFile = TFile::Open(InputFile);
+  TFile *outFile = new TFile(OutputFile,"RECREATE");
 
   TCanvas *c1 = new TCanvas("c1","Polarimeter Angle 28.0 Deg, E = 4.4 GeV",1000,900);
 
