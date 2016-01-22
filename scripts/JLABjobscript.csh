@@ -6,7 +6,7 @@ cat > jsubfile_$i << EOF1
 PROJECT: cgen
 TRACK : simulation
 OS : centos65
-JOBNAME : CGEN-4.4GeV_4Bdl_10cm_$i
+JOBNAME : CGEN-4.4GeV_4Bdl_0cm_$i
 MAIL: tireman@jlab.org
 TIME: 4320
 MEMORY: 1200 MB

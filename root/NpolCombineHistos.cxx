@@ -22,39 +22,74 @@ void MergeRootfile( TDirectory *target, TList *sourcelist );
 
 void NpolCombineHistos() {
   
-  // Maybe I can make this a bit more translatable later
-  /*TString OutputDir = "Plots/";
-  TString InputDir = "Output/";
-
-  TString OutputFile = OutputDir + "JLAB4.4GeV_Lead10cm_4Bdl_HistosOutput.root";
-  TString InputFile = InputDir + "JLAB4.4GeV_Lead10cm_4Bdl_Histos.root";
-
-  TFile *inFile = TFile::Open(InputFile);
-  TFile *outFile = new TFile(OutputFile,"RECREATE");*/
-
-   // Prepare the files to me merged
+  // Prepare the files to me merged, throw back to the example I copied
    if(gSystem->AccessPathName("hsimple1.root")) {
      gSystem->CopyFile("hsimple.root", "hsimple1.root");
      gSystem->CopyFile("hsimple.root", "hsimple2.root");
    }
 
-   // in an interactive ROOT session, edit the file names
-   // Target and FileList, then
-   // root > .L hadd.C
-   // root > hadd()
-
-   Target = TFile::Open( "Output/JLAB4.4GeV_Lead10cm_4Bdl_Histos_All_1.root", "RECREATE" );
-
-   FileList = new TList();
-   //FileList->Add( TFile::Open("Output/JLAB4.4GeV_Lead10cm_4Bdl_Histos_All_3.root") );
-
-   for (Int_t i=1; i<501; i++) {
-     char fname[60];
-     sprintf(fname,"Output/JLAB4.4GeV_Lead10cm_4Bdl_Histos_%i.root",i);
-     FileList->Add( TFile::Open(fname) );
+   TString Lead = "0"; TString Energy = "4.4"; TString Bfield = "4";
+   TString OutputDir = "Output/";
+   TString InputDir = "/work/hallc/cgen/tireman/MagFieldOn/MagField_" + Bfield + "Bdl/LeadOn" + Lead + "cm/";
+   Int_t Ncut = 500;
+   Int_t Nfiles = 2;
+   Int_t Nloops = 0;
+   if (Nfiles % Ncut != 0){
+     Nloops = Nfiles/Ncut+ 1;
+   } else {
+     Nloops = Nfiles/Ncut;
    }
 
+   std::cout << "Starting up the processing ..." << std::endl;
+   for(Int_t j=0; j < Nloops; j++){
+
+     TString OutputFile;
+     if(j == (Nloops - 1)){
+       OutputFile = OutputDir + "JLAB" + Energy + "GeV_Lead" + Lead + "cm_" + Bfield + "Bdl_Histos.root";
+     } else {
+       char jtemp[2];
+       sprintf(jtemp,"%i",j);
+       OutputFile = OutputDir + "JLAB" + Energy + "GeV_Lead" + Lead + "cm_" + Bfield + "Bdl_Histos_All_" + jtemp + ".root";
+     }
+
+     TString InputFile;
+     if (j!= 0 ){
+       char jplustemp[2];
+       sprintf(jplustemp,"%i",j-1);
+       InputFile = OutputDir + "JLAB" + Energy + "GeV_Lead" + Lead + "cm_" + Bfield + "Bdl_Histos_All_" + jplustemp + ".root";
+     }
+
+     Int_t A = 0; 
+     Int_t B = 0;
+     if(j == (Nloops-1)){
+       A = j*500 + 1;
+       B = Nfiles + 1;
+     } else {
+       A = j*500 + 1;
+       B = j*500 + 501;
+     }
+     if(B < A) continue;
+
+     Target = TFile::Open( OutputFile, "RECREATE" );
+
+     FileList = new TList();
+     if (j != 0) FileList->Add( TFile::Open(InputFile) );
+
+     std::cout << "Engaging files " << A << " through " << B-1 << std::endl;
+     for (Int_t i = A; i < B; i++) {
+       char fname[60];
+       sprintf(fname,"JLAB" + Energy + "GeV_Lead" + Lead + "cm_" + Bfield + "Bdl_Histos_%i.root",i);
+       FileList->Add( TFile::Open(InputDir + fname) );
+     }
+   
+
    MergeRootfile( Target, FileList );
+
+   Target->Close();
+   FileList->Clear();
+   delete FileList;
+ 
+   }
 
 }
 
