@@ -14,6 +14,9 @@
 // Created: Daniel Wilbern - November 2014
 // Modified: William Tireman - December 2014-January 2015
 
+#include <map>
+#include <string>
+
 #include "G4SystemOfUnits.hh"
 #include "G4NistManager.hh"
 #include "G4Isotope.hh"
@@ -22,6 +25,14 @@
 #include "NpolMaterials.hh"
 
 NpolMaterials *pInstance = NULL;
+
+NpolMaterials *NpolMaterials::GetInstance() {
+  
+  if(pInstance == NULL)
+    pInstance = new NpolMaterials();
+  
+  return pInstance;
+}
 
 NpolMaterials::NpolMaterials() {
   nistMan = G4NistManager::Instance();
@@ -32,60 +43,50 @@ NpolMaterials::NpolMaterials() {
 }
 
 NpolMaterials::~NpolMaterials() {
-  delete Vacuum;
-  delete Air;
-  delete Scint;
-  delete Al;
-  delete LH2;
-  delete LD2;
-  delete Concrete;
-  delete Fe;
-  delete SSteel;
-  delete Cu;
-  delete Pb;
-}
+  std::map<std::string,G4Material *>::iterator it;
+  for(it = materials.begin(); it != materials.end(); it++) 
+    delete it->second;
 
-NpolMaterials *NpolMaterials::GetInstance() {
-  
-  if(pInstance == NULL)
-    pInstance = new NpolMaterials();
-  
-  return pInstance;
+  materials.clear();
 }
 
 G4Material *NpolMaterials::GetMaterial(const G4String material) {
-  
-  G4Material *mat = nistMan->FindOrBuildMaterial(material);
-  
-  if(mat == NULL)
-    mat = G4Material::GetMaterial(material);
-  
-  if(mat == NULL)
+  G4Material *ret = NULL;
+  G4Material *mat = NULL;
+
+  std::map<std::string,G4Material *>::iterator it = materials.find(material);
+  if(it != materials.end())
+  	ret = it->second;
+  else if((mat = nistMan->FindOrBuildMaterial(material)) != NULL)
+	  ret = mat;
+  else if((mat = G4Material::GetMaterial(material)) != NULL)
+	  ret = mat;
+  else
     G4cout << "Material " << material << " not found." << G4endl;
-  
-  return mat;
+
+  return ret;  
 }
 
 void NpolMaterials::CreateMaterials() {
   
-  Vacuum = CreateVacuum();
-  Air = CreateAir();
-  Scint = CreateScint();
-  Al = CreateAl();
-  LH2 = CreateLH2();
-  LD2 = CreateLD2();
-  Concrete = CreateConcrete();
-  Fe = CreateFe();
-  SSteel = CreateSSteel();
-  Cu = CreateCu();
-  Pb = CreatePb();
+  materials["Vacuum"] = CreateVacuum();
+  materials["Air"] = CreateAir();
+  materials["Scint"] = CreateScint();
+  materials["Al"] = CreateAl();
+  materials["LH2"] = CreateLH2();
+  materials["LD2"] = CreateLD2();
+  materials["Concrete"] = CreateConcrete();
+  materials["Fe"] = CreateFe();
+  materials["SSteel"] = CreateSSteel();
+  materials["Cu"] = CreateCu();
+  materials["Pb"] = CreatePb();
 }
 
 G4Material *NpolMaterials::CreateVacuum() {
   // Define Vacuum: New version; use Air and just make it very low density
   G4double fractionmass, density;
   G4int ncomponents;
-  Vacuum = new G4Material("Vacuum", density= 1.e-25*g/cm3, ncomponents=1, kStateGas, 253*kelvin, 1.e-8*atmosphere);
+  G4Material *Vacuum = new G4Material("Vacuum", density= 1.e-25*g/cm3, ncomponents=1, kStateGas, 253*kelvin, 1.e-8*atmosphere);
   Vacuum->AddMaterial(nistMan->FindOrBuildMaterial("G4_AIR"), fractionmass=1.);
   
   return Vacuum;
@@ -117,7 +118,7 @@ G4Material *NpolMaterials::CreateLH2() {
   G4Element* H = nistMan->FindOrBuildElement("H");
   
   // Liquid Hydrogen
-  LH2 = new G4Material("LH2", 0.07085*g/cm3, 1, kStateLiquid, 15.0*kelvin);
+  G4Material *LH2 = new G4Material("LH2", 0.07085*g/cm3, 1, kStateLiquid, 15.0*kelvin);
   LH2->AddElement(H, 2);
   
   return LH2;
@@ -135,7 +136,7 @@ G4Material *NpolMaterials::CreateLD2() {
   deuterium->AddIsotope(deuteron, 1);
   
   // Liquid Deuterium
-  LD2 = new G4Material("LD2", 0.169*g/cm3, 1, kStateLiquid, 22.0*kelvin);
+  G4Material *LD2 = new G4Material("LD2", 0.169*g/cm3, 1, kStateLiquid, 22.0*kelvin);
   LD2->AddElement(deuterium, 2);
   
   return LD2;

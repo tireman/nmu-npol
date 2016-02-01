@@ -80,7 +80,7 @@ void NpolDipole1::ConstructDipole1Yoke() {
   
   G4ExtrudedSolid *Dipole1Yoke = new G4ExtrudedSolid("Dipole1Yoke",polygon, yokeLength/2, G4TwoVector(0, 0), 1.0, G4TwoVector(0, 0), 1.0);
   Dipole1YokeLV = new G4LogicalVolume(Dipole1Yoke,
-       NpolMaterials::GetInstance()->GetFe(),"Dipole1YokeLV",0,0,0);
+       NpolMaterials::GetInstance()->GetMaterial("Fe"),"Dipole1YokeLV",0,0,0);
 
   G4VisAttributes *Dipole1YokeVisAtt= 
     new G4VisAttributes(G4Colour(1.0,0.0,0.00));
@@ -95,7 +95,7 @@ void NpolDipole1::ConstructDipole1CuBar(){
   
   G4Box *Dipole1CuBar = new G4Box("Dipole1CuBar", 0.190*m, 0.075*m, 0.66*m);
   Dipole1CuBarLV = new G4LogicalVolume(Dipole1CuBar, 
-         NpolMaterials::GetInstance()->GetCu(),"Dipole1CuBarLV", 0,0,0);
+         NpolMaterials::GetInstance()->GetMaterial("Cu"),"Dipole1CuBarLV", 0,0,0);
   G4VisAttributes *CuBar = new G4VisAttributes(G4Colour(0.0,0.50,0.51));
   Dipole1CuBarLV->SetVisAttributes(CuBar);
 }
@@ -118,7 +118,7 @@ void NpolDipole1::ConstructDipole1CuEnd(){
   G4ExtrudedSolid *Dipole1CuEnd = new G4ExtrudedSolid("Dipole1CuEnd", 
        polygon, 0.075*m, G4TwoVector(0, 0), 1.0, G4TwoVector(0, 0), 1.0);
   Dipole1CuEndLV = new G4LogicalVolume(Dipole1CuEnd,
-       NpolMaterials::GetInstance()->GetCu(),"Dipole1CuEndLV",0,0,0);
+       NpolMaterials::GetInstance()->GetMaterial("Cu"),"Dipole1CuEndLV",0,0,0);
 
   G4VisAttributes *Dipole1CuEndVisAtt= 
     new G4VisAttributes(G4Colour(0.0,0.50,0.51));
@@ -148,7 +148,7 @@ void NpolDipole1::ConstructDipole1FieldClamp1(){
   G4SubtractionSolid *PlateHole = new G4SubtractionSolid("PlateHole", Slab,BHole, yRot, xTrans);
   G4SubtractionSolid *FieldClamp1 = new G4SubtractionSolid("FieldClamp1", PlateHole, Hole); 
 
-  FieldClamp1LV = new G4LogicalVolume(FieldClamp1, NpolMaterials::GetInstance()->GetFe(),"FieldClampLV1", 0,0,0);
+  FieldClamp1LV = new G4LogicalVolume(FieldClamp1, NpolMaterials::GetInstance()->GetMaterial("Fe"),"FieldClampLV1", 0,0,0);
   G4VisAttributes *Clamp = new G4VisAttributes(G4Colour(0.5,0.5,0.0));
   FieldClamp1LV->SetVisAttributes(Clamp);
 }
@@ -164,7 +164,7 @@ void NpolDipole1::ConstructDipole1FieldClamp2(){
 
   G4SubtractionSolid *FieldClamp2 = new G4SubtractionSolid("FieldClamp2", Slab, Hole); 
   
-  FieldClamp2LV = new G4LogicalVolume(FieldClamp2, NpolMaterials::GetInstance()->GetFe(),"FieldClamp2LV", 0,0,0);
+  FieldClamp2LV = new G4LogicalVolume(FieldClamp2, NpolMaterials::GetInstance()->GetMaterial("Fe"),"FieldClamp2LV", 0,0,0);
   G4VisAttributes *Clamp = new G4VisAttributes(G4Colour(0.5,0.5,0.0));
   FieldClamp2LV->SetVisAttributes(Clamp);
 
@@ -173,7 +173,7 @@ void NpolDipole1::ConstructDipole1FieldClamp2(){
 void NpolDipole1::ConstructDipole1Field(){
   // Generate the magnetic field volume
   G4Box *Dipole1Field = new G4Box("Dipole1Field",gapWidth/2, gapHeight/2, gapLength/2);
-  Dipole1FieldLV = new G4LogicalVolume(Dipole1Field, NpolMaterials::GetInstance()->GetAir(),"Dipole1FieldLV", 0,0,0);
+  Dipole1FieldLV = new G4LogicalVolume(Dipole1Field, NpolMaterials::GetInstance()->GetMaterial("Air"),"Dipole1FieldLV", 0,0,0);
   G4VisAttributes *Field = new G4VisAttributes(G4Colour(0.0,1.0,0.0));
   Dipole1FieldLV->SetVisAttributes(Field);
 

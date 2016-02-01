@@ -11,6 +11,9 @@
 #ifndef Npol_Materials_h
 #define Npol_Materials_h
 
+#include <map>
+#include <string>
+
 class G4NistManager;
 class G4Material;
 
@@ -18,18 +21,7 @@ class NpolMaterials {
 
 public:
   static NpolMaterials *GetInstance();
-  
-  G4Material *GetVacuum() {return Vacuum;};
-  G4Material *GetAir() {return Air;};
-  G4Material *GetScint() {return Scint;};
-  G4Material *GetAl() {return Al;};
-  G4Material *GetLH2() {return LH2;};
-  G4Material *GetLD2() {return LD2;};
-  G4Material *GetConcrete() {return Concrete;};
-  G4Material *GetFe() {return Fe;};
-  G4Material *GetSSteel() {return SSteel;};
-  G4Material *GetCu() {return Cu;};
-  G4Material *GetPb() {return Pb;};
+  G4Material *GetMaterial(const G4String material);
   
 private:
   NpolMaterials();
@@ -38,7 +30,6 @@ private:
   NpolMaterials & operator=(const NpolMaterials &);
   
   void CreateMaterials();
-  G4Material *GetMaterial(const G4String material);
   
   G4Material *CreateVacuum();
   G4Material *CreateAir();
@@ -54,18 +45,7 @@ private:
 
 private:
   G4NistManager *nistMan;
-  
-  G4Material *Vacuum;
-  G4Material *Air;
-  G4Material *Scint;
-  G4Material *Al;
-  G4Material *LH2;
-  G4Material *LD2;
-  G4Material *Concrete;
-  G4Material *Fe;
-  G4Material *SSteel;
-  G4Material *Cu;
-  G4Material *Pb;
+  std::map<std::string,G4Material *> materials;
 };
 
 #endif
