@@ -128,7 +128,7 @@ void NpolShieldHut::Place(G4LogicalVolume *motherLV) {
   G4double NpolAng = 28.0*deg, PosSide = 9.4025*m, AngSide = 14.0*deg;
   G4double VertOffSet = 0.3424*m, PosFront = 6.3739*m, PosBack = 11.8739*m; // PosFront = 6.2739*m, PosBack = 11.7739*m;
   G4double PosRoof = 9.1239*m, OffSetRoof = 3.7776*m;
-  G4double PosLead = PosFront - 0.515*m, PosTagger = PosFront + 0.465*m;
+  G4double PosLead = PosFront - 0.535*m, PosTagger = PosFront + 0.465*m;
 
   PlaceCylindrical(LeadCurtainLV, motherLV, "LeadCurtain", PosLead,-NpolAng, 0);
   PlaceCylindrical(NPOLTaggerLV, motherLV, "NPOLTagger", PosTagger, -NpolAng, 0);
