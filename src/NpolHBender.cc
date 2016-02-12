@@ -33,7 +33,7 @@ void NpolHBender::ConstructSHMSTagger(){
   G4double xlen = 0.1588*m; G4double ylen = 0.2075*m; G4double zlen = 0.010*cm;
   
   G4Box *SHMSTagger = new G4Box("SHMSTagger",xlen/2,ylen/2,zlen/2);
-  SHMSTaggerLV = new G4LogicalVolume(SHMSTagger,NpolMaterials::GetInstance()->GetAir(),"SHMSTaggerLV",0,0,0);
+  SHMSTaggerLV = new G4LogicalVolume(SHMSTagger,NpolMaterials::GetInstance()->GetMaterial("Air"),"SHMSTaggerLV",0,0,0);
   G4VisAttributes *TaggerVisAtt = new G4VisAttributes(G4Colour(0.2, 0.2, 0.2));
   SHMSTaggerLV->SetVisAttributes(TaggerVisAtt);
 }

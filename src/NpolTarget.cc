@@ -47,7 +47,7 @@ void NpolTarget::ConstructTargetCan() {
   G4Tubs *TargetCan = new G4Tubs("TargetCan",0.0*cm,(TargetCellDiameter/2),
  (TargetCellLength/2), 0.0*deg, 360.*deg);
   TargetCanLV = new G4LogicalVolume(TargetCan, 
-        NpolMaterials::GetInstance()->GetAl(),"TargetCanLV",0,0,0);
+        NpolMaterials::GetInstance()->GetMaterial("Al"),"TargetCanLV",0,0,0);
 
   G4VisAttributes *TopVisAtt= new G4VisAttributes(G4Colour(1.0,0.0,0.0));
   TargetCanLV->SetVisAttributes(TopVisAtt);
@@ -58,7 +58,7 @@ void NpolTarget::ConstructTargetFluid() {
 
   G4Tubs *TargetFluid = new G4Tubs("TargetFluid",0.0*cm, (TargetCellDiameter/2-TargetCellSideWindow), (TargetCellLength/2-TargetCellUpStreamWindow), 0.0*deg, 360.*deg);
   TargetFluidLV = new G4LogicalVolume(TargetFluid,
-	NpolMaterials::GetInstance()->GetLD2(),"TargetFluidLV",0,0,0);
+	NpolMaterials::GetInstance()->GetMaterial("LD2"),"TargetFluidLV",0,0,0);
   
   G4VisAttributes *TopVisAtt= new G4VisAttributes(G4Colour(0.0,1.0,0.0));
   TargetFluidLV->SetVisAttributes(TopVisAtt);

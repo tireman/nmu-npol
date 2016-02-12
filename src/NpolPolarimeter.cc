@@ -36,7 +36,7 @@
 NpolPolarimeter::NpolPolarimeter() {
   G4VSolid *PolarimeterBox = new G4Box("PolarimeterBox",1.30*m,1.45*m,1.85*m);
   PolarimeterLV = new G4LogicalVolume(PolarimeterBox,
-      NpolMaterials::GetInstance()->GetAir(), "PolarimeterLV",0,0,0);
+      NpolMaterials::GetInstance()->GetMaterial("Air"), "PolarimeterLV",0,0,0);
       //NpolMaterials::GetInstance()->GetVacuum(), "PolarimeterLV", 0,0,0);	
   //G4VisAttributes* PolarimeterVisAtt= new G4VisAttributes(G4Colour(1.0,1.0,0.0));
   //PolarimeterLV->SetVisAttributes(PolarimeterVisAtt);
@@ -102,7 +102,7 @@ void NpolPolarimeter::ConstructTopDetArray(G4LogicalVolume *motherLV) {
   
   G4VSolid *TopDet = new G4Box("TopDet",0.80*m,0.0508*m,0.0508*m);
   G4LogicalVolume *TopDetLV = new G4LogicalVolume(TopDet,
-	  NpolMaterials::GetInstance()->GetScint(),"TopDetLV",0,0,0);
+	  NpolMaterials::GetInstance()->GetMaterial("Scint"),"TopDetLV",0,0,0);
 
   G4AssemblyVolume *TopDetArray1 = MakePlate(TopDetLV, 13, 0.0*m, 0.0*m, 0.60*m, 0.0*m, 0.0*m, 0.10*m);
   G4AssemblyVolume *TopDetArray2 = MakePlate(TopDetLV, 14, 0.0*m, 0.0*m, 0.60*m, 0.0*m, 0.0*m, 0.10*m);
@@ -124,7 +124,7 @@ void NpolPolarimeter::ConstructTopVetoArray(G4LogicalVolume *motherLV) {
   
   G4VSolid *TopVeto = new G4Box("TopVeto",0.80*m,0.0050*m,0.0508*m);
   G4LogicalVolume *TopVetoLV = new G4LogicalVolume(TopVeto,
-	NpolMaterials::GetInstance()->GetScint(), "TopVetoLV",0,0,0);
+	NpolMaterials::GetInstance()->GetMaterial("Scint"), "TopVetoLV",0,0,0);
   
   G4AssemblyVolume *TopVetoArray1 = MakePlate(TopVetoLV, 13, 0.0*m, 0.0*m, 0.60*m, 0.0*m, 0.0*m, 0.10*m);
   G4AssemblyVolume *TopVetoArray2 = MakePlate(TopVetoLV, 14, 0.0*m, 0.0*m, 0.60*m, 0.0*m, 0.0*m, 0.10*m);
@@ -145,7 +145,7 @@ void NpolPolarimeter::ConstructBottomDetArray(G4LogicalVolume *motherLV) {
   
   G4VSolid *BottomDet = new G4Box("BottomDet",0.80*m,0.0508*m,0.0508*m);
   G4LogicalVolume *BottomDetLV = new G4LogicalVolume(BottomDet,
-	NpolMaterials::GetInstance()->GetScint(), "BottomDetLV",0,0,0);
+	NpolMaterials::GetInstance()->GetMaterial("Scint"), "BottomDetLV",0,0,0);
   
   G4AssemblyVolume *BottomDetArray1 = MakePlate(BottomDetLV,
 	13, 0.0*m, 0.0*m, 0.60*m, 0.0*m, 0.0*m, 0.10*m);
@@ -169,7 +169,7 @@ void NpolPolarimeter::ConstructBottomVetoArray(G4LogicalVolume *motherLV) {
   
   G4VSolid *BottomVeto = new G4Box("BottomVeto",0.80*m,0.0050*m,0.0508*m);
   G4LogicalVolume *BottomVetoLV = new G4LogicalVolume(BottomVeto,
-	NpolMaterials::GetInstance()->GetScint(), "BottomVetoLV",0,0,0);
+	NpolMaterials::GetInstance()->GetMaterial("Scint"), "BottomVetoLV",0,0,0);
 
   G4AssemblyVolume *BottomVetoArray1 = MakePlate(BottomVetoLV,
 	 13, 0.0*m, 0.0*m, 0.60*m, 0.0*m, 0.0*m, 0.10*m);
@@ -190,7 +190,7 @@ void NpolPolarimeter::ConstructFrontDetArray(G4LogicalVolume *motherLV) {
   
   G4VSolid *FrontDet = new G4Box("FrontDet",0.50*m,0.0508*m,0.0508*m);
   G4LogicalVolume *FrontDetLV = new G4LogicalVolume(FrontDet,
-	NpolMaterials::GetInstance()->GetScint(), "FrontDetLV",0,0,0);
+	NpolMaterials::GetInstance()->GetMaterial("Scint"), "FrontDetLV",0,0,0);
   
   G4AssemblyVolume *FrontDetArray1 = MakePlate(FrontDetLV, 6, 0.0*m, 0.25*m, 0.0*m, 0.0*m, 0.10*m, 0.0*m);
   G4AssemblyVolume *FrontDetArray2 = MakePlate(FrontDetLV, 8, 0.0*m, 0.35*m, 0.0*m, 0.0*m, 0.10*m, 0.0*m);
@@ -221,7 +221,7 @@ void NpolPolarimeter::ConstructFrontTagArray(G4LogicalVolume *motherLV) {
   
   G4VSolid *FrontTag = new G4Box("FrontTag",0.50*m,0.0508*m,0.00508*m);
   G4LogicalVolume *FrontTagLV = new G4LogicalVolume(FrontTag,
-	NpolMaterials::GetInstance()->GetScint(), "FrontTagLV",0,0,0);
+	NpolMaterials::GetInstance()->GetMaterial("Scint"), "FrontTagLV",0,0,0);
   
   G4AssemblyVolume *FrontTaggerArray1 = MakePlate(FrontTagLV,
 	  6, 0.0*m, 0.25*m, 0.0*m, 0.0*m, 0.10*m, 0.0*m);

@@ -119,9 +119,9 @@ void NpolScatteringChamber::ConstructChamber() {
     G4SubtractionSolid("ChamberWallWithSHMS", chamberWallWithWindow, shmsWindow);
   
   innerChamberLV = new G4LogicalVolume(innerChamber,
-       NpolMaterials::GetInstance()->GetVacuum(), "InnerChamberLV, 0,0,0");
+       NpolMaterials::GetInstance()->GetMaterial("Vacuum"), "InnerChamberLV, 0,0,0");
   chamberWallLV = new G4LogicalVolume(chamberWallWithSHMS,
-       NpolMaterials::GetInstance()->GetAl(), "ChamberWallLV", 0,0,0);
+       NpolMaterials::GetInstance()->GetMaterial("Al"), "ChamberWallLV", 0,0,0);
 }
 
 void NpolScatteringChamber::Place(G4LogicalVolume *motherLV) {
