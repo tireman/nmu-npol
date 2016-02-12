@@ -32,7 +32,7 @@ void NpolCombineHistos() {
    TString OutputDir = "Output/";
    TString InputDir = "/work/hallc/cgen/tireman/MagFieldOn/MagField_" + Bfield + "Bdl/LeadOn" + Lead + "cm/";
    Int_t Ncut = 500;
-   Int_t Nfiles = 2;
+   Int_t Nfiles = 2954;
    Int_t Nloops = 0;
    if (Nfiles % Ncut != 0){
      Nloops = Nfiles/Ncut+ 1;
