@@ -52,7 +52,7 @@ void NpolBeamlineUpper::ConstructBeamlineUpper() {
   G4Tubs *BeamlineUpper = new G4Tubs("BeamlineUpper", 0, upperOuterRadius, 
      upperLen/2, 0.0*deg, 360.*deg);
   BeamlineUpperLV = new G4LogicalVolume(BeamlineUpper,
-     NpolMaterials::GetInstance()->GetSSteel(),"BeamlineUpperLV",0,0,0);
+     NpolMaterials::GetInstance()->GetMaterial("SSteel"),"BeamlineUpperLV",0,0,0);
   G4VisAttributes *UpperVisAtt= new G4VisAttributes(G4Colour(1.0,1.5,0.5));
   
   BeamlineUpperLV->SetVisAttributes(UpperVisAtt);
@@ -63,7 +63,7 @@ void NpolBeamlineUpper::ConstructBeamlineUpperInner() {
   
   G4Tubs *BeamlineUpperInner = new G4Tubs("BeamlineUpperInner", 0, upperOuterRadius, upperLen/2, 0.0*deg, 360.*deg);
   BeamlineUpperInnerLV = new G4LogicalVolume(BeamlineUpperInner,
-     NpolMaterials::GetInstance()->GetVacuum(),"BeamlineUpperInnerLV",0,0,0);
+     NpolMaterials::GetInstance()->GetMaterial("Vacuum"),"BeamlineUpperInnerLV",0,0,0);
   
   BeamlineUpperInnerLV->SetVisAttributes(G4VisAttributes::GetInvisible());
 }

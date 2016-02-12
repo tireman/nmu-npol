@@ -102,7 +102,7 @@ G4int gnum = 60; // # of facets to circle for polygon
   G4ExtrudedSolid *BeamlineDown = new G4ExtrudedSolid("BeamlineDown",polygon,
 	zsections); 
   BeamlineDownLV = new G4LogicalVolume(BeamlineDown,NpolMaterials::GetInstance()
-       ->GetSSteel(), "BeamlineDownLV", 0,0,0);
+       ->GetMaterial("SSteel"), "BeamlineDownLV", 0,0,0);
   G4VisAttributes *BeamlineVisAtt= new G4VisAttributes(G4Colour(0.3,0.7,0.2));
   BeamlineDownLV->SetVisAttributes(BeamlineVisAtt);
 }
@@ -118,7 +118,7 @@ void NpolBeamlineDown::ConstructBeamlineCap(){
 
   G4Tubs *Cap = new G4Tubs("Cap", 0.0*cm, Radius, Thickness/2, 0.0*deg, 360.0*deg);
 
-  CapLV = new G4LogicalVolume(Cap, NpolMaterials::GetInstance()->GetVacuum(),"CapLV", 0,0,0);
+  CapLV = new G4LogicalVolume(Cap, NpolMaterials::GetInstance()->GetMaterial("Vacuum"),"CapLV", 0,0,0);
 
   G4VisAttributes *CapVisAtt= new G4VisAttributes(G4Colour(0.80,0.2,0.5));
   CapLV->SetVisAttributes(CapVisAtt);  
@@ -145,7 +145,7 @@ void NpolBeamlineDown::ConstructBeamlineDownInner(){
  
   G4ExtrudedSolid *BeamlineDownInner = new G4ExtrudedSolid("BeamlineDownInner",    polygon,zsections); 
   BeamlineDownInnerLV = new G4LogicalVolume(BeamlineDownInner,
-    NpolMaterials::GetInstance()->GetVacuum(), "BeamlineDownInnerLV", 0,0,0);
+    NpolMaterials::GetInstance()->GetMaterial("Vacuum"), "BeamlineDownInnerLV", 0,0,0);
   G4VisAttributes *BeamlineVisAtt= new G4VisAttributes(G4Colour(100,0.0,1.0));
   BeamlineDownInnerLV->SetVisAttributes(BeamlineVisAtt);  
 }
@@ -265,7 +265,7 @@ void NpolBeamlineDown::ConstructBeamlineSecA(){
   G4UnionSolid *PipeFinalB = new G4UnionSolid("PipeFinalB", PipeFinalA, Pipe3B, transform);
 
   // Finally ...  create the logical volume and give it a pretty color
- SectionALV = new G4LogicalVolume(PipeFinalB, NpolMaterials::GetInstance()->GetAl(), "SectionALV", 0,0,0);
+ SectionALV = new G4LogicalVolume(PipeFinalB, NpolMaterials::GetInstance()->GetMaterial("Al"), "SectionALV", 0,0,0);
  
  G4VisAttributes *BeamlineVisAtt= new G4VisAttributes(G4Colour(0.9,0.6,.8));
  SectionALV->SetVisAttributes(BeamlineVisAtt);
@@ -277,7 +277,7 @@ void NpolBeamlineDown::ConstructSecA1Inner(){
 
   G4Tubs *SecA1In = new G4Tubs("SecA1In", 0, SecA1InRadius, SecA1zLen/2, 0*deg, 360*deg);
 
-  SecA1InLV = new G4LogicalVolume(SecA1In, NpolMaterials::GetInstance()->GetVacuum(),"SecA1InLV", 0,0,0);
+  SecA1InLV = new G4LogicalVolume(SecA1In, NpolMaterials::GetInstance()->GetMaterial("Vacuum"),"SecA1InLV", 0,0,0);
   
   G4VisAttributes *BeamlineVisAtt= new G4VisAttributes(G4Colour(.8,0.7,.2));
   SecA1InLV->SetVisAttributes(BeamlineVisAtt);  
@@ -288,7 +288,7 @@ void NpolBeamlineDown::ConstructSecA2Inner(){
 
   G4Tubs *SecA2In = new G4Tubs("SecA2In", 0, SecA2InRadius, SecA2zLen/2, 0*deg, 360*deg);
 
-  SecA2InLV = new G4LogicalVolume(SecA2In, NpolMaterials::GetInstance()->GetVacuum(),"SecA2InLV", 0,0,0);
+  SecA2InLV = new G4LogicalVolume(SecA2In, NpolMaterials::GetInstance()->GetMaterial("Vacuum"),"SecA2InLV", 0,0,0);
   
   G4VisAttributes *BeamlineVisAtt= new G4VisAttributes(G4Colour(1.0,0.0,1.0));
   SecA2InLV->SetVisAttributes(BeamlineVisAtt);  
@@ -299,7 +299,7 @@ void NpolBeamlineDown::ConstructSecA3Inner(){
 
   G4Tubs *SecA3In = new G4Tubs("SecA3In", 0, SecA3InRadius, SecA3zLen/2, 0*deg, 360*deg);
 
-  SecA3InLV = new G4LogicalVolume(SecA3In, NpolMaterials::GetInstance()->GetVacuum(),"SecA3InLV", 0,0,0);
+  SecA3InLV = new G4LogicalVolume(SecA3In, NpolMaterials::GetInstance()->GetMaterial("Vacuum"),"SecA3InLV", 0,0,0);
   
   G4VisAttributes *BeamlineVisAtt= new G4VisAttributes(G4Colour(1.0,0.0,1.0));
   SecA3InLV->SetVisAttributes(BeamlineVisAtt);  

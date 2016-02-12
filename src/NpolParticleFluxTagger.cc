@@ -49,7 +49,7 @@ void NpolParticleFluxTagger::ConstructParticleTagger(){
 
 
   G4Box *ParticleTagger = new G4Box("ParticleTagger",xlen/2,ylen/2,zlen/2);
-  ParticleTaggerLV = new G4LogicalVolume(ParticleTagger,NpolMaterials::GetInstance()->GetAir(),"NPOLTaggerLV",0,0,0);
+  ParticleTaggerLV = new G4LogicalVolume(ParticleTagger,NpolMaterials::GetInstance()->GetMaterial("Air"),"NPOLTaggerLV",0,0,0);
   G4VisAttributes *TaggerVisAtt = new G4VisAttributes(G4Colour(0.2, 0.2, 0.2));
   ParticleTaggerLV->SetVisAttributes(TaggerVisAtt);
 }
