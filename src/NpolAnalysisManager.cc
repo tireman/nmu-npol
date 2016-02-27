@@ -1,388 +1,258 @@
-//********************************************************************
-//* License and Disclaimer: From GEANT Collaboration                 *
-//*                                                                  *
-//* The  Geant4 software  is  copyright of the Copyright Holders  of *
-//* the Geant4 Collaboration.  It is provided  under  the terms  and *
-//* conditions of the Geant4 Software License,  included in the file *
-//* LICENSE and available at  http://cern.ch/geant4/license .  These *
-//* include a list of copyright holders.     		      	*
-//********************************************************************
 
-#include <string>
-#include <iostream>
-#include <sstream>
+#include <vector>
+#include <map>
 
+#include <G4SystemOfUnits.hh>
 #include <G4Track.hh>
 #include <G4Step.hh>
-#include <G4ThreeVector.hh>
-#include <G4String.hh>
-#include <G4ParticleDefinition.hh>
+#include <G4StepPoint.hh>
+#include <G4VPhysicalVolume.hh>
 #include <G4VProcess.hh>
-#include "G4VVisManager.hh"
-#include "G4UIcommand.hh"
-#include "G4UImanager.hh"
-#include "G4PhysicalConstants.hh"
 
-#include <TFile.h>
 #include <TTree.h>
-#include <TBranch.h>
-#include <TClassTable.h>
-#include <TSystem.h>
-#include <TInterpreter.h>
 
 #include "NpolAnalysisManager.hh"
+#include "NpolFileManager.hh"
 #include "NpolVertex.hh"
-#include "NpolTagger.hh"
 #include "NpolStep.hh"
+#include "NpolTagger.hh"
 #include "NpolStatistics.hh"
 
+#define OUTFILE_VERSION 20150224 // Determined by YYYYMMDD
 
-static NpolAnalysisManager *pInstance = NULL;
+NpolAnalysisManager *NpolAnalysisManager::pInstance = NULL;
 
 NpolAnalysisManager *NpolAnalysisManager::GetInstance() {
-  if(pInstance == NULL)
-    pInstance = new NpolAnalysisManager();
-  
-  return pInstance;
+	if(pInstance == NULL)
+		pInstance = new NpolAnalysisManager();
+
+	return pInstance;
 }
 
-NpolAnalysisManager::NpolAnalysisManager(){
+NpolAnalysisManager::NpolAnalysisManager() {
+	std::cout << "Constructing NpolAnalysisManager singleton" << std::endl;
+	
+	eventFlag = false;
 
-  npolOutFile = NULL;
-  npolTree = NULL;
-  statsTree = NULL;
-  tracks = NULL;
-  NPOLTaggedParticle = NULL;
-  SHMSTaggedParticle = NULL;
-  TargetTaggedParticle = NULL;
-  EventSteps = NULL; 
-  statistics = NULL;
-  Initialize();
+	tracks = new std::vector<NpolVertex *>();
+	steps = new std::vector<NpolStep *>();
 
+	taggers["NPOLTagger"] = new std::vector<NpolTagger *>();
+	taggers["SHMSTagger"] = new std::vector<NpolTagger *>();
+	taggers["ParticleTagger"] = new std::vector<NpolTagger *>();
+
+	statistics = new std::vector<NpolStatistics *>();
+	statistics->push_back(new NpolStatistics());
+	((*statistics)[0])->version = OUTFILE_VERSION;
+	((*statistics)[0])->totalEvents = 0;
+	((*statistics)[0])->eventsSaved = 0;
+
+	RecreateTrees();
 }
 
 NpolAnalysisManager::~NpolAnalysisManager() {
-  ClearObjects();
-  delete statistics;
+	delete npolTree;
+	delete statsTree;
+
+	ClearVectors();
+	delete tracks;
+	delete steps;
+
+	std::map<G4String,std::vector<NpolTagger *> *>::iterator it;
+	for(it = taggers.begin(); it != taggers.end(); it++)
+		delete it->second;
+	taggers.clear();
+
+	std::vector<NpolStatistics *>::iterator it2;
+	for(it2 = statistics->begin(); it2 != statistics->end(); it2++)
+		delete *it2;
+	statistics->clear();
+	delete statistics;
 }
 
-void NpolAnalysisManager::Initialize(){
-  if(singletonInitialized)
-    std::cout << "WARNING: NpolAnalysisManager is already initialized and is being initialized again." << std::endl;
-  
-  InitializeFilenameVariables();
-  eventsPerFile = 100000; // the number of primary events that will be 
-                           //simulated before the output file is changed
-  
-  InitializeObjects();
-  
-  singletonInitialized = true;
+// Delete and recreate the TTrees so they belong to the most recently opened TFile.
+void NpolAnalysisManager::RecreateTrees() {
+	npolTree = NULL;
+	npolTree = new TTree("T","Per-event information from Npol simulation");
+	npolTree->Branch("tracks","std::vector<NpolVertex *>",&tracks,32000,2);
+	npolTree->Branch("steps","std::vector<NpolStep *>",&steps,32000,2);
+	std::map<G4String,std::vector<NpolTagger *> *>::iterator it;
+	for(it = taggers.begin(); it != taggers.end(); it++)
+		npolTree->Branch(it->first,"std::vector<NpolTagger *>",it->second,32000,2);
+
+	statsTree = NULL;
+	statsTree = new TTree("T2","Per-run information from Npol simulation");
+	statsTree->Branch("stats","std::vector<NpolStatistics *>",&statistics,32000,2);
+	((*statistics)[0])->version = OUTFILE_VERSION;
+	((*statistics)[0])->totalEvents = 0;
+	((*statistics)[0])->eventsSaved = 0;
 }
 
-void NpolAnalysisManager::InitializeObjects() {
-
-  statistics = new std::vector<NpolStatistics *>();
-  statistics->push_back(new NpolStatistics());
-  ((*statistics)[0])->version = 20151216;  // Determined by Date: YYYYMMDD
-  ((*statistics)[0])->totalEvents = 0;
-  ((*statistics)[0])->eventsSaved = 0;
-
-  tracks = new std::vector<NpolVertex *>();
-  tracks->push_back(NULL);
-
-  NPOLTaggedParticle = new std::vector<NpolTagger *>();
-  NPOLTaggedParticle->push_back(NULL);
-  
-  SHMSTaggedParticle = new std::vector<NpolTagger *>();
-  SHMSTaggedParticle->push_back(NULL);
-
-  TargetTaggedParticle = new std::vector<NpolTagger *>();
-  TargetTaggedParticle->push_back(NULL);
-
-  EventSteps = new std::vector<NpolStep *>();
-  EventSteps ->push_back(NULL);
-  
-  npolTree = new TTree("T","Per-event information from Npol simulation");
-  npolTree->Branch("tracks","std::vector<NpolVertex *>",&tracks,32000,2);
-  npolTree->Branch("steps","std::vector<NpolStep *>",&EventSteps,32000,2);
-  npolTree->Branch("NPOL_Tagger","std::vector<NpolTagger *>",&NPOLTaggedParticle,32000,2);
-  npolTree->Branch("SHMS_Tagger","std::vector<NpolTagger *>",&SHMSTaggedParticle,32000,2);
-  npolTree->Branch("Target_Tagger","std::vector<NpolTagger *>",&TargetTaggedParticle,32000,2);
-
-  statsTree = new TTree("T2","Per-run information from Npol simulation");
-  statsTree->Branch("stats","std::vector<NpolStatistics *>",&statistics,32000,2);
+// Prepare for the next event.
+void NpolAnalysisManager::BeginEvent(const G4int evtID) {
+	eventFlag = false;
+	ClearVectors();
+	
+	NpolFileManager *fileMan = NpolFileManager::GetInstance();
+	if(fileMan->CheckIfChangingFiles(evtID)) {
+		statsTree->Fill();
+		fileMan->ChangeFiles();
+		RecreateTrees();
+	}
 }
 
-void NpolAnalysisManager::BeginOfRun(){}
-
-void NpolAnalysisManager::EndOfRun(){
-  WriteObjectsToFile();
-  npolOutFile->Close();
-  ClearObjects();
-  G4cout << "Shutting down the run!" << G4endl;
+// Clean up a the end of an event.
+void NpolAnalysisManager::EndEvent(const G4int evtID) {
+	if(eventFlag) {
+		((*statistics)[0])->eventsSaved += 1;
+		QSort(steps,1,steps->size()); // Sort the steps vector in order of global time
+		npolTree->Fill();
+	}
+	((*statistics)[0])->totalEvents += 1;
+	
 }
 
-void NpolAnalysisManager::PrepareNewEvent(const G4int evtID) {
-  eventFlag = false;
+// Prepare for the run.
+void NpolAnalysisManager::BeginRun(const G4int runID) {}
 
-  // clean out the vectors from last event
-  std::vector<NpolVertex *>::iterator it;
-  for(it = tracks->begin(); it != tracks->end(); it++)
-    delete *it;
-  
-  std::vector<NpolTagger *>::iterator it2;
-  for(it2 = NPOLTaggedParticle->begin(); it2 != NPOLTaggedParticle->end(); it2++)
-    delete *it2;
-
-  std::vector<NpolTagger *>::iterator it3;
-  for(it3 = SHMSTaggedParticle->begin(); it3 != SHMSTaggedParticle->end(); it3++)
-    delete *it3;
-  
-  std::vector<NpolStep *>::iterator it4;
-  for(it4 = EventSteps->begin(); it4 != EventSteps->end(); it4++)
-    delete *it4;
-
-  std::vector<NpolTagger *>::iterator it5;
-  for(it5 = TargetTaggedParticle->begin(); it5 != TargetTaggedParticle->end(); it5++)
-    delete *it5;
- 
-  tracks->clear();
-  NPOLTaggedParticle->clear();
-  SHMSTaggedParticle->clear();
-  TargetTaggedParticle->clear();
-  EventSteps->clear();
-
-  // maybe open a new root file
-  if((evtID % eventsPerFile == 0)/* && (evtId != 0)*/) {
-    if(npolOutFile != NULL) {
-      WriteObjectsToFile();
-      npolOutFile->Close();
-      ClearObjects();
-    }
-    
-    RootFileNumber++;
-    OpenRootFile();
-    InitializeObjects();
-  }
-  
-  ((*statistics)[0])->totalEvents++;
+// Clean up at the end of the run.
+void NpolAnalysisManager::EndRun(const G4int runID) {
+	statsTree->Fill();
+	NpolFileManager::GetInstance()->CloseFile();
 }
 
-void NpolAnalysisManager::AddStep(const G4Step *aStep, std::string volName){
-  NpolStep *Step = new NpolStep();
-  G4Track *aTrack = aStep->GetTrack();
-  Step->time = (aTrack->GetGlobalTime())/ns;
-  Step->eDep = (aStep->GetTotalEnergyDeposit())/MeV;
-  Step->volume = volName;
+// Make a new NpolVertex and add it to the tracks vector at index determined by TrackID
+void NpolAnalysisManager::RecordTrack(const G4Track *aTrack) {
+	NpolVertex *anNpolVertex = new NpolVertex();
+	G4int trackID = aTrack->GetTrackID();
+	G4int parentID = aTrack->GetParentID();
 
-  EventSteps->push_back(Step);
+	anNpolVertex->trackId = trackID;
+	anNpolVertex->parentId = parentID;
+	anNpolVertex->posX = (aTrack->GetPosition()).x()/cm;
+	anNpolVertex->posY = (aTrack->GetPosition()).y()/cm;
+	anNpolVertex->posZ = (aTrack->GetPosition()).z()/cm;
+	anNpolVertex->momX = (aTrack->GetMomentum()).x()/cm;
+	anNpolVertex->momY = (aTrack->GetMomentum()).y()/cm;
+	anNpolVertex->momZ = (aTrack->GetMomentum()).z()/cm;
+	anNpolVertex->time = (aTrack->GetGlobalTime())/ns;
+	anNpolVertex->energy = (aTrack->GetKineticEnergy())/MeV;
+	anNpolVertex->eMiss = false;
+	anNpolVertex->particle = (aTrack->GetDefinition()->GetParticleName()).data();
+	anNpolVertex->particleId = aTrack->GetDefinition()->GetPDGEncoding();
+	anNpolVertex->volume = (aTrack->GetVolume()->GetName()).data();
+	if(aTrack->GetCreatorProcess() != NULL)
+		anNpolVertex->process = (aTrack->GetCreatorProcess()->GetProcessName()).data();
+	else
+		anNpolVertex->process = "";
+	
+	// Add anNpolVertex to the tracks vector with its trackId as the index.
+	// This may require the vector be resized first.
+	if(tracks->size() <= (unsigned int)trackID)
+		tracks->resize(trackID+1);
+	(*tracks)[trackID] = anNpolVertex;
+
+	// Add this track to its mother's list of daughters
+	if(parentID != 0) {
+		NpolVertex *parent = tracks->at(parentID);
+		(parent->daughterIds).push_back(trackID);
+	} 
 }
 
+// Make a new NpolStep and add it to the steps vector.  Also check if this step is in a tagger
+// volume and add it to the appropriate tagger vector if that is the case.
+void NpolAnalysisManager::RecordStep(const G4Step *aStep) {
+	NpolStep *npolStep = new NpolStep();
+	G4Track *aTrack = aStep->GetTrack();
+	G4StepPoint *preStepPoint = aStep->GetPreStepPoint();
+	G4String volName = preStepPoint->GetPhysicalVolume()->GetName();
 
-void NpolAnalysisManager::AddTrack(const G4Track *aTrack) {
-  NpolVertex *anNpolVertex = new NpolVertex();
-  G4int trackId = aTrack->GetTrackID();
-  G4int parentId = aTrack->GetParentID();
-  
-  anNpolVertex->trackId = trackId;
-  anNpolVertex->parentId = parentId;
-  anNpolVertex->posX = (aTrack->GetPosition()).x()/cm;
-  anNpolVertex->posY = (aTrack->GetPosition()).y()/cm;
-  anNpolVertex->posZ = (aTrack->GetPosition()).z()/cm;
-  anNpolVertex->momX = (aTrack->GetMomentum()).x()/MeV;
-  anNpolVertex->momY = (aTrack->GetMomentum()).y()/MeV;
-  anNpolVertex->momZ = (aTrack->GetMomentum()).z()/MeV;
-  anNpolVertex->time = (aTrack->GetGlobalTime())/ns;
-  anNpolVertex->energy = aTrack->GetKineticEnergy()/MeV;
-  anNpolVertex->eMiss = false;
-  anNpolVertex->particle = (aTrack->GetDefinition()->GetParticleName()).data();
-  anNpolVertex->particleId = (aTrack->GetDefinition()->GetPDGEncoding());
-  if(aTrack->GetCreatorProcess() != NULL)
-    anNpolVertex->process = (aTrack->GetCreatorProcess()->GetProcessName()).data();
-  else
-    anNpolVertex->process = "";
-  anNpolVertex->volume = (aTrack->GetVolume()->GetName()).data();
-  
-  if(tracks->size() <= (unsigned int)trackId)
-    tracks->resize(trackId+1);
-  (*tracks)[trackId] = anNpolVertex;
-  
-  if(parentId != 0) {
-    NpolVertex *parent = tracks->at(parentId);
-    (parent->daughterIds).push_back(trackId);
-  }
+	npolStep->time = aTrack->GetGlobalTime()/ns;
+	npolStep->eDep = (aStep->GetTotalEnergyDeposit())/MeV;
+	npolStep->volume = volName;
+
+	steps->push_back(npolStep);
+
+	// Flag this event to be saved if at least one step takes place inside
+	// this tagger volume.
+	if(volName == "ParticleTagger")
+		eventFlag = true;
+
+	if(taggers.find(volName) != taggers.end()) {
+		NpolTagger *taggedParticle = new NpolTagger();
+
+		taggedParticle->trackId = aTrack->GetTrackID();
+		taggedParticle->posX = (aTrack->GetPosition()).x()/cm;
+		taggedParticle->posY = (aTrack->GetPosition()).y()/cm;
+		taggedParticle->posZ = (aTrack->GetPosition()).z()/cm;
+		taggedParticle->momX = (aTrack->GetMomentum()).x()/cm;
+		taggedParticle->momY = (aTrack->GetMomentum()).y()/cm;
+		taggedParticle->momZ = (aTrack->GetMomentum()).z()/cm;
+		taggedParticle->time = aTrack->GetGlobalTime()/ns;
+		taggedParticle->energy = aTrack->GetKineticEnergy()/MeV;
+		taggedParticle->particle = (aTrack->GetDefinition()->GetParticleName()).data();
+		taggedParticle->particleId = aTrack->GetDefinition()->GetPDGEncoding();
+
+		(taggers[volName])->push_back(taggedParticle);
+	}
 }
 
-void NpolAnalysisManager::SetTrackAsKilled(int trackId) {
-  (*tracks)[trackId]->eMiss = true;
+// If we manually kill a track (e.g. hits the hall shell or exits the world), we should set the
+// eMiss boolean for that track in the vector.
+void NpolAnalysisManager::TrackKilled(const G4int trackID) {
+	(*tracks)[trackID]->eMiss = true;
 }
 
-void NpolAnalysisManager::AddTargetTaggedParticle(const G4Track *aTrack) {
-  NpolTagger *anTargetTaggedParticle = new NpolTagger();
-  
-  anTargetTaggedParticle->trackId = aTrack->GetTrackID();
-  anTargetTaggedParticle->posX = (aTrack->GetPosition()).x()/cm;
-  anTargetTaggedParticle->posY = (aTrack->GetPosition()).y()/cm;
-  anTargetTaggedParticle->posZ = (aTrack->GetPosition()).z()/cm;
-  anTargetTaggedParticle->momX = (aTrack->GetMomentum()).x()/MeV;
-  anTargetTaggedParticle->momY = (aTrack->GetMomentum()).y()/MeV;
-  anTargetTaggedParticle->momZ = (aTrack->GetMomentum()).z()/MeV;
-  anTargetTaggedParticle->time = (aTrack->GetGlobalTime())/ns;
-  anTargetTaggedParticle->energy = aTrack->GetKineticEnergy()/MeV;
-  anTargetTaggedParticle->particle = (aTrack->GetDefinition()->GetParticleName()).data();
-  anTargetTaggedParticle->particleId = (aTrack->GetDefinition()->GetPDGEncoding());
-  
-  TargetTaggedParticle->push_back(anTargetTaggedParticle);
-  
-  // Trigers the event to be saved as long as one step takes placed in this volume
-  eventFlag = true;
- 
+// clear out the per-event information vectors
+void NpolAnalysisManager::ClearVectors() {
+	std::vector<NpolVertex *>::iterator it;
+	std::vector<NpolStep *>::iterator it2;
+	std::vector<NpolTagger *>::iterator it3;
+	std::map<G4String, std::vector<NpolTagger *> *>::iterator it4;
+
+	for(it = tracks->begin(); it != tracks->end(); it++)
+		delete *it;
+	tracks->clear();
+
+	for(it2 = steps->begin(); it2 != steps->end(); it2++)
+		delete *it2;
+	steps->clear();
+
+	for(it4 = taggers.begin(); it4 != taggers.end(); it4++) {
+		std::vector<NpolTagger *> *v = it4->second;
+		for(it3 = v->begin(); it3 != v->end(); it3++) {
+			NpolTagger *t = *it3;
+			delete t;
+		}
+		v->clear();
+	}
 }
 
-void NpolAnalysisManager::AddNPOLTaggedParticle(const G4Track *aTrack) {
-  NpolTagger *anNpolTaggedParticle = new NpolTagger();
-  
-  anNpolTaggedParticle->trackId = aTrack->GetTrackID();
-  anNpolTaggedParticle->posX = (aTrack->GetPosition()).x()/cm;
-  anNpolTaggedParticle->posY = (aTrack->GetPosition()).y()/cm;
-  anNpolTaggedParticle->posZ = (aTrack->GetPosition()).z()/cm;
-  anNpolTaggedParticle->momX = (aTrack->GetMomentum()).x()/MeV;
-  anNpolTaggedParticle->momY = (aTrack->GetMomentum()).y()/MeV;
-  anNpolTaggedParticle->momZ = (aTrack->GetMomentum()).z()/MeV;
-  anNpolTaggedParticle->time = (aTrack->GetGlobalTime())/ns;
-  anNpolTaggedParticle->energy = aTrack->GetKineticEnergy()/MeV;
-  anNpolTaggedParticle->particle = (aTrack->GetDefinition()->GetParticleName()).data();
-  anNpolTaggedParticle->particleId = (aTrack->GetDefinition()->GetPDGEncoding());
-  
-  NPOLTaggedParticle->push_back(anNpolTaggedParticle);
+// Quicksort routine for sorting the steps vector in time order
+// before filling the tree
+int partition(std::vector<NpolStep *> *aVector, int p, int q) {
+	double x = (*aVector)[p]->time;
+	int i = p;
+
+	for(int j = p+1; j < q; j++) {
+		if((*aVector)[j]->time <= x) {
+			i++;
+			std::swap((*aVector)[i],(*aVector)[j]);
+		}
+	}
+
+	std::swap((*aVector)[i],(*aVector)[p]);
+	return i;
 }
 
-void NpolAnalysisManager::AddSHMSTaggedParticle(const G4Track *aTrack) {
-  NpolTagger *anSHMSTaggedParticle = new NpolTagger();
-  
-  anSHMSTaggedParticle->trackId = aTrack->GetTrackID();
-  anSHMSTaggedParticle->posX = (aTrack->GetPosition()).x()/cm;
-  anSHMSTaggedParticle->posY = (aTrack->GetPosition()).y()/cm;
-  anSHMSTaggedParticle->posZ = (aTrack->GetPosition()).z()/cm;
-  anSHMSTaggedParticle->momX = (aTrack->GetMomentum()).x()/MeV;
-  anSHMSTaggedParticle->momY = (aTrack->GetMomentum()).y()/MeV;
-  anSHMSTaggedParticle->momZ = (aTrack->GetMomentum()).z()/MeV;
-  anSHMSTaggedParticle->time = (aTrack->GetGlobalTime())/ns;
-  anSHMSTaggedParticle->energy = aTrack->GetKineticEnergy()/MeV;
-  anSHMSTaggedParticle->particle = (aTrack->GetDefinition()->GetParticleName()).data();
-  anSHMSTaggedParticle->particleId = (aTrack->GetDefinition()->GetPDGEncoding());
-  
-  SHMSTaggedParticle->push_back(anSHMSTaggedParticle);
+void QSort(std::vector<NpolStep *> *aVector, int p, int q) {
+	if(aVector == NULL)
+		return;
+
+	if(p<q) {
+		int r = partition(aVector,p,q);
+		QSort(aVector,p,r);
+		QSort(aVector,r+1,q);
+	}
 }
 
-void NpolAnalysisManager::FillTree() {
-
-  if(eventFlag){
-    if(EventSteps != NULL) QSort(EventSteps,1,EventSteps->size());
-    npolTree->Fill();
-    ((*statistics)[0])->eventsSaved++;
-  }
-}
-
-
-void NpolAnalysisManager::WriteObjectsToFile() {
-  statsTree->Fill();
-  npolTree->Write(); 
-  statsTree->Write();
-}
-
-void NpolAnalysisManager::OpenRootFile() {
-  
-  G4String fileName = Form("%s/%s_%s_%04d.root", dirName.c_str(), rootName.c_str(), jobNumber.c_str(), RootFileNumber);
-  npolOutFile = new TFile(fileName,"RECREATE");
-  
-  if( npolOutFile->IsZombie() ) {
-    G4cerr << "------- File " << fileName << "  could not be opened. " << G4endl;
-    G4cerr << "             " << " Does the directory '" << dirName << "/' exist?" << G4endl;
-    exit(0);
-  }
-  G4cout << "------- File " << fileName << " has been opened. " << G4endl;
-}
-
-void NpolAnalysisManager::setFileName(const G4String& nam) {
-  rootName = nam;
-}
-
-void NpolAnalysisManager::ClearObjects(){
-
-  std::vector<NpolStatistics *>::iterator it;
-  for(it = statistics->begin(); it != statistics->end(); it++)
-    delete *it;
-  statistics->clear();
-
-  delete npolOutFile;
-  delete tracks;
-  delete NPOLTaggedParticle;
-  delete SHMSTaggedParticle;
-  delete TargetTaggedParticle;
-  delete EventSteps;
-  delete statistics;
-
-  npolOutFile = NULL;
-  npolTree = NULL;
-  statsTree = NULL;
-  tracks = NULL;
-  NPOLTaggedParticle = NULL;
-  SHMSTaggedParticle = NULL;
-  TargetTaggedParticle = NULL;
-  EventSteps = NULL;
-  statistics = NULL;
-}
-
-void NpolAnalysisManager::InitializeFilenameVariables(){
-  if(getenv("NPOLBASENAME")){
-    rootName = getenv("NPOLBASENAME");
-  }else{
-    rootName = "npol"; // default filename
-  }
-  
-  if(getenv("NPOLDIR")){
-    dirName = getenv("NPOLDIR");
-  }else{
-    dirName = "output"; // default directory location is build/output
-  }
-  
-  if(getenv("JOBNUMBER")){
-    jobNumber = getenv("JOBNUMBER");
-  }else{
-    jobNumber = "99999"; // default job number is 99999; anyone plan to submit more than this number of jobs?
-  }
-  
-  RootFileNumber = 0;
-}
-
-
-// Quick sort routine for the step vector to put the steps in time order
-int NpolAnalysisManager::partition(std::vector<NpolStep*> *aVector, int p, int q){
- 
-  double x = (*aVector)[p]->time;
-  int i = p;
-  int j;
- 
-  for(j = p+1; j < q; j++){
-    if((*aVector)[j]->time <= x){
-      i = i +1;
-      std::swap((*aVector)[i],(*aVector)[j]);
-    }
-  }
-
-  std::swap((*aVector)[i],(*aVector)[p]);
-  return i;
-}
-
-void NpolAnalysisManager::QSort(std::vector<NpolStep*> *aVector, int p, int q){
-
-  if(aVector == NULL) return;
-  int r; 
-
-  if(p<q){
-    r = partition(aVector,p,q);
-    QSort(aVector,p,r);
-    QSort(aVector,r+1,q);
-  }
-}
