@@ -24,9 +24,12 @@
 #include "G4ios.hh"
 #include "NpolMaterials.hh"
 
+NpolMaterials *NpolMaterials::pInstance = NULL;
+
 NpolMaterials *NpolMaterials::GetInstance() {
-  static NpolMaterials instance;
-  return &instance;
+  if(pInstance == NULL)
+	  pInstance = new NpolMaterials();
+  return pInstance;
 }
 
 NpolMaterials::NpolMaterials() {

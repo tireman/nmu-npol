@@ -44,6 +44,7 @@ private:
   G4Material *CreatePb();
 
 private:
+  static NpolMaterials *pInstance;
   G4NistManager *nistMan;
   std::map<std::string,G4Material *> materials;
 };
