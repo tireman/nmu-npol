@@ -10,7 +10,7 @@ then
 	FINISH=$1
 else
 	START=$1
-	FINISH=$2
+	FINISH=$(($1 + $2 - 1))
 fi
 
 for ((i=$START; i<=$FINISH; i++))
