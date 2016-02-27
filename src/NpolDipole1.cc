@@ -43,7 +43,7 @@ G4double NpolDipole1::gapWidth = 0.56*m;
 G4double NpolDipole1::gapLength = 1.22*m;
 G4double NpolDipole1::gapHeight = 0.20965*m;  // using 8.25 inch gap
 G4double NpolDipole1::yokeGap = 0.1016*m;
-G4double NpolDipole1::dipole1FieldY = 4*0.40984*tesla; // 1 B.dl = 0.40984*tesla 4 B.dl = 1.639*tesla
+G4double NpolDipole1::dipole1FieldY = 1*0.40984*tesla; // 1 B.dl = 0.40984*tesla 4 B.dl = 1.639*tesla
 
 NpolDipole1::NpolDipole1() {
   ConstructDipole1Yoke();

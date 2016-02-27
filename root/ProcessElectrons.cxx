@@ -4,6 +4,7 @@
 #include <string>
 #include <vector>
 #include <map>
+#include <set>
 
 #include <TMath.h>
 #include <TFile.h>
@@ -83,10 +84,10 @@ void ProcessElectrons() {
   }
 
   TString OutputDir = "Output/";
-  TString InputDir = "/data2/cgen/NMUSimData/4.4GeV/4Bdl/Lead10cm/";
+  TString InputDir = "/data3/cgen/NMUSimData/11GeV/4Bdl/Lead10cm/";
   
-  TString OutputFile = OutputDir + "NMU4.4GeV_Lead10cm_4Bdl_Histos_" + JobNum + ".root";
-  TString InputFile = InputDir + "npolLead10cm_4.4GeV_4Bdl_" + JobNum + "_*.root";
+  TString OutputFile = OutputDir + "NMU11GeV_Lead10cm_4Bdl_Histos_" + JobNum + ".root";
+  TString InputFile = InputDir + "npolLead10cm_11GeV_4Bdl_" + JobNum + ".root";
 
   TFile *outFile = new TFile(OutputFile,"RECREATE"); 
 
@@ -111,7 +112,7 @@ void ProcessElectrons() {
   // saved to the files 
   Long_t TotalElectrons = 0;
   Long_t TotalEventsRecorded = 0;
-  cout << "Number of enteries " << statsTree->GetEntries() <<endl;
+  std::cout << "Number of enteries " << statsTree->GetEntries() << std::endl;
   for(int i = 0; i < statsTree->GetEntries(); i++){ 
     statsTree->GetEntry(i); 
     TotalElectrons += ((*anStat)[0])->totalEvents;
@@ -140,8 +141,10 @@ void ProcessElectrons() {
   std::map<std::string,TH1 *> histograms;
   std::map<std::string,TH1F *> targetParticleKE;
   std::map<std::string,TH1F *> npolParticleKE;
+  std::map<std::string,TH1F *> correlateKE;
   std::map<std::string,TH2F *> targetParticlePOS;
   std::map<std::string,TH2F *> npolParticlePOS;
+  std::map<std::string,TH2F *> correlatePOS;
 
   // Allocate KE histograms and Position Histograms
   std::map<std::string,std::string>::iterator it;
@@ -150,20 +153,31 @@ void ProcessElectrons() {
     std::string targetHistoTitle = it->second + " Flux vs. KE in Target Tagger"; 
     std::string npolHistoName = "NpolFlux_" + it->first; 
     std::string npolHistoTitle = it->second + " Flux vs. KE in NPOL Tagger";
+    std::string correlateHistoName = "Correlated_TargetFlux_" + it->first;
+    std::string correlateHistoTitle = it->second + " Flux vs. KE Target Tagger Correlated to NPOL Tagger";
+
     std::string targetXYHistoName = "targetXY_" + it->first;
     std::string npolXYHistoName = "npolXY_" + it->first;
     std::string targetXYHistoTitle = it->second + " XY Position in Target Tagger";
     std::string npolXYHistoTitle = it->second + " XY Position in NPOL Tagger";
+    std::string correlateXYHistoName = "Correlated_targetXY_" + it->first;
+    std::string correlateXYTitle = it->second + " XY position in Target Tagger Correlated to NPOL Tagger";
 
     targetParticleKE[it->first] = new TH1F(
      targetHistoName.c_str(), targetHistoTitle.c_str(),nbins,bins);
     targetParticlePOS[it->first] = new TH2F(targetXYHistoName.c_str(),
-     targetXYHistoTitle.c_str(),120,-10.0,-40.0,160,-15,15);  
+     targetXYHistoTitle.c_str(),120,45.0,65.0,160,-15,15);  
 
     npolParticleKE[it->first] = new TH1F(
      npolHistoName.c_str(), npolHistoTitle.c_str(),nbins,bins);
     npolParticlePOS[it->first] = new TH2F(npolXYHistoName.c_str(),
-     npolXYHistoTitle.c_str(),120,-380.0,-270.0,160,-35,35);
+     npolXYHistoTitle.c_str(),120,270.0,380.0,160,-35,35);
+
+    correlateKE[it->first] = new TH1F(
+     correlateHistoName.c_str(), correlateHistoTitle.c_str(),nbins,bins);
+    correlatePOS[it->first] = new TH2F(correlateXYHistoName.c_str(),
+     correlateXYTitle.c_str(),120,45.0,65.0,160,-15,15);
+
   }  
 
   // Allocate the dTOF histogram
@@ -193,21 +207,8 @@ void ProcessElectrons() {
 	std::cout << "Processing event no. " << i << std::endl;
     }
 
-    // loop over all tagged particles (one step in target tagger volume)
-    std::vector<NpolTagger *>::iterator t_it;
-    for(t_it = targetEntry->begin(); t_it != targetEntry->end(); t_it++){
-      NpolTagger *aVertex = *t_it;
-      if(aVertex == NULL) continue;  
-      std::string particleName = aVertex->particle;
-      if(targetParticleKE.find(particleName) == targetParticleKE.end())
-	continue;
+    std:set<int> npolTrackIDs;
 
-      (targetParticleKE[particleName])->
-	Fill(aVertex->energy,fluxScaling);
-      (targetParticlePOS[particleName])->
-	Fill(aVertex->posX,aVertex->posY,fluxScaling);
-    }
-    
     // loop over all tagged particles (one step in NPOL tagger volume)
     std::vector<NpolTagger *>::iterator n_it;
     for(n_it = npolEntry->begin(); n_it != npolEntry->end(); n_it++){
@@ -216,11 +217,47 @@ void ProcessElectrons() {
       std::string particleName = aVertex->particle;
       if(npolParticleKE.find(particleName) == npolParticleKE.end())
 	continue;
+    
       (npolParticleKE[particleName])->
 	Fill(aVertex->energy,fluxScaling);
       (npolParticlePOS[particleName])->
-	Fill(aVertex->posX,aVertex->posY,fluxScaling);
+	Fill(abs(aVertex->posX),aVertex->posY);
+      
+      npolTrackIDs.insert(aVertex->trackId);
     }
+
+    // loop over all tagged particles (one step in target tagger volume)
+    Double_t xOffSet = 150.0*sin(28.0);
+    std::vector<NpolTagger *>::iterator t_it;
+    for(t_it = targetEntry->begin(); t_it != targetEntry->end(); t_it++){
+      NpolTagger *aVertex = *t_it;
+      if(aVertex == NULL) continue;  
+      std::string particleName = aVertex->particle;
+      if(targetParticleKE.find(particleName) == targetParticleKE.end())
+	continue;
+     
+      Double_t Xcenter = abs(aVertex->posX) - xOffSet;
+      if((abs(aVertex->posY) <= 13.16) && (abs(Xcenter) <= 21.495)){
+	(targetParticleKE[particleName])->
+	  Fill(aVertex->energy,fluxScaling);
+	(targetParticlePOS[particleName])->
+	  Fill(abs(aVertex->posX),aVertex->posY);
+	
+	// Here the correlated histograms are to be filled
+      
+	if(npolTrackIDs.find(aVertex->trackId) != npolTrackIDs.end()){
+	  (correlateKE[particleName])->
+	    Fill(aVertex->energy,fluxScaling);
+	  (correlatePOS[particleName])->
+	    Fill(abs(aVertex->posX),aVertex->posY);
+	  
+	  std::cout << "Correlated hit!" << std::endl;
+	}
+      }
+    }
+      
+  npolTrackIDs.clear();
+
   
     // This section is designed to file up the histograms for hits in
     // the Scintillator detectors
@@ -323,9 +360,19 @@ void ProcessElectrons() {
     it5->second->Write();
   }
 
-  std::map<std::string, TH1 *>::iterator it6;
-  for(it6 = histograms.begin(); it6 != histograms.end(); it6++) {
+  std::map<std::string,TH1F *>::iterator it6;
+  for(it6 = correlateKE.begin(); it6 != correlateKE.end(); it6++) {
     it6->second->Write();
+  }
+
+  std::map<std::string,TH2F *>::iterator it7;
+  for(it7 = correlatePOS.begin(); it7 != correlatePOS.end(); it7++) {
+    it7->second->Write();
+  }
+
+  std::map<std::string, TH1 *>::iterator it8;
+  for(it8 = histograms.begin(); it8 != histograms.end(); it8++) {
+    it8->second->Write();
   }
 
   delta_TOF->Write();

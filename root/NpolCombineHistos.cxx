@@ -28,11 +28,11 @@ void NpolCombineHistos() {
      gSystem->CopyFile("hsimple.root", "hsimple2.root");
    }
 
-   TString Lead = "0"; TString Energy = "4.4"; TString Bfield = "4";
+   TString Lead = "10"; TString Energy = "11"; TString Bfield = "4";
    TString OutputDir = "Output/";
-   TString InputDir = "/work/hallc/cgen/tireman/MagFieldOn/MagField_" + Bfield + "Bdl/LeadOn" + Lead + "cm/";
+   TString InputDir = "Output/";
    Int_t Ncut = 500;
-   Int_t Nfiles = 2;
+   Int_t Nfiles = 38;
    Int_t Nloops = 0;
    if (Nfiles % Ncut != 0){
      Nloops = Nfiles/Ncut+ 1;
@@ -45,18 +45,18 @@ void NpolCombineHistos() {
 
      TString OutputFile;
      if(j == (Nloops - 1)){
-       OutputFile = OutputDir + "JLAB" + Energy + "GeV_Lead" + Lead + "cm_" + Bfield + "Bdl_Histos.root";
+       OutputFile = OutputDir + "NMU" + Energy + "GeV_Lead" + Lead + "cm_" + Bfield + "Bdl_Histos.root";
      } else {
        char jtemp[2];
        sprintf(jtemp,"%i",j);
-       OutputFile = OutputDir + "JLAB" + Energy + "GeV_Lead" + Lead + "cm_" + Bfield + "Bdl_Histos_All_" + jtemp + ".root";
+       OutputFile = OutputDir + "NMU" + Energy + "GeV_Lead" + Lead + "cm_" + Bfield + "Bdl_Histos_All_" + jtemp + ".root";
      }
 
      TString InputFile;
      if (j!= 0 ){
        char jplustemp[2];
        sprintf(jplustemp,"%i",j-1);
-       InputFile = OutputDir + "JLAB" + Energy + "GeV_Lead" + Lead + "cm_" + Bfield + "Bdl_Histos_All_" + jplustemp + ".root";
+       InputFile = OutputDir + "NMU" + Energy + "GeV_Lead" + Lead + "cm_" + Bfield + "Bdl_Histos_All_" + jplustemp + ".root";
      }
 
      Int_t A = 0; 
@@ -78,7 +78,7 @@ void NpolCombineHistos() {
      std::cout << "Engaging files " << A << " through " << B-1 << std::endl;
      for (Int_t i = A; i < B; i++) {
        char fname[60];
-       sprintf(fname,"JLAB" + Energy + "GeV_Lead" + Lead + "cm_" + Bfield + "Bdl_Histos_%i.root",i);
+       sprintf(fname,"NMU" + Energy + "GeV_Lead" + Lead + "cm_" + Bfield + "Bdl_Histos_%i.root",i);
        FileList->Add( TFile::Open(InputDir + fname) );
      }
    
