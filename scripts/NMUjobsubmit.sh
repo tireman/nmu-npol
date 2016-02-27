@@ -1,19 +1,29 @@
 #!/bin/bash
 
-source scripts/NMUsetuprun.sh
+if [ $# -eq 0 ]
+then
+	START=1
+	FINISH=1
+elif [ $# -eq 1 ]
+then
+	START=1
+	FINISH=$1
+else
+	START=$1
+	FINISH=$2
+fi
 
-for ((i=$1; i<=$2; i++))
+for ((i=$START; i<=$FINISH; i++))
 do
     export JOBNUMBER=$i
 
-    if [ -f "$BUILD_DIR/output/electron_11GeV_$i.out" ]
+    if [ -f "$NPOLDIR/${NPOLBASENAME}_$i.out" ]
     then
-	rm $BUILD_DIR/output/electron_11GeV_$i.out
-	rm $BUILD_DIR/output/electron_11GeV_$i.err
+		rm $NPOLDIR/${NPOLBASENAME}_$i.out
+		rm $NPOLDIR/${NPOLBASENAME}_$i.err
     fi
-    echo "Starting up Job Number $i."
 
-    $BUILD_DIR/Npolapp $BUILD_DIR/npol.mac 1>$BUILD_DIR/output/electron_11GeV_$i.out 2>$BUILD_DIR/output/electron_11GeV_$i.err &
+	echo "Starting up Job Number $i."
+    $BUILD_DIR/Npolapp $BUILD_DIR/npol.mac 1>$NPOLDIR/${NPOLBASENAME}_$i.out 2>$NPOLDIR/${NPOLBASENAME}_$i.err &
     sleep 5s
-
 done

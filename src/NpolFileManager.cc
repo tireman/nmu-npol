@@ -49,13 +49,13 @@ NpolFileManager::~NpolFileManager() {
 // Construct the prefix for output filenames from enviornment variables, or
 // use defaults if enviornment variables are not defined.
 void NpolFileManager::ConstructFilenamePrefix() {
-	const char *dirName = getenv("DIRNAME");
+	const char *dirName = getenv("NPOLDIR");
 	const char *baseName = getenv("NPOLBASENAME");
 	const char *jobNumber = getenv("JOBNUMBER");
 
 	filenamePrefix = "";
 	filenamePrefix = filenamePrefix + 
-		(dirName != NULL ? dirName : "output") + "/"
+		(dirName != NULL ? dirName : "output") + "/root/"
 		+ (baseName != NULL ? baseName : "npol") + "_"
 		+ (jobNumber != NULL ? jobNumber : "99999") + "_";
 }
