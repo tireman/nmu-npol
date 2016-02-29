@@ -48,22 +48,11 @@ void NpolSteppingAction::UserSteppingAction(const G4Step *aStep) {
   if(volName == "Cap" || volName == "HallShellRoof" || 
      volName == "HallShellFloor" || volName == "HallShellWall" || 
      postStepVolume == NULL) {
-	analysisMan->SetTrackAsKilled(aTrack->GetTrackID());
+	analysisMan->TrackKilled(aTrack->GetTrackID());
 	aTrack->SetTrackStatus(fStopAndKill);
   }
   
   // All Stepping information is saved to a vector for analysis later
-  analysisMan->AddStep(aStep, volName);
- 
-  // Check if any tagger is hit and if so pass track to the Vector
-  if(volName == "NPOLTagger") {
-    analysisMan->AddNPOLTaggedParticle(aTrack);
-  }
-  if(volName == "SHMSTagger") {
-    analysisMan->AddSHMSTaggedParticle(aTrack);
-  }
-  if(volName == "ParticleTagger") {
-    analysisMan->AddTargetTaggedParticle(aTrack);
-  }
+  analysisMan->RecordStep(aStep);
 }
 

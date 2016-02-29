@@ -24,17 +24,17 @@
 #include "G4ios.hh"
 #include "NpolMaterials.hh"
 
-NpolMaterials *pInstance = NULL;
+NpolMaterials *NpolMaterials::pInstance = NULL;
 
 NpolMaterials *NpolMaterials::GetInstance() {
-  
   if(pInstance == NULL)
-    pInstance = new NpolMaterials();
-  
+	  pInstance = new NpolMaterials();
   return pInstance;
 }
 
 NpolMaterials::NpolMaterials() {
+  G4cout << "Constructing NpolMaterials singleton" << G4endl;
+
   nistMan = G4NistManager::Instance();
   
   CreateMaterials();

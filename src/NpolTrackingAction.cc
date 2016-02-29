@@ -9,7 +9,7 @@ NpolTrackingAction::~NpolTrackingAction() {}
 
 void NpolTrackingAction::PreUserTrackingAction(const G4Track *aTrack) {
 	NpolAnalysisManager *analysisMan = NpolAnalysisManager::GetInstance();
-	analysisMan->AddTrack(aTrack);
+	analysisMan->RecordTrack(aTrack);
 }
 
 void NpolTrackingAction::PostUserTrackingAction(const G4Track *aTrack) {}

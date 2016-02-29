@@ -13,7 +13,6 @@
 // Daniel Wilbern, dwilbern@nmu.edu  September 2014
 // Geant4 example B4a used for reference
 
-
 #include <cstdio> // for sprintf
 #include <string>
 
@@ -32,19 +31,17 @@ NpolRunAction::NpolRunAction() {
 }
 
 NpolRunAction::~NpolRunAction() {
+	delete runTimer;
 }
 
-void NpolRunAction::BeginOfRunAction(const G4Run* aRun) {
+void NpolRunAction::BeginOfRunAction(const G4Run *aRun) {
   runTimer->Start();
+  NpolAnalysisManager::GetInstance()->BeginRun(aRun->GetRunID());
   G4cout << "### Run " << aRun->GetRunID() << " start." << G4endl;
-  NpolAnalysisManager *analysisMan = NpolAnalysisManager::GetInstance();
-  analysisMan->BeginOfRun();
 }
 
-void NpolRunAction::EndOfRunAction(const G4Run*) {
-  NpolAnalysisManager *analysisMan = NpolAnalysisManager::GetInstance();
-  analysisMan->EndOfRun();
-  
+void NpolRunAction::EndOfRunAction(const G4Run *aRun) {
+  NpolAnalysisManager::GetInstance()->EndRun(aRun->GetRunID());
   runTimer->Stop();
   G4cout << "Run Time: " << *(runTimer) << G4endl;
   
