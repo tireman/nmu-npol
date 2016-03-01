@@ -55,7 +55,7 @@ void NpolFileManager::ConstructFilenamePrefix() {
 
 	filenamePrefix = "";
 	filenamePrefix = filenamePrefix + 
-		(dirName != NULL ? dirName : "output") + "/root/"
+		(dirName != NULL ? (G4String)dirName + "/root" : "output") + "/"
 		+ (baseName != NULL ? baseName : "npol") + "_"
 		+ (jobNumber != NULL ? jobNumber : "99999") + "_";
 }
