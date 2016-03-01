@@ -2,14 +2,14 @@
 #include <vector>
 #include <map>
 
+#include <TTree.h>
+
 #include <G4SystemOfUnits.hh>
 #include <G4Track.hh>
 #include <G4Step.hh>
 #include <G4StepPoint.hh>
 #include <G4VPhysicalVolume.hh>
 #include <G4VProcess.hh>
-
-#include <TTree.h>
 
 #include "NpolAnalysisManager.hh"
 #include "NpolFileManager.hh"
