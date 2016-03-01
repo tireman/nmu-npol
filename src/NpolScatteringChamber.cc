@@ -34,12 +34,12 @@ G4double NpolScatteringChamber::insideHeight = 1.2*m;
 G4double NpolScatteringChamber::wallThickness = 1.30*cm;
 G4double NpolScatteringChamber::holeRadius = 2.5*cm;
 G4double NpolScatteringChamber::WindowThickness = 0.1016*cm;
-G4double NpolScatteringChamber::shmsWindowAngle = 110.0*deg;
+G4double NpolScatteringChamber::shmsWindowAngle = 60.0*deg;
 G4double NpolScatteringChamber::shmsWindowDeltaAngle = 60.0*deg;
 G4double NpolScatteringChamber::npolWindowAngle = 190.0*deg;
 G4double NpolScatteringChamber::npolWindowDeltaAngle = 60.0*deg;
-G4double NpolScatteringChamber::npolWindowHeight = 10.00*cm;
-G4double NpolScatteringChamber::shmsWindowHeight = 12.00*cm;
+G4double NpolScatteringChamber::npolWindowHeight = 40.00*cm;
+G4double NpolScatteringChamber::shmsWindowHeight = 40.00*cm;
 
 NpolScatteringChamber::NpolScatteringChamber() {
   target = new NpolTarget();
