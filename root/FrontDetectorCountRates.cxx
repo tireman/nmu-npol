@@ -56,13 +56,13 @@ int GetPlacementNumber(const std::string &volName) {
     return 0;
 }
 
-void FrontTaggerCountRates() {
+void FrontDetectorCountRates() {
 
   Long_t TotalElectrons = 0, TotalEventsRecorded = 0; 
 
-  std::string histoNames[3][2]={{"av_11_impr_1_FrontTagLV_pv_1","av_11_impr_1_FrontTagLV_pv_0"},{"av_11_impr_1_FrontTagLV_pv_3","av_11_impr_1_FrontTagLV_pv_2"},{"av_11_impr_1_FrontTagLV_pv_5","av_11_impr_1_FrontTagLV_pv_4"}};
+  std::string histoNames[3][2]={{"av_9_impr_1_FrontDetLV_pv_1","av_9_impr_1_FrontDetLV_pv_0"},{"av_9_impr_1_FrontDetLV_pv_3","av_9_impr_1_FrontDetLV_pv_2"},{"av_9_impr_1_FrontDetLV_pv_5","av_9_impr_1_FrontDetLV_pv_4"}};
    
-  TString Lead = "0"; TString Energy = "4.4"; TString Bfield = "4";
+  TString Lead = "10"; TString Energy = "4.4"; TString Bfield = "1";
   TString OutputDir = "/work/hallc/cgen/tireman/MagFieldOn/MagField_" + Bfield + "Bdl/Plots/";
   TString InputDir = "/work/hallc/cgen/tireman/MagFieldOn/MagField_" + Bfield + "Bdl/LeadOn" + Lead + "cm/";
 
@@ -82,15 +82,16 @@ void FrontTaggerCountRates() {
   std::cout << "Electron beam time at 1 micro-amp is " << electronTime << " s " << std::endl;
   std::cout << "Total electrons on target: " << totalElectrons/1e6 << " Million" << std::endl;
 
-  TCanvas *c1 = new TCanvas("c1","Front Tagger Energy Plots at Polarimeter Angle 28.0 Deg, E = 4.4 GeV",1000,900);
-  TCanvas *c2 = new TCanvas("c2","Front Taggger Count Rate vs. Threshold plots",1000,900);
+  TCanvas *c1 = new TCanvas("c1","Front Detector Energy Plots at Polarimeter Angle 28.0 Deg, E = 4.4 GeV",1000,900);
+  TCanvas *c2 = new TCanvas("c2","Front Detector Count Rate vs. Threshold plots",1000,900);
 
-  Int_t Nx = 3, Ny = 2, nThresh = 10, fillStyle = 1001;
+  Int_t Nx = 3, Ny = 2, nThresh = 12, fillStyle = 1001;
   int pvNum, avNum, imprNum;
   Float_t lMargin = 0.10, rMargin = 0.05, bMargin = 0.10, tMargin = 0.05;
   Float_t vSpacing = 0.0; Float_t hSpacing = 0.0;
   double CTagger[Nx][Ny];
-  double Thresholds[10]={0.5,1.0,1.5,2.0,2.5,3.0,3.5,4.0,4.5,5.0};
+  double Thresholds[12];
+  Thresholds={3.0,3.5,4.0,4.5,5.0,6.0,7.0,8.0,10.0,12.0,14.0,16.0};
   double CountRates [nThresh][Nx][Ny];
 
   CanvasPartition(c1,Nx,Ny,lMargin,rMargin,bMargin,tMargin,vSpacing,hSpacing);
@@ -130,10 +131,10 @@ void FrontTaggerCountRates() {
      imprNum = GetImprNumber(hname);
      pvNum = GetPlacementNumber(hname);
      char htitle[80];
-     sprintf(htitle,"#splitline{Energy Deposited}{Front Tagger %i, Layer %i}",pvNum+1, imprNum);
+     sprintf(htitle,"#splitline{Energy Deposited}{Front Detector %i, Layer %i}",pvNum+1, imprNum);
      hFrame->SetTitle(htitle);     
      // y axis range
-     hFrame->GetYaxis()->SetRangeUser(0.2,0.5e6);
+     hFrame->GetYaxis()->SetRangeUser(0.2,5.0e4);
      
      // Format for y axis
      hFrame->GetYaxis()->SetTitle("Events");
@@ -161,7 +162,7 @@ void FrontTaggerCountRates() {
      hFrame->GetXaxis()->SetNdivisions(505);
 
      // Set X axis range
-     hFrame->GetXaxis()->SetRangeUser(-0.15,18);
+     hFrame->GetXaxis()->SetRangeUser(0.0003,27);
 
      // TICKS X Axis
      hFrame->GetXaxis()->SetTickLength(yFactor*0.06/xFactor);
@@ -176,9 +177,9 @@ void FrontTaggerCountRates() {
        
        CTagger[i][j] = hFrame->Integral((Threshold/binWidth),nBins);    
        CountRates[k][i][j] = CTagger[i][j];
-       cout << "First Tagger layer, detector " << pvNum << " counts/s for 1 microAmp of Beam " 
+       cout << "First Detector layer, detector " << pvNum << " counts/s for 1 microAmp of Beam " 
 	    << CTagger[i][j]/electronTime/(1e6) << " MHz" << endl;
-       cout << "First Tagger layer, detector " << pvNum << " counts/s for 80 microAmp of Beam " 
+       cout << "First Detector layer, detector " << pvNum << " counts/s for 80 microAmp of Beam " 
 	    << 80*CTagger[i][j]/electronTime/(1e6) << " MHz" << endl;    
        cout << " " << endl;
      }
@@ -197,7 +198,7 @@ void FrontTaggerCountRates() {
      TGraph *gr = new TGraph(nThresh,x,y); 
      // Set Good Graph Title
      char gtitle[80];
-     sprintf(gtitle,"#splitline{Count Rate VS. Threshold}{Front Tagger %i, Layer %i}",pvNum+1, imprNum);
+     sprintf(gtitle,"#splitline{Count Rate VS. Threshold}{Front Detector %i, Layer %i}",pvNum+1, imprNum);
      gr->SetTitle(gtitle);   
 
      // Clean up Y axis
@@ -209,7 +210,7 @@ void FrontTaggerCountRates() {
      gr->GetYaxis()->SetTitleSize(16);
      gr->GetYaxis()->SetTitleOffset(5);
      gr->GetYaxis()->CenterTitle(); 
-     gr->GetYaxis()->SetRangeUser(-0.005,7.11);
+     gr->GetYaxis()->SetRangeUser(0.0,0.16);
 
      // Clean up X axis
      gr->GetXaxis()->SetTitle("Threshold Energy (MeV)");

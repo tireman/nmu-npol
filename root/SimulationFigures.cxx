@@ -32,12 +32,13 @@ void SimulationFigures() {
   std::string histoNames[3][3]={{"pi-","mu+","gamma"},
 				{"neutron","mu-","e+"},
 				{"proton","pi+","e-"}};
-  
-  TString OutputDir = "Plots/";
-  TString InputDir = "Output/";
 
-  TString OutputFile = OutputDir + "JLAB4.4GeV_Lead10cm_4Bdl_Fig21-23.root";
-  TString InputFile = InputDir + "JLAB4.4GeV_Lead10cm_4Bdl_Histos.root";
+  TString Lead = "10"; TString Energy = "4.4"; TString Bfield = "4";
+  TString OutputDir = "/work/hallc/cgen/tireman/MagFieldOn/MagField_" + Bfield + "Bdl/Plots/";
+   TString InputDir = "/work/hallc/cgen/tireman/MagFieldOn/MagField_" + Bfield + "Bdl/LeadOn" + Lead +"cm/";
+
+  TString OutputFile = OutputDir + "JLAB" + Energy + "GeV_Lead" + Lead + "cm_" + Bfield + "Bdl_Fig21-23.root";
+  TString InputFile = InputDir + "JLAB" + Energy + "GeV_Lead" + Lead + "cm_" + Bfield + "Bdl_Histos.root";
 
   TFile *inFile = TFile::Open(InputFile);
   TFile *outFile = new TFile(OutputFile,"RECREATE");
@@ -45,15 +46,15 @@ void SimulationFigures() {
   TVectorD *v = (TVectorD*)inFile->Get("TVectorT<double>");
   Double_t totalElectrons = ((*v))[0];
   Double_t electronTime = totalElectrons/(6.242e12); //6.242e12 e-/s at 1 microAmp
-  Double_t fluxscaling1 = 1/(totalElectrons*1.602e-13*(98*60));  // My scale
-  Double_t fluxscaling2 = 1/(totalElectrons*1.602e-13*(54.98*25.86));  // My scale
-  //Double_t fluxscaling1 = 1/(totalElectrons*(98*60));  //Proposal Scale
-  //Double_t fluxscaling2 = 1/(totalElectrons*(54.98*25.86));  //Proposal Scale
+  //Double_t fluxscaling1 = 1/(totalElectrons*1.602e-13*(98*60));  // My scale
+  //Double_t fluxscaling2 = 1/(totalElectrons*1.602e-13*(42.99*26.32));  // My scale
+  Double_t fluxscaling1 = 1/(totalElectrons*(98*60));  //Proposal Scale
+  Double_t fluxscaling2 = 1/(totalElectrons*(42.99*26.32));  //Proposal Scale
 
   std::cout << "Electron beam time at 1 micro-amp is " << electronTime << " s " << std::endl;
   std::cout << "Total electrons on target: " << totalElectrons/1e6 << " Million" << std::endl;
 
-  TCanvas *c1 = new TCanvas("c1","Polarimeter Angle 28.0 Deg, E = 4.4 GeV",1000,900);
+  TCanvas *c1 = new TCanvas("c1","NPOL Tagger Flux vs. KE at Polarimeter Angle 28.0 Deg, E = 4.4 GeV",1000,900);
   Int_t Nx = 3, Ny =3, fillStyle = 1001;
   Float_t lMargin = 0.10, rMargin = 0.05, bMargin = 0.07, tMargin = 0.05;
   Float_t vSpacing = 0.0; Float_t hSpacing = 0.0;
@@ -90,12 +91,12 @@ void SimulationFigures() {
      hFrame->Draw();
   
      // y axis range
-     //hFrame->GetYaxis()->SetRangeUser(5e-18,2e-11); // proposal scale
-     hFrame->GetYaxis()->SetRangeUser(0.005,200); // my scale
+     hFrame->GetYaxis()->SetRangeUser(2e-15,4e-8); // proposal scale
+     //hFrame->GetYaxis()->SetRangeUser(0.005,200); // my scale
      
      // Format for y axis
-     hFrame->GetYaxis()->SetTitle("#frac{Particles}{#muA #times cm^{2}}"); // My scale
-     //hFrame->GetYaxis()->SetTitle("#frac{Particles}{electron #times cm^{2}}"); // Proposal scale
+     //hFrame->GetYaxis()->SetTitle("#frac{Particles}{#muA #times cm^{2}}"); // My scale
+     hFrame->GetYaxis()->SetTitle("#frac{Particles}{electron #times cm^{2}}"); // Proposal scale
      hFrame->GetYaxis()->SetLabelFont(43);
      hFrame->GetYaxis()->SetLabelSize(16);
      hFrame->GetYaxis()->SetLabelOffset(0.02);
@@ -120,19 +121,21 @@ void SimulationFigures() {
      hFrame->GetXaxis()->CenterTitle();
      hFrame->GetXaxis()->SetNdivisions(505);
      
+     // Set X axis range
+     hFrame->GetXaxis()->SetRangeUser(1e-1,8e3);
+
      // TICKS X Axis
      hFrame->GetXaxis()->SetTickLength(yFactor*0.06/xFactor);
      
    }
   }
 
-  TCanvas *c2 = new TCanvas("c2","Polarimeter Angle 28.0 Deg, E = 4.4 GeV",1000,900);
+
+  TCanvas *c2 = new TCanvas("c2","Target Tagger Flux vs. KE at Polarimeter Angle 28.0 Deg, E = 4.4 GeV",1000,900);
   Nx = 3, Ny =3, fillStyle = 1001;
   lMargin = 0.10, rMargin = 0.05, bMargin = 0.07, tMargin = 0.05;
   vSpacing = 0.0; hSpacing = 0.0;
   CanvasPartition(c2,Nx,Ny,lMargin,rMargin,bMargin,tMargin,vSpacing,hSpacing);
-
-  //TPad *pad[Nx][Ny];
     
   for(int i = 0; i < Nx; i++){
    for(int j = 0; j < Ny; j++){
@@ -163,12 +166,86 @@ void SimulationFigures() {
      hFrame->Draw();
 
      // y axis range
-     //hFrame->GetYaxis()->SetRangeUser(5e-14,2e-7); // proposal scale
-     hFrame->GetYaxis()->SetRangeUser(0.5,500000); // my scale
+     hFrame->GetYaxis()->SetRangeUser(2e-15,4e-8); // proposal scale
+     //hFrame->GetYaxis()->SetRangeUser(0.5,500000); // my scale
      
      // Format for y axis
-     hFrame->GetYaxis()->SetTitle("#frac{Particles}{#muA #times cm^{2}}"); // My scale
-     //hFrame->GetYaxis()->SetTitle("#frac{Particles}{electron #times cm^{2}}"); // Proposal Scale
+     //hFrame->GetYaxis()->SetTitle("#frac{Particles}{#muA #times cm^{2}}"); // My scale
+     hFrame->GetYaxis()->SetTitle("#frac{Particles}{electron #times cm^{2}}"); // Proposal Scale
+     hFrame->GetYaxis()->SetLabelFont(43);
+     hFrame->GetYaxis()->SetLabelSize(16);
+     hFrame->GetYaxis()->SetLabelOffset(0.02);
+     hFrame->GetYaxis()->SetTitleFont(43);
+     hFrame->GetYaxis()->SetTitleSize(16);
+     hFrame->GetYaxis()->SetTitleOffset(5);
+     
+     hFrame->GetYaxis()->CenterTitle();
+     hFrame->GetYaxis()->SetNdivisions(505);
+     
+     // TICKS Y Axis
+     hFrame->GetYaxis()->SetTickLength(xFactor*0.04/yFactor);
+     
+     // Format for x axis
+     hFrame->GetXaxis()->SetTitle("Kinetic Energy (MeV)");
+     hFrame->GetXaxis()->SetLabelFont(43);
+     hFrame->GetXaxis()->SetLabelSize(16);
+     hFrame->GetXaxis()->SetLabelOffset(0.02);
+     hFrame->GetXaxis()->SetTitleFont(43);
+     hFrame->GetXaxis()->SetTitleSize(16);
+     hFrame->GetXaxis()->SetTitleOffset(5);
+     hFrame->GetXaxis()->CenterTitle();
+     hFrame->GetXaxis()->SetNdivisions(505);
+
+     // Set X axis range
+     hFrame->GetXaxis()->SetRangeUser(1e-1,8e3);
+
+     // TICKS X Axis
+     hFrame->GetXaxis()->SetTickLength(yFactor*0.06/xFactor);
+     
+   }
+  }
+
+ TCanvas *c2b = new TCanvas("c2b","Correlated Target Tagger Flux vs. KE at Polarimeter Angle 28.0 Deg, E = 4.4 GeV",1000,900);
+  Nx = 3, Ny =3, fillStyle = 1001;
+  lMargin = 0.10, rMargin = 0.05, bMargin = 0.07, tMargin = 0.05;
+  vSpacing = 0.0; hSpacing = 0.0;
+  CanvasPartition(c2b,Nx,Ny,lMargin,rMargin,bMargin,tMargin,vSpacing,hSpacing);
+    
+  for(int i = 0; i < Nx; i++){
+   for(int j = 0; j < Ny; j++){
+     c2b->cd(0);
+     // Get the pads previosly created.
+     char pname[24];
+     sprintf(pname,"pad_%i_%i",i,j);
+     pad[i][j] = (TPad*) gROOT->FindObject(pname);
+     pad[i][j]->Draw();
+     pad[i][j]->SetLogx();
+     pad[i][j]->SetLogy();
+     pad[i][j]->SetFillStyle(4000);
+     pad[i][j]->SetFrameFillStyle(4000);
+     pad[i][j]->cd();
+     // Size factors
+     Float_t xFactor = pad[0][0]->GetAbsWNDC()/pad[i][j]->GetAbsWNDC();
+     Float_t yFactor = pad[0][0]->GetAbsHNDC()/pad[i][j]->GetAbsHNDC();
+
+     char hname[34];
+     std::string str = histoNames[i][j];
+     sprintf(hname,"Correlated_TargetFlux_%s",histoNames[i][j].c_str());
+     TH1F *hFrame = (TH1F*) inFile->Get(hname);
+     hFrame->SetStats(false); 
+     hFrame->SetFillColor(kBlue);
+     hFrame->SetTitleFont(16);
+     hFrame->SetFillStyle(fillStyle);
+     hFrame->Scale(fluxscaling2);
+     hFrame->Draw();
+
+     // y axis range
+     hFrame->GetYaxis()->SetRangeUser(2e-15,2e-8); // proposal scale
+     //hFrame->GetYaxis()->SetRangeUser(0.5,500000); // my scale
+     
+     // Format for y axis
+     //hFrame->GetYaxis()->SetTitle("#frac{Particles}{#muA #times cm^{2}}"); // My scale
+     hFrame->GetYaxis()->SetTitle("#frac{Particles}{electron #times cm^{2}}"); // Proposal Scale
      hFrame->GetYaxis()->SetLabelFont(43);
      hFrame->GetYaxis()->SetLabelSize(16);
      hFrame->GetYaxis()->SetLabelOffset(0.02);
@@ -193,6 +270,9 @@ void SimulationFigures() {
      hFrame->GetXaxis()->CenterTitle();
      hFrame->GetXaxis()->SetNdivisions(505);
      
+     // Set X axis range
+     hFrame->GetXaxis()->SetRangeUser(1e-1,8e3);
+
      // TICKS X Axis
      hFrame->GetXaxis()->SetTickLength(yFactor*0.06/xFactor);
      
@@ -205,8 +285,6 @@ void SimulationFigures() {
   Nx = 3; Ny = 3;
   vSpacing = 0.0; hSpacing = 0.0;
   CanvasPartition(c3,Nx,Ny,lMargin,rMargin,bMargin,tMargin,vSpacing,hSpacing);
-
-  //TPad *pad[Nx][Ny];
     
   for(int i = 0; i < Nx; i++){
    for(int j = 0; j < Ny; j++){
@@ -276,6 +354,7 @@ void SimulationFigures() {
   
   c1->Write();
   c2->Write();
+  c2b->Write();
   c3->Write();
   outFile->Close();
   

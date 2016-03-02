@@ -83,11 +83,36 @@ void ProcessElectrons() {
     JobNum = "99999"; // default job number is 99999; anyone plan to submit more than this number of jobs?
   }
 
-  TString OutputDir = "Output/";
-  TString InputDir = "/data3/cgen/NMUSimData/11GeV/4Bdl/Lead10cm/";
-  
-  TString OutputFile = OutputDir + "NMU11GeV_Lead10cm_4Bdl_Histos_" + JobNum + ".root";
-  TString InputFile = InputDir + "npolLead10cm_11GeV_4Bdl_" + JobNum + ".root";
+  TString Lead = ""; 
+   if(getenv("Lead")){
+    Lead = getenv("Lead");
+  }else{
+     std::cout << "Lead environmental variable not set" << std::endl;
+     return; // Return error if not found
+  }
+
+  TString Energy = ""; 
+  if(getenv("Energy")){
+    Energy = getenv("Energy");
+  }else{
+    std::cout << "Energy environmental variable not set" << std::endl;
+     return; // Return error if not found
+  }
+  TString Bfield = "";
+  if(getenv("Bfield")){
+    Bfield = getenv("Bfield");
+  }else{
+    std::cout << "Bfield environmental variable not set" << std::endl;
+     return; // Return error if not found
+  }
+
+  TString OutputDir = "/work/hallc/cgen/tireman/MagFieldOn/MagField_" + Bfield + "Bdl/LeadOn" + Lead + "cm/";
+  TString InputDir = "/cache/mss/hallc/cgen/simulation/tireman/" + Energy + "GeV/MagField_" + Bfield + "Bdl/Lead" + Lead + "cm/";
+  //TString InputDir = "/volatile/hallc/cgen/tireman/4.4GeV/MagField_4Bdl/Lead0cm/";
+
+  TString OutputFile = OutputDir + "JLAB" + Energy + "GeV_Lead" + Lead + "cm_" + Bfield + "Bdl_Histos_" + JobNum + ".root";
+  TString InputFile = InputDir + "npolLead" + Lead + "cm_" + Energy + "GeV_" + Bfield + "Bdl_" + JobNum + ".root";
+
 
   TFile *outFile = new TFile(OutputFile,"RECREATE"); 
 
@@ -122,7 +147,7 @@ void ProcessElectrons() {
   std::cout << "Total electrons: " << TotalElectrons/1e6 << " Million" << std::endl;
   
   // Scale to (microAmp^-1)(cm^-2) 
-  Double_t fluxScaling = 1/((Double_t)TotalElectrons*1.609e-13*98*60);
+  //Double_t fluxScaling = 1/((Double_t)TotalElectrons*1.609e-13*98*60);
     
   // The particle names as they will appear in the histogram titles
   std::map<std::string,std::string> fancyNames;
@@ -219,7 +244,7 @@ void ProcessElectrons() {
 	continue;
     
       (npolParticleKE[particleName])->
-	Fill(aVertex->energy,fluxScaling);
+	Fill(aVertex->energy);
       (npolParticlePOS[particleName])->
 	Fill(abs(aVertex->posX),aVertex->posY);
       
@@ -239,7 +264,7 @@ void ProcessElectrons() {
       Double_t Xcenter = abs(aVertex->posX) - xOffSet;
       if((abs(aVertex->posY) <= 13.16) && (abs(Xcenter) <= 21.495)){
 	(targetParticleKE[particleName])->
-	  Fill(aVertex->energy,fluxScaling);
+	  Fill(aVertex->energy);
 	(targetParticlePOS[particleName])->
 	  Fill(abs(aVertex->posX),aVertex->posY);
 	
@@ -247,11 +272,9 @@ void ProcessElectrons() {
       
 	if(npolTrackIDs.find(aVertex->trackId) != npolTrackIDs.end()){
 	  (correlateKE[particleName])->
-	    Fill(aVertex->energy,fluxScaling);
+	    Fill(aVertex->energy);
 	  (correlatePOS[particleName])->
 	    Fill(abs(aVertex->posX),aVertex->posY);
-	  
-	  std::cout << "Correlated hit!" << std::endl;
 	}
       }
     }

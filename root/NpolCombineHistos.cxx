@@ -28,12 +28,13 @@ void NpolCombineHistos() {
      gSystem->CopyFile("hsimple.root", "hsimple2.root");
    }
 
-   TString Lead = "10"; TString Energy = "11"; TString Bfield = "4";
-   TString OutputDir = "Output/";
-   TString InputDir = "Output/";
-   Int_t Ncut = 500;
-   Int_t Nfiles = 38;
+   // THis first line of variables needs to be set in order to combine the correct files together.
+   TString Lead = "0"; TString Energy = "4.4"; TString Bfield = "4"; Int_t Nfiles = 4000;
+   Int_t Ncut = 500; 
    Int_t Nloops = 0;
+   TString OutputDir = "/work/hallc/cgen/tireman/MagFieldOn/MagField_" + Bfield + "Bdl/LeadOn" + Lead + "cm/";
+   TString InputDir = "/work/hallc/cgen/tireman/MagFieldOn/MagField_" + Bfield + "Bdl/LeadOn" + Lead +"cm/";
+
    if (Nfiles % Ncut != 0){
      Nloops = Nfiles/Ncut+ 1;
    } else {
@@ -45,18 +46,18 @@ void NpolCombineHistos() {
 
      TString OutputFile;
      if(j == (Nloops - 1)){
-       OutputFile = OutputDir + "NMU" + Energy + "GeV_Lead" + Lead + "cm_" + Bfield + "Bdl_Histos.root";
+       OutputFile = OutputDir + "JLAB" + Energy + "GeV_Lead" + Lead + "cm_" + Bfield + "Bdl_Histos.root";
      } else {
        char jtemp[2];
        sprintf(jtemp,"%i",j);
-       OutputFile = OutputDir + "NMU" + Energy + "GeV_Lead" + Lead + "cm_" + Bfield + "Bdl_Histos_All_" + jtemp + ".root";
+       OutputFile = OutputDir + "JLAB" + Energy + "GeV_Lead" + Lead + "cm_" + Bfield + "Bdl_Histos_All_" + jtemp + ".root";
      }
 
      TString InputFile;
      if (j!= 0 ){
        char jplustemp[2];
        sprintf(jplustemp,"%i",j-1);
-       InputFile = OutputDir + "NMU" + Energy + "GeV_Lead" + Lead + "cm_" + Bfield + "Bdl_Histos_All_" + jplustemp + ".root";
+       InputFile = OutputDir + "JLAB" + Energy + "GeV_Lead" + Lead + "cm_" + Bfield + "Bdl_Histos_All_" + jplustemp + ".root";
      }
 
      Int_t A = 0; 
@@ -78,7 +79,7 @@ void NpolCombineHistos() {
      std::cout << "Engaging files " << A << " through " << B-1 << std::endl;
      for (Int_t i = A; i < B; i++) {
        char fname[60];
-       sprintf(fname,"NMU" + Energy + "GeV_Lead" + Lead + "cm_" + Bfield + "Bdl_Histos_%i.root",i);
+       sprintf(fname,"JLAB" + Energy + "GeV_Lead" + Lead + "cm_" + Bfield + "Bdl_Histos_%i.root",i);
        FileList->Add( TFile::Open(InputDir + fname) );
      }
    
