@@ -20,3 +20,6 @@ dEoverE1.cxx
 TaggedParticles.cxx
 
 build/
+root/*.hh
+root/old
+root/PEjobsubmit.sh
