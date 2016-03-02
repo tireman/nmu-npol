@@ -2,14 +2,15 @@
 #include <vector>
 #include <map>
 
+#include <TTree.h>
+
+#include "G4PhysicalConstants.hh"
 #include <G4SystemOfUnits.hh>
 #include <G4Track.hh>
 #include <G4Step.hh>
 #include <G4StepPoint.hh>
 #include <G4VPhysicalVolume.hh>
 #include <G4VProcess.hh>
-
-#include <TTree.h>
 
 #include "NpolAnalysisManager.hh"
 #include "NpolFileManager.hh"
@@ -18,7 +19,7 @@
 #include "NpolTagger.hh"
 #include "NpolStatistics.hh"
 
-#define OUTFILE_VERSION 20150224 // Determined by YYYYMMDD
+#define OUTFILE_VERSION 20160301 // Determined by YYYYMMDD
 
 NpolAnalysisManager *NpolAnalysisManager::pInstance = NULL;
 
@@ -173,6 +174,8 @@ void NpolAnalysisManager::RecordStep(const G4Step *aStep) {
 
 	if(volName.substr(0,3) == "av_")
 	  steps->push_back(npolStep);
+	else 
+	  delete npolStep;
 
 	// Flag this event to be saved if at least one step takes place inside
 	// this tagger volume.
