@@ -37,7 +37,7 @@ NpolDetectorConstruction::NpolDetectorConstruction() {
   world = new NpolWorld();
   detectors.insert(new NpolPolarimeter());
   detectors.insert(new NpolScatteringChamber);
-  detectors.insert(new NpolHallShell);
+  //detectors.insert(new NpolHallShell);
   detectors.insert(new NpolBeamlineUpper);
   detectors.insert(new NpolBeamlineDown);
   detectors.insert(new NpolDipole1);
