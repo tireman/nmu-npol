@@ -163,19 +163,17 @@ void NpolAnalysisManager::RecordTrack(const G4Track *aTrack) {
 // Make a new NpolStep and add it to the steps vector.  Also check if this step is in a tagger
 // volume and add it to the appropriate tagger vector if that is the case.
 void NpolAnalysisManager::RecordStep(const G4Step *aStep) {
-    NpolStep *npolStep = new NpolStep();
 	G4Track *aTrack = aStep->GetTrack();
 	G4StepPoint *preStepPoint = aStep->GetPreStepPoint();
 	G4String volName = preStepPoint->GetPhysicalVolume()->GetName();
 
-	npolStep->time = aTrack->GetGlobalTime()/ns;
-	npolStep->eDep = (aStep->GetTotalEnergyDeposit())/MeV;
-	npolStep->volume = volName;
-
-	if(volName.substr(0,3) == "av_")
-	  steps->push_back(npolStep);
-	else 
-	  delete npolStep;
+	if(volName.substr(0,3) == "av_") {
+    	NpolStep *npolStep = new NpolStep();
+		npolStep->time = aTrack->GetGlobalTime()/ns;
+		npolStep->eDep = (aStep->GetTotalEnergyDeposit())/MeV;
+		npolStep->volume = volName;
+		steps->push_back(npolStep);
+	}
 
 	// Flag this event to be saved if at least one step takes place inside
 	// this tagger volume.
