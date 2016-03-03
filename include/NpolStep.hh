@@ -17,6 +17,13 @@
 class NpolStep : public TObject {
 
 public:
+  int trackId;
+  double posX;
+  double posY;
+  double posZ;
+  double momX;
+  double momY;
+  double momZ;
   double time;
   double eDep;
   std::string volume;
