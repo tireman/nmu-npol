@@ -32,6 +32,7 @@ private:
   void CreateMaterials();
   
   G4Material *CreateVacuum();
+  G4Material *CreateHardVacuum();
   G4Material *CreateAir();
   G4Material *CreateScint();
   G4Material *CreateAl();

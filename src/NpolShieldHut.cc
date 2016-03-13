@@ -55,7 +55,7 @@ void NpolShieldHut::ConstructNPOLTagger(){
   G4double xlen = 0.98*m; G4double ylen = 0.600*m; G4double zlen = 0.010*cm;
 
   G4Box *NPOLTagger = new G4Box("NPOLTagger",xlen/2,ylen/2,zlen/2);
-  NPOLTaggerLV = new G4LogicalVolume(NPOLTagger,NpolMaterials::GetInstance()->GetMaterial("Air"),"NPOLTaggerLV",0,0,0);
+  NPOLTaggerLV = new G4LogicalVolume(NPOLTagger,NpolMaterials::GetInstance()->GetMaterial("HardVacuum"),"NPOLTaggerLV",0,0,0);
   G4VisAttributes *TaggerVisAtt = new G4VisAttributes(G4Colour(0.2, 0.2, 0.2));
   NPOLTaggerLV->SetVisAttributes(TaggerVisAtt);
 }
