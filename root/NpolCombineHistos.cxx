@@ -44,11 +44,11 @@ void NpolCombineHistos() {
   // THis first line of variables needs to be set in order to combine the correct files together.
   std::string Lead = "15"; std::string Energy = "4.4"; std::string Bfield = "4"; 
   
-  std::string OutputDir = "/data3/cgen/NMUSimData/testing/Plots";
-  std::string InputDir = "/data3/cgen/NMUSimData/testing/Output";
+  std::string OutputDir = "/work/hallc/cgen/tireman/MagFieldOn/MagField_4Bdl/LeadOn15cm/root";
+  std::string InputDir = "/work/hallc/cgen/tireman/MagFieldOn/MagField_4Bdl/LeadOn15cm/Output";
   std::string OutputFile;
 
-  OutputFile = OutputDir + "/Semenov" + Energy + "GeV_Lead" + Lead + "cm_" + Bfield + "Bdl_Histos.root";
+  OutputFile = OutputDir +"/" + "semenov" + Energy + "GeV_Lead" + Lead + "cm_" + Bfield + "Bdl_Histos.root";
 
   TargetFile = TFile::Open( OutputFile.c_str(), "RECREATE" );
 
@@ -65,7 +65,12 @@ void NpolCombineHistos() {
 	std::string InFile = InputDir + "/" + dir->d_name;
 
 	if(isRootFile(dir->d_name)) {
-	  InputFile = TFile::Open( InFile.c_str(), "READ" );	
+	  InputFile = TFile::Open( InFile.c_str(), "READ" );
+	  if(InputFile->IsZombie()){
+		std::cout << "File was found to be zombie so skipping. " << dir->d_name << std::endl;
+		continue;
+	  }
+
 	  std::cout << "Filename: " << dir->d_name << std::endl;
 	  MergeRootObjects(TargetFile, InputFile);	
 	  TargetFile->SaveSelf(kTRUE);

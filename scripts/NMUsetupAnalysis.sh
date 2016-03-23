@@ -1,15 +1,18 @@
 #!/bin/sh
 
-export JOBNUMBER=$1
-export Lead=10
+#export JOBNUMBER=$1
+export Lead=15
 export Energy=4.4
 export Bfield=4
 export BUILD_DIR=/home/tireman/simulation/jlab/npol/nmu-npol/build
-export NPOLBASENAME=test_1_Lead10cm_4.4GeV_4Bdl
-export NPOLDIR=/data3/cgen/NMUSimData/4.4GeV/4Bdl/Lead10cm
+export NPOLBASENAME=semenov
+export NPOLDIR=/data3/cgen/SemenovGeometry/4.4GeV/4Bdl/Lead15cm
+export NPOLWORKDIR=/data3/cgen/SemenovGeometry/4.4GeV/4Bdl/Lead15cm
 
-export OutputDir=$NPOLDIR/Output/
+export OutputDir=$NPOLDIR/Plots/
 export InputDir=$NPOLDIR/root/
+export WorkOutputDir=$NPOLWORKDIR/Plots/
+export WorkInputDir=$NPOLWORKDIR/root/
 
 if [ ! -e $NPOLDIR ]
 then

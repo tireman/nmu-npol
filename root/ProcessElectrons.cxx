@@ -31,16 +31,18 @@ int GetAVNumber(const std::string &volName);
 int GetImprNumber(const std::string &volName);
 int GetPlacementNumber(const std::string &volName);
 double *AntilogBins(const int nbins, const double xmin, const double xmax); 
+
+TString BaseName = "";
 TString JobNum = "";
 TString Lead = ""; 
-TString Energy = ""; 
+TString Energy = "";
 TString Bfield = "";
 TString OutputDir = "";
 TString InputDir = "";
 
 void ProcessElectrons() {
   gSystem->Load("NpolClass.so"); 
-  
+
   // Set up the TTrees and their branch addresses
   TChain *npolTree = new TChain("T");
   TChain *statsTree = new TChain("T2");
@@ -55,7 +57,7 @@ void ProcessElectrons() {
   npolTree->Add(InputFile);
   statsTree->Add(InputFile);
 
-  std::vector<NpolVertex *> *anEntry = NULL;
+  std::vector<NpolVertex *> *vertexEntry = NULL;
   std::vector<NpolTagger *> *npolEntry = NULL;
   std::vector<NpolTagger *> *targetEntry = NULL;
   std::vector<NpolTagger *> *shmsEntry = NULL;
@@ -65,7 +67,7 @@ void ProcessElectrons() {
   npolTree->SetBranchAddress("NPOLTagger",&npolEntry);
   npolTree->SetBranchAddress("SHMSTagger",&shmsEntry);
   npolTree->SetBranchAddress("ParticleTagger",&targetEntry);
-  npolTree->SetBranchAddress("tracks",&anEntry);
+  npolTree->SetBranchAddress("tracks",&vertexEntry);
   npolTree->SetBranchAddress("steps",&anStep);
   statsTree->SetBranchAddress("stats",&anStat);
 
@@ -124,17 +126,17 @@ void ProcessElectrons() {
     targetParticleKE[it->first] = new TH1F(
      targetHistoName.c_str(), targetHistoTitle.c_str(),nbins,bins);
     targetParticlePOS[it->first] = new TH2F(targetXYHistoName.c_str(),
-     targetXYHistoTitle.c_str(),50,40.0,65.0,60,-15,15);  
+     targetXYHistoTitle.c_str(),70,40.0,75.0,60,-15,15);  
 
     npolParticleKE[it->first] = new TH1F(
-     npolHistoName.c_str(), npolHistoTitle.c_str(),nbins,bins);
+	  npolHistoName.c_str(), npolHistoTitle.c_str(),nbins,bins);
     npolParticlePOS[it->first] = new TH2F(npolXYHistoName.c_str(),
-     npolXYHistoTitle.c_str(),280,260.0,400.0,300,-75,75);
+     npolXYHistoTitle.c_str(),280,220.0,360.0,320,-80,80);
 
     correlateKE[it->first] = new TH1F(
      correlateHistoName.c_str(), correlateHistoTitle.c_str(),nbins,bins);
     correlatePOS[it->first] = new TH2F(correlateXYHistoName.c_str(),
-     correlateXYTitle.c_str(),50,40.0,65.0,60,-15,15);
+     correlateXYTitle.c_str(),70,40.0,75.0,60,-15,15);
 
   }  
 
@@ -154,39 +156,41 @@ void ProcessElectrons() {
 	PrintEventNumber(nentries,i);
 
 	std::set<int> npolTrackIDs;
-	std::set<int> vertexTrackIDs;
+	//std::set<int> vertexTrackIDs;
 
 	// loop over all vertex entries to find particles created in
 	// the lead curtain or front wall of shield hut
-	std::vector<NpolVertex *>::iterator v_it;
-	for(v_it = anEntry->begin(); v_it != anEntry->end(); v_it++){
+	/*std::vector<NpolVertex *>::iterator v_it;
+	for(v_it = vertexEntry->begin(); v_it != vertexEntry->end(); v_it++){
 	  NpolVertex *aVertex = *v_it;
 	  if(aVertex == NULL) continue;
 	  std::string volumeName = aVertex->volume;
-	  if(volumeName == "HutFrontWall" || volumeName == "LeadCurtain"){
+	  if((volumeName == "HutFrontWall") || (volumeName == "LeadCurtain") || (volumeName == "ExpHall") 
+	    || (volumeName == "NPOLTagger")){
 		vertexTrackIDs.insert(aVertex->trackId);
 	  }
-	}
+	  }*/
 	
     // loop over all tagged particles (one step in NPOL tagger volume)
     std::vector<NpolTagger *>::iterator n_it;
     for(n_it = npolEntry->begin(); n_it != npolEntry->end(); n_it++){
       NpolTagger *npolTagged = *n_it;
       if(npolTagged == NULL)  continue;
-      std::string particleName = npolTagged->particle;
+	  std::string particleName = npolTagged->particle;
       if(npolParticleKE.find(particleName) == npolParticleKE.end())
 		continue;
-	  if(vertexTrackIDs.find(npolTagged->trackId) 
-		 == vertexTrackIDs.end()){
+	  Double_t fluxscaling = 1;///(pow(618.0,2)*4*asin(sin(73.74e-3)*sin(61.82e-3))*log10(npolTagged->energy*1e6));
+
+	  //if(vertexTrackIDs.find(npolTagged->trackId) == vertexTrackIDs.end()){
 		(npolParticleKE[particleName])->
-		  Fill(npolTagged->energy);
+		  Fill(npolTagged->energy,fluxscaling);
 		(npolParticlePOS[particleName])->
 		  Fill(abs(npolTagged->posX),npolTagged->posY);
-
-	  }
+		
+		//}
 	  npolTrackIDs.insert(npolTagged->trackId);
 	}
-	vertexTrackIDs.clear();
+	//vertexTrackIDs.clear();
 
     // loop over all tagged particles (one step in target tagger volume)
     Double_t xOffSet = 112.0*sin(28.0*3.1416/180);
@@ -197,11 +201,11 @@ void ProcessElectrons() {
       std::string particleName = targetTagged->particle;
       if(targetParticleKE.find(particleName) == targetParticleKE.end())
 		continue;
-	  
+	  Double_t fluxscaling = 1;///(TotalElectrons*pow(112.0,2)*4*asin(sin(73.74e-3)*sin(61.82e-3))*log10(targetTagged->energy*1e6));
       Double_t Xcenter = abs(targetTagged->posX) - xOffSet;
       if((abs(targetTagged->posY) <= 8.115) && (abs(Xcenter) <= 9.750)){
 		(targetParticleKE[particleName])->
-		  Fill(targetTagged->energy);
+		  Fill(targetTagged->energy,fluxscaling);
 		(targetParticlePOS[particleName])->
 		  Fill(abs(targetTagged->posX),targetTagged->posY);
 		
@@ -210,7 +214,7 @@ void ProcessElectrons() {
 		   != npolTrackIDs.end()){  
 
 		  (correlateKE[particleName])->
-			Fill(targetTagged->energy);
+			Fill(targetTagged->energy,fluxscaling);
 		  (correlatePOS[particleName])->
 			Fill(abs(targetTagged->posX),targetTagged->posY);
 		}
@@ -412,14 +416,14 @@ double *AntilogBins(const int nbins, const double xmin, const double xmax) {
 
 TString FormInputFile(TString InputDir){
   
-  TString fileName = InputDir + "test_1_Lead" + Lead + "cm_" + Energy + "GeV_" + Bfield + "Bdl_" + JobNum + "_00002.root";
+  TString fileName = InputDir + BaseName + "Lead" + Lead + "cm_" + Energy + "GeV_" + Bfield + "Bdl_" + JobNum + ".root";
   
   return fileName;
 }
 
 TString FormOutputFile(TString OutputDir){
   
-  TString fileName =  OutputDir + "test_1" + Energy + "GeV_Lead" + Lead + "cm_" + Bfield + "Bdl_Histos_" + JobNum + ".root";
+  TString fileName =  OutputDir + "/" + BaseName + Energy + "GeV_Lead" + Lead + "cm_" + Bfield + "Bdl_Histos_" + JobNum + ".root";
   
   return fileName;
 }
@@ -434,29 +438,34 @@ void RetrieveENVvariables() {
 
   std::cout << "Processing job number: " << JobNum << std::endl;
 
-  //TString Lead = ""; 
-   if(getenv("Lead")){
+  if(getenv("NPOLBASENAME")){
+	BaseName = getenv("NPOLBASENAME");
+  }else{
+	std::cout << "Npol Base Name environmental variable not set" << std::endl; 
+	return; // Return error if not found
+  }
+
+  if(getenv("Lead")){
     Lead = getenv("Lead");
   }else{
      std::cout << "Lead environmental variable not set" << std::endl;
      return; // Return error if not found
   }
 
-   // TString Energy = ""; 
   if(getenv("Energy")){
     Energy = getenv("Energy");
   }else{
     std::cout << "Energy environmental variable not set" << std::endl;
      return; // Return error if not found
   }
-  // TString Bfield = "";
+  
   if(getenv("Bfield")){
     Bfield = getenv("Bfield");
   }else{
     std::cout << "Bfield environmental variable not set" << std::endl;
      return; // Return error if not found
   }
-  //  TString OutputDir = "";
+  
   if(getenv("OutputDir")){
 	OutputDir = getenv("OutputDir");
   }else{
@@ -464,7 +473,6 @@ void RetrieveENVvariables() {
 	return;
   }
 
-  //TString InputDir = "";
   if(getenv("InputDir")){
 	InputDir = getenv("InputDir");
   }else{
@@ -472,3 +480,4 @@ void RetrieveENVvariables() {
 	return;
   }
 }
+
