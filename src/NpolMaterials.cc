@@ -87,7 +87,8 @@ G4Material *NpolMaterials::CreateVacuum() {
   // Define Vacuum: New version; use Air and just make it very low density
   G4double fractionmass, density;
   G4int ncomponents;
-  G4Material *Vacuum = new G4Material("Vacuum", density= 1.0e-5*g/cm3, ncomponents=1, kStateGas, 0.1*kelvin, 1.e-19*atmosphere);
+  G4Material *Vacuum = 
+	new G4Material("Vacuum", density= 1.0e-3*g/cm3, ncomponents=1, kStateGas, 0.1*kelvin, 1.e-19*atmosphere);
   Vacuum->AddMaterial(nistMan->FindOrBuildMaterial("G4_AIR"), fractionmass=1.);
   
   return Vacuum;

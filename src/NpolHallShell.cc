@@ -61,7 +61,8 @@ void NpolHallShell::ConstructHallShellWall() {
   G4RotationMatrix *Rot = new G4RotationMatrix;
   G4ThreeVector zTrans(+0.0*m, 0.0*m, +3.0*m);
   
-  G4SubtractionSolid *HallShellWall = new G4SubtractionSolid("HallShellWall", Wall, Hole, Rot, zTrans);
+  G4SubtractionSolid *HallShellWall = 
+	new G4SubtractionSolid("HallShellWall", Wall, Hole, Rot, zTrans);
   
   HallShellWallLV = new G4LogicalVolume(HallShellWall,
      NpolMaterials::GetInstance()->GetMaterial("Concrete"),"HallShellWallLV",0,0,0);
@@ -87,7 +88,8 @@ void NpolHallShell::ConstructHallShellFloor() {
 // Construct the Hall Roof in the world
 void NpolHallShell::ConstructHallShellRoof() {
 
-  G4Sphere *HallShellRoof = new G4Sphere("HallShellRoof",(roofRadius-creteThick),roofRadius, 0.0*deg, 360.0*deg, 0.0*deg, 37.0*deg);
+  G4Sphere *HallShellRoof = 
+	new G4Sphere("HallShellRoof",(roofRadius-creteThick),roofRadius,0.0*deg, 360.0*deg, 0.0*deg, 37.0*deg);
   HallShellRoofLV = new G4LogicalVolume(HallShellRoof,
      NpolMaterials::GetInstance()->GetMaterial("Concrete"),"HallShellRoofLV",0,0,0);
   
@@ -98,11 +100,11 @@ void NpolHallShell::ConstructHallShellRoof() {
 
 void NpolHallShell::Place(G4LogicalVolume *motherLV) {
 
-	PlaceRectangular(HallShellRoofLV, motherLV, "HallShellRoof", 
-			-4.700*m, -21.60*m, +4.700*m, -90*deg, 0*deg, 0*deg);
-	PlaceRectangular(HallShellFloorLV, motherLV, "HallShellFloor", 
-			-4.700*m, -5.00*m, +4.700*m, -90*deg, 0*deg, 0*deg);
-	PlaceRectangular(HallShellWallLV, motherLV, "HallShellWall", 
-			-4.700*m,+3.00*m,+4.700*m, 90*deg, 0*deg, 0*deg);
+  PlaceRectangular(HallShellRoofLV, motherLV, "HallShellRoof", 
+				   -4.700*m, -21.60*m, +4.700*m, -90*deg, 0*deg, 0*deg);
+  PlaceRectangular(HallShellFloorLV, motherLV, "HallShellFloor", 
+				   -4.700*m, -5.00*m, +4.700*m, -90*deg, 0*deg, 0*deg);
+  PlaceRectangular(HallShellWallLV, motherLV, "HallShellWall", 
+				   -4.700*m,+3.00*m,+4.700*m, 90*deg, 0*deg, 0*deg);
 }
 

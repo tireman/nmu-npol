@@ -45,7 +45,8 @@ void NpolShieldHut::ConstructLeadCurtain(){
   G4double xlen = 0.85*m; G4double ylen = 0.55*m; G4double zlen = 0.100*m;
 
   G4Box *LeadCurtain = new G4Box("LeadCurtain",xlen/2,ylen/2,zlen/2);
-  LeadCurtainLV = new G4LogicalVolume(LeadCurtain,NpolMaterials::GetInstance()->GetMaterial("Pb"),"LeadCurtainLV",0,0,0);
+  LeadCurtainLV = 
+	new G4LogicalVolume(LeadCurtain,NpolMaterials::GetInstance()->GetMaterial("Pb"),"LeadCurtainLV",0,0,0);
   G4VisAttributes *LeadCurtainVisAtt = new G4VisAttributes(G4Colour(1.0, 0.7, 0.2));
   LeadCurtainLV->SetVisAttributes(LeadCurtainVisAtt);
 }
@@ -55,7 +56,8 @@ void NpolShieldHut::ConstructNPOLTagger(){
   G4double xlen = 0.98*m; G4double ylen = 0.600*m; G4double zlen = 0.010*cm;
 
   G4Box *NPOLTagger = new G4Box("NPOLTagger",xlen/2,ylen/2,zlen/2);
-  NPOLTaggerLV = new G4LogicalVolume(NPOLTagger,NpolMaterials::GetInstance()->GetMaterial("HardVacuum"),"NPOLTaggerLV",0,0,0);
+  NPOLTaggerLV = 
+	new G4LogicalVolume(NPOLTagger,NpolMaterials::GetInstance()->GetMaterial("HardVacuum"),"NPOLTaggerLV",0,0,0);
   G4VisAttributes *TaggerVisAtt = new G4VisAttributes(G4Colour(0.2, 0.2, 0.2));
   NPOLTaggerLV->SetVisAttributes(TaggerVisAtt);
 }
@@ -80,7 +82,8 @@ void NpolShieldHut::ConstructHutFrontWall() {
   G4SubtractionSolid *HutFrontWall = new G4SubtractionSolid("HutFrontWall", Sheet, Collimator, yRot, xTrans);
   
   // Generate the logical volume
-  HutFrontWallLV = new G4LogicalVolume(HutFrontWall,NpolMaterials::GetInstance()->GetMaterial("SSteel"),"HutFrontWallLV",0,0,0);
+  HutFrontWallLV = 
+	new G4LogicalVolume(HutFrontWall,NpolMaterials::GetInstance()->GetMaterial("SSteel"),"HutFrontWallLV",0,0,0);
   
   G4VisAttributes *FrontWallVisAtt= new G4VisAttributes(G4Colour(0.0,1.5,0.0));
   HutFrontWallLV->SetVisAttributes(FrontWallVisAtt);
@@ -134,8 +137,10 @@ void NpolShieldHut::Place(G4LogicalVolume *motherLV) {
   PlaceCylindrical(NPOLTaggerLV, motherLV, "NPOLTagger", PosTagger, -NpolAng, 0);
   PlaceCylindrical(HutFrontWallLV, motherLV, "HutFrontWall", PosFront,-NpolAng,-VertOffSet);
   PlaceCylindrical(HutBackWallLV, motherLV, "HutBackWall", PosBack,-NpolAng,-VertOffSet);
-  PlaceRectangular(HutSideWallLV, motherLV, "HutSideWall", -PosSide*sin(AngSide+NpolAng), -VertOffSet, PosSide*cos(AngSide+NpolAng), 0*deg, -NpolAng, 0*deg);
-  PlaceRectangular(HutSideWallLV, motherLV, "HutSideWall", -PosSide*sin(AngSide), -VertOffSet, PosSide*cos(AngSide), 0*deg, -NpolAng, 0);
+  PlaceRectangular(HutSideWallLV, motherLV, "HutSideWall", -PosSide*sin(AngSide+NpolAng), 
+				   -VertOffSet, PosSide*cos(AngSide+NpolAng), 0*deg, -NpolAng, 0*deg);
+  PlaceRectangular(HutSideWallLV, motherLV, "HutSideWall", -PosSide*sin(AngSide), 
+				   -VertOffSet, PosSide*cos(AngSide), 0*deg, -NpolAng, 0);
   PlaceCylindrical(HutRoofLV, motherLV, "HutRoof", PosRoof, -NpolAng, OffSetRoof);
 }
 

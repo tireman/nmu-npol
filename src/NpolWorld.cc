@@ -28,7 +28,7 @@ NpolWorld::NpolWorld() {
   //G4Box *expHall = new G4Box("ExpHall", 8.0*m, 5.0*m, 10.0*m); // P/N only
   expHallLV = new G4LogicalVolume(expHall, 			       
 	//NpolMaterials::GetInstance()->GetMaterial("Air"), "expHallLV", 0, 0, 0);
-  NpolMaterials::GetInstance()->GetMaterial("Vacuum"), "expHallLV", 0, 0, 0);
+  NpolMaterials::GetInstance()->GetMaterial("HardVacuum"), "expHallLV", 0, 0, 0);
   expHallLV->SetVisAttributes(G4VisAttributes::GetInvisible());
 }
 
