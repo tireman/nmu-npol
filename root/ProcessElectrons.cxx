@@ -416,14 +416,14 @@ double *AntilogBins(const int nbins, const double xmin, const double xmax) {
 
 TString FormInputFile(TString InputDir){
   
-  TString fileName = InputDir + BaseName + "Lead" + Lead + "cm_" + Energy + "GeV_" + Bfield + "Bdl_" + JobNum + ".root";
+  TString fileName = InputDir + "/" + BaseName + "_Lead" + Lead + "cm_" + Energy + "GeV_" + Bfield + "Bdl_" + JobNum + ".root";
   
   return fileName;
 }
 
 TString FormOutputFile(TString OutputDir){
   
-  TString fileName =  OutputDir + "/" + BaseName + Energy + "GeV_Lead" + Lead + "cm_" + Bfield + "Bdl_Histos_" + JobNum + ".root";
+  TString fileName =  OutputDir + "/" + BaseName + "_Lead" + Lead + "cm_" + Energy + "GeV_" + Bfield + "Bdl_Histos_" + JobNum + ".root";
   
   return fileName;
 }

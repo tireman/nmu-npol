@@ -358,14 +358,14 @@ void SimulationFigures() {
 
 TString FormInputFile(TString InputDir){
   
-  TString fileName = InputDir + BaseName + Energy + "GeV_" + "Lead" + Lead + "cm_" + Bfield + "Bdl_Histos.root";
+  TString fileName = InputDir + "/" + BaseName + "_Lead" + Lead + "cm_" + Energy + "GeV_" + Bfield + "Bdl_Histos.root";
   
   return fileName;
 }
 
 TString FormOutputFile(TString OutputDir){
   
-  TString fileName =  OutputDir + BaseName + Energy + "GeV_Lead" + Lead + "cm_" + Bfield + "Bdl_Fig21-23.root";
+  TString fileName =  OutputDir + "/" + BaseName + Energy + "GeV_Lead" + Lead + "cm_" + Bfield + "Bdl_Fig21-23.root";
   
   return fileName;
 }

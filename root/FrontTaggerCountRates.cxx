@@ -30,6 +30,12 @@ void CanvasPartition(TCanvas *C,const Int_t Nx = 2,const Int_t Ny = 2,
 int GetAVNumber(const std::string &volName);
 int GetImprNumber(const std::string &volName);
 int GetPlacementNumber(const std::string &volName);
+TString FormInputFile(TString InputDir);
+TString FormOutputFile(TString OutputDir);
+void RetrieveENVvariables();
+
+TString BaseName = "";  TString JobNum = "";  TString Lead = ""; TString Energy = ""; 
+TString Bfield = ""; TString OutputDir = ""; TString InputDir = "";
 
 void FrontTaggerCountRates() {
 
@@ -37,13 +43,10 @@ void FrontTaggerCountRates() {
 
   std::string histoNames[3][2]={{"av_11_impr_1_FrontTagLV_pv_1","av_11_impr_1_FrontTagLV_pv_0"},{"av_11_impr_1_FrontTagLV_pv_3","av_11_impr_1_FrontTagLV_pv_2"},{"av_11_impr_1_FrontTagLV_pv_5","av_11_impr_1_FrontTagLV_pv_4"}};
    
-  TString Lead = "15"; TString Energy = "4.4"; TString Bfield = "4";
-  TString OutputDir = "/work/hallc/cgen/tireman/MagFieldOn/MagField_" + Bfield + "Bdl/LeadOn" + Lead + "cm/Plots/";
-  TString InputDir = "/work/hallc/cgen/tireman/MagFieldOn/MagField_" + Bfield + "Bdl/LeadOn" + Lead + "cm/root/";
-
- TString OutputFile = OutputDir + "semenov" + Energy + "GeV_Lead" + Lead + "cm_" + Bfield + "Bdl_FrontTaggerRates.root";
-  TString InputFile = InputDir + "semenov" + Energy + "GeV_Lead" + Lead + "cm_" + Bfield + "Bdl_Histos.root";
-
+  RetrieveENVvariables();
+  
+  TString InputFile = FormInputFile(InputDir);
+  TString OutputFile = FormOutputFile(OutputDir);
   TFile *inFile = TFile::Open(InputFile);
   TFile *outFile = new TFile(OutputFile,"RECREATE");
 
@@ -320,5 +323,72 @@ int GetPlacementNumber(const std::string &volName) {
     return atoi(volName.substr(underscorePos+1,std::string::npos).c_str());
   } else
     return 0;
+}
+
+TString FormInputFile(TString InputDir){
+  
+  TString fileName = InputDir + "/" + BaseName + "_Lead" + Lead + "cm_" + Energy + "GeV_" + Bfield + "Bdl_Histos.root";
+  
+  return fileName;
+}
+
+TString FormOutputFile(TString OutputDir){
+  
+  TString fileName =  OutputDir + "/" + BaseName + Energy + "GeV_Lead" + Lead + "cm_" + Bfield + "Bdl_Fig21-23.root";
+  
+  return fileName;
+}
+
+void RetrieveENVvariables() {
+
+ if(getenv("JOBNUMBER")){
+    JobNum = getenv("JOBNUMBER");
+  }else{
+    JobNum = "99999"; // default job number is 99999
+  }
+
+  std::cout << "Processing job number: " << JobNum << std::endl;
+
+  if(getenv("NPOLBASENAME")){
+	BaseName = getenv("NPOLBASENAME");
+  }else{
+	std::cout << "Npol Base Name environmental variable not set" << std::endl;
+	return; // Return error if not found
+  }
+
+  if(getenv("Lead")){
+    Lead = getenv("Lead");
+  }else{
+     std::cout << "Lead environmental variable not set" << std::endl;
+     return; // Return error if not found
+  }
+
+  if(getenv("Energy")){
+    Energy = getenv("Energy");
+  }else{
+    std::cout << "Energy environmental variable not set" << std::endl;
+     return; // Return error if not found
+  }
+  
+  if(getenv("Bfield")){
+    Bfield = getenv("Bfield");
+  }else{
+    std::cout << "Bfield environmental variable not set" << std::endl;
+     return; // Return error if not found
+  }
+  
+  if(getenv("WorkOutputDir")){
+	OutputDir = getenv("WorkOutputDir");
+  }else{
+	std::cout << "Output Directory environmental varilable not set" << std::endl;
+	return;
+  }
+
+  if(getenv("WorkInputDir")){
+	InputDir = getenv("WorkInputDir");
+  }else{
+	std::cout << "Input Directory environmental varilable not set" << std::endl;
+	return;
+  }
 }
 
