@@ -4,369 +4,192 @@
 #include <string>
 #include <vector>
 #include <map>
+#include <set>
 
 #include <TLatex.h>
 #include <TAttAxis.h>
 #include <TMath.h>
 #include <TFile.h>
-#include <TTree.h>
-#include <TChain.h>
 #include <TCanvas.h>
-#include <TBranch.h>
 #include <TVector.h>
 #include <TH1.h>
-#include <TH2.h>
 #include <TSystem.h>
 #include <TROOT.h>
 #include <TObject.h>
 #include <TString.h>
 
-void CanvasPartition(TCanvas *C,const Int_t Nx = 2,const Int_t Ny = 2, 
-		     Float_t lMargin = 0.15, Float_t rMargin = 0.05,
+void CanvasPartition(TCanvas *C,const Int_t Nxx = 2,const Int_t Nyy = 2, 
+					 Float_t lMargin = 0.15, Float_t rMargin = 0.05,
                      Float_t bMargin = 0.15, Float_t tMargin = 0.05,
-		     Float_t vSpacing = 0.0, Float_t hSpacing = 0.0);
+					 Float_t vSpacing = 0.0, Float_t hSpacing = 0.0);
 
+void FillCanvas(TCanvas *C, Double_t scaleFactor,TFile *F, std::string histoNames[3][3], struct histoParams plotSettings);
+TString FormInputFile(TString InputDir);
+TString FormOutputFile(TString OutputDir);
+void RetrieveENVvariables();
+
+struct histoParams {
+  std::string leadName; 
+  std::map<std::string, bool> plotFlags; 
+  Int_t fillStyle; 
+  Int_t Nx; Int_t Ny; 
+  std::string plotStyle; 
+  std::string xTitle; 
+  std::string yTitle; 
+  std::string zTitle; 
+  std::map<std::string, Double_t> Ranges;
+} plotSettings;
+
+TString BaseName = "";  TString JobNum = "";  TString Lead = ""; TString Energy = ""; 
+TString Bfield = ""; TString OutputDir = ""; TString InputDir = "";
+
+// main function
 void SimulationFigures() {
 
   Long_t TotalElectrons = 0, TotalEventsRecorded = 0; 
   std::string histoNames[3][3]={{"pi-","mu+","gamma"},
-				{"neutron","mu-","e+"},
-				{"proton","pi+","e-"}};
-
-  TString Lead = "10"; TString Energy = "4.4"; TString Bfield = "4";
-  TString OutputDir = "/work/hallc/cgen/tireman/MagFieldOn/MagField_" + Bfield + "Bdl/Plots/";
-   TString InputDir = "/work/hallc/cgen/tireman/MagFieldOn/MagField_" + Bfield + "Bdl/LeadOn" + Lead +"cm/";
-
-  TString OutputFile = OutputDir + "JLAB" + Energy + "GeV_Lead" + Lead + "cm_" + Bfield + "Bdl_Fig21-23.root";
-  TString InputFile = InputDir + "JLAB" + Energy + "GeV_Lead" + Lead + "cm_" + Bfield + "Bdl_Histos.root";
-
+								{"neutron","mu-","e+"},
+								{"proton","pi+","e-"}};
+  
+  RetrieveENVvariables();
+  
+  TString InputFile = FormInputFile(InputDir);
+  TString OutputFile = FormOutputFile(OutputDir);
   TFile *inFile = TFile::Open(InputFile);
   TFile *outFile = new TFile(OutputFile,"RECREATE");
-
+  
   TVectorD *v = (TVectorD*)inFile->Get("TVectorT<double>");
   Double_t totalElectrons = ((*v))[0];
   Double_t electronTime = totalElectrons/(6.242e12); //6.242e12 e-/s at 1 microAmp
-  //Double_t fluxscaling1 = 1/(totalElectrons*1.602e-13*(98*60));  // My scale
-  //Double_t fluxscaling2 = 1/(totalElectrons*1.602e-13*(42.99*26.32));  // My scale
-  Double_t fluxscaling1 = 1/(totalElectrons*(98*60));  //Proposal Scale
-  Double_t fluxscaling2 = 1/(totalElectrons*(42.99*26.32));  //Proposal Scale
-
+  
+  Double_t theta = 147.48e-3;  // Vertical angle
+  Double_t phi = 123.64e-3;    // Horizontal angle
+  Double_t solidAngle = 4*asin(sin(theta/2)*sin(phi/2));
+  
+  // My scale for NPOL Tagger
+  //Double_t fluxscaling1 = 1/(totalElectrons*1.602e-13*pow(618.0,2)*solidAngle)); 
+  //Double_t fluxscaling2 = 1/(totalElectrons*1.602e-13*pow(112.0,2)*solidAngle)); 
+  
+  //Proposal Scale for NPOL Tagger
+  Double_t fluxscaling1 = 1/(totalElectrons*pow(618.0,2)*solidAngle);  // full solid angle calculation for a pyramid
+  Double_t fluxscaling2 = 1/(totalElectrons*pow(112.0,2)*solidAngle);  
+   
+  // Put out some statistics
   std::cout << "Electron beam time at 1 micro-amp is " << electronTime << " s " << std::endl;
   std::cout << "Total electrons on target: " << totalElectrons/1e6 << " Million" << std::endl;
-
+  
+  // Plot the Npol Tagger Flux plots
   TCanvas *c1 = new TCanvas("c1","NPOL Tagger Flux vs. KE at Polarimeter Angle 28.0 Deg, E = 4.4 GeV",1000,900);
-  Int_t Nx = 3, Ny =3, fillStyle = 1001;
   Float_t lMargin = 0.10, rMargin = 0.05, bMargin = 0.07, tMargin = 0.05;
   Float_t vSpacing = 0.0; Float_t hSpacing = 0.0;
-  CanvasPartition(c1,Nx,Ny,lMargin,rMargin,bMargin,tMargin,vSpacing,hSpacing);
-
-  TPad *pad[Nx][Ny];
-    
-  for(int i = 0; i < Nx; i++){
-   for(int j = 0; j < Ny; j++){
-     c1->cd(0);
-     // Get the pads previosly created.
-     char pname[24];
-     sprintf(pname,"pad_%i_%i",i,j);
-     pad[i][j] = (TPad*) gROOT->FindObject(pname);
-     pad[i][j]->Draw();
-     pad[i][j]->SetLogx();
-     pad[i][j]->SetLogy();
-     pad[i][j]->SetFillStyle(4000);
-     pad[i][j]->SetFrameFillStyle(4000);
-     pad[i][j]->cd();
-     // Size factors
-     Float_t xFactor = pad[0][0]->GetAbsWNDC()/pad[i][j]->GetAbsWNDC();
-     Float_t yFactor = pad[0][0]->GetAbsHNDC()/pad[i][j]->GetAbsHNDC();
-
-     char hname[24];
-     std::string str = histoNames[i][j];
-     sprintf(hname,"NpolFlux_%s",histoNames[i][j].c_str());
-     TH1F *hFrame = (TH1F*) inFile->Get(hname);
-     hFrame->SetStats(false); 
-     hFrame->SetFillColor(kBlue);
-     hFrame->SetTitleFont(16);
-     hFrame->SetFillStyle(fillStyle);
-     hFrame->Scale(fluxscaling1);
-     hFrame->Draw();
   
-     // y axis range
-     hFrame->GetYaxis()->SetRangeUser(2e-15,4e-8); // proposal scale
-     //hFrame->GetYaxis()->SetRangeUser(0.005,200); // my scale
-     
-     // Format for y axis
-     //hFrame->GetYaxis()->SetTitle("#frac{Particles}{#muA #times cm^{2}}"); // My scale
-     hFrame->GetYaxis()->SetTitle("#frac{Particles}{electron #times cm^{2}}"); // Proposal scale
-     hFrame->GetYaxis()->SetLabelFont(43);
-     hFrame->GetYaxis()->SetLabelSize(16);
-     hFrame->GetYaxis()->SetLabelOffset(0.02);
-     hFrame->GetYaxis()->SetTitleFont(43);
-     hFrame->GetYaxis()->SetTitleSize(16);
-     hFrame->GetYaxis()->SetTitleOffset(5);
-     
-     hFrame->GetYaxis()->CenterTitle();
-     hFrame->GetYaxis()->SetNdivisions(505);
-     
-     // TICKS Y Axis
-     hFrame->GetYaxis()->SetTickLength(xFactor*0.04/yFactor);
-     
-     // Format for x axis
-     hFrame->GetXaxis()->SetTitle("Kinetic Energy (MeV)");
-     hFrame->GetXaxis()->SetLabelFont(43);
-     hFrame->GetXaxis()->SetLabelSize(16);
-     hFrame->GetXaxis()->SetLabelOffset(0.02);
-     hFrame->GetXaxis()->SetTitleFont(43);
-     hFrame->GetXaxis()->SetTitleSize(16);
-     hFrame->GetXaxis()->SetTitleOffset(5);
-     hFrame->GetXaxis()->CenterTitle();
-     hFrame->GetXaxis()->SetNdivisions(505);
-     
-     // Set X axis range
-     hFrame->GetXaxis()->SetRangeUser(1e-1,8e3);
-
-     // TICKS X Axis
-     hFrame->GetXaxis()->SetTickLength(yFactor*0.06/xFactor);
-     
-   }
-  }
-
-
-  TCanvas *c2 = new TCanvas("c2","Target Tagger Flux vs. KE at Polarimeter Angle 28.0 Deg, E = 4.4 GeV",1000,900);
-  Nx = 3, Ny =3, fillStyle = 1001;
-  lMargin = 0.10, rMargin = 0.05, bMargin = 0.07, tMargin = 0.05;
+  plotSettings.leadName = "NpolFlux"; plotSettings.Nx = 3; plotSettings.Ny = 3;
+  plotSettings.plotFlags.insert(std::pair<std::string, bool>("xAxis",true)); 
+  plotSettings.plotFlags.insert(std::pair<std::string, bool>("yAxis",true)); 
+  plotSettings.plotFlags.insert(std::pair<std::string, bool>("zAxis",false)); 
+  plotSettings.plotFlags.insert(std::pair<std::string, bool>("binScale",false));
+  plotSettings.fillStyle = 1001; plotSettings.plotStyle = ""; 
+  plotSettings.xTitle = "#frac{Particles}{electron #times cm^{2}#times Log_{10}T}"; 
+  //plotSettings.xTitle = "#frac{Particles}{#muA #times cm^{2}}";  // my scale
+  plotSettings.yTitle = "Kinetic Energy (MeV)"; 
+  plotSettings.zTitle = "z title";
+  plotSettings.Ranges.insert(std::pair<std::string, Double_t>("xLow",1e-1)); 
+  plotSettings.Ranges.insert(std::pair<std::string, Double_t>("xHigh",1e4));
+  plotSettings.Ranges.insert(std::pair<std::string, Double_t>("yLow",2e-15)); 
+  plotSettings.Ranges.insert(std::pair<std::string, Double_t>("yHigh",1e-10));
+  plotSettings.Ranges.insert(std::pair<std::string, Double_t>("zLow",0.0)); 
+  plotSettings.Ranges.insert(std::pair<std::string, Double_t>("zHigh",1000.0));
+  
+  CanvasPartition(c1,plotSettings.Nx,plotSettings.Ny,lMargin,rMargin,bMargin,tMargin,vSpacing,hSpacing);
+  FillCanvas(c1, fluxscaling1, inFile, histoNames, plotSettings);
+  
+  // Plot the Target Tagger (just before the first magnet) flux plots
+  TCanvas *c2a = new TCanvas("c2a","Target Tagger Flux vs. KE at Polarimeter Angle 28.0 Deg, E = 4.4 GeV",1000,900);
+  lMargin = 0.10; rMargin = 0.05; bMargin = 0.07; tMargin = 0.05;
   vSpacing = 0.0; hSpacing = 0.0;
-  CanvasPartition(c2,Nx,Ny,lMargin,rMargin,bMargin,tMargin,vSpacing,hSpacing);
-    
-  for(int i = 0; i < Nx; i++){
-   for(int j = 0; j < Ny; j++){
-     c2->cd(0);
-     // Get the pads previosly created.
-     char pname[24];
-     sprintf(pname,"pad_%i_%i",i,j);
-     pad[i][j] = (TPad*) gROOT->FindObject(pname);
-     pad[i][j]->Draw();
-     pad[i][j]->SetLogx();
-     pad[i][j]->SetLogy();
-     pad[i][j]->SetFillStyle(4000);
-     pad[i][j]->SetFrameFillStyle(4000);
-     pad[i][j]->cd();
-     // Size factors
-     Float_t xFactor = pad[0][0]->GetAbsWNDC()/pad[i][j]->GetAbsWNDC();
-     Float_t yFactor = pad[0][0]->GetAbsHNDC()/pad[i][j]->GetAbsHNDC();
-
-     char hname[24];
-     std::string str = histoNames[i][j];
-     sprintf(hname,"TargetFlux_%s",histoNames[i][j].c_str());
-     TH1F *hFrame = (TH1F*) inFile->Get(hname);
-     hFrame->SetStats(false); 
-     hFrame->SetFillColor(kBlue);
-     hFrame->SetTitleFont(16);
-     hFrame->SetFillStyle(fillStyle);
-     hFrame->Scale(fluxscaling2);
-     hFrame->Draw();
-
-     // y axis range
-     hFrame->GetYaxis()->SetRangeUser(2e-15,4e-8); // proposal scale
-     //hFrame->GetYaxis()->SetRangeUser(0.5,500000); // my scale
-     
-     // Format for y axis
-     //hFrame->GetYaxis()->SetTitle("#frac{Particles}{#muA #times cm^{2}}"); // My scale
-     hFrame->GetYaxis()->SetTitle("#frac{Particles}{electron #times cm^{2}}"); // Proposal Scale
-     hFrame->GetYaxis()->SetLabelFont(43);
-     hFrame->GetYaxis()->SetLabelSize(16);
-     hFrame->GetYaxis()->SetLabelOffset(0.02);
-     hFrame->GetYaxis()->SetTitleFont(43);
-     hFrame->GetYaxis()->SetTitleSize(16);
-     hFrame->GetYaxis()->SetTitleOffset(5);
-     
-     hFrame->GetYaxis()->CenterTitle();
-     hFrame->GetYaxis()->SetNdivisions(505);
-     
-     // TICKS Y Axis
-     hFrame->GetYaxis()->SetTickLength(xFactor*0.04/yFactor);
-     
-     // Format for x axis
-     hFrame->GetXaxis()->SetTitle("Kinetic Energy (MeV)");
-     hFrame->GetXaxis()->SetLabelFont(43);
-     hFrame->GetXaxis()->SetLabelSize(16);
-     hFrame->GetXaxis()->SetLabelOffset(0.02);
-     hFrame->GetXaxis()->SetTitleFont(43);
-     hFrame->GetXaxis()->SetTitleSize(16);
-     hFrame->GetXaxis()->SetTitleOffset(5);
-     hFrame->GetXaxis()->CenterTitle();
-     hFrame->GetXaxis()->SetNdivisions(505);
-
-     // Set X axis range
-     hFrame->GetXaxis()->SetRangeUser(1e-1,8e3);
-
-     // TICKS X Axis
-     hFrame->GetXaxis()->SetTickLength(yFactor*0.06/xFactor);
-     
-   }
-  }
-
- TCanvas *c2b = new TCanvas("c2b","Correlated Target Tagger Flux vs. KE at Polarimeter Angle 28.0 Deg, E = 4.4 GeV",1000,900);
-  Nx = 3, Ny =3, fillStyle = 1001;
-  lMargin = 0.10, rMargin = 0.05, bMargin = 0.07, tMargin = 0.05;
-  vSpacing = 0.0; hSpacing = 0.0;
-  CanvasPartition(c2b,Nx,Ny,lMargin,rMargin,bMargin,tMargin,vSpacing,hSpacing);
-    
-  for(int i = 0; i < Nx; i++){
-   for(int j = 0; j < Ny; j++){
-     c2b->cd(0);
-     // Get the pads previosly created.
-     char pname[24];
-     sprintf(pname,"pad_%i_%i",i,j);
-     pad[i][j] = (TPad*) gROOT->FindObject(pname);
-     pad[i][j]->Draw();
-     pad[i][j]->SetLogx();
-     pad[i][j]->SetLogy();
-     pad[i][j]->SetFillStyle(4000);
-     pad[i][j]->SetFrameFillStyle(4000);
-     pad[i][j]->cd();
-     // Size factors
-     Float_t xFactor = pad[0][0]->GetAbsWNDC()/pad[i][j]->GetAbsWNDC();
-     Float_t yFactor = pad[0][0]->GetAbsHNDC()/pad[i][j]->GetAbsHNDC();
-
-     char hname[34];
-     std::string str = histoNames[i][j];
-     sprintf(hname,"Correlated_TargetFlux_%s",histoNames[i][j].c_str());
-     TH1F *hFrame = (TH1F*) inFile->Get(hname);
-     hFrame->SetStats(false); 
-     hFrame->SetFillColor(kBlue);
-     hFrame->SetTitleFont(16);
-     hFrame->SetFillStyle(fillStyle);
-     hFrame->Scale(fluxscaling2);
-     hFrame->Draw();
-
-     // y axis range
-     hFrame->GetYaxis()->SetRangeUser(2e-15,2e-8); // proposal scale
-     //hFrame->GetYaxis()->SetRangeUser(0.5,500000); // my scale
-     
-     // Format for y axis
-     //hFrame->GetYaxis()->SetTitle("#frac{Particles}{#muA #times cm^{2}}"); // My scale
-     hFrame->GetYaxis()->SetTitle("#frac{Particles}{electron #times cm^{2}}"); // Proposal Scale
-     hFrame->GetYaxis()->SetLabelFont(43);
-     hFrame->GetYaxis()->SetLabelSize(16);
-     hFrame->GetYaxis()->SetLabelOffset(0.02);
-     hFrame->GetYaxis()->SetTitleFont(43);
-     hFrame->GetYaxis()->SetTitleSize(16);
-     hFrame->GetYaxis()->SetTitleOffset(5);
-     
-     hFrame->GetYaxis()->CenterTitle();
-     hFrame->GetYaxis()->SetNdivisions(505);
-     
-     // TICKS Y Axis
-     hFrame->GetYaxis()->SetTickLength(xFactor*0.04/yFactor);
-     
-     // Format for x axis
-     hFrame->GetXaxis()->SetTitle("Kinetic Energy (MeV)");
-     hFrame->GetXaxis()->SetLabelFont(43);
-     hFrame->GetXaxis()->SetLabelSize(16);
-     hFrame->GetXaxis()->SetLabelOffset(0.02);
-     hFrame->GetXaxis()->SetTitleFont(43);
-     hFrame->GetXaxis()->SetTitleSize(16);
-     hFrame->GetXaxis()->SetTitleOffset(5);
-     hFrame->GetXaxis()->CenterTitle();
-     hFrame->GetXaxis()->SetNdivisions(505);
-     
-     // Set X axis range
-     hFrame->GetXaxis()->SetRangeUser(1e-1,8e3);
-
-     // TICKS X Axis
-     hFrame->GetXaxis()->SetTickLength(yFactor*0.06/xFactor);
-     
-   }
-  }
-     
-  TCanvas *c3 = new TCanvas("c3","Position in Npol Tagger with Polarimeter Angle 28.0 Deg, E = 4.4 GeV",1000,900);
+  
+  plotSettings.plotFlags.clear(); plotSettings.Ranges.clear();
+  plotSettings.leadName = "TargetFlux"; plotSettings.Nx = 3; plotSettings.Ny = 3;
+  plotSettings.plotFlags.insert(std::pair<std::string, bool>("xAxis",true)); 
+  plotSettings.plotFlags.insert(std::pair<std::string, bool>("yAxis",true)); 
+  plotSettings.plotFlags.insert(std::pair<std::string, bool>("zAxis",false)); 
+  plotSettings.plotFlags.insert(std::pair<std::string, bool>("binScale",false));
+  plotSettings.fillStyle = 1001; plotSettings.plotStyle = ""; 
+  plotSettings.xTitle = "#frac{Particles}{electron #times cm^{2}#times Log_{10}T}"; 
+  //plotSettings.xTitle = "#frac{Particles}{#muA #times cm^{2}}";  // my scale
+  plotSettings.yTitle = "Kinetic Energy (MeV)"; 
+  plotSettings.zTitle = "z title";
+  plotSettings.Ranges.insert(std::pair<std::string, Double_t>("xLow",1e-1)); 
+  plotSettings.Ranges.insert(std::pair<std::string, Double_t>("xHigh",1e4));
+  plotSettings.Ranges.insert(std::pair<std::string, Double_t>("yLow",2e-15)); 
+  plotSettings.Ranges.insert(std::pair<std::string, Double_t>("yHigh",8e-8));
+  plotSettings.Ranges.insert(std::pair<std::string, Double_t>("zLow",0.0)); 
+  plotSettings.Ranges.insert(std::pair<std::string, Double_t>("zHigh",1000.0));
  
-  lMargin = 0.07, rMargin = 0.03, bMargin = 0.08, tMargin = 0.05;
-  Nx = 3; Ny = 3;
+  CanvasPartition(c2a,plotSettings.Nx,plotSettings.Ny,lMargin,rMargin,bMargin,tMargin,vSpacing,hSpacing);
+  FillCanvas(c2a, fluxscaling1, inFile,  histoNames, plotSettings);
+  
+  // Plot the Target Tagger flux plot requiring a hit in the NPOLll tagger as well
+  TCanvas *c2b = new TCanvas("c2b","Correlated Target Tagger Flux vs. KE at Polarimeter Angle 28.0 Deg, E = 4.4 GeV",1000,900);
+  lMargin = 0.10; rMargin = 0.05; bMargin = 0.07; tMargin = 0.05;
   vSpacing = 0.0; hSpacing = 0.0;
-  CanvasPartition(c3,Nx,Ny,lMargin,rMargin,bMargin,tMargin,vSpacing,hSpacing);
-    
-  for(int i = 0; i < Nx; i++){
-   for(int j = 0; j < Ny; j++){
-     c3->cd(0);
-     // Get the pads previosly created.
-     char pname[16];
-     sprintf(pname,"pad_%i_%i",i,j);
-     pad[i][j] = (TPad*) gROOT->FindObject(pname);
-     pad[i][j]->Draw();
-     //pad[i][j]->SetLogz();
-     pad[i][j]->SetFillStyle(4000);
-     pad[i][j]->SetFrameFillStyle(4000);
-     pad[i][j]->cd();
-     // Size factors
-     Float_t xFactor = pad[0][0]->GetAbsWNDC()/pad[i][j]->GetAbsWNDC();
-     Float_t yFactor = pad[0][0]->GetAbsHNDC()/pad[i][j]->GetAbsHNDC();
 
-     char hname[16];
-     std::string str = histoNames[i][j];
-     sprintf(hname,"npolXY_%s",histoNames[i][j].c_str());
-     TH1F *hFrame = (TH1F*) inFile->Get(hname);
-     hFrame->SetStats(false); 
-     hFrame->SetFillColor(kBlue);
-     hFrame->SetTitleFont(16);
-     hFrame->SetOption("Cont1");
-     hFrame->SetFillStyle(fillStyle);
-     hFrame->Draw();
-     
-     // Format for Z axis
-     hFrame->GetZaxis()->SetTitle("#frac{Particles}{#muA #times cm^{2}}");
-     
-     // Z axis range
-     hFrame->GetZaxis()->SetRangeUser(0.001,1.0*hFrame->GetMaximum());
-     
-     // Format for y axis
-     hFrame->GetYaxis()->SetTitle("Vertical Position (cm)");
-     hFrame->GetYaxis()->SetLabelFont(43);
-     hFrame->GetYaxis()->SetLabelSize(16);
-     hFrame->GetYaxis()->SetLabelOffset(0.02);
-     hFrame->GetYaxis()->SetTitleFont(43);
-     hFrame->GetYaxis()->SetTitleSize(16);
-     hFrame->GetYaxis()->SetTitleOffset(4);
-     
-     hFrame->GetYaxis()->CenterTitle();
-     hFrame->GetYaxis()->SetNdivisions(505);
-     
-     // TICKS Y Axis
-     hFrame->GetYaxis()->SetTickLength(xFactor*0.04/yFactor);
-     
-     // Format for x axis
-     hFrame->GetXaxis()->SetTitle("Horizontal Position (cm)");
-     hFrame->GetXaxis()->SetLabelFont(43);
-     hFrame->GetXaxis()->SetLabelSize(16);
-     hFrame->GetXaxis()->SetLabelOffset(0.02);
-     hFrame->GetXaxis()->SetTitleFont(43);
-     hFrame->GetXaxis()->SetTitleSize(16);
-     hFrame->GetXaxis()->SetTitleOffset(4);
-     hFrame->GetXaxis()->CenterTitle();
-     hFrame->GetXaxis()->SetNdivisions(505);
-     
-     // TICKS X Axis
-     hFrame->GetXaxis()->SetTickLength(yFactor*0.06/xFactor);
-     
-   }
-  }
-
+  plotSettings.plotFlags.clear(); plotSettings.Ranges.clear();
+  plotSettings.leadName = "Correlated_TargetFlux"; plotSettings.Nx = 3; plotSettings.Ny = 3;
+  plotSettings.plotFlags.insert(std::pair<std::string, bool>("xAxis",true)); 
+  plotSettings.plotFlags.insert(std::pair<std::string, bool>("yAxis",true)); 
+  plotSettings.plotFlags.insert(std::pair<std::string, bool>("zAxis",false)); 
+  plotSettings.plotFlags.insert(std::pair<std::string, bool>("binScale",false));
+  plotSettings.fillStyle = 1001; plotSettings.plotStyle = ""; 
+  plotSettings.xTitle = "#frac{Particles}{electron #times cm^{2}#times Log_{10}T}"; 
+  //plotSettings.xTitle = "#frac{Particles}{#muA #times cm^{2}}";  // my scale
+  plotSettings.yTitle = "Kinetic Energy (MeV)"; 
+  plotSettings.zTitle = "z title";
+  plotSettings.Ranges.insert(std::pair<std::string, Double_t>("xLow",1e-1)); 
+  plotSettings.Ranges.insert(std::pair<std::string, Double_t>("xHigh",1e4));
+  plotSettings.Ranges.insert(std::pair<std::string, Double_t>("yLow",2e-15)); 
+  plotSettings.Ranges.insert(std::pair<std::string, Double_t>("yHigh",1e-10));
+  plotSettings.Ranges.insert(std::pair<std::string, Double_t>("zLow",0.0)); 
+  plotSettings.Ranges.insert(std::pair<std::string, Double_t>("zHigh",1000.0));
+ 
+  CanvasPartition(c2b,plotSettings.Nx,plotSettings.Ny,lMargin,rMargin,bMargin,tMargin,vSpacing,hSpacing);
+  FillCanvas(c2b, fluxscaling2, inFile, histoNames, plotSettings);
+  
+  // Plot of the xy position in the npol tagger volume for various particles   
+  TCanvas *c3 = new TCanvas("c3","Position in Npol Tagger with Polarimeter Angle 28.0 Deg, E = 4.4 GeV",1000,900);
+  lMargin = 0.07; rMargin = 0.03; bMargin = 0.08; tMargin = 0.05;
+  vSpacing = 0.0; hSpacing = 0.0;
+  
+  plotSettings.plotFlags.clear(); plotSettings.Ranges.clear();
+  plotSettings.leadName = "npolXY"; plotSettings.Nx = 3; plotSettings.Ny = 3;
+  plotSettings.plotFlags.insert(std::pair<std::string, bool>("xAxis",false)); 
+  plotSettings.plotFlags.insert(std::pair<std::string, bool>("yAxis",false)); 
+  plotSettings.plotFlags.insert(std::pair<std::string, bool>("zAxis",false)); 
+  plotSettings.plotFlags.insert(std::pair<std::string, bool>("binScale",false));
+  plotSettings.fillStyle = 1001; plotSettings.plotStyle = "Cont1"; 
+  plotSettings.xTitle = "Horizontal Position (cm)"; 
+  plotSettings.yTitle = "Vertical Position (cm)"; 
+  plotSettings.zTitle = "#frac{Particles}{#muA #times cm^{2}}";
+  plotSettings.Ranges.insert(std::pair<std::string, Double_t>("xLow",220.0)); 
+  plotSettings.Ranges.insert(std::pair<std::string, Double_t>("xHigh",370.0));
+  plotSettings.Ranges.insert(std::pair<std::string, Double_t>("yLow",-70.0)); 
+  plotSettings.Ranges.insert(std::pair<std::string, Double_t>("yHigh",70.0));
+  plotSettings.Ranges.insert(std::pair<std::string, Double_t>("zLow",0.0)); 
+  plotSettings.Ranges.insert(std::pair<std::string, Double_t>("zHigh",1000.0));
+  
+  CanvasPartition(c3, plotSettings.Nx, plotSettings.Ny,lMargin,rMargin,bMargin,tMargin,vSpacing,hSpacing);
+  FillCanvas(c3, 1, inFile, histoNames, plotSettings);
   
   c1->Write();
-  c2->Write();
+  c2a->Write();
   c2b->Write();
   c3->Write();
   outFile->Close();
-  
-  //inFile->Close();
-
+  inFile->Close();
 }
 
-void CanvasPartition(TCanvas *C,const Int_t Nx,const Int_t Ny,
-                     Float_t lMargin, Float_t rMargin,
-                     Float_t bMargin, Float_t tMargin,
-		     Float_t vSpacing, Float_t hSpacing)
-{
+  void CanvasPartition(TCanvas *C,const Int_t Nx,const Int_t Ny,Float_t lMargin, Float_t rMargin,Float_t bMargin, Float_t tMargin,Float_t vSpacing, Float_t hSpacing){
+
    if (!C) return;
 
    // Setup Pad layout:
@@ -433,7 +256,7 @@ void CanvasPartition(TCanvas *C,const Int_t Nx,const Int_t Ny,
          pad->SetLeftMargin(hmarl);
          pad->SetRightMargin(hmarr);
          pad->SetBottomMargin(vmard);
-	 pad->SetTopMargin(vmaru);
+		 pad->SetTopMargin(vmaru);
 
          pad->SetFrameBorderMode(0);
          pad->SetBorderMode(0);
@@ -443,3 +266,160 @@ void CanvasPartition(TCanvas *C,const Int_t Nx,const Int_t Ny,
       }
    }
 }
+ 
+ void FillCanvas(TCanvas *C, Double_t scaleFactor, TFile *inFile, std::string histoNames[3][3], struct histoParams plotSettings){
+  
+  Int_t Nx = plotSettings.Nx; Int_t Ny = plotSettings.Ny;
+  TPad *pad[Nx][Ny];	  
+  
+  for(int i = 0; i < Nx; i++){
+  for(int j = 0; j < Ny; j++){
+  C->cd(0);
+  // Get the pads previosly created.
+  char pname[16];
+  sprintf(pname,"pad_%i_%i",i,j);
+  pad[i][j] = (TPad*) gROOT->FindObject(pname);
+  pad[i][j]->Draw();
+  if((*plotSettings.plotFlags.find("xAxis")).second) pad[i][j]->SetLogx();
+  if((*plotSettings.plotFlags.find("yAxis")).second) pad[i][j]->SetLogy();
+  if((*plotSettings.plotFlags.find("zAxis")).second) pad[i][j]->SetLogy();
+  pad[i][j]->SetFillStyle(4000);
+  pad[i][j]->SetFrameFillStyle(4000);
+  pad[i][j]->cd();
+  // Size factors
+  Float_t xFactor = pad[0][0]->GetAbsWNDC()/pad[i][j]->GetAbsWNDC();
+  Float_t yFactor = pad[0][0]->GetAbsHNDC()/pad[i][j]->GetAbsHNDC();
+  
+  char hname[32];
+  sprintf(hname,"%s_%s",plotSettings.leadName.c_str(),histoNames[i][j].c_str());
+  TH1F *hFrame = (TH1F*) inFile->Get(hname);
+  hFrame->SetStats(false); 
+  hFrame->SetFillColor(kBlue);
+  hFrame->SetTitleFont(16);     
+  hFrame->SetOption(plotSettings.plotStyle.c_str());
+  hFrame->SetFillStyle(plotSettings.fillStyle);
+  
+  // Bin-by-bin scaling to the width of the bins in eVs
+  if((*plotSettings.plotFlags.find("binScale")).second){	
+    for(int i = 1; i <= hFrame->GetNbinsX()-2; i++){
+      double oldbincontent = hFrame->GetBinContent(i);
+      double scalingfactor = scaleFactor/TMath::Log10(hFrame->GetBinCenter(i)*1e6);
+    hFrame->SetBinContent(i,oldbincontent*scalingfactor);
+    }
+  } else {
+    hFrame->Scale(scaleFactor);
+  }
+  
+  hFrame->Draw();
+  
+  if(plotSettings.leadName == "npolXY"){
+  hFrame->GetZaxis()->SetTitle(plotSettings.zTitle.c_str());    // Format for Z axis
+  hFrame->GetZaxis()->SetRangeUser(0.001,1.10*hFrame->GetMaximum()); // Z axis range
+}
+  // y axis range 
+  hFrame->GetYaxis()->SetRangeUser((*plotSettings.Ranges.find("yLow")).second ,(*plotSettings.Ranges.find("yHigh")).second);
+  
+  // Format for y axis
+  hFrame->GetYaxis()->SetTitle(plotSettings.xTitle.c_str());
+  hFrame->GetYaxis()->SetLabelFont(43);
+  hFrame->GetYaxis()->SetLabelSize(16);
+  hFrame->GetYaxis()->SetLabelOffset(0.02);
+  hFrame->GetYaxis()->SetTitleFont(43);
+  hFrame->GetYaxis()->SetTitleSize(16);
+  hFrame->GetYaxis()->SetTitleOffset(5);
+  
+  hFrame->GetYaxis()->CenterTitle();
+  hFrame->GetYaxis()->SetNdivisions(505);
+  
+  // TICKS Y Axis
+  hFrame->GetYaxis()->SetTickLength(xFactor*0.04/yFactor);
+  
+  // Format for x axis
+  hFrame->GetXaxis()->SetTitle(plotSettings.yTitle.c_str());
+  hFrame->GetXaxis()->SetLabelFont(43);
+  hFrame->GetXaxis()->SetLabelSize(16);
+  hFrame->GetXaxis()->SetLabelOffset(0.02);
+  hFrame->GetXaxis()->SetTitleFont(43);
+  hFrame->GetXaxis()->SetTitleSize(16);
+  hFrame->GetXaxis()->SetTitleOffset(5);
+  hFrame->GetXaxis()->CenterTitle();
+  hFrame->GetXaxis()->SetNdivisions(505);
+  
+  // Set X axis range
+  hFrame->GetXaxis()->SetRangeUser((*plotSettings.Ranges.find("xLow")).second ,(*plotSettings.Ranges.find("xHigh")).second);
+  
+  // TICKS X Axis
+  hFrame->GetXaxis()->SetTickLength(yFactor*0.06/xFactor);
+  hFrame->SetDirectory(0);
+}
+}
+}
+
+
+TString FormInputFile(TString InputDir){
+  
+  TString fileName = InputDir + BaseName + Energy + "GeV_" + "Lead" + Lead + "cm_" + Bfield + "Bdl_Histos.root";
+  
+  return fileName;
+}
+
+TString FormOutputFile(TString OutputDir){
+  
+  TString fileName =  OutputDir + BaseName + Energy + "GeV_Lead" + Lead + "cm_" + Bfield + "Bdl_Fig21-23.root";
+  
+  return fileName;
+}
+
+void RetrieveENVvariables() {
+
+ if(getenv("JOBNUMBER")){
+    JobNum = getenv("JOBNUMBER");
+  }else{
+    JobNum = "99999"; // default job number is 99999
+  }
+
+  std::cout << "Processing job number: " << JobNum << std::endl;
+
+  if(getenv("NPOLBASENAME")){
+	BaseName = getenv("NPOLBASENAME");
+  }else{
+	std::cout << "Npol Base Name environmental variable not set" << std::endl;
+	return; // Return error if not found
+  }
+
+  if(getenv("Lead")){
+    Lead = getenv("Lead");
+  }else{
+     std::cout << "Lead environmental variable not set" << std::endl;
+     return; // Return error if not found
+  }
+
+  if(getenv("Energy")){
+    Energy = getenv("Energy");
+  }else{
+    std::cout << "Energy environmental variable not set" << std::endl;
+     return; // Return error if not found
+  }
+  
+  if(getenv("Bfield")){
+    Bfield = getenv("Bfield");
+  }else{
+    std::cout << "Bfield environmental variable not set" << std::endl;
+     return; // Return error if not found
+  }
+  
+  if(getenv("WorkOutputDir")){
+	OutputDir = getenv("WorkOutputDir");
+  }else{
+	std::cout << "Output Directory environmental varilable not set" << std::endl;
+	return;
+  }
+
+  if(getenv("WorkInputDir")){
+	InputDir = getenv("WorkInputDir");
+  }else{
+	std::cout << "Input Directory environmental varilable not set" << std::endl;
+	return;
+  }
+}
+

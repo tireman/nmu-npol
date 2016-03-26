@@ -70,6 +70,7 @@ G4Material *NpolMaterials::GetMaterial(const G4String material) {
 void NpolMaterials::CreateMaterials() {
   
   materials["Vacuum"] = CreateVacuum();
+  materials["HardVacuum"] = CreateHardVacuum();
   materials["Air"] = CreateAir();
   materials["Scint"] = CreateScint();
   materials["Al"] = CreateAl();
@@ -86,10 +87,22 @@ G4Material *NpolMaterials::CreateVacuum() {
   // Define Vacuum: New version; use Air and just make it very low density
   G4double fractionmass, density;
   G4int ncomponents;
-  G4Material *Vacuum = new G4Material("Vacuum", density= 1.e-25*g/cm3, ncomponents=1, kStateGas, 253*kelvin, 1.e-8*atmosphere);
+  G4Material *Vacuum = 
+	new G4Material("Vacuum", density= 1.0e-3*g/cm3, ncomponents=1, kStateGas, 0.1*kelvin, 1.e-19*atmosphere);
   Vacuum->AddMaterial(nistMan->FindOrBuildMaterial("G4_AIR"), fractionmass=1.);
   
   return Vacuum;
+}
+
+G4Material *NpolMaterials::CreateHardVacuum() {
+  // Define HardVacuum: New version; use Air and just make it very low density
+  G4double fractionmass, density;
+  G4int ncomponents;
+  G4Material *HardVacuum = new G4Material("HardVacuum", density= 1.0e-15*g/cm3,
+	   ncomponents=1, kStateGas, 0.1*kelvin, 1.e-19*atmosphere);
+  HardVacuum->AddMaterial(nistMan->FindOrBuildMaterial("G4_AIR"), fractionmass=1.);
+  
+  return HardVacuum;
 }
 
 G4Material *NpolMaterials::CreateAir() {

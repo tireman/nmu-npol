@@ -33,7 +33,8 @@ void NpolHBender::ConstructSHMSTagger(){
   G4double xlen = 0.1588*m; G4double ylen = 0.2075*m; G4double zlen = 0.010*cm;
   
   G4Box *SHMSTagger = new G4Box("SHMSTagger",xlen/2,ylen/2,zlen/2);
-  SHMSTaggerLV = new G4LogicalVolume(SHMSTagger,NpolMaterials::GetInstance()->GetMaterial("Air"),"SHMSTaggerLV",0,0,0);
+  SHMSTaggerLV = 
+	new G4LogicalVolume(SHMSTagger,NpolMaterials::GetInstance()->GetMaterial("HardVacuum"),"SHMSTaggerLV",0,0,0);
   G4VisAttributes *TaggerVisAtt = new G4VisAttributes(G4Colour(0.2, 0.2, 0.2));
   SHMSTaggerLV->SetVisAttributes(TaggerVisAtt);
 }
@@ -61,13 +62,14 @@ G4String NpolHBender::GetName() {
 }
 
 void NpolHBender::Place(G4LogicalVolume *motherLV) {
-  G4double ShmsAng = 16.79*deg; // Angle at 4.4 GeV/c 36.53*deg; at 11 GeV/c 16.79; 
+  G4double ShmsAng = 36.53*deg; // Angle at 4.4 GeV/c 36.53*deg; at 11 GeV/c 16.79; 
   G4double PosHB = 1.76*m, PosTagger = 1.195*m;
   
   PlaceCylindrical(HBBoreLogicLV, motherLV, "HBBore", PosHB, ShmsAng, 0);
   //PlaceCylindrical(HBCoilLogicLV, motherLV, "HBCoil", PosHB, ShmsAng, 0);
   PlaceCylindrical(HBYorkLogicLV, motherLV, "HBYork", PosHB, ShmsAng, 0);
   PlaceCylindrical(HBCryoBoxLV, motherLV, "HBCyro", PosHB, ShmsAng, 0);
-  PlaceRectangular(SHMSTaggerLV,motherLV, "SHMSTagger", (PosTagger+4.0*cm)*sin(ShmsAng), 0.0, (PosTagger-4.0*cm)*cos(ShmsAng), 0.0, ShmsAng, 0.0);
+  PlaceRectangular(SHMSTaggerLV,motherLV, "SHMSTagger", (PosTagger+4.0*cm)*sin(ShmsAng), 
+				   0.0, (PosTagger-4.0*cm)*cos(ShmsAng), 0.0, ShmsAng, 0.0);
 } 
 

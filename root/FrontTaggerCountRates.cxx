@@ -27,34 +27,9 @@ void CanvasPartition(TCanvas *C,const Int_t Nx = 2,const Int_t Ny = 2,
                      Float_t bMargin = 0.15, Float_t tMargin = 0.05,
 		     Float_t vSpacing = 0.0, Float_t hSpacing = 0.0);
 
-int GetAVNumber(const std::string &volName) {
-  if(volName.substr(0,3) == "av_") {
-    int underscoreLocation = volName.find_first_of("_",3);
-    return atoi(volName.substr(3,underscoreLocation-3).c_str());
-  } else{
-    return 0;
-  }
-}
-int GetImprNumber(const std::string &volName) {
-  if(volName.substr(0,3) == "av_") {
-    int underscorePos = volName.find_first_of("_",1+
-      volName.find_first_of("_",3));
-    return atoi(volName.substr(underscorePos+1,1).c_str());
-  } else
-    return 0;
-}
-
-int GetPlacementNumber(const std::string &volName) {
-  if(volName.substr(0,3) == "av_") {
-    int underscorePos = volName.find_first_of("_",1+
-      volName.find_first_of("_",1+
-      volName.find_first_of("_",1+
-      volName.find_first_of("_",1+
-      volName.find_first_of("_",3)))));
-    return atoi(volName.substr(underscorePos+1,std::string::npos).c_str());
-  } else
-    return 0;
-}
+int GetAVNumber(const std::string &volName);
+int GetImprNumber(const std::string &volName);
+int GetPlacementNumber(const std::string &volName);
 
 void FrontTaggerCountRates() {
 
@@ -62,12 +37,12 @@ void FrontTaggerCountRates() {
 
   std::string histoNames[3][2]={{"av_11_impr_1_FrontTagLV_pv_1","av_11_impr_1_FrontTagLV_pv_0"},{"av_11_impr_1_FrontTagLV_pv_3","av_11_impr_1_FrontTagLV_pv_2"},{"av_11_impr_1_FrontTagLV_pv_5","av_11_impr_1_FrontTagLV_pv_4"}};
    
-  TString Lead = "0"; TString Energy = "4.4"; TString Bfield = "4";
-  TString OutputDir = "/work/hallc/cgen/tireman/MagFieldOn/MagField_" + Bfield + "Bdl/Plots/";
-  TString InputDir = "/work/hallc/cgen/tireman/MagFieldOn/MagField_" + Bfield + "Bdl/LeadOn" + Lead + "cm/";
+  TString Lead = "15"; TString Energy = "4.4"; TString Bfield = "4";
+  TString OutputDir = "/work/hallc/cgen/tireman/MagFieldOn/MagField_" + Bfield + "Bdl/LeadOn" + Lead + "cm/Plots/";
+  TString InputDir = "/work/hallc/cgen/tireman/MagFieldOn/MagField_" + Bfield + "Bdl/LeadOn" + Lead + "cm/root/";
 
- TString OutputFile = OutputDir + "JLAB" + Energy + "GeV_Lead" + Lead + "cm_" + Bfield + "Bdl_FrontTaggerRates.root";
-  TString InputFile = InputDir + "JLAB" + Energy + "GeV_Lead" + Lead + "cm_" + Bfield + "Bdl_Histos.root";
+ TString OutputFile = OutputDir + "semenov" + Energy + "GeV_Lead" + Lead + "cm_" + Bfield + "Bdl_FrontTaggerRates.root";
+  TString InputFile = InputDir + "semenov" + Energy + "GeV_Lead" + Lead + "cm_" + Bfield + "Bdl_Histos.root";
 
   TFile *inFile = TFile::Open(InputFile);
   TFile *outFile = new TFile(OutputFile,"RECREATE");
@@ -78,7 +53,7 @@ void FrontTaggerCountRates() {
   TVectorD *v = (TVectorD*)inFile->Get("TVectorT<double>");
   Double_t totalElectrons = ((*v))[0];
   Double_t electronTime = totalElectrons/(6.242e12); //6.242e12 e-/s at 1 microAmp
-  Double_t fluxscaling = 1/(totalElectrons*1.602e-13*(98*60));
+  //Double_t fluxscaling = 1/(totalElectrons*1.602e-13*(98*60));
   std::cout << "Electron beam time at 1 micro-amp is " << electronTime << " s " << std::endl;
   std::cout << "Total electrons on target: " << totalElectrons/1e6 << " Million" << std::endl;
 
@@ -161,7 +136,7 @@ void FrontTaggerCountRates() {
      hFrame->GetXaxis()->SetNdivisions(505);
 
      // Set X axis range
-     hFrame->GetXaxis()->SetRangeUser(-0.15,18);
+     hFrame->GetXaxis()->SetRangeUser(0.012,18);
 
      // TICKS X Axis
      hFrame->GetXaxis()->SetTickLength(yFactor*0.06/xFactor);
@@ -209,7 +184,7 @@ void FrontTaggerCountRates() {
      gr->GetYaxis()->SetTitleSize(16);
      gr->GetYaxis()->SetTitleOffset(5);
      gr->GetYaxis()->CenterTitle(); 
-     gr->GetYaxis()->SetRangeUser(-0.005,7.11);
+     gr->GetYaxis()->SetRangeUser(0.000,0.028);
 
      // Clean up X axis
      gr->GetXaxis()->SetTitle("Threshold Energy (MeV)");
@@ -317,3 +292,33 @@ void CanvasPartition(TCanvas *C,const Int_t Nx,const Int_t Ny,
       }
    }
 }
+
+int GetAVNumber(const std::string &volName) {
+  if(volName.substr(0,3) == "av_") {
+    int underscoreLocation = volName.find_first_of("_",3);
+    return atoi(volName.substr(3,underscoreLocation-3).c_str());
+  } else{
+    return 0;
+  }
+}
+int GetImprNumber(const std::string &volName) {
+  if(volName.substr(0,3) == "av_") {
+    int underscorePos = volName.find_first_of("_",1+
+      volName.find_first_of("_",3));
+    return atoi(volName.substr(underscorePos+1,1).c_str());
+  } else
+    return 0;
+}
+
+int GetPlacementNumber(const std::string &volName) {
+  if(volName.substr(0,3) == "av_") {
+    int underscorePos = volName.find_first_of("_",1+
+      volName.find_first_of("_",1+
+      volName.find_first_of("_",1+
+      volName.find_first_of("_",1+
+      volName.find_first_of("_",3)))));
+    return atoi(volName.substr(underscorePos+1,std::string::npos).c_str());
+  } else
+    return 0;
+}
+

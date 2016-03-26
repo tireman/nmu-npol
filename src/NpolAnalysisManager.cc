@@ -169,6 +169,14 @@ void NpolAnalysisManager::RecordStep(const G4Step *aStep) {
 
 	if(volName.substr(0,3) == "av_") {
     	NpolStep *npolStep = new NpolStep();
+		
+		npolStep->trackId = aTrack->GetTrackID();
+		npolStep->posX = (aTrack->GetPosition()).x()/cm;
+		npolStep->posY = (aTrack->GetPosition()).y()/cm;
+		npolStep->posZ = (aTrack->GetPosition()).z()/cm;
+		npolStep->momX = (aTrack->GetMomentum()).x()/cm;
+		npolStep->momY = (aTrack->GetMomentum()).y()/cm;
+		npolStep->momZ = (aTrack->GetMomentum()).z()/cm;
 		npolStep->time = aTrack->GetGlobalTime()/ns;
 		npolStep->eDep = (aStep->GetTotalEnergyDeposit())/MeV;
 		npolStep->volume = volName;

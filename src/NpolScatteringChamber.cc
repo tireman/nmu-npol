@@ -75,7 +75,8 @@ void NpolScatteringChamber::ConstructChamber() {
 
   // New Solid chamber using extruded solid
   for (int i = 0; i < gnum; i++){
-    polygon[i] = G4TwoVector((insideRadius+wallThickness)*cos(360.0*deg/gnum*i),(insideRadius+wallThickness)*sin(360.0*deg/gnum*i));
+    polygon[i] = 
+	  G4TwoVector((insideRadius+wallThickness)*cos(360.0*deg/gnum*i),(insideRadius+wallThickness)*sin(360.0*deg/gnum*i));
   }
   std::vector<G4ExtrudedSolid::ZSection> zsections2;
   zsections2.push_back(G4ExtrudedSolid::ZSection((-(insideHeight+(2*wallThickness))/2),G4TwoVector(0.0*cm,0.0*cm),1.0));
@@ -85,10 +86,14 @@ void NpolScatteringChamber::ConstructChamber() {
 
   // New Npol Window using extruded solid
   for (int i = 0; i < 61; i++){
-    polygon2[i] = G4TwoVector((insideRadius+wallThickness-WindowThickness)*cos(npolWindowAngle+i*deg),(insideRadius+wallThickness-WindowThickness)*sin(npolWindowAngle+i*deg));
+    polygon2[i] = 
+	  G4TwoVector((insideRadius+wallThickness-WindowThickness)*cos(npolWindowAngle+i*deg),
+				  (insideRadius+wallThickness-WindowThickness)*sin(npolWindowAngle+i*deg));
   }
   for (int i = 0; i < 61; i++){
-    polygon2[61+i] = G4TwoVector((insideRadius-1.0*cm)*cos(npolWindowAngle+npolWindowDeltaAngle-i*deg),(insideRadius-1.0*cm)*sin(npolWindowAngle+npolWindowDeltaAngle-i*deg));
+    polygon2[61+i] = 
+	  G4TwoVector((insideRadius-1.0*cm)*cos(npolWindowAngle+npolWindowDeltaAngle-i*deg),
+				  (insideRadius-1.0*cm)*sin(npolWindowAngle+npolWindowDeltaAngle-i*deg));
   }
   std::vector<G4ExtrudedSolid::ZSection> zsections3;
   zsections3.push_back(G4ExtrudedSolid::ZSection(-npolWindowHeight/2, G4TwoVector(0.0*cm, 0.0*cm), 1.0));
@@ -97,10 +102,14 @@ void NpolScatteringChamber::ConstructChamber() {
 
 // New SHMS Window using extruded solid
   for (int i = 0; i < 61; i++){
-    polygon2[i] = G4TwoVector((insideRadius+wallThickness-WindowThickness)*cos(shmsWindowAngle+i*deg),(insideRadius+wallThickness-WindowThickness)*sin(shmsWindowAngle+i*deg));
+    polygon2[i] = 
+	  G4TwoVector((insideRadius+wallThickness-WindowThickness)*cos(shmsWindowAngle+i*deg),
+				  (insideRadius+wallThickness-WindowThickness)*sin(shmsWindowAngle+i*deg));
   }
   for (int i = 0; i < 61; i++){
-    polygon2[61+i] = G4TwoVector((insideRadius-1.0*cm)*cos(shmsWindowAngle+shmsWindowDeltaAngle-i*deg),(insideRadius-1.0*cm)*sin(shmsWindowAngle+shmsWindowDeltaAngle-i*deg));
+    polygon2[61+i] = 
+	  G4TwoVector((insideRadius-1.0*cm)*cos(shmsWindowAngle+shmsWindowDeltaAngle-i*deg),
+				  (insideRadius-1.0*cm)*sin(shmsWindowAngle+shmsWindowDeltaAngle-i*deg));
   }
   std::vector<G4ExtrudedSolid::ZSection> zsections4;
   zsections4.push_back(G4ExtrudedSolid::ZSection(-shmsWindowHeight/2, G4TwoVector(0.0*cm, 0.0*cm), 1.0));
@@ -119,7 +128,7 @@ void NpolScatteringChamber::ConstructChamber() {
     G4SubtractionSolid("ChamberWallWithSHMS", chamberWallWithWindow, shmsWindow);
   
   innerChamberLV = new G4LogicalVolume(innerChamber,
-       NpolMaterials::GetInstance()->GetMaterial("Vacuum"), "InnerChamberLV, 0,0,0");
+       NpolMaterials::GetInstance()->GetMaterial("HardVacuum"), "InnerChamberLV, 0,0,0");
   chamberWallLV = new G4LogicalVolume(chamberWallWithSHMS,
        NpolMaterials::GetInstance()->GetMaterial("Al"), "ChamberWallLV", 0,0,0);
 }

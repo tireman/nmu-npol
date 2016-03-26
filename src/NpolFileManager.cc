@@ -38,7 +38,7 @@ NpolFileManager::NpolFileManager() {
 	eventsPerFile = atoi(eventsPerFileString);
 
 	outFile = NULL;
-	fileNumber = 0;
+	fileNumber = 1;
 	ConstructFilenamePrefix();
 }
 

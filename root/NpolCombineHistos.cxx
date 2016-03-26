@@ -1,224 +1,210 @@
 
 #include <cstdlib>
+#include <cstdio>
 #include <iostream>
-#include <string>
+#include <cstring>
+
+#include <unistd.h>
+#include <sys/types.h>
+#include <dirent.h>
 
 #include <TFile.h>
+#include <TMap.h>
 #include <TTree.h>
 #include <TChain.h>
 #include <TBranch.h>
-#include <TVector.h>
+#include <TVectorD.h>
+#include <TROOT.h>
 #include <TH1.h>
 #include <TH2.h>
 #include <TSystem.h>
 #include <TString.h>
 #include "TKey.h"
+
 #include "Riostream.h"
 
-TList *FileList;
-TFile *Target;
+TFile *TargetFile = NULL;
+TFile *InputFile = NULL;
 
-void MergeRootfile( TDirectory *target, TList *sourcelist );
+std::map<std::string, TH1 *> histograms;
+std::map<std::string, TVectorD *> vectors;
+std::map<std::string, TChain *> treechain;
+
+void MergeRootObjects(TDirectory *TargetFile, TFile *InFile);
+void WriteMergeObjects( TFile *TargetFile );
+
+bool isRootFile(char *filename) {
+  int len = strlen(filename);
+  if(len <= 5) return false;
+  return strcmp(&(filename[len-5]),".root") == 0;
+}
 
 void NpolCombineHistos() {
   
-  // Prepare the files to me merged, throw back to the example I copied
-   if(gSystem->AccessPathName("hsimple1.root")) {
-     gSystem->CopyFile("hsimple.root", "hsimple1.root");
-     gSystem->CopyFile("hsimple.root", "hsimple2.root");
-   }
+  // THis first line of variables needs to be set in order to combine the correct files together.
+  std::string Lead = "15"; std::string Energy = "4.4"; std::string Bfield = "4"; 
+  
+  std::string OutputDir = "/work/hallc/cgen/tireman/MagFieldOn/MagField_4Bdl/LeadOn15cm/root";
+  std::string InputDir = "/work/hallc/cgen/tireman/MagFieldOn/MagField_4Bdl/LeadOn15cm/Output";
+  std::string OutputFile;
 
-   // THis first line of variables needs to be set in order to combine the correct files together.
-   TString Lead = "0"; TString Energy = "4.4"; TString Bfield = "4"; Int_t Nfiles = 4000;
-   Int_t Ncut = 500; 
-   Int_t Nloops = 0;
-   TString OutputDir = "/work/hallc/cgen/tireman/MagFieldOn/MagField_" + Bfield + "Bdl/LeadOn" + Lead + "cm/";
-   TString InputDir = "/work/hallc/cgen/tireman/MagFieldOn/MagField_" + Bfield + "Bdl/LeadOn" + Lead +"cm/";
+  OutputFile = OutputDir +"/" + "semenov" + Energy + "GeV_Lead" + Lead + "cm_" + Bfield + "Bdl_Histos.root";
 
-   if (Nfiles % Ncut != 0){
-     Nloops = Nfiles/Ncut+ 1;
-   } else {
-     Nloops = Nfiles/Ncut;
-   }
+  TargetFile = TFile::Open( OutputFile.c_str(), "RECREATE" );
 
-   std::cout << "Starting up the processing ..." << std::endl;
-   for(Int_t j=0; j < Nloops; j++){
-
-     TString OutputFile;
-     if(j == (Nloops - 1)){
-       OutputFile = OutputDir + "JLAB" + Energy + "GeV_Lead" + Lead + "cm_" + Bfield + "Bdl_Histos.root";
-     } else {
-       char jtemp[2];
-       sprintf(jtemp,"%i",j);
-       OutputFile = OutputDir + "JLAB" + Energy + "GeV_Lead" + Lead + "cm_" + Bfield + "Bdl_Histos_All_" + jtemp + ".root";
-     }
-
-     TString InputFile;
-     if (j!= 0 ){
-       char jplustemp[2];
-       sprintf(jplustemp,"%i",j-1);
-       InputFile = OutputDir + "JLAB" + Energy + "GeV_Lead" + Lead + "cm_" + Bfield + "Bdl_Histos_All_" + jplustemp + ".root";
-     }
-
-     Int_t A = 0; 
-     Int_t B = 0;
-     if(j == (Nloops-1)){
-       A = j*500 + 1;
-       B = Nfiles + 1;
-     } else {
-       A = j*500 + 1;
-       B = j*500 + 501;
-     }
-     if(B < A) continue;
-
-     Target = TFile::Open( OutputFile, "RECREATE" );
-
-     FileList = new TList();
-     if (j != 0) FileList->Add( TFile::Open(InputFile) );
-
-     std::cout << "Engaging files " << A << " through " << B-1 << std::endl;
-     for (Int_t i = A; i < B; i++) {
-       char fname[60];
-       sprintf(fname,"JLAB" + Energy + "GeV_Lead" + Lead + "cm_" + Bfield + "Bdl_Histos_%i.root",i);
-       FileList->Add( TFile::Open(InputDir + fname) );
-     }
-   
-
-   MergeRootfile( Target, FileList );
-
-   Target->Close();
-   FileList->Clear();
-   delete FileList;
+  DIR *d = NULL;
+  struct dirent *dir = NULL;
  
-   }
+  d = opendir(InputDir.c_str());
+  if(d == NULL) {
+    std::cerr << "Cannot open directory " << InputDir << std::endl;
+    return;
+  }
+    
+  while((dir = readdir(d)) != NULL) {
+	std::string InFile = InputDir + "/" + dir->d_name;
+
+	if(isRootFile(dir->d_name)) {
+	  InputFile = TFile::Open( InFile.c_str(), "READ" );
+	  if(InputFile->IsZombie()){
+		std::cout << "File was found to be zombie so skipping. " << dir->d_name << std::endl;
+		continue;
+	  }
+
+	  std::cout << "Filename: " << dir->d_name << std::endl;
+	  MergeRootObjects(TargetFile, InputFile);	
+	  TargetFile->SaveSelf(kTRUE);
+	  InputFile->Close();
+	}
+  }
+  WriteMergeObjects( TargetFile );
+  TargetFile->Close();
+  
+}
+
+void WriteMergeObjects( TFile *TargetFile ) {
+  cout << "Writing the merged data." << endl;
+  
+  TargetFile->cd();
+  std::map<std::string,TH1 *>::iterator it;
+  std::map<std::string,TVectorD *>::iterator it2;
+  std::map<std::string,TChain *>::iterator it3;
+
+  for(it3 = treechain.begin(); it3 != treechain.end(); it3++){
+	it3->second->Merge(TargetFile->GetFile(),0,"keep");
+  }
+  for(it2 = vectors.begin(); it2 != vectors.end(); it2++) {
+	it2->second->Write();
+  }
+  for(it = histograms.begin(); it != histograms.end(); it++) {
+    it->second->Write();
+  } 
 
 }
 
-void MergeRootfile( TDirectory *target, TList *sourcelist ) {
- 
-   //  cout << "Target path: " << target->GetPath() << endl;
-   TString path( (char*)strstr( target->GetPath(), ":" ) );
-   path.Remove( 0, 2 );
 
-   TFile *first_source = (TFile*)sourcelist->First();
-   first_source->cd( path );
-   TDirectory *current_sourcedir = gDirectory;
+void MergeRootObjects( TDirectory *TargetFile, TFile *InFile ){
 
-   //gain time, do not add the objects in the list in memory
-   Bool_t status = TH1::AddDirectoryStatus();
-   TH1::AddDirectory(kFALSE);
+  TString path( (char*)strstr( TargetFile->GetPath(), ":" ) );
+  path.Remove( 0, 1 );
+  
+  InFile->cd(path);
+  TDirectory *current_sourcedir = gDirectory;
+  
+  // loop over all keys in this directory
+  TIter nextkey( current_sourcedir->GetListOfKeys() );
+  TKey *key, *oldkey=0;
+  while ( (key = (TKey*)nextkey())) {
 
-   // loop over all keys in this directory
-   TChain *globChain = 0;
-   TIter nextkey( current_sourcedir->GetListOfKeys() );
-   TKey *key, *oldkey=0;
-   while ( (key = (TKey*)nextkey())) {
-
-       //keep only the highest cycle number for each key
-      if (oldkey && !strcmp(oldkey->GetName(),key->GetName())) continue;
-
-      // read object from first source file
-      first_source->cd( path );
-      TObject *obj = key->ReadObj();
-
-      if ( obj->IsA()->InheritsFrom( TH1::Class() ) ) {
-         // descendant of TH1 -> merge it
-
-         //      cout << "Merging histogram " << obj->GetName() << endl;
-         TH1 *h1 = (TH1*)obj;
-
-         // loop over all source files and add the content of the
-         // correspondant histogram to the one pointed to by "h1"
-         TFile *nextsource = (TFile*)sourcelist->After( first_source );
-         while ( nextsource ) {
-
-            // make sure we are at the correct directory level by cd'ing to path
-            nextsource->cd( path );
-            TKey *key2 = (TKey*)gDirectory->GetListOfKeys()->FindObject(h1->GetName());
-            if (key2) {
-               TH1 *h2 = (TH1*)key2->ReadObj();
-               h1->Add( h2 );
-               delete h2;
-            }
-
-            nextsource = (TFile*)sourcelist->After( nextsource );
-         }
-      }
-      else if ( obj->IsA()->InheritsFrom( TTree::Class() ) ) {
-
-         // loop over all source files create a chain of Trees "globChain"
-         const char* obj_name= obj->GetName();
-
-         globChain = new TChain(obj_name);
-         globChain->Add(first_source->GetName());
-         TFile *nextsource = (TFile*)sourcelist->After( first_source );
-         //      const char* file_name = nextsource->GetName();
-         // cout << "file name  " << file_name << endl;
-         while ( nextsource ) {
-
-            globChain->Add(nextsource->GetName());
-            nextsource = (TFile*)sourcelist->After( nextsource );
-         }
-
-      } else if ( obj->IsA()->InheritsFrom( TDirectory::Class() ) ) {
-         // it's a subdirectory
-
-         cout << "Found subdirectory " << obj->GetName() << endl;
-
-         // create a new subdir of same name and title in the target file
-         target->cd();
-         TDirectory *newdir = target->mkdir( obj->GetName(), obj->GetTitle() );
-
-         // newdir is now the starting point of another round of merging
-         // newdir still knows its depth within the target file via
-         // GetPath(), so we can still figure out where we are in the recursion
-         MergeRootfile( newdir, sourcelist );
-
-      } else if ( obj->IsA()->InheritsFrom( TVectorD::Class() ) ) {
-	Long_t num1 = 0, num2 = 0;
-	TVectorD *v1 = (TVectorD*)obj;
+	//keep only the highest cycle number for each key
+	if (oldkey && !strcmp(oldkey->GetName(),key->GetName())) continue;
 	
-	TFile *nextsource = (TFile*)sourcelist->After( first_source );
-         while ( nextsource ) {
+	
+	TObject *obj = key->ReadObj();
 
-            // make sure we are at the correct directory level by cd'ing to path
-            nextsource->cd( path );
-            TKey *key2 = (TKey*)gDirectory->GetListOfKeys()->FindObject(v1->GetName());
-            if (key2) {
-               TVectorD *v2 = (TVectorD*)key2->ReadObj();
-	       for(Int_t i=0; i<v1->GetNoElements(); i++){
-		 ((*v1))[i] += ((*v2))[i];
-	       }
-	       delete v2;
-	    }
+	if ( obj->IsA()->InheritsFrom( TH1::Class() ) ) {
+	  TargetFile->cd(path);
+	  // descendant of TH1 -> merge it
+	  TH1 *h1 = (TH1*)obj->Clone();
+	  
+	  if(histograms.find(h1->GetName()) == histograms.end()){
+		(histograms[h1->GetName()]) = h1;
+	  } else {
+		TH1 *h2 = (TH1*)(histograms[h1->GetName()]);
+		h1->Add( h2 );
+		(histograms[h1->GetName()]) = h1;	
+		delete h2;
+	  }
+	  InFile->cd( path );
 
-            nextsource = (TFile*)sourcelist->After( nextsource );
-         }
-      } else {
+	} else if ( obj->IsA()->InheritsFrom( TVectorD::Class() ) ) {
 
-         // object is of no type that we know or can handle
-         cout << "Unknown object type, name: "
-         << obj->GetName() << " title: " << obj->GetTitle() << endl;
-      }
+	  TargetFile->cd(path);
+	  
+	  TVectorD *v1 = (TVectorD*)obj->Clone();
+	  
+	  if(vectors.find(v1->GetName()) == vectors.end()){
+		(vectors[v1->GetName()]) = v1;
+	  } else {
+		TVectorD *v2 = (TVectorD*)(vectors[v1->GetName()]);
+		for(Int_t i=0; i<v1->GetNoElements(); i++){
+		  ((*v1))[i] += ((*v2))[i];
+		}
+		(vectors[v1->GetName()]) = v1;
+		delete v2;
+	  }
+	  InFile->cd( path );
 
-      // now write the merged histogram (which is "in" obj) to the target file
-      // note that this will just store obj in the current directory level,
-      // which is not persistent until the complete directory itself is stored
-      // by "target->Write()" below
-      if ( obj ) {
-         target->cd();
+	} else if ( obj->IsA()->InheritsFrom( TTree::Class() ) ) {
+	  
+	  InFile->cd(path);
 
-         //!!if the object is a tree, it is stored in globChain...
-         if(obj->IsA()->InheritsFrom( TTree::Class() ))
-            globChain->Merge(target->GetFile(),0,"keep");
-         else
-            obj->Write( key->GetName() );
-      }
+	  std::string str = std::string(obj->GetName());
+	  std::map<std::string ,TChain *>::iterator rit;
+	  
+	  TargetFile->cd(path);
+	  
+	  if(treechain.find(str) == treechain.end()){
+		treechain[str] =  new TChain(obj->GetName());
+	  }
+	  rit = treechain.find(str);
+	  rit->second->Add(InFile->GetName());
+	  
+	  InFile->cd( path );
 
-   } // while ( ( TKey *key = (TKey*)nextkey() ) )
+	} else if ( obj->IsA()->InheritsFrom( TDirectory::Class() ) ) {
+	  // it's a subdirectory!!!!!
+	  
+	  cout << "Found subdirectory " << obj->GetName() << endl;
+	  
+	  // create a new subdir of same name and title in the target file
+	  TargetFile->cd();
+	  TDirectory *newdir = TargetFile->mkdir( obj->GetName(), obj->GetTitle() );
+	  
+	  // newdir is now the starting point of another round of merging
+	  // newdir still knows its depth within the TargetFile via
+	  // GetPath(), so we can still figure out where we are in the recursion
+	  MergeRootObjects( newdir, InFile );	 
+		 
+	} else {
+	  
+	  // object is of no type that we know or can handle
+	  cout << "Unknown object type, name: "
+		   << obj->GetName() << " title: " << obj->GetTitle() << endl;
+	  InFile->cd( path );
 
-   // save modifications to target file
-   target->SaveSelf(kTRUE);
-   TH1::AddDirectory(status);
+	}
+	
+	if ( obj )
+	  TargetFile->cd( path );
+
+    delete obj;
+	obj = NULL;
+  }
+  
 }
+
+
+
+
 

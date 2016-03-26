@@ -26,35 +26,9 @@ void CanvasPartition(TCanvas *C,const Int_t Nx = 2,const Int_t Ny = 2,
 		     Float_t lMargin = 0.15, Float_t rMargin = 0.05,
                      Float_t bMargin = 0.15, Float_t tMargin = 0.05,
 		     Float_t vSpacing = 0.0, Float_t hSpacing = 0.0);
-
-int GetAVNumber(const std::string &volName) {
-  if(volName.substr(0,3) == "av_") {
-    int underscoreLocation = volName.find_first_of("_",3);
-    return atoi(volName.substr(3,underscoreLocation-3).c_str());
-  } else{
-    return 0;
-  }
-}
-int GetImprNumber(const std::string &volName) {
-  if(volName.substr(0,3) == "av_") {
-    int underscorePos = volName.find_first_of("_",1+
-      volName.find_first_of("_",3));
-    return atoi(volName.substr(underscorePos+1,1).c_str());
-  } else
-    return 0;
-}
-
-int GetPlacementNumber(const std::string &volName) {
-  if(volName.substr(0,3) == "av_") {
-    int underscorePos = volName.find_first_of("_",1+
-      volName.find_first_of("_",1+
-      volName.find_first_of("_",1+
-      volName.find_first_of("_",1+
-      volName.find_first_of("_",3)))));
-    return atoi(volName.substr(underscorePos+1,std::string::npos).c_str());
-  } else
-    return 0;
-}
+int GetAVNumber(const std::string &volName);
+int GetImprNumber(const std::string &volName);
+int GetPlacementNumber(const std::string &volName);
 
 void FrontDetectorCountRates() {
 
@@ -62,12 +36,12 @@ void FrontDetectorCountRates() {
 
   std::string histoNames[3][2]={{"av_9_impr_1_FrontDetLV_pv_1","av_9_impr_1_FrontDetLV_pv_0"},{"av_9_impr_1_FrontDetLV_pv_3","av_9_impr_1_FrontDetLV_pv_2"},{"av_9_impr_1_FrontDetLV_pv_5","av_9_impr_1_FrontDetLV_pv_4"}};
    
-  TString Lead = "10"; TString Energy = "4.4"; TString Bfield = "1";
-  TString OutputDir = "/work/hallc/cgen/tireman/MagFieldOn/MagField_" + Bfield + "Bdl/Plots/";
-  TString InputDir = "/work/hallc/cgen/tireman/MagFieldOn/MagField_" + Bfield + "Bdl/LeadOn" + Lead + "cm/";
+  TString Lead = "15"; TString Energy = "4.4"; TString Bfield = "4";
+  TString OutputDir = "/work/hallc/cgen/tireman/MagFieldOn/MagField_" + Bfield + "Bdl/LeadOn" + Lead + "cm/Plots/";
+  TString InputDir = "/work/hallc/cgen/tireman/MagFieldOn/MagField_" + Bfield + "Bdl/LeadOn" + Lead + "cm/root/";
 
- TString OutputFile = OutputDir + "JLAB" + Energy + "GeV_Lead" + Lead + "cm_" + Bfield + "Bdl_FrontTaggerRates.root";
-  TString InputFile = InputDir + "JLAB" + Energy + "GeV_Lead" + Lead + "cm_" + Bfield + "Bdl_Histos.root";
+ TString OutputFile = OutputDir + "semenov" + Energy + "GeV_Lead" + Lead + "cm_" + Bfield + "Bdl_FrontDetectorRates.root";
+  TString InputFile = InputDir + "semenov" + Energy + "GeV_Lead" + Lead + "cm_" + Bfield + "Bdl_Histos.root";
 
   TFile *inFile = TFile::Open(InputFile);
   TFile *outFile = new TFile(OutputFile,"RECREATE");
@@ -78,20 +52,20 @@ void FrontDetectorCountRates() {
   TVectorD *v = (TVectorD*)inFile->Get("TVectorT<double>");
   Double_t totalElectrons = ((*v))[0];
   Double_t electronTime = totalElectrons/(6.242e12); //6.242e12 e-/s at 1 microAmp
-  Double_t fluxscaling = 1/(totalElectrons*1.602e-13*(98*60));
+  //Double_t fluxscaling = 1/(totalElectrons*1.602e-13*(98*60));
   std::cout << "Electron beam time at 1 micro-amp is " << electronTime << " s " << std::endl;
   std::cout << "Total electrons on target: " << totalElectrons/1e6 << " Million" << std::endl;
 
   TCanvas *c1 = new TCanvas("c1","Front Detector Energy Plots at Polarimeter Angle 28.0 Deg, E = 4.4 GeV",1000,900);
   TCanvas *c2 = new TCanvas("c2","Front Detector Count Rate vs. Threshold plots",1000,900);
 
-  Int_t Nx = 3, Ny = 2, nThresh = 12, fillStyle = 1001;
+  Int_t Nx = 3, Ny = 2, nThresh = 10, fillStyle = 1001;
   int pvNum, avNum, imprNum;
   Float_t lMargin = 0.10, rMargin = 0.05, bMargin = 0.10, tMargin = 0.05;
   Float_t vSpacing = 0.0; Float_t hSpacing = 0.0;
   double CTagger[Nx][Ny];
-  double Thresholds[12];
-  Thresholds={3.0,3.5,4.0,4.5,5.0,6.0,7.0,8.0,10.0,12.0,14.0,16.0};
+  double Thresholds[10];
+  Thresholds={1.0,2.0,3.0,4.0,6.0,8.0,10.0,12.0,14.0,16.0};
   double CountRates [nThresh][Nx][Ny];
 
   CanvasPartition(c1,Nx,Ny,lMargin,rMargin,bMargin,tMargin,vSpacing,hSpacing);
@@ -210,7 +184,7 @@ void FrontDetectorCountRates() {
      gr->GetYaxis()->SetTitleSize(16);
      gr->GetYaxis()->SetTitleOffset(5);
      gr->GetYaxis()->CenterTitle(); 
-     gr->GetYaxis()->SetRangeUser(0.0,0.16);
+     gr->GetYaxis()->SetRangeUser(0.0,0.082);
 
      // Clean up X axis
      gr->GetXaxis()->SetTitle("Threshold Energy (MeV)");
@@ -317,4 +291,33 @@ void CanvasPartition(TCanvas *C,const Int_t Nx,const Int_t Ny,
          pad->Draw();
       }
    }
+}
+
+int GetAVNumber(const std::string &volName) {
+  if(volName.substr(0,3) == "av_") {
+    int underscoreLocation = volName.find_first_of("_",3);
+    return atoi(volName.substr(3,underscoreLocation-3).c_str());
+  } else{
+    return 0;
+  }
+}
+int GetImprNumber(const std::string &volName) {
+  if(volName.substr(0,3) == "av_") {
+    int underscorePos = volName.find_first_of("_",1+
+      volName.find_first_of("_",3));
+    return atoi(volName.substr(underscorePos+1,1).c_str());
+  } else
+    return 0;
+}
+
+int GetPlacementNumber(const std::string &volName) {
+  if(volName.substr(0,3) == "av_") {
+    int underscorePos = volName.find_first_of("_",1+
+      volName.find_first_of("_",1+
+      volName.find_first_of("_",1+
+      volName.find_first_of("_",1+
+      volName.find_first_of("_",3)))));
+    return atoi(volName.substr(underscorePos+1,std::string::npos).c_str());
+  } else
+    return 0;
 }
