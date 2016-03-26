@@ -9,10 +9,10 @@ export NPOLBASENAME=npol
 export NPOLDIR=/data2/cgen/NMUSimData/4.4GeV/4Bdl/Lead15cm
 export NPOLWORKDIR=/data2/cgen/NMUSimData/4.4GeV/4Bdl/Lead15cm
 
-export OutputDir=$NPOLDIR/Plots/
-export InputDir=$NPOLDIR/root/
-export WorkOutputDir=$NPOLWORKDIR/Plots/
-export WorkInputDir=$NPOLWORKDIR/root/
+export OutputDir=$NPOLDIR/root
+export InputDir=$NPOLDIR/root
+export WorkOutputDir=$NPOLWORKDIR/Plots
+export WorkInputDir=$NPOLWORKDIR/root
 
 if [ ! -e $NPOLDIR ]
 then
