@@ -63,7 +63,7 @@ void NpolBeamlineUpper::ConstructBeamlineUpperInner() {
   
   G4Tubs *BeamlineUpperInner = new G4Tubs("BeamlineUpperInner", 0, upperOuterRadius, upperLen/2, 0.0*deg, 360.*deg);
   BeamlineUpperInnerLV = new G4LogicalVolume(BeamlineUpperInner,
-     NpolMaterials::GetInstance()->GetMaterial("Vacuum"),"BeamlineUpperInnerLV",0,0,0);
+     NpolMaterials::GetInstance()->GetMaterial("HardVacuum"),"BeamlineUpperInnerLV",0,0,0);
   
   BeamlineUpperInnerLV->SetVisAttributes(G4VisAttributes::GetInvisible());
 }
