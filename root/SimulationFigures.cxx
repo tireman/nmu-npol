@@ -62,8 +62,8 @@ void SimulationFigures() {
   Double_t totalElectrons = ((*v))[0];
   Double_t electronTime = totalElectrons/(6.242e12); //6.242e12 e-/s at 1 microAmp
   
-  Double_t theta = 147.48e-3;  // Vertical angle
-  Double_t phi = 123.64e-3;    // Horizontal angle
+  Double_t theta = 138.12e-3;  // Vertical angle
+  Double_t phi = 84.66e-3;    // Horizontal angle
   Double_t solidAngle = 4*asin(sin(theta/2)*sin(phi/2));
   
   // My scale for NPOL Tagger
@@ -71,8 +71,8 @@ void SimulationFigures() {
   //Double_t fluxscaling2 = 1/(totalElectrons*1.602e-13*pow(112.0,2)*solidAngle)); 
   
   //Proposal Scale for NPOL Tagger
-  Double_t fluxscaling1 = 1/(totalElectrons*pow(618.0,2)*solidAngle);  // full solid angle calculation for a pyramid
-  Double_t fluxscaling2 = 1/(totalElectrons*pow(112.0,2)*solidAngle);  
+  Double_t fluxscaling1 = 1/(totalElectrons*pow(683.86,2)*solidAngle);  // full solid angle calculation for a pyramid
+  Double_t fluxscaling2 = 1/(totalElectrons*pow(150.0,2)*solidAngle);  
    
   // Put out some statistics
   std::cout << "Electron beam time at 1 micro-amp is " << electronTime << " s " << std::endl;
@@ -87,7 +87,7 @@ void SimulationFigures() {
   plotSettings.plotFlags.insert(std::pair<std::string, bool>("xAxis",true)); 
   plotSettings.plotFlags.insert(std::pair<std::string, bool>("yAxis",true)); 
   plotSettings.plotFlags.insert(std::pair<std::string, bool>("zAxis",false)); 
-  plotSettings.plotFlags.insert(std::pair<std::string, bool>("binScale",false));
+  plotSettings.plotFlags.insert(std::pair<std::string, bool>("binScale",true));
   plotSettings.fillStyle = 1001; plotSettings.plotStyle = ""; 
   plotSettings.xTitle = "#frac{Particles}{electron #times cm^{2}#times Log_{10}T}"; 
   //plotSettings.xTitle = "#frac{Particles}{#muA #times cm^{2}}";  // my scale
@@ -113,7 +113,7 @@ void SimulationFigures() {
   plotSettings.plotFlags.insert(std::pair<std::string, bool>("xAxis",true)); 
   plotSettings.plotFlags.insert(std::pair<std::string, bool>("yAxis",true)); 
   plotSettings.plotFlags.insert(std::pair<std::string, bool>("zAxis",false)); 
-  plotSettings.plotFlags.insert(std::pair<std::string, bool>("binScale",false));
+  plotSettings.plotFlags.insert(std::pair<std::string, bool>("binScale",true));
   plotSettings.fillStyle = 1001; plotSettings.plotStyle = ""; 
   plotSettings.xTitle = "#frac{Particles}{electron #times cm^{2}#times Log_{10}T}"; 
   //plotSettings.xTitle = "#frac{Particles}{#muA #times cm^{2}}";  // my scale
@@ -122,7 +122,7 @@ void SimulationFigures() {
   plotSettings.Ranges.insert(std::pair<std::string, Double_t>("xLow",1e-1)); 
   plotSettings.Ranges.insert(std::pair<std::string, Double_t>("xHigh",1e4));
   plotSettings.Ranges.insert(std::pair<std::string, Double_t>("yLow",2e-15)); 
-  plotSettings.Ranges.insert(std::pair<std::string, Double_t>("yHigh",8e-8));
+  plotSettings.Ranges.insert(std::pair<std::string, Double_t>("yHigh",2e-9));
   plotSettings.Ranges.insert(std::pair<std::string, Double_t>("zLow",0.0)); 
   plotSettings.Ranges.insert(std::pair<std::string, Double_t>("zHigh",1000.0));
  
@@ -139,7 +139,7 @@ void SimulationFigures() {
   plotSettings.plotFlags.insert(std::pair<std::string, bool>("xAxis",true)); 
   plotSettings.plotFlags.insert(std::pair<std::string, bool>("yAxis",true)); 
   plotSettings.plotFlags.insert(std::pair<std::string, bool>("zAxis",false)); 
-  plotSettings.plotFlags.insert(std::pair<std::string, bool>("binScale",false));
+  plotSettings.plotFlags.insert(std::pair<std::string, bool>("binScale",true));
   plotSettings.fillStyle = 1001; plotSettings.plotStyle = ""; 
   plotSettings.xTitle = "#frac{Particles}{electron #times cm^{2}#times Log_{10}T}"; 
   //plotSettings.xTitle = "#frac{Particles}{#muA #times cm^{2}}";  // my scale
@@ -358,7 +358,7 @@ void SimulationFigures() {
 
 TString FormInputFile(TString InputDir){
   
-  TString fileName = InputDir + "/" + BaseName + "_Lead" + Lead + "cm_" + Energy + "GeV_" + Bfield + "Bdl_Histos.root";
+  TString fileName = InputDir + "/" + BaseName + "_" + Energy + "GeV_" + "Lead" + Lead + "cm_" + Bfield + "Bdl_Histos.root";
   
   return fileName;
 }

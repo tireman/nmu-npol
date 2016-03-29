@@ -126,17 +126,17 @@ void ProcessElectrons() {
     targetParticleKE[it->first] = new TH1F(
      targetHistoName.c_str(), targetHistoTitle.c_str(),nbins,bins);
     targetParticlePOS[it->first] = new TH2F(targetXYHistoName.c_str(),
-     targetXYHistoTitle.c_str(),70,40.0,75.0,60,-15,15);  
+     targetXYHistoTitle.c_str(),60,55.0,85.0,40,-10,10);  
 
     npolParticleKE[it->first] = new TH1F(
 	  npolHistoName.c_str(), npolHistoTitle.c_str(),nbins,bins);
     npolParticlePOS[it->first] = new TH2F(npolXYHistoName.c_str(),
-     npolXYHistoTitle.c_str(),280,220.0,360.0,320,-80,80);
+     npolXYHistoTitle.c_str(),260,270.0,400.0,280,-70,70);
 
     correlateKE[it->first] = new TH1F(
      correlateHistoName.c_str(), correlateHistoTitle.c_str(),nbins,bins);
     correlatePOS[it->first] = new TH2F(correlateXYHistoName.c_str(),
-     correlateXYTitle.c_str(),70,40.0,75.0,60,-15,15);
+     correlateXYTitle.c_str(),60,55.0,85.0,40,-10,10);
 
   }  
 
@@ -147,6 +147,11 @@ void ProcessElectrons() {
   delta_TOF->GetYaxis()->SetTitle("Events");
   delta_TOF->GetXaxis()->SetTitle("Analyzer to Top/Bottom Array Time-of-Flight (ns)");
 
+  Double_t targetTaggerPos = 150.0;
+  Double_t npolTaggerPos = 683.86;
+  Double_t theta = 0.13812; // collimator horizontal angular accecptance
+  Double_t phi = 0.08466; // collimator vertical angular acceptance 
+  Double_t solidAngle = 4*asin(sin(theta/2)*sin(phi/2)); // solid angle
   // loop over all entries (one per event)
   Int_t nentries = npolTree->GetEntries();
   //for(int i = 0; i < 100000; i++) {
@@ -171,7 +176,10 @@ void ProcessElectrons() {
 	  }
 	  }*/
 	
-    // loop over all tagged particles (one step in NPOL tagger volume)
+    // loop over all tagged particles (min. one step in NPOL tagger volume)
+    Double_t npolxOffSet = npolTaggerPos*sin(0.48869); // 28 degree 
+	Double_t npolxMax = npolTaggerPos*tan(theta/2); 
+	Double_t npolyMax = npolTaggerPos*tan(phi/2);
     std::vector<NpolTagger *>::iterator n_it;
     for(n_it = npolEntry->begin(); n_it != npolEntry->end(); n_it++){
       NpolTagger *npolTagged = *n_it;
@@ -179,21 +187,25 @@ void ProcessElectrons() {
 	  std::string particleName = npolTagged->particle;
       if(npolParticleKE.find(particleName) == npolParticleKE.end())
 		continue;
-	  Double_t fluxscaling = 1;///(pow(618.0,2)*4*asin(sin(73.74e-3)*sin(61.82e-3))*log10(npolTagged->energy*1e6));
+	  Double_t fluxscaling = 1;
 
 	  //if(vertexTrackIDs.find(npolTagged->trackId) == vertexTrackIDs.end()){
+	  Double_t Xcenter = abs(npolTagged->posX) - npolxOffSet;
+      if((abs(npolTagged->posY) <= npolyMax) && (abs(Xcenter) <= npolxMax)){
 		(npolParticleKE[particleName])->
 		  Fill(npolTagged->energy,fluxscaling);
 		(npolParticlePOS[particleName])->
 		  Fill(abs(npolTagged->posX),npolTagged->posY);
-		
+	  }
 		//}
 	  npolTrackIDs.insert(npolTagged->trackId);
 	}
 	//vertexTrackIDs.clear();
 
-    // loop over all tagged particles (one step in target tagger volume)
-    Double_t xOffSet = 112.0*sin(28.0*3.1416/180);
+    // loop over all tagged particles (min. one step in target tagger volume)
+    Double_t targetxOffSet = targetTaggerPos*sin(0.48869); // 28 degree
+	Double_t targetxMax = targetTaggerPos*tan(theta/2); 
+	Double_t targetyMax = targetTaggerPos*tan(phi/2);
     std::vector<NpolTagger *>::iterator t_it;
     for(t_it = targetEntry->begin(); t_it != targetEntry->end(); t_it++){
       NpolTagger *targetTagged = *t_it;
@@ -201,9 +213,9 @@ void ProcessElectrons() {
       std::string particleName = targetTagged->particle;
       if(targetParticleKE.find(particleName) == targetParticleKE.end())
 		continue;
-	  Double_t fluxscaling = 1;///(TotalElectrons*pow(112.0,2)*4*asin(sin(73.74e-3)*sin(61.82e-3))*log10(targetTagged->energy*1e6));
-      Double_t Xcenter = abs(targetTagged->posX) - xOffSet;
-      if((abs(targetTagged->posY) <= 8.115) && (abs(Xcenter) <= 9.750)){
+	  Double_t fluxscaling = 1;
+      Double_t Xcenter = abs(targetTagged->posX) - targetxOffSet;
+      if((abs(targetTagged->posY) <= targetyMax) && (abs(Xcenter) <= targetxMax)){
 		(targetParticleKE[particleName])->
 		  Fill(targetTagged->energy,fluxscaling);
 		(targetParticlePOS[particleName])->
@@ -416,14 +428,14 @@ double *AntilogBins(const int nbins, const double xmin, const double xmax) {
 
 TString FormInputFile(TString InputDir){
   
-  TString fileName = InputDir + "/" + BaseName + "_Lead" + Lead + "cm_" + Energy + "GeV_" + Bfield + "Bdl_" + JobNum + ".root";
+  TString fileName = InputDir + "/" + BaseName + "_" + "Lead" + Lead + "cm_" + Energy + "GeV_" + Bfield + "Bdl_" + JobNum + ".root";
   
   return fileName;
 }
 
 TString FormOutputFile(TString OutputDir){
   
-  TString fileName =  OutputDir + "/" + BaseName + "_Lead" + Lead + "cm_" + Energy + "GeV_" + Bfield + "Bdl_Histos_" + JobNum + ".root";
+  TString fileName =  OutputDir + "/" + BaseName + "_" + Energy + "GeV_Lead" + Lead + "cm_" + Bfield + "Bdl_Histos_" + JobNum + ".root";
   
   return fileName;
 }

@@ -139,7 +139,7 @@ void FrontTaggerCountRates() {
      hFrame->GetXaxis()->SetNdivisions(505);
 
      // Set X axis range
-     hFrame->GetXaxis()->SetRangeUser(0.012,18);
+     hFrame->GetXaxis()->SetRangeUser(0.012,20.0);
 
      // TICKS X Axis
      hFrame->GetXaxis()->SetTickLength(yFactor*0.06/xFactor);
@@ -187,7 +187,7 @@ void FrontTaggerCountRates() {
      gr->GetYaxis()->SetTitleSize(16);
      gr->GetYaxis()->SetTitleOffset(5);
      gr->GetYaxis()->CenterTitle(); 
-     gr->GetYaxis()->SetRangeUser(0.000,0.028);
+     gr->GetYaxis()->SetRangeUser(0.000,0.06);
 
      // Clean up X axis
      gr->GetXaxis()->SetTitle("Threshold Energy (MeV)");
@@ -327,14 +327,14 @@ int GetPlacementNumber(const std::string &volName) {
 
 TString FormInputFile(TString InputDir){
   
-  TString fileName = InputDir + "/" + BaseName + "_Lead" + Lead + "cm_" + Energy + "GeV_" + Bfield + "Bdl_Histos.root";
+  TString fileName = InputDir + "/" + BaseName + "_" + Energy + "GeV_" +"Lead" + Lead + "cm_" +  Bfield + "Bdl_Histos.root";
   
   return fileName;
 }
 
 TString FormOutputFile(TString OutputDir){
   
-  TString fileName =  OutputDir + "/" + BaseName + Energy + "GeV_Lead" + Lead + "cm_" + Bfield + "Bdl_Fig21-23.root";
+  TString fileName =  OutputDir + "/" + BaseName + Energy + "GeV_Lead" + Lead + "cm_" + Bfield + "Bdl_FrontTaggerRates.root";
   
   return fileName;
 }
