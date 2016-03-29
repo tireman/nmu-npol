@@ -42,7 +42,7 @@ G4String NpolShieldHut::GetName() {
 
 // Construct a lead shield for in front of the polarimeter
 void NpolShieldHut::ConstructLeadCurtain(){
-  G4double xlen = 0.85*m; G4double ylen = 0.55*m; G4double zlen = 0.100*m;
+  G4double xlen = 0.85*m; G4double ylen = 0.55*m; G4double zlen = 0.150*m;
 
   G4Box *LeadCurtain = new G4Box("LeadCurtain",xlen/2,ylen/2,zlen/2);
   LeadCurtainLV = 

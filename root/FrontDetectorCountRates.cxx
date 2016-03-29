@@ -29,20 +29,23 @@ void CanvasPartition(TCanvas *C,const Int_t Nx = 2,const Int_t Ny = 2,
 int GetAVNumber(const std::string &volName);
 int GetImprNumber(const std::string &volName);
 int GetPlacementNumber(const std::string &volName);
+TString FormInputFile(TString InputDir);
+TString FormOutputFile(TString OutputDir);
+void RetrieveENVvariables();
+
+TString BaseName = "";  TString JobNum = "";  TString Lead = ""; TString Energy = ""; 
+TString Bfield = ""; TString OutputDir = ""; TString InputDir = "";
 
 void FrontDetectorCountRates() {
 
   Long_t TotalElectrons = 0, TotalEventsRecorded = 0; 
 
   std::string histoNames[3][2]={{"av_9_impr_1_FrontDetLV_pv_1","av_9_impr_1_FrontDetLV_pv_0"},{"av_9_impr_1_FrontDetLV_pv_3","av_9_impr_1_FrontDetLV_pv_2"},{"av_9_impr_1_FrontDetLV_pv_5","av_9_impr_1_FrontDetLV_pv_4"}};
-   
-  TString Lead = "15"; TString Energy = "4.4"; TString Bfield = "4";
-  TString OutputDir = "/work/hallc/cgen/tireman/MagFieldOn/MagField_" + Bfield + "Bdl/LeadOn" + Lead + "cm/Plots/";
-  TString InputDir = "/work/hallc/cgen/tireman/MagFieldOn/MagField_" + Bfield + "Bdl/LeadOn" + Lead + "cm/root/";
 
- TString OutputFile = OutputDir + "semenov" + Energy + "GeV_Lead" + Lead + "cm_" + Bfield + "Bdl_FrontDetectorRates.root";
-  TString InputFile = InputDir + "semenov" + Energy + "GeV_Lead" + Lead + "cm_" + Bfield + "Bdl_Histos.root";
-
+  RetrieveENVvariables();
+  
+  TString InputFile = FormInputFile(InputDir);
+  TString OutputFile = FormOutputFile(OutputDir);
   TFile *inFile = TFile::Open(InputFile);
   TFile *outFile = new TFile(OutputFile,"RECREATE");
 
@@ -64,8 +67,7 @@ void FrontDetectorCountRates() {
   Float_t lMargin = 0.10, rMargin = 0.05, bMargin = 0.10, tMargin = 0.05;
   Float_t vSpacing = 0.0; Float_t hSpacing = 0.0;
   double CTagger[Nx][Ny];
-  double Thresholds[10];
-  Thresholds={1.0,2.0,3.0,4.0,6.0,8.0,10.0,12.0,14.0,16.0};
+  Double_t Thresholds[10] = {1.0,2.0,3.0,4.0,6.0,8.0,10.0,12.0,14.0,16.0};
   double CountRates [nThresh][Nx][Ny];
 
   CanvasPartition(c1,Nx,Ny,lMargin,rMargin,bMargin,tMargin,vSpacing,hSpacing);
@@ -184,7 +186,7 @@ void FrontDetectorCountRates() {
      gr->GetYaxis()->SetTitleSize(16);
      gr->GetYaxis()->SetTitleOffset(5);
      gr->GetYaxis()->CenterTitle(); 
-     gr->GetYaxis()->SetRangeUser(0.0,0.082);
+     gr->GetYaxis()->SetRangeUser(0.0,0.24);
 
      // Clean up X axis
      gr->GetXaxis()->SetTitle("Threshold Energy (MeV)");
@@ -320,4 +322,71 @@ int GetPlacementNumber(const std::string &volName) {
     return atoi(volName.substr(underscorePos+1,std::string::npos).c_str());
   } else
     return 0;
+}
+
+TString FormInputFile(TString InputDir){
+  
+  TString fileName = InputDir + "/" + BaseName + "_" + Energy + "GeV_" + "Lead" + Lead + "cm_" +  Bfield + "Bdl_Histos.root";
+  
+  return fileName;
+}
+
+TString FormOutputFile(TString OutputDir){
+  
+  TString fileName =  OutputDir + "/" + BaseName + Energy + "GeV_Lead" + Lead + "cm_" + Bfield + "Bdl_FrontDetectorRates.root";
+  
+  return fileName;
+}
+
+void RetrieveENVvariables() {
+
+ if(getenv("JOBNUMBER")){
+    JobNum = getenv("JOBNUMBER");
+  }else{
+    JobNum = "99999"; // default job number is 99999
+  }
+
+  std::cout << "Processing job number: " << JobNum << std::endl;
+
+  if(getenv("NPOLBASENAME")){
+	BaseName = getenv("NPOLBASENAME");
+  }else{
+	std::cout << "Npol Base Name environmental variable not set" << std::endl;
+	return; // Return error if not found
+  }
+
+  if(getenv("Lead")){
+    Lead = getenv("Lead");
+  }else{
+     std::cout << "Lead environmental variable not set" << std::endl;
+     return; // Return error if not found
+  }
+
+  if(getenv("Energy")){
+    Energy = getenv("Energy");
+  }else{
+    std::cout << "Energy environmental variable not set" << std::endl;
+     return; // Return error if not found
+  }
+  
+  if(getenv("Bfield")){
+    Bfield = getenv("Bfield");
+  }else{
+    std::cout << "Bfield environmental variable not set" << std::endl;
+     return; // Return error if not found
+  }
+  
+  if(getenv("WorkOutputDir")){
+	OutputDir = getenv("WorkOutputDir");
+  }else{
+	std::cout << "Output Directory environmental varilable not set" << std::endl;
+	return;
+  }
+
+  if(getenv("WorkInputDir")){
+	InputDir = getenv("WorkInputDir");
+  }else{
+	std::cout << "Input Directory environmental varilable not set" << std::endl;
+	return;
+  }
 }
