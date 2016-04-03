@@ -174,7 +174,7 @@ void NpolPolarimeter::ConstructBottomVetoArray(G4LogicalVolume *motherLV) {
   G4AssemblyVolume *BottomVetoArray1 = MakePlate(BottomVetoLV,
 	 13, 0.0*m, 0.0*m, 0.60*m, 0.0*m, 0.0*m, 0.10*m);
   G4AssemblyVolume *BottomVetoArray2 = MakePlate(BottomVetoLV,
-	13, 0.0*m, 0.0*m, 0.60*m, 0.0*m, 0.0*m, 0.10*m);
+	14, 0.0*m, 0.0*m, 0.60*m, 0.0*m, 0.0*m, 0.10*m);
 
   ImprintPlate(BottomVetoArray1, motherLV, 0.0*m, -0.32*m, -1.15*m, 0.0*deg);
   ImprintPlate(BottomVetoArray2, motherLV, 0.0*m, -0.42*m, 0.30*m, 0.0*deg);
