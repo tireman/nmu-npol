@@ -78,5 +78,10 @@ G4VPhysicalVolume* NpolDetectorConstruction::Construct() {
   return world->GetWorldPV();
 }
 
-void NpolDetectorConstruction::ConstructSDandField() {}
+void NpolDetectorConstruction::ConstructSDandField() {
+  // Iterate through the set and construct each detector's fields and sensitive detectors.
+  std::set<NpolDetectorFactory *>::iterator it;
+  for(it = detectors.begin(); it != detectors.end(); it++)
+	  (*it)->ConstructSDandField();
+}
 

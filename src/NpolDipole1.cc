@@ -181,22 +181,6 @@ void NpolDipole1::ConstructDipole1Field(){
 	new G4LogicalVolume(Dipole1Field, NpolMaterials::GetInstance()->GetMaterial("Vacuum"),"Dipole1FieldLV", 0,0,0);
   G4VisAttributes *Field = new G4VisAttributes(G4Colour(0.0,1.0,0.0));
   Dipole1FieldLV->SetVisAttributes(Field);
-
-  // Generate the Magnetic Field for Charybdis
-  G4TransportationManager* tmanMagField = G4TransportationManager::GetTransportationManager();
-  tmanMagField -> GetPropagatorInField() -> SetLargestAcceptableStep(1*mm);
-  
-  magField = new G4UniformMagField(G4ThreeVector(0., dipole1FieldY, 0.));
-  fEqMagField = new G4Mag_UsualEqRhs(magField);
-  minStepMagneticField = 0.0025*mm;
-  G4FieldManager* fieldManMagField = new G4FieldManager(magField);
-  
-  stepperMagField = new G4ClassicalRK4(fEqMagField);
-  fieldManMagField -> SetDetectorField(magField);
-  
-  fChordFinder = new G4ChordFinder(magField, minStepMagneticField, stepperMagField);
-  
-  Dipole1FieldLV->SetFieldManager(fieldManMagField, true);
 }
 
 void NpolDipole1::Place(G4LogicalVolume *motherLV) {
@@ -235,5 +219,24 @@ void NpolDipole1::Place(G4LogicalVolume *motherLV) {
   PlaceCylindrical(Dipole1FieldLV, motherLV, "Field1", PosD1,-NpolAng,0.0*cm);
    
   // End Dipole 1 (Charybdis) construction.  May the field be with it. 
+}
+
+void NpolDipole1::ConstructSDandField() {
+  // Generate the Magnetic Field for Charybdis
+  G4TransportationManager* tmanMagField = G4TransportationManager::GetTransportationManager();
+  tmanMagField -> GetPropagatorInField() -> SetLargestAcceptableStep(1*mm);
+  
+  G4UniformMagField *magField = new G4UniformMagField(G4ThreeVector(0., dipole1FieldY, 0.));
+  G4Mag_EqRhs *fEqMagField = new G4Mag_UsualEqRhs(magField);
+  G4double minStepMagneticField = 0.0025*mm;
+  G4FieldManager *fieldManMagField = new G4FieldManager(magField);
+  
+  G4MagIntegratorStepper *stepperMagField = new G4ClassicalRK4(fEqMagField);
+  fieldManMagField -> SetDetectorField(magField);
+  
+  G4ChordFinder *fChordFinder = new G4ChordFinder(magField, minStepMagneticField, stepperMagField);
+  fieldManMagField->SetChordFinder(fChordFinder);
+  
+  Dipole1FieldLV->SetFieldManager(fieldManMagField, true);
 }
 

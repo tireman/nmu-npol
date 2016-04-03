@@ -45,6 +45,7 @@ public:
 
   virtual G4String GetName();
   virtual void Place(G4LogicalVolume *motherLV);
+  virtual void ConstructSDandField();
 
   static G4double yokeLength;
   static G4double gapWidth;
@@ -55,13 +56,6 @@ public:
 private: 
   G4LogicalVolume *Dipole2YokeLV, *Dipole2CuBarLV, *Dipole2CuEndLV;
   G4LogicalVolume *FieldClampLV, *Dipole2FieldLV;
-
-  G4double minStepMagneticField;
-
-  G4UniformMagField* magField;
-  G4Mag_EqRhs *fEqMagField;
-  G4MagIntegratorStepper* stepperMagField;
-  G4ChordFinder* fChordFinder;
 };
 
 #endif
