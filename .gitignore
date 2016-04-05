@@ -5,6 +5,7 @@
 *~
 *.swp
 *.swo
+*.pcm
 \#*\#
 
 CMakeCache.txt

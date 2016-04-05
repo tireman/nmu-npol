@@ -181,6 +181,7 @@ void NpolDipole1::ConstructDipole1Field(){
 	new G4LogicalVolume(Dipole1Field, NpolMaterials::GetInstance()->GetMaterial("Vacuum"),"Dipole1FieldLV", 0,0,0);
   G4VisAttributes *Field = new G4VisAttributes(G4Colour(0.0,1.0,0.0));
   Dipole1FieldLV->SetVisAttributes(Field);
+
 }
 
 void NpolDipole1::Place(G4LogicalVolume *motherLV) {
