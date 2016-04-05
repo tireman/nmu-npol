@@ -194,7 +194,8 @@ void NpolDipole1::ConstructDipole1Field(){
   stepperMagField = new G4ClassicalRK4(fEqMagField);
   fieldManMagField -> SetDetectorField(magField);
   
-  fChordFinder = new G4ChordFinder(magField, minStepMagneticField, stepperMagField);
+  fChordFinder = new G4ChordFinder(magField, minStepMagneticField, stepperMagField); 
+  fieldManMagField->SetChordFinder(fChordFinder);
   
   Dipole1FieldLV->SetFieldManager(fieldManMagField, true);
 }
