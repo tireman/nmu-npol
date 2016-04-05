@@ -17,4 +17,4 @@ mkdir "$BUILDDIR"
 cd "$BUILDDIR"
 #cmake --debug-output --trace CMakeLists.txt ../
 cmake CMakeLists.txt ../
-make -j${NPROC}
+make -j${NPROC} 

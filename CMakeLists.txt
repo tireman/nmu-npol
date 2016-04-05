@@ -1,5 +1,6 @@
 # (1)
-cmake_minimum_required(VERSION 2.6 FATAL_ERROR)
+cmake_minimum_required(VERSION 3.1 FATAL_ERROR)
+set(CMAKE_CXX_STANDARD 11)
 
 project (Npolapp)
 set(useROOT true)
@@ -30,8 +31,9 @@ if(useROOT)
   if(myROOTclasses)
     ADD_CUSTOM_COMMAND(
       OUTPUT ${CMAKE_CURRENT_BINARY_DIR}/dict.cxx ${CMAKE_CURRENT_BINARY_DIR}/dict.h
-      COMMAND rootcint -f ${CMAKE_CURRENT_BINARY_DIR}/dict.cxx -c -p
-          -I${Geant4_INCLUDE_DIR}
+      #COMMAND rootcint -f ${CMAKE_CURRENT_BINARY_DIR}/dict.cxx -c -p
+       COMMAND rootcling -f ${CMAKE_CURRENT_BINARY_DIR}/dict.cxx -c -p
+	      -I${Geant4_INCLUDE_DIR}
           ${myROOTclasses} ${PROJECT_SOURCE_DIR}/include/linkdef.hh
       DEPENDS ${PROJECT_SOURCE_DIR}/include/linkdef.hh ${myROOTclasses}
     )
