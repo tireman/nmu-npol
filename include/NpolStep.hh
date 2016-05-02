@@ -18,9 +18,12 @@ class NpolStep : public TObject {
 
 public:
   int trackId;
-  double posX;
-  double posY;
-  double posZ;
+  double gPosX;
+  double gPosY;
+  double gPosZ;
+  double lPosX;
+  double lPosY;
+  double lPosZ;
   double momX;
   double momY;
   double momZ;
