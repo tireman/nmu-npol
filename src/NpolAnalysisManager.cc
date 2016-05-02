@@ -11,6 +11,7 @@
 #include <G4StepPoint.hh>
 #include <G4VPhysicalVolume.hh>
 #include <G4VProcess.hh>
+#include <G4NavigationHistory.hh>
 
 #include "NpolAnalysisManager.hh"
 #include "NpolFileManager.hh"
@@ -166,14 +167,20 @@ void NpolAnalysisManager::RecordStep(const G4Step *aStep) {
 	G4Track *aTrack = aStep->GetTrack();
 	G4StepPoint *preStepPoint = aStep->GetPreStepPoint();
 	G4String volName = preStepPoint->GetPhysicalVolume()->GetName();
+	G4ThreeVector worldPosition = preStepPoint->GetPosition();
+	G4ThreeVector localPosition = preStepPoint->GetTouchableHandle()->GetHistory()
+	  ->GetTopTransform().TransformPoint(worldPosition);
 
 	if(volName.substr(0,3) == "av_") {
     	NpolStep *npolStep = new NpolStep();
 		
 		npolStep->trackId = aTrack->GetTrackID();
-		npolStep->posX = (aTrack->GetPosition()).x()/cm;
-		npolStep->posY = (aTrack->GetPosition()).y()/cm;
-		npolStep->posZ = (aTrack->GetPosition()).z()/cm;
+		npolStep->gPosX = worldPosition.x()/cm;
+		npolStep->gPosY = worldPosition.y()/cm;
+		npolStep->gPosZ = worldPosition.z()/cm;
+		npolStep->lPosX = localPosition.x()/cm;
+		npolStep->lPosY = localPosition.y()/cm;
+		npolStep->lPosZ = localPosition.z()/cm;
 		npolStep->momX = (aTrack->GetMomentum()).x()/cm;
 		npolStep->momY = (aTrack->GetMomentum()).y()/cm;
 		npolStep->momZ = (aTrack->GetMomentum()).z()/cm;
@@ -192,9 +199,12 @@ void NpolAnalysisManager::RecordStep(const G4Step *aStep) {
 		NpolTagger *taggedParticle = new NpolTagger();
 
 		taggedParticle->trackId = aTrack->GetTrackID();
-		taggedParticle->posX = (aTrack->GetPosition()).x()/cm;
-		taggedParticle->posY = (aTrack->GetPosition()).y()/cm;
-		taggedParticle->posZ = (aTrack->GetPosition()).z()/cm;
+		taggedParticle->gPosX = worldPosition.x()/cm;
+		taggedParticle->gPosY = worldPosition.y()/cm;
+		taggedParticle->gPosZ = worldPosition.z()/cm;
+		taggedParticle->lPosX = localPosition.x()/cm;
+		taggedParticle->lPosY = localPosition.y()/cm;
+		taggedParticle->lPosZ = localPosition.z()/cm;
 		taggedParticle->momX = (aTrack->GetMomentum()).x()/cm;
 		taggedParticle->momY = (aTrack->GetMomentum()).y()/cm;
 		taggedParticle->momZ = (aTrack->GetMomentum()).z()/cm;
