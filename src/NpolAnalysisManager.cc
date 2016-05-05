@@ -20,7 +20,7 @@
 #include "NpolTagger.hh"
 #include "NpolStatistics.hh"
 
-#define OUTFILE_VERSION 20160301 // Determined by YYYYMMDD
+#define OUTFILE_VERSION 20160504 // Determined by YYYYMMDD
 
 NpolAnalysisManager *NpolAnalysisManager::pInstance = NULL;
 
@@ -134,6 +134,12 @@ void NpolAnalysisManager::RecordTrack(const G4Track *aTrack) {
 	anNpolVertex->posX = (aTrack->GetPosition()).x()/cm;
 	anNpolVertex->posY = (aTrack->GetPosition()).y()/cm;
 	anNpolVertex->posZ = (aTrack->GetPosition()).z()/cm;
+	/*anNpolVertex->gPosX = (aTrack->GetPosition()).x()/cm;
+	anNpolVertex->gPosY = (aTrack->GetPosition()).y()/cm;
+	anNpolVertex->gPosZ = (aTrack->GetPosition()).z()/cm;
+	anNpolVertex->lPosX = (aTrack->GetPosition()).x()/cm;
+	anNpolVertex->lPosY = (aTrack->GetPosition()).y()/cm;
+	anNpolVertex->lPosZ = (aTrack->GetPosition()).z()/cm;*/
 	anNpolVertex->momX = (aTrack->GetMomentum()).x()/cm;
 	anNpolVertex->momY = (aTrack->GetMomentum()).y()/cm;
 	anNpolVertex->momZ = (aTrack->GetMomentum()).z()/cm;
