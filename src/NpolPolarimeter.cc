@@ -48,6 +48,7 @@ NpolPolarimeter::NpolPolarimeter() {
   ConstructBottomVetoArray(PolarimeterLV);
   ConstructFrontDetArray(PolarimeterLV);
   ConstructFrontTagArray(PolarimeterLV);
+  ConstructBackTagArray(PolarimeterLV);
 }
 
 NpolPolarimeter::~NpolPolarimeter() {}
@@ -238,6 +239,28 @@ void NpolPolarimeter::ConstructFrontTagArray(G4LogicalVolume *motherLV) {
   G4VisAttributes* FrontTagVisAtt= new G4VisAttributes(G4Colour(1.0,1.0,1.0));
   FrontTagLV->SetVisAttributes(FrontTagVisAtt);
 }
+
+void NpolPolarimeter::ConstructBackTagArray(G4LogicalVolume *motherLV) {
+  
+  
+  G4ThreeVector Tm;
+  G4Transform3D Tr; 
+  
+  G4VSolid *BackTag = new G4Box("BackTag",0.80*m,0.0508*m,0.00508*m);
+  G4LogicalVolume *BackTagLV = new G4LogicalVolume(BackTag,
+	NpolMaterials::GetInstance()->GetMaterial("Scint"), "BackTagLV",0,0,0);
+  
+  G4AssemblyVolume *BackTaggerArray = MakePlate(BackTagLV,
+	  12, 0.0*m, 0.55*m, 0.0*m, 0.0*m, 0.10*m, 0.0*m);
+
+  //for(unsigned int i=0; i<2; i++)
+  ImprintPlate(BackTaggerArray, motherLV, 0.0*m, 0.0*m,1.80*m, 0.0*deg);
+  ImprintPlate(BackTaggerArray, motherLV, 0.0*m, 0.0*m,1.82*m, 90.0*deg);
+
+  G4VisAttributes* BackTagVisAtt= new G4VisAttributes(G4Colour(1.0,1.0,1.0));
+  BackTagLV->SetVisAttributes(BackTagVisAtt);
+}
+
 
 void NpolPolarimeter::Place(G4LogicalVolume *motherLV) {
   

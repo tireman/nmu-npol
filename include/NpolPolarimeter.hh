@@ -35,7 +35,8 @@ public:
   void ConstructBottomVetoArray(G4LogicalVolume *motherLV);
   void ConstructFrontDetArray(G4LogicalVolume *motherLV);
   void ConstructFrontTagArray(G4LogicalVolume *motherLV);
-  
+  void ConstructBackTagArray(G4LogicalVolume *motherLV);
+
   virtual G4String GetName();
   virtual void Place(G4LogicalVolume *motherLV);
   void TranslateRotateAndPlace(G4LogicalVolume *polarimeterLV, G4LogicalVolume *motherLV,G4double rho, G4double phi, G4double z);
