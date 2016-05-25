@@ -44,11 +44,11 @@ void NpolCombineHistos() {
   // THis first line of variables needs to be set in order to combine the correct files together.
   std::string Lead = "15"; std::string Energy = "4.4"; std::string Bfield = "4"; 
   
-  std::string OutputDir = "/work/hallc/cgen/tireman/MagFieldOn/MagField_4Bdl/LeadOn15cm/root";
-  std::string InputDir = "/work/hallc/cgen/tireman/MagFieldOn/MagField_4Bdl/LeadOn15cm/Output";
+  std::string OutputDir = "/data2/cgen/JlabSimData/4.4GeV/4Bdl/Lead15cm/histos";
+  std::string InputDir = "/data2/cgen/JlabSimData/4.4GeV/4Bdl/Lead15cm/histos";
   std::string OutputFile;
 
-  OutputFile = OutputDir +"/" + "semenov" + Energy + "GeV_Lead" + Lead + "cm_" + Bfield + "Bdl_Histos.root";
+  OutputFile = OutputDir +"/" + "npol_" + Energy + "GeV_Lead" + Lead + "cm_" + Bfield + "Bdl_Histos.root";
 
   TargetFile = TFile::Open( OutputFile.c_str(), "RECREATE" );
 

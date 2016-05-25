@@ -47,6 +47,9 @@ void ProcessElectrons() {
   TChain *npolTree = new TChain("T");
   TChain *statsTree = new TChain("T2");
 
+  npolTree->SetCacheSize(200000000);
+  statsTree->SetCacheSize(200000000);
+  
   RetrieveENVvariables();
 
   TString InputFile = FormInputFile(InputDir);
@@ -149,7 +152,7 @@ void ProcessElectrons() {
 
   Double_t targetTaggerPos = 150.0;
   Double_t npolTaggerPos = 683.86;
-  Double_t theta = 0.13812; // collimator horizontal angular accecptance
+  Double_t theta = 0.014; //0.13812; // collimator horizontal angular accecptance
   Double_t phi = 0.08466; // collimator vertical angular acceptance 
   Double_t solidAngle = 4*asin(sin(theta/2)*sin(phi/2)); // solid angle
   // loop over all entries (one per event)
@@ -161,20 +164,21 @@ void ProcessElectrons() {
 	PrintEventNumber(nentries,i);
 
 	std::set<int> npolTrackIDs;
-	//std::set<int> vertexTrackIDs;
+	std::set<int> vertexTrackIDs;
 
 	// loop over all vertex entries to find particles created in
 	// the lead curtain or front wall of shield hut
-	/*std::vector<NpolVertex *>::iterator v_it;
+	std::vector<NpolVertex *>::iterator v_it;
 	for(v_it = vertexEntry->begin(); v_it != vertexEntry->end(); v_it++){
 	  NpolVertex *aVertex = *v_it;
 	  if(aVertex == NULL) continue;
 	  std::string volumeName = aVertex->volume;
-	  if((volumeName == "HutFrontWall") || (volumeName == "LeadCurtain") || (volumeName == "ExpHall") 
-	    || (volumeName == "NPOLTagger")){
+	  std::string processName = aVertex->process;
+	  //if(volumeName == "TargetFluid" && processName == "electronNuclear") std::cout << "Process name is: " << processName << std::endl;
+	  if((volumeName == "TargetFluid") && (processName == "electronNuclear")){
 		vertexTrackIDs.insert(aVertex->trackId);
 	  }
-	  }*/
+	}
 	
     // loop over all tagged particles (min. one step in NPOL tagger volume)
     Double_t npolxOffSet = npolTaggerPos*sin(0.48869); // 28 degree 
@@ -188,20 +192,19 @@ void ProcessElectrons() {
       if(npolParticleKE.find(particleName) == npolParticleKE.end())
 		continue;
 	  Double_t fluxscaling = 1;
-
-	  //if(vertexTrackIDs.find(npolTagged->trackId) == vertexTrackIDs.end()){
-	  Double_t Xcenter = abs(npolTagged->posX) - npolxOffSet;
-      if((abs(npolTagged->posY) <= npolyMax) && (abs(Xcenter) <= npolxMax)){
-		(npolParticleKE[particleName])->
-		  Fill(npolTagged->energy,fluxscaling);
-		(npolParticlePOS[particleName])->
-		  Fill(abs(npolTagged->posX),npolTagged->posY);
+	  
+	  if(vertexTrackIDs.find(npolTagged->trackId) != vertexTrackIDs.end()){
+		Double_t Xcenter = abs(npolTagged->gPosX) - npolxOffSet;
+		if((abs(npolTagged->gPosY) <= npolyMax) && (abs(Xcenter) <= npolxMax)){
+		  (npolParticleKE[particleName])->
+			Fill(npolTagged->energy,fluxscaling);
+		  (npolParticlePOS[particleName])->
+			Fill(abs(npolTagged->gPosX),npolTagged->gPosY);
+		}
 	  }
-		//}
 	  npolTrackIDs.insert(npolTagged->trackId);
 	}
-	//vertexTrackIDs.clear();
-
+	
     // loop over all tagged particles (min. one step in target tagger volume)
     Double_t targetxOffSet = targetTaggerPos*sin(0.48869); // 28 degree
 	Double_t targetxMax = targetTaggerPos*tan(theta/2); 
@@ -214,26 +217,29 @@ void ProcessElectrons() {
       if(targetParticleKE.find(particleName) == targetParticleKE.end())
 		continue;
 	  Double_t fluxscaling = 1;
-      Double_t Xcenter = abs(targetTagged->posX) - targetxOffSet;
-      if((abs(targetTagged->posY) <= targetyMax) && (abs(Xcenter) <= targetxMax)){
-		(targetParticleKE[particleName])->
-		  Fill(targetTagged->energy,fluxscaling);
-		(targetParticlePOS[particleName])->
-		  Fill(abs(targetTagged->posX),targetTagged->posY);
-		
-		// Here the correlated histograms are to be filled
-		if(npolTrackIDs.find(targetTagged->trackId) 
-		   != npolTrackIDs.end()){  
-
-		  (correlateKE[particleName])->
+	  if(vertexTrackIDs.find(targetTagged->trackId) != vertexTrackIDs.end()){
+		Double_t Xcenter = abs(targetTagged->gPosX) - targetxOffSet;
+		if((abs(targetTagged->gPosY) <= targetyMax) && (abs(Xcenter) <= targetxMax)){
+		  (targetParticleKE[particleName])->
 			Fill(targetTagged->energy,fluxscaling);
-		  (correlatePOS[particleName])->
-			Fill(abs(targetTagged->posX),targetTagged->posY);
+		  (targetParticlePOS[particleName])->
+			Fill(abs(targetTagged->gPosX),targetTagged->gPosY);
+		  
+		  // Here the correlated histograms are to be filled
+		  if(npolTrackIDs.find(targetTagged->trackId) 
+			 != npolTrackIDs.end()){  
+			
+			(correlateKE[particleName])->
+			  Fill(targetTagged->energy,fluxscaling);
+			(correlatePOS[particleName])->
+			  Fill(abs(targetTagged->gPosX),targetTagged->gPosY);
+		  }
 		}
 	  }
 	}
 	npolTrackIDs.clear();
-  
+  	vertexTrackIDs.clear();
+
     // This section is designed to file up the histograms for hits in
     // the Scintillator detectors
     std::map<std::string, double> eDep;
@@ -493,3 +499,8 @@ void RetrieveENVvariables() {
   }
 }
 
+int main(){
+
+  ProcessElectrons();
+  return 0;
+}
