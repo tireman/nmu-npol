@@ -15,22 +15,32 @@
 
 class NpolDetectorEvent : public TObject {
 
-public:
-  
-  inline NpolDetectorEvent() { }
-  virtual ~NpolDetectorEvent() { }
+	public:
 
-  double gPosX;
-  double gPosY;
-  double gPosZ;
-  double lPosX;
-  double lPosY;
-  double lPosZ;
-  double time;
-  double totEnergyDep;
-  bool thresholdExceeded;
+		NpolDetectorEvent() {
+			gPosX = 0.0;
+			gPosY = 0.0;
+			gPosZ = 0.0;
+			lPosX = 0.0;
+			lPosY = 0.0;
+			lPosZ = 0.0;
+			time = 0.0;
+			thresholdExceeded = false;
+			totEnergyDep = 0.0;
+		}
+		~NpolDetectorEvent() { }
 
-  ClassDef(NpolDetectorEvent, 1);
+		double gPosX;
+		double gPosY;
+		double gPosZ;
+		double lPosX;
+		double lPosY;
+		double lPosZ;
+		double time;
+		double totEnergyDep;
+		bool thresholdExceeded;
+
+		ClassDef(NpolDetectorEvent, 1);
 };
 
 #endif
