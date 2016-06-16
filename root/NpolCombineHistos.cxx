@@ -44,8 +44,8 @@ void NpolCombineHistos() {
   // THis first line of variables needs to be set in order to combine the correct files together.
   std::string Lead = "15"; std::string Energy = "4.4"; std::string Bfield = "4"; 
   
-  std::string OutputDir = "/data2/cgen/JlabSimData/4.4GeV/4Bdl/Lead15cm/histos";
-  std::string InputDir = "/data2/cgen/JlabSimData/4.4GeV/4Bdl/Lead15cm/histos";
+  std::string OutputDir = "/home/tireman/simulation/jlab/npol/analysis/June-9-2016/histos";
+  std::string InputDir = "/home/tireman/simulation/jlab/npol/analysis/June-9-2016/histos";
   std::string OutputFile;
 
   OutputFile = OutputDir +"/" + "npol_" + Energy + "GeV_Lead" + Lead + "cm_" + Bfield + "Bdl_Histos.root";
@@ -60,7 +60,7 @@ void NpolCombineHistos() {
     std::cerr << "Cannot open directory " << InputDir << std::endl;
     return;
   }
-    
+  
   while((dir = readdir(d)) != NULL) {
 	std::string InFile = InputDir + "/" + dir->d_name;
 

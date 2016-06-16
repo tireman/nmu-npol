@@ -23,7 +23,8 @@ void CanvasPartition(TCanvas *C,const Int_t Nxx = 2,const Int_t Nyy = 2,
                      Float_t bMargin = 0.15, Float_t tMargin = 0.05,
 					 Float_t vSpacing = 0.0, Float_t hSpacing = 0.0);
 
-void FillCanvas(TCanvas *C, Double_t scaleFactor,TFile *F, std::string histoNames[3][3], struct histoParams plotSettings);
+void FillCanvas(TCanvas *C, Double_t scaleFactor,TFile *F, std::string histoNames[3][3], 
+				struct histoParams plotSettings);
 TString FormInputFile(TString InputDir);
 TString FormOutputFile(TString OutputDir);
 void RetrieveENVvariables();
@@ -62,17 +63,17 @@ void SimulationFigures() {
   Double_t totalElectrons = ((*v))[0];
   Double_t electronTime = totalElectrons/(6.242e12); //6.242e12 e-/s at 1 microAmp
   
-  Double_t theta = 138.12e-3;  // Vertical angle
-  Double_t phi = 84.66e-3;    // Horizontal angle
+  Double_t theta = 138.12e-3; //87.266e-3; // G4 Version 138.12e-3;  // Vertical angle
+  Double_t phi = 67.16e-3; //87.266e-3; // G4 Version 84.66e-3;    // Horizontal angle
   Double_t solidAngle = 4*asin(sin(theta/2)*sin(phi/2));
   
-  // My scale for NPOL Tagger
+  // My scale 
   //Double_t fluxscaling1 = 1/(totalElectrons*1.602e-13*pow(618.0,2)*solidAngle)); 
   //Double_t fluxscaling2 = 1/(totalElectrons*1.602e-13*pow(112.0,2)*solidAngle)); 
   
-  //Proposal Scale for NPOL Tagger
-  Double_t fluxscaling1 = 1/(totalElectrons*pow(683.86,2)*solidAngle);  // full solid angle calculation for a pyramid
-  Double_t fluxscaling2 = 1/(totalElectrons*pow(150.0,2)*solidAngle);  
+  //Proposal Scale
+  Double_t fluxscaling1 = 1/(totalElectrons*pow(638.86,2)*solidAngle);  // G4 Version 683.86 cm // full solid angle calculation for a pyramid
+  Double_t fluxscaling2 = 1/(totalElectrons*pow(150.0,2)*solidAngle);  // G4 Version 150.0 cm
    
   // Put out some statistics
   std::cout << "Electron beam time at 1 micro-amp is " << electronTime << " s " << std::endl;
@@ -96,7 +97,7 @@ void SimulationFigures() {
   plotSettings.Ranges.insert(std::pair<std::string, Double_t>("xLow",1e-1)); 
   plotSettings.Ranges.insert(std::pair<std::string, Double_t>("xHigh",1e4));
   plotSettings.Ranges.insert(std::pair<std::string, Double_t>("yLow",2e-15)); 
-  plotSettings.Ranges.insert(std::pair<std::string, Double_t>("yHigh",1e-10));
+  plotSettings.Ranges.insert(std::pair<std::string, Double_t>("yHigh",4e-10));
   plotSettings.Ranges.insert(std::pair<std::string, Double_t>("zLow",0.0)); 
   plotSettings.Ranges.insert(std::pair<std::string, Double_t>("zHigh",1000.0));
   
@@ -122,12 +123,12 @@ void SimulationFigures() {
   plotSettings.Ranges.insert(std::pair<std::string, Double_t>("xLow",1e-1)); 
   plotSettings.Ranges.insert(std::pair<std::string, Double_t>("xHigh",1e4));
   plotSettings.Ranges.insert(std::pair<std::string, Double_t>("yLow",2e-15)); 
-  plotSettings.Ranges.insert(std::pair<std::string, Double_t>("yHigh",2e-9));
+  plotSettings.Ranges.insert(std::pair<std::string, Double_t>("yHigh",4e-7));
   plotSettings.Ranges.insert(std::pair<std::string, Double_t>("zLow",0.0)); 
   plotSettings.Ranges.insert(std::pair<std::string, Double_t>("zHigh",1000.0));
  
   CanvasPartition(c2a,plotSettings.Nx,plotSettings.Ny,lMargin,rMargin,bMargin,tMargin,vSpacing,hSpacing);
-  FillCanvas(c2a, fluxscaling1, inFile,  histoNames, plotSettings);
+  FillCanvas(c2a, fluxscaling2, inFile,  histoNames, plotSettings);
   
   // Plot the Target Tagger flux plot requiring a hit in the NPOLll tagger as well
   TCanvas *c2b = new TCanvas("c2b","Correlated Target Tagger Flux vs. KE at Polarimeter Angle 28.0 Deg, E = 4.4 GeV",1000,900);
@@ -203,71 +204,69 @@ void SimulationFigures() {
    Float_t hposl,hposr,hmarl,hmarr,hfactor;
 
    for (Int_t i=0;i<Nx;i++) {
-
-      if (i==0) {
-         hposl = 0.0;
-         hposr = lMargin + hStep;
-         hfactor = hposr-hposl;
-         hmarl = lMargin / hfactor;
-         hmarr = 0.0;
-      } else if (i == Nx-1) {
-         hposl = hposr + hSpacing;
-         hposr = hposl + hStep + rMargin;
-         hfactor = hposr-hposl;
-         hmarl = 0.0;
-         hmarr = rMargin / (hposr-hposl);
-      } else {
-         hposl = hposr + hSpacing;
-         hposr = hposl + hStep;
-         hfactor = hposr-hposl;
-         hmarl = 0.0;
-         hmarr = 0.0;
-      }
-
-      for (Int_t j=0;j<Ny;j++) {
-
-         if (j==0) {
-            vposd = 0.0;
-            vposu = bMargin + vStep;
-            vfactor = vposu-vposd;
-            vmard = bMargin / vfactor;
-            vmaru = 0.0;
-         } else if (j == Ny-1) {
-            vposd = vposu + vSpacing;
-            vposu = vposd + vStep + tMargin;
-            vfactor = vposu-vposd;
-            vmard = 0.0;
-            vmaru = tMargin / (vposu-vposd);
-         } else {
-            vposd = vposu + vSpacing;
-            vposu = vposd + vStep;
-            vfactor = vposu-vposd;
-            vmard = 0.0;
-            vmaru = 0.0;
-         }
-
-         C->cd(0);
-
-         char name[16];
-         sprintf(name,"pad_%i_%i",i,j);
-         TPad *pad = (TPad*) gROOT->FindObject(name);
-         if (pad) delete pad;
-         pad = new TPad(name,"",hposl,vposd,hposr,vposu);
-         pad->SetLeftMargin(hmarl);
-         pad->SetRightMargin(hmarr);
-         pad->SetBottomMargin(vmard);
-		 pad->SetTopMargin(vmaru);
-
-         pad->SetFrameBorderMode(0);
-         pad->SetBorderMode(0);
-         pad->SetBorderSize(0);
-
-         pad->Draw();
-      }
+	 
+	 if (i==0) {
+	   hposl = 0.0;
+	   hposr = lMargin + hStep;
+	   hfactor = hposr-hposl;
+	   hmarl = lMargin / hfactor;
+	   hmarr = 0.0;
+	 } else if (i == Nx-1) {
+	   hposl = hposr + hSpacing;
+	   hposr = hposl + hStep + rMargin;
+	   hfactor = hposr-hposl;
+	   hmarl = 0.0;
+	   hmarr = rMargin / (hposr-hposl);
+	 } else {
+	   hposl = hposr + hSpacing;
+	   hposr = hposl + hStep;
+	   hfactor = hposr-hposl;
+	   hmarl = 0.0;
+	   hmarr = 0.0;
+	 }
+	 
+	 for (Int_t j=0;j<Ny;j++) {
+	   
+	   if (j==0) {
+		 vposd = 0.0;
+		 vposu = bMargin + vStep;
+		 vfactor = vposu-vposd;
+		 vmard = bMargin / vfactor;
+		 vmaru = 0.0;
+	   } else if (j == Ny-1) {
+		 vposd = vposu + vSpacing;
+		 vposu = vposd + vStep + tMargin;
+		 vfactor = vposu-vposd;
+		 vmard = 0.0;
+		 vmaru = tMargin / (vposu-vposd);
+	   } else {
+		 vposd = vposu + vSpacing;
+		 vposu = vposd + vStep;
+		 vfactor = vposu-vposd;
+		 vmard = 0.0;
+		 vmaru = 0.0;
+	   }
+	   
+	   C->cd(0);
+	   
+	   char name[16];
+	   sprintf(name,"pad_%i_%i",i,j);
+	   TPad *pad = (TPad*) gROOT->FindObject(name);
+	   if (pad) delete pad;
+	   pad = new TPad(name,"",hposl,vposd,hposr,vposu);
+	   pad->SetLeftMargin(hmarl);
+	   pad->SetRightMargin(hmarr);
+	   pad->SetBottomMargin(vmard);
+	   pad->SetTopMargin(vmaru);
+	   pad->SetFrameBorderMode(0);
+	   pad->SetBorderMode(0);
+	   pad->SetBorderSize(0);
+	   pad->Draw();
+	 }
    }
-}
- 
- void FillCanvas(TCanvas *C, Double_t scaleFactor, TFile *inFile, std::string histoNames[3][3], struct histoParams plotSettings){
+  }
+
+void FillCanvas(TCanvas *C, Double_t scaleFactor, TFile *inFile, std::string histoNames[3][3], struct histoParams plotSettings){
   
   Int_t Nx = plotSettings.Nx; Int_t Ny = plotSettings.Ny;
   TPad *pad[Nx][Ny];	  
@@ -303,8 +302,8 @@ void SimulationFigures() {
   if((*plotSettings.plotFlags.find("binScale")).second){	
     for(int i = 1; i <= hFrame->GetNbinsX()-2; i++){
       double oldbincontent = hFrame->GetBinContent(i);
-      double scalingfactor = scaleFactor/TMath::Log10(hFrame->GetBinCenter(i)*1e6);
-    hFrame->SetBinContent(i,oldbincontent*scalingfactor);
+      double scalingfactor = scaleFactor/TMath::Log10(hFrame->GetBinWidth(i)*1e6);
+	  hFrame->SetBinContent(i,oldbincontent*scalingfactor);
     }
   } else {
     hFrame->Scale(scaleFactor);
@@ -359,8 +358,9 @@ void SimulationFigures() {
 TString FormInputFile(TString InputDir){
   
   TString fileName = InputDir + "/" + BaseName + "_" + Energy + "GeV_" + "Lead" + Lead + "cm_" + Bfield + "Bdl_Histos.root";
-  
+
   return fileName;
+  
 }
 
 TString FormOutputFile(TString OutputDir){
