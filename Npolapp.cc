@@ -24,6 +24,7 @@
 #include "QGSP_BERT_HP.hh"
 #include "QGSP_BIC_HP.hh"
 #include "QGSP_BIC.hh"
+#include "QGSP_INCLXX_HP.hh"
 
 #include "NpolActionInitialization.hh"
 #include "NpolDetectorConstruction.hh"
@@ -77,6 +78,7 @@ int main(int argc,char *argv[]) {
   // mandatory user initialization classes
   runManager->SetUserInitialization(new NpolDetectorConstruction);
   runManager->SetUserInitialization(new QGSP_BERT_HP); 
+  //runManager->SetUserInitialization(new QGSP_INCLXX_HP);
             // Use _HP version for full runs and non-_HP version for tests
   runManager->SetUserInitialization(new NpolActionInitialization);
   

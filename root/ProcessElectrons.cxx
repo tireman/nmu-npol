@@ -47,8 +47,8 @@ void ProcessElectrons() {
   TChain *npolTree = new TChain("T");
   TChain *statsTree = new TChain("T2");
 
-  npolTree->SetCacheSize(200000000);
-  statsTree->SetCacheSize(200000000);
+  npolTree->SetCacheSize(50000000);
+  statsTree->SetCacheSize(50000000);
   
   RetrieveENVvariables();
 
@@ -129,35 +129,34 @@ void ProcessElectrons() {
     targetParticleKE[it->first] = new TH1F(
      targetHistoName.c_str(), targetHistoTitle.c_str(),nbins,bins);
     targetParticlePOS[it->first] = new TH2F(targetXYHistoName.c_str(),
-     targetXYHistoTitle.c_str(),60,55.0,85.0,40,-10,10);  
+     targetXYHistoTitle.c_str(),120,-30.0,30.0,40,-10,10);  
 
     npolParticleKE[it->first] = new TH1F(
 	  npolHistoName.c_str(), npolHistoTitle.c_str(),nbins,bins);
     npolParticlePOS[it->first] = new TH2F(npolXYHistoName.c_str(),
-     npolXYHistoTitle.c_str(),260,270.0,400.0,280,-70,70);
+     npolXYHistoTitle.c_str(),260,-65.0,65.0,280,-70,70);
 
     correlateKE[it->first] = new TH1F(
      correlateHistoName.c_str(), correlateHistoTitle.c_str(),nbins,bins);
     correlatePOS[it->first] = new TH2F(correlateXYHistoName.c_str(),
-     correlateXYTitle.c_str(),60,55.0,85.0,40,-10,10);
+     correlateXYTitle.c_str(),120,-30.0,30.0,40,-10,10);
 
   }  
 
   // Allocate the dTOF histogram
   TH1F *delta_TOF = 
-    new TH1F("dToF", "Time of flight between Analyzer and Top/Bottom Detectors", 
-	     500, -15.0, 200.0);
+    new TH1F("dToF", "Time of flight between Analyzer and Top/Bottom Detectors", 	     500, -15.0, 200.0);
   delta_TOF->GetYaxis()->SetTitle("Events");
   delta_TOF->GetXaxis()->SetTitle("Analyzer to Top/Bottom Array Time-of-Flight (ns)");
 
   Double_t targetTaggerPos = 150.0;
   Double_t npolTaggerPos = 683.86;
-  Double_t theta = 0.014; //0.13812; // collimator horizontal angular accecptance
-  Double_t phi = 0.08466; // collimator vertical angular acceptance 
+  Double_t theta = 0.13812; //0.13812; // collimator horizontal angular accecptance
+  Double_t phi = 0.06716; // using the Dipole 1 limit // 0.08466; // collimator vertical angular acceptance 
   Double_t solidAngle = 4*asin(sin(theta/2)*sin(phi/2)); // solid angle
+  
   // loop over all entries (one per event)
   Int_t nentries = npolTree->GetEntries();
-  //for(int i = 0; i < 100000; i++) {
   for(int i = 0; i < nentries; i++) {
     npolTree->GetEntry(i);
 	
@@ -174,14 +173,14 @@ void ProcessElectrons() {
 	  if(aVertex == NULL) continue;
 	  std::string volumeName = aVertex->volume;
 	  std::string processName = aVertex->process;
+	  Int_t PID = aVertex->parentId;
 	  //if(volumeName == "TargetFluid" && processName == "electronNuclear") std::cout << "Process name is: " << processName << std::endl;
-	  if((volumeName == "TargetFluid") && (processName == "electronNuclear")){
+	  if((volumeName == "TargetFluid") && (processName == "electronNuclear") && (PID == 1)){
 		vertexTrackIDs.insert(aVertex->trackId);
 	  }
 	}
 	
     // loop over all tagged particles (min. one step in NPOL tagger volume)
-    Double_t npolxOffSet = npolTaggerPos*sin(0.48869); // 28 degree 
 	Double_t npolxMax = npolTaggerPos*tan(theta/2); 
 	Double_t npolyMax = npolTaggerPos*tan(phi/2);
     std::vector<NpolTagger *>::iterator n_it;
@@ -192,21 +191,18 @@ void ProcessElectrons() {
       if(npolParticleKE.find(particleName) == npolParticleKE.end())
 		continue;
 	  Double_t fluxscaling = 1;
-	  
 	  if(vertexTrackIDs.find(npolTagged->trackId) != vertexTrackIDs.end()){
-		Double_t Xcenter = abs(npolTagged->gPosX) - npolxOffSet;
-		if((abs(npolTagged->gPosY) <= npolyMax) && (abs(Xcenter) <= npolxMax)){
+		if((abs(npolTagged->lPosX) <= npolxMax) && (abs(npolTagged->lPosY) <= npolyMax)){
 		  (npolParticleKE[particleName])->
 			Fill(npolTagged->energy,fluxscaling);
 		  (npolParticlePOS[particleName])->
-			Fill(abs(npolTagged->gPosX),npolTagged->gPosY);
+			Fill(npolTagged->lPosX,npolTagged->lPosY);
 		}
+		npolTrackIDs.insert(npolTagged->trackId);
 	  }
-	  npolTrackIDs.insert(npolTagged->trackId);
 	}
 	
     // loop over all tagged particles (min. one step in target tagger volume)
-    Double_t targetxOffSet = targetTaggerPos*sin(0.48869); // 28 degree
 	Double_t targetxMax = targetTaggerPos*tan(theta/2); 
 	Double_t targetyMax = targetTaggerPos*tan(phi/2);
     std::vector<NpolTagger *>::iterator t_it;
@@ -218,12 +214,11 @@ void ProcessElectrons() {
 		continue;
 	  Double_t fluxscaling = 1;
 	  if(vertexTrackIDs.find(targetTagged->trackId) != vertexTrackIDs.end()){
-		Double_t Xcenter = abs(targetTagged->gPosX) - targetxOffSet;
-		if((abs(targetTagged->gPosY) <= targetyMax) && (abs(Xcenter) <= targetxMax)){
+		if((abs(targetTagged->lPosX) <= targetxMax) && (abs(targetTagged->lPosY) <= targetyMax)){
 		  (targetParticleKE[particleName])->
 			Fill(targetTagged->energy,fluxscaling);
 		  (targetParticlePOS[particleName])->
-			Fill(abs(targetTagged->gPosX),targetTagged->gPosY);
+			Fill(targetTagged->lPosX,targetTagged->lPosY);
 		  
 		  // Here the correlated histograms are to be filled
 		  if(npolTrackIDs.find(targetTagged->trackId) 
@@ -232,7 +227,7 @@ void ProcessElectrons() {
 			(correlateKE[particleName])->
 			  Fill(targetTagged->energy,fluxscaling);
 			(correlatePOS[particleName])->
-			  Fill(abs(targetTagged->gPosX),targetTagged->gPosY);
+			  Fill(targetTagged->lPosX,targetTagged->lPosY);
 		  }
 		}
 	  }
@@ -264,7 +259,7 @@ void ProcessElectrons() {
       case 1: case 2: case 5: case 6:
 		Ethreshold = 1.0;
 		break;
-      case 3: case 4: case 7: case 8:
+      case 3: case 4: case 7: case 8: case 13:
 		Ethreshold = 1.0;
 		break;
       case 9: case 10:
@@ -304,7 +299,7 @@ void ProcessElectrons() {
 		  histograms[it->first] = 
 			new TH1F((it->first).c_str(),(it->first).c_str(),1000,0,200);
 		}else if((avNum == 3 || avNum == 4 || avNum == 7 || avNum == 8 || 
-				  avNum == 11 || avNum == 12)){
+				  avNum == 11 || avNum == 12 || avNum == 13)){
 		  histograms[it->first] = 
 			new TH1F((it->first).c_str(),(it->first).c_str(),200,0,20);
 		}else if(avNum == 0){
@@ -317,9 +312,8 @@ void ProcessElectrons() {
     eDep.clear();	
 	hitTime.clear();
   }
-  
-  // Write it all out to the ROOT file.
-  
+
+  /* // Write it all out to the ROOT file.*/
   TVectorD totalElectrons(2);
   totalElectrons[0] = TotalElectrons;
   totalElectrons[1] = TotalEventsRecorded;
@@ -484,8 +478,8 @@ void RetrieveENVvariables() {
      return; // Return error if not found
   }
   
-  if(getenv("OutputDir")){
-	OutputDir = getenv("OutputDir");
+  if(getenv("WorkOutputDir")){
+	OutputDir = getenv("WorkInputDir");
   }else{
 	std::cout << "Output Directory environmental varilable not set" << std::endl;
 	return;
@@ -501,6 +495,6 @@ void RetrieveENVvariables() {
 
 int main(){
 
-  ProcessElectrons();
-  return 0;
+ ProcessElectrons();
+ return 0;
 }
