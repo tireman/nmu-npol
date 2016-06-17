@@ -63,17 +63,33 @@ void SimulationFigures() {
   Double_t totalElectrons = ((*v))[0];
   Double_t electronTime = totalElectrons/(6.242e12); //6.242e12 e-/s at 1 microAmp
   
-  Double_t theta = 138.12e-3; //87.266e-3; // G4 Version 138.12e-3;  // Vertical angle
-  Double_t phi = 67.16e-3; //87.266e-3; // G4 Version 84.66e-3;    // Horizontal angle
-  Double_t solidAngle = 4*asin(sin(theta/2)*sin(phi/2));
+  // Tagger sizes
+  Double_t theta = 138.12e-3; //0.13812; // horizontal angular accecptance (radians)
+  Double_t phi = 67.16e-3;  // using the Dipole 1 limit // 0.08466; // vertical angular acceptance (radians)
+  Double_t targetD = 150.0;  // Position of target tagger (cm)
+  Double_t targetW = 2*targetD*TMath::Tan(theta/2);  // height of target tagger (cm)
+  Double_t targetL = 2*targetD*TMath::Tan(phi/2);   // width of target tagger (cm)
+  Double_t npolD = 683.89;  // Position of Npol Tagger (cm)
+  Double_t npolW = 2*npolD*TMath::Tan(theta/2);  // height of npol tagger (cm)
+  Double_t npolL = 2*npolD*TMath::Tan(phi/2);  // width of npol tagger (cm)
+
+  Double_t targetAlpha = targetW/(4*targetD);   // Constant needed for solid angle
+  Double_t npolAlpha = npolW/(4*npolD);  // Constant needed for solid angle
   
+  // Solid angle calculation! 
+  Double_t targetSolidAngle = 8*(TMath::ATan(targetL/targetW)-TMath::ASin(targetL/TMath::Sqrt((1+TMath::Power(targetAlpha,2))*(TMath::Power(targetL,2)+TMath::Power(targetW,2)))));
+  Double_t npolSolidAngle = 8*(TMath::ATan(npolL/npolW)-TMath::ASin(npolL/TMath::Sqrt((1+TMath::Power(npolAlpha,2))*(TMath::Power(npolL,2)+TMath::Power(npolW,2)))));
+  
+  std::cout << "Target solid angle = " << targetSolidAngle << std::endl;
+  std::cout << "Npol solid angle = " << npolSolidAngle << std::endl;
+
   // My scale 
-  //Double_t fluxscaling1 = 1/(totalElectrons*1.602e-13*pow(618.0,2)*solidAngle)); 
-  //Double_t fluxscaling2 = 1/(totalElectrons*1.602e-13*pow(112.0,2)*solidAngle)); 
+  //Double_t fluxscaling1 = 1/(totalElectrons*1.602e-13*pow(618.0,2)*npolSolidAngle)); 
+  //Double_t fluxscaling2 = 1/(totalElectrons*1.602e-13*pow(112.0,2)*targetSolidAngle)); 
   
   //Proposal Scale
-  Double_t fluxscaling1 = 1/(totalElectrons*pow(638.86,2)*solidAngle);  // G4 Version 683.86 cm // full solid angle calculation for a pyramid
-  Double_t fluxscaling2 = 1/(totalElectrons*pow(150.0,2)*solidAngle);  // G4 Version 150.0 cm
+  Double_t fluxscaling1 = 1/(totalElectrons*pow(112.0,2)*npolSolidAngle);  // G4 Version 683.86 cm // full solid angle calculation for a pyramid
+  Double_t fluxscaling2 = 1/(totalElectrons*pow(112.0,2)*targetSolidAngle);  // G4 Version 150.0 cm
    
   // Put out some statistics
   std::cout << "Electron beam time at 1 micro-amp is " << electronTime << " s " << std::endl;
@@ -97,7 +113,7 @@ void SimulationFigures() {
   plotSettings.Ranges.insert(std::pair<std::string, Double_t>("xLow",1e-1)); 
   plotSettings.Ranges.insert(std::pair<std::string, Double_t>("xHigh",1e4));
   plotSettings.Ranges.insert(std::pair<std::string, Double_t>("yLow",2e-15)); 
-  plotSettings.Ranges.insert(std::pair<std::string, Double_t>("yHigh",4e-10));
+  plotSettings.Ranges.insert(std::pair<std::string, Double_t>("yHigh",4e-4));
   plotSettings.Ranges.insert(std::pair<std::string, Double_t>("zLow",0.0)); 
   plotSettings.Ranges.insert(std::pair<std::string, Double_t>("zHigh",1000.0));
   
@@ -123,7 +139,7 @@ void SimulationFigures() {
   plotSettings.Ranges.insert(std::pair<std::string, Double_t>("xLow",1e-1)); 
   plotSettings.Ranges.insert(std::pair<std::string, Double_t>("xHigh",1e4));
   plotSettings.Ranges.insert(std::pair<std::string, Double_t>("yLow",2e-15)); 
-  plotSettings.Ranges.insert(std::pair<std::string, Double_t>("yHigh",4e-7));
+  plotSettings.Ranges.insert(std::pair<std::string, Double_t>("yHigh",4e-4));
   plotSettings.Ranges.insert(std::pair<std::string, Double_t>("zLow",0.0)); 
   plotSettings.Ranges.insert(std::pair<std::string, Double_t>("zHigh",1000.0));
  
@@ -149,7 +165,7 @@ void SimulationFigures() {
   plotSettings.Ranges.insert(std::pair<std::string, Double_t>("xLow",1e-1)); 
   plotSettings.Ranges.insert(std::pair<std::string, Double_t>("xHigh",1e4));
   plotSettings.Ranges.insert(std::pair<std::string, Double_t>("yLow",2e-15)); 
-  plotSettings.Ranges.insert(std::pair<std::string, Double_t>("yHigh",1e-10));
+  plotSettings.Ranges.insert(std::pair<std::string, Double_t>("yHigh",4e-4));
   plotSettings.Ranges.insert(std::pair<std::string, Double_t>("zLow",0.0)); 
   plotSettings.Ranges.insert(std::pair<std::string, Double_t>("zHigh",1000.0));
  
