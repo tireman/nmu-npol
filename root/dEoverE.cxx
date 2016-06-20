@@ -294,9 +294,9 @@ void OutputTracks(const std::vector<NpolVertex *> *verticies, std::ofstream &txt
 int dEoverE() {
 //int main(int argc, char *argv[]) {
 
-	gSystem->Load("NpolClass.so");
+	gSystem->Load("libNpolClasses.so");
 
-	std::string inFilename = "/data1/cgen/NeutronOnly/PointSource/vacuum/QGSP/root/neutron_2.1GeV_1_00001.root";
+	std::string inFilename = "/data1/cgen/NeutronOnly/PointSource/vacuum/QGSP/root/neutron_2.1GeV_1_00002.root";
 	std::string outFilenamePrefix = "dEoverE_dTOF_PointSource_Vacuum_test";
 	std::ofstream txtOut;
 	txtOut.open("/data1/dEoverE_txt_files/" + outFilenamePrefix + ".txt");
