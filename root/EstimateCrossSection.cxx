@@ -262,7 +262,7 @@ void FillCanvas(TCanvas *C, Double_t scaleFactor, TFile *inFile, std::string his
 				<< totalCounts << " Counts" << std::endl;
 	  
 	  std::cout << "Cross Section for " << histoNames[i][j]  << ": " 
-				<< totalCounts/(TotalElectrons*targetSolidAngle*nucleiPerVolume
+				<< totalCounts/(TotalElectrons*/*targetSolidAngle*/0.00232136*nucleiPerVolume
 				*thickness)/1e-24/1e-6 << " microbarns/sr\n" << endl; 
 	  
 	  

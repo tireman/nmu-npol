@@ -3,7 +3,7 @@
 export BUILD_DIR=/home/tireman/simulation/jlab/npol/nmu-npol/build
 export NPOLBASENAME=neutron_2.1GeV
 export NPOLEVENTSPERFILE=100000
-export NPOLDIR=/data1/cgen/NeutronOnly/PointSource/vacuum/QGSP
+export NPOLDIR=/data1/cgen/test
 
 if [ ! -e $NPOLDIR ]
 then
