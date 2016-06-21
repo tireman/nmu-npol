@@ -74,8 +74,8 @@ int main(int argc,char *argv[]) {
   
   // mandatory user initialization classes
   runManager->SetUserInitialization(new NpolDetectorConstruction);
-  runManager->SetUserInitialization(new NpolPhysicsList);
-  //runManager->SetUserInitialization(new QGSP_BERT_HP); 
+  //runManager->SetUserInitialization(new NpolPhysicsList);
+  runManager->SetUserInitialization(new QGSP_BERT_HP); 
   //runManager->SetUserInitialization(new QGSP_INCLXX_HP);
             // Use _HP version for full runs and non-_HP version for tests
   runManager->SetUserInitialization(new NpolActionInitialization);
