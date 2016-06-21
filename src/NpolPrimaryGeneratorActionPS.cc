@@ -55,15 +55,20 @@ void NpolPrimaryGeneratorActionPS::GeneratePrimaries(G4Event* anEvent)
 	// Theta is the azimulthal angle and phi is the rotation angle 
 
 	// Generate random angles between maximum and minimum angles
-	G4double NpolAng = 28.0*deg, dTheta = 3.975*deg, dPhi = 3.975*deg; //28
+	G4double NpolAng = 0.48869; // Polarimeter angle to downstream line (radians)
+	G4double dTheta = 0.13812; //0.13812; // Horizontal acceptance of dipole 1 exit (radians)
+	G4double dPhi = 0.13812; //0.06716; // Vertical of dipole 1 exit (radians)
 
-	G4double theta = -(NpolAng+dTheta*(2*G4UniformRand()-1));
-	G4double phi = (dPhi*(2*G4UniformRand()-1));
+	//G4double theta = -(NpolAng+(dTheta/2)*(2*G4UniformRand()-1));
+	//G4double phi = ((dPhi/2)*(2*G4UniformRand()-1));
+	G4double theta = -(NpolAng+(dTheta/2)*(G4RandGauss::shoot(0.0,0.300)));
+	G4double phi = ((dPhi/2)*(G4RandGauss::shoot(0.0,0.500)));
 
 	// Generate the momentum three vector and set the particle momentum
 	// direction and energy (energy can be changed from macro file).
-	G4ThreeVector momDirection;
+	G4ThreeVector momDirection = G4ThreeVector(0., 0., 0.);
 	momDirection.setRThetaPhi(1., theta, phi);
+
 	particleGun->SetParticleMomentumDirection(momDirection);
 	particleGun->SetParticleEnergy(2000.*MeV);
 

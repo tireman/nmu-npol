@@ -6,7 +6,7 @@ project (Npolapp)
 set(useROOT true)
 
 # (2)
-#set(CMAKE_MODULE_PATH /usr/local/geant4/geant4.10.00.p01/share/Geant4-10.0.1/bin)
+#set(CMAKE_MODULE_PATH /opt/geant4/geant4.10.02.p01/share/Geant4-10.2.1/bin)
 option(WITH_GEANT4_UIVIS "Build project with Geant4 UI an Vis Drivers" ON)
 if(WITH_GEANT4_UIVIS)
   find_package(Geant4 REQUIRED gdml ui_all vis_all)
@@ -22,7 +22,7 @@ if(useROOT)
   set(myROOTclasses ${PROJECT_SOURCE_DIR}/include/NpolStep.hh ${PROJECT_SOURCE_DIR}/include/NpolTagger.hh ${PROJECT_SOURCE_DIR}/include/NpolVertex.hh ${PROJECT_SOURCE_DIR}/include/NpolStatistics.hh)
 
   # Load ROOT and setup include directory
-  #set(CMAKE_MODULE_PATH /usr/local/lib/Geant4-10.0.1/Modules)
+  #set(CMAKE_MODULE_PATH /usr/local/lib/Geant4-10.2.1/Modules)
   find_package(ROOT REQUIRED)
   message("    -> ROOT Include directory is: ${ROOT_INCLUDE_DIR}")
   message("    -> ROOT Library Directory is: ${ROOT_LIBRARY_DIR}")
