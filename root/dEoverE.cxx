@@ -294,16 +294,18 @@ void OutputTracks(const std::vector<NpolVertex *> *verticies, std::ofstream &txt
 int dEoverE() {
 //int main(int argc, char *argv[]) {
 
-	gSystem->Load("NpolClass.so");
+  //gSystem->Load("libNpolClasses.so");
 
-	std::string inFilename = "/data1/cgen/NeutronOnly/PointSource/vacuum/QGSP/root/neutron_2.1GeV_1_00001.root";
-	std::string outFilenamePrefix = "dEoverE_dTOF_PointSource_Vacuum_test";
+	std::string inFilename = "/data1/cgen/test/root/neutron_2.1GeV_*_*.root";
+	std::string outFilenamePrefix = "dEoverE_dTOF_Gaussian_test";
 	std::ofstream txtOut;
-	txtOut.open("/data1/dEoverE_txt_files/" + outFilenamePrefix + ".txt");
+	txtOut.open("/data1/cgen/test/Output" + outFilenamePrefix + ".txt");
 
 	TChain *npolTree = new TChain("T");
 	TChain *statsTree = new TChain("T2");
-//	npolTree->Add("/data2/cgen/NMUSimData/NeutronOnly/2.1GeV/root/neutron_2.1GeV_*.root");
+//	npolTree->Add("/data2/cgen/NMUSimData/NeutronOnly/2.1GeV/root/neutron_2.1GeV_*.root"); 
+	npolTree->SetCacheSize(500000000);
+	statsTree->SetCacheSize(500000000);
 	npolTree->Add(inFilename.c_str());
 	statsTree->Add(inFilename.c_str());
 
@@ -314,7 +316,7 @@ int dEoverE() {
 	npolTree->SetBranchAddress("tracks",&verts);
 	statsTree->SetBranchAddress("stats",&stats);
 
-	TFile *outFile = new TFile(("~/dEoverE_out/" + outFilenamePrefix + ".root").c_str(),"RECREATE");
+	TFile *outFile = new TFile(("/data1/cgen/test/histos/" + outFilenamePrefix + ".root").c_str(),"RECREATE");
 	TH2F *h_dEoverEtop = new TH2F("dEoverEtop", "dE over E for top array", 200,0,150,400,0,20);
 	TH2F *h_dEoverEbot = new TH2F("dEoverEbot", "dE over E for bottom array", 200,0,150,400,0,20);
 	TH2F *h_dEoverEtop3 = new TH2F("dEoverEtop3", "dE over E for top array in section 3", 200,0,150,400,0,20);
@@ -339,7 +341,7 @@ int dEoverE() {
 	// BEGIN EVENT LOOP
 	int nentries = npolTree->GetEntries();
 	for(int i = 0; i < nentries; i++) {
-		if(++eventCounter % 1000 == 0)
+		if(++eventCounter % 10000 == 0)
 			std::cout << "Processing event #" << eventCounter << std::endl;
 		npolTree->GetEntry(i);
 

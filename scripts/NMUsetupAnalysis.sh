@@ -5,7 +5,7 @@ export Lead=15
 export Energy=4.4
 export Bfield=4
 export BUILD_DIR=/home/tireman/simulation/jlab/npol/nmu-npol/build
-export NPOLBASENAME=npol
+export NPOLBASENAME=neutron
 export NPOLDIR=/data1/cgen/test
 export NPOLWORKDIR=/data1/cgen/test
 
