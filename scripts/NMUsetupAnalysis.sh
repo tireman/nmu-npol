@@ -6,8 +6,8 @@ export Energy=4.4
 export Bfield=4
 export BUILD_DIR=/home/tireman/simulation/jlab/npol/nmu-npol/build
 export NPOLBASENAME=npol
-export NPOLDIR=/data2/cgen/JlabSimData/4.4GeV/4Bdl/Lead15cm
-export NPOLWORKDIR=/home/tireman/simulation/jlab/npol/analysis/June-9-2016
+export NPOLDIR=/data1/cgen/test
+export NPOLWORKDIR=/data1/cgen/test
 
 export OutputDir=$NPOLDIR/histos
 export InputDir=$NPOLDIR/root

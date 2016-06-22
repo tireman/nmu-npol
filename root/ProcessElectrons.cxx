@@ -18,10 +18,10 @@
 #include <TVectorD.h>
 #include <TString.h>
 
-#include "../include/NpolVertex.hh"
-#include "../include/NpolTagger.hh"
-#include "../include/NpolStatistics.hh"
-#include "../include/NpolStep.hh"
+#include "NpolVertex.hh"
+#include "NpolTagger.hh"
+#include "NpolStatistics.hh"
+#include "NpolStep.hh"
 
 void RetrieveENVvariables();
 TString FormInputFile(TString InputDir);
@@ -41,14 +41,14 @@ TString OutputDir = "";
 TString InputDir = "";
 
 void ProcessElectrons() {
-  gSystem->Load("NpolClass.so"); 
+  gSystem->Load("libNpolClass.so"); 
 
   // Set up the TTrees and their branch addresses
   TChain *npolTree = new TChain("T");
   TChain *statsTree = new TChain("T2");
 
-  npolTree->SetCacheSize(50000000);
-  statsTree->SetCacheSize(50000000);
+  npolTree->SetCacheSize(500000000);
+  statsTree->SetCacheSize(500000000);
   
   RetrieveENVvariables();
 
@@ -145,15 +145,25 @@ void ProcessElectrons() {
 
   // Allocate the dTOF histogram
   TH1F *delta_TOF = 
-    new TH1F("dToF", "Time of flight between Analyzer and Top/Bottom Detectors", 	     500, -15.0, 200.0);
+    new TH1F("dToF", "Time of flight between Analyzer and Top/Bottom Detectors",500, -15.0, 200.0);
   delta_TOF->GetYaxis()->SetTitle("Events");
   delta_TOF->GetXaxis()->SetTitle("Analyzer to Top/Bottom Array Time-of-Flight (ns)");
 
-  Double_t targetTaggerPos = 150.0;
-  Double_t npolTaggerPos = 683.86;
-  Double_t theta = 0.13812; //0.13812; // collimator horizontal angular accecptance
-  Double_t phi = 0.06716; // using the Dipole 1 limit // 0.08466; // collimator vertical angular acceptance 
-  Double_t solidAngle = 4*asin(sin(theta/2)*sin(phi/2)); // solid angle
+  Double_t targetTaggerPos = 150.0;  // Position of target tagger (cm)
+  Double_t npolTaggerPos = 683.86;  // Position of Npol Tagger (cm)
+  Double_t theta = 0.13812; //0.13812; // horizontal angular accecptance (radians)
+  Double_t phi = 0.06716; // using the Dipole 1 limit // 0.08466; // vertical angular acceptance (radians)
+  Double_t targetW = 2*targetTaggerPos*TMath::Tan(theta/2);  // height of target tagger (cm)
+  Double_t targetL = 2*targetTaggerPos*TMath::Tan(phi/2);   // width of target tagger (cm)
+  Double_t npolW = 2*npolTaggerPos*TMath::Tan(theta/2);  // height of npol tagger (cm)
+  Double_t npolL = 2*npolTaggerPos*TMath::Tan(phi/2);  // width of npol tagger (cm)
+
+  Double_t targetAlpha = targetW/(4*targetTaggerPos);  // Constant needed for solid angle
+  Double_t npolAlpha = npolW/(4*npolTaggerPos);  // Constant needed for solid angle
+
+  // Solid angle calculation! 
+  Double_t targetSolidAngle = 8*(TMath::ATan(targetL/targetW)-TMath::ASin(targetL/TMath::Sqrt((1+TMath::Power(targetAlpha,2))*(TMath::Power(targetL,2)+TMath::Power(targetW,2)))));
+  Double_t npolSolidAngle = 8*(TMath::ATan(npolL/npolW)-TMath::ASin(npolL/TMath::Sqrt((1+TMath::Power(npolAlpha,2))*(TMath::Power(npolL,2)+TMath::Power(npolW,2)))));
   
   // loop over all entries (one per event)
   Int_t nentries = npolTree->GetEntries();
@@ -163,11 +173,11 @@ void ProcessElectrons() {
 	PrintEventNumber(nentries,i);
 
 	std::set<int> npolTrackIDs;
-	std::set<int> vertexTrackIDs;
+	//std::set<int> vertexTrackIDs;
 
 	// loop over all vertex entries to find particles created in
 	// the lead curtain or front wall of shield hut
-	std::vector<NpolVertex *>::iterator v_it;
+/*	std::vector<NpolVertex *>::iterator v_it;
 	for(v_it = vertexEntry->begin(); v_it != vertexEntry->end(); v_it++){
 	  NpolVertex *aVertex = *v_it;
 	  if(aVertex == NULL) continue;
@@ -178,7 +188,7 @@ void ProcessElectrons() {
 	  if((volumeName == "TargetFluid") && (processName == "electronNuclear") && (PID == 1)){
 		vertexTrackIDs.insert(aVertex->trackId);
 	  }
-	}
+	  } */
 	
     // loop over all tagged particles (min. one step in NPOL tagger volume)
 	Double_t npolxMax = npolTaggerPos*tan(theta/2); 
@@ -191,7 +201,7 @@ void ProcessElectrons() {
       if(npolParticleKE.find(particleName) == npolParticleKE.end())
 		continue;
 	  Double_t fluxscaling = 1;
-	  if(vertexTrackIDs.find(npolTagged->trackId) != vertexTrackIDs.end()){
+	  //if(vertexTrackIDs.find(npolTagged->trackId) != vertexTrackIDs.end()){
 		if((abs(npolTagged->lPosX) <= npolxMax) && (abs(npolTagged->lPosY) <= npolyMax)){
 		  (npolParticleKE[particleName])->
 			Fill(npolTagged->energy,fluxscaling);
@@ -199,7 +209,7 @@ void ProcessElectrons() {
 			Fill(npolTagged->lPosX,npolTagged->lPosY);
 		}
 		npolTrackIDs.insert(npolTagged->trackId);
-	  }
+		//}
 	}
 	
     // loop over all tagged particles (min. one step in target tagger volume)
@@ -213,7 +223,7 @@ void ProcessElectrons() {
       if(targetParticleKE.find(particleName) == targetParticleKE.end())
 		continue;
 	  Double_t fluxscaling = 1;
-	  if(vertexTrackIDs.find(targetTagged->trackId) != vertexTrackIDs.end()){
+	  //if(vertexTrackIDs.find(targetTagged->trackId) != vertexTrackIDs.end()){
 		if((abs(targetTagged->lPosX) <= targetxMax) && (abs(targetTagged->lPosY) <= targetyMax)){
 		  (targetParticleKE[particleName])->
 			Fill(targetTagged->energy,fluxscaling);
@@ -230,10 +240,10 @@ void ProcessElectrons() {
 			  Fill(targetTagged->lPosX,targetTagged->lPosY);
 		  }
 		}
-	  }
+		//}
 	}
 	npolTrackIDs.clear();
-  	vertexTrackIDs.clear();
+  	//vertexTrackIDs.clear();
 
     // This section is designed to file up the histograms for hits in
     // the Scintillator detectors
