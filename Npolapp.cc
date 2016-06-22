@@ -44,12 +44,9 @@ int main(int argc,char *argv[]) {
   //
  
   G4long seeds[2];
-  G4long systime;	
-  if(getenv("SEED")){
-    systime = atoi(getenv("SEED"));
-  }else{
-    systime = time(NULL);
-  }
+  G4long systime = time(NULL);	
+  if(getenv("JOBNUMBER"))
+    systime += atoi(getenv("JOBNUMBER"));
   seeds[0] = (long) systime;
   seeds[1] = (long) (systime*G4UniformRand());
   G4int index = (int) 215*G4UniformRand();
