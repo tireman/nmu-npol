@@ -1,0 +1,40 @@
+# $Id: npol.mac,v1.1 For running with or without visualization
+# on the nmuNpol simulation 12/4/2013 $
+# 
+# can be run in batch, without graphic
+# or interactively: Idle> /control/execute npol.mac
+
+#/vis/viewer/set/viewpointThetaPhi -45 180 deg
+#/vis/viewer/zoom 1.5
+
+/run/initialize
+/run/verbose 0
+#/event/verbose 0
+/material/verbose 0
+/cuts/verbose 0
+/process/verbose 0
+
+/tracking/verbose 0
+/tracking/storeTrajectory 1
+
+# Particle type
+/gps/particle e-
+
+# source
+/gps/pos/type Point
+/gps/pos/centre 0. 0. -300. cm
+/gps/direction 0 0 1
+#/gps/pos/rot1 1 0 0
+#/gps/pos/rot2 0 0 1
+
+# the beam energy is in gaussian profile centered at 4400 MeV
+/gps/ene/type Mono
+/gps/ene/mono 4400. MeV
+
+#
+# Commands below are independent of gps
+#
+/vis/scene/endOfEventAction accumulate 50
+/run/printProgress 100
+
+/run/beamOn 50
