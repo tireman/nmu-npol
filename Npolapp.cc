@@ -44,12 +44,9 @@ int main(int argc,char *argv[]) {
   //
  
   G4long seeds[2];
-  G4long systime;	
-  if(getenv("SEED")){
-    systime = atoi(getenv("SEED"));
-  }else{
-    systime = time(NULL);
-  }
+  G4long systime = time(NULL);
+  if(getenv("JOBNUMBER"))
+	systime += atoi(getenv("JOBNUMBER"));
   seeds[0] = (long) systime;
   seeds[1] = (long) (systime*G4UniformRand());
   G4int index = (int) 215*G4UniformRand();
@@ -75,7 +72,7 @@ int main(int argc,char *argv[]) {
   // mandatory user initialization classes
   runManager->SetUserInitialization(new NpolDetectorConstruction);
   //runManager->SetUserInitialization(new NpolPhysicsList);
-  runManager->SetUserInitialization(new QGSP_BERT_HP); 
+  runManager->SetUserInitialization(new QGSP_BERT); 
   //runManager->SetUserInitialization(new QGSP_INCLXX_HP);
             // Use _HP version for full runs and non-_HP version for tests
   runManager->SetUserInitialization(new NpolActionInitialization);
