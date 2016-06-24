@@ -2,7 +2,7 @@
 
 Update 24-June-2016: Multi-threading has been added but there are still a couple of "random" bugs that cause a significant number of crashes.  Daniel Wilbern is working on it.  When it did work it was producing correct results and resulted in about 30% less RAM used over the same number of threads launched individually.  We are currently working on modifications to allow for fully compiled ROOT codes and easier switching between running with the full simulation (target, electron beam, etc) and the magnets/polarimeter "stack" only.  We are working on including more realistic particle flux distributions to the primary generator for studies on the polarimeter.  
 
-Switched to Geant 4.10.02.p02 which has resulted in the HBender being constructed to very small.  Probably a change in the version of GDML being used.  Fix was not obvious and currently not important (little flux comes from HBender at the larger angle).  Needs to be fixed, however, at some point.
+Switched to Geant 4.10.02.p01 which has resulted in the HBender being constructed to very small.  Probably a change in the version of GDML being used.  Fix was not obvious and currently not important (little flux comes from HBender at the larger angle).  Needs to be fixed, however, at some point.
 ------------------------------------------------------------------------------
 	
 Update 23-March-2016: Multi-Threading implementation could be useful but it will have to be checked if it will be a better use of resources over the current setup.  In particular, the amount of use of RAM on the Jlab Farm versus the # of cores.  It will have to be extensively tested to make sure it doesn't result in errors.  -- Daniel Wilbern is working on it.
