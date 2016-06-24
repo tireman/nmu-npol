@@ -24,15 +24,25 @@
 # Particle type  !!! Must be chosen by the user !!!!
 /gps/particle neutron
 
+################################################################
 # Particle source:  The particle source will generally be a plane
 # with dimensions specificed by the user.  The current version 
 # rotates the plane to 28 degrees right of beam line to line up with
 # the polarimeter.  
+
+# Choose wisely here and for the file to load for the particle 
+# distribution. There are two taggers to choose from depending on 
+# if you are just tossing particles at the NPOL or thorugh the entire 
+# NPOL, Magnet, shield house stack.
+######################################################################
 /gps/pos/type Plane
 /gps/pos/shape Rectangle
-/gps/pos/centre -70.397 0. 132.398 cm
-/gps/pos/halfx 27.490 cm
-/gps/pos/halfy 13.049 cm
+#/gps/pos/centre -70.397 0. 132.398 cm  # target tagger
+#/gps/pos/halfx 27.490 cm   		   	   # target tagger
+#/gps/pos/halfy 13.049 cm			   # target tagger
+/gps/pos/centre -321.067 0. 603.839 cm # NPOL tagger
+/gps/pos/halfx 125.332 cm   		   # NPOL tagger
+/gps/pos/halfy 58.9547 cm			   # NPOL tagger
 /gps/pos/rot1 0.882947 0 0.46947
 /gps/pos/rot2 0 1 0
 /gps/direction -0.46947 0 0.882947
@@ -47,7 +57,7 @@
 #
 # Commands below are independent of GPS
 #
-/vis/scene/endOfEventAction accumulate 1000
+/vis/scene/endOfEventAction accumulate 100
 /run/printProgress 100
 
-/run/beamOn 1000
+/run/beamOn 100
