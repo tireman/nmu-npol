@@ -1,6 +1,7 @@
 
 #include <cstdlib>
 #include <iostream>
+#include <fstream>
 #include <string>
 #include <vector>
 #include <map>
@@ -313,8 +314,8 @@ void FillCanvas(TCanvas *C, Double_t scaleFactor, TFile *inFile, std::string his
   hFrame->SetTitleFont(16);     
   hFrame->SetOption(plotSettings.plotStyle.c_str());
   hFrame->SetFillStyle(plotSettings.fillStyle);
-  
-  totalParticles += hFrame->Integral();
+
+  Double_t totalParticles = hFrame->Integral();
 
   // Bin-by-bin scaling to the width of the bins in eVs
   if((*plotSettings.plotFlags.find("binScale")).second){	
@@ -328,8 +329,7 @@ void FillCanvas(TCanvas *C, Double_t scaleFactor, TFile *inFile, std::string his
   }
   
   hFrame->Draw();
-
-  
+    
   if(plotSettings.leadName == "npolXY"){
   hFrame->GetZaxis()->SetTitle(plotSettings.zTitle.c_str());    // Format for Z axis
   hFrame->GetZaxis()->SetRangeUser(0.001,1.10*hFrame->GetMaximum()); // Z axis range
