@@ -1,9 +1,14 @@
 %% issues.txt - used to track standing issues in the devlopment of Npol %%
+
+Update 24-June-2016: Multi-threading has been added but there are still a couple of "random" bugs that cause a significant number of crashes.  Daniel Wilbern is working on it.  When it did work it was producing correct results and resulted in about 30% less RAM used over the same number of threads launched individually.  We are currently working on modifications to allow for fully compiled ROOT codes and easier switching between running with the full simulation (target, electron beam, etc) and the magnets/polarimeter "stack" only.  We are working on including more realistic particle flux distributions to the primary generator for studies on the polarimeter.  
+
+Switched to Geant 4.10.02.p02 which has resulted in the HBender being constructed to very small.  Probably a change in the version of GDML being used.  Fix was not obvious and currently not important (little flux comes from HBender at the larger angle).  Needs to be fixed, however, at some point.
+------------------------------------------------------------------------------
 	
 Update 23-March-2016: Multi-Threading implementation could be useful but it will have to be checked if it will be a better use of resources over the current setup.  In particular, the amount of use of RAM on the Jlab Farm versus the # of cores.  It will have to be extensively tested to make sure it doesn't result in errors.  -- Daniel Wilbern is working on it.
 
 Update 26-Oct-2015: Horizontal bender magnet: Checked the horizontal bender and narrowed the problem down to the HBcoil.  Namely, it has illegal operations when particles cross lines that two solids which are subtracted out of the coil in the GDML implementation are crossed.  This goes away when the coil is not included.  We are leaving out for now since background in the polarimeter is expected to be very small from the SHMS magnet but should be cleaned up in the future.  Suggestion is to simply move the code to a G4 construtor and dump the GDML implementation.
 
-Update 22-Oct-2015: Beam Dump: Currently we don't build or use the beam dump but if desired in the future it needs checked. Same for the beam dump and beam dump pipe.  It doesn't make a lot of sense to me but it is low priority at this point as it doesn't add a lot to the background radiation. If we go with an open polarimeter style then it will need to be added.
+Update 22-Oct-2015: Beam Dump: Currently we don't build or use the beam dump but if desired in the future it needs checked. Same for the beam dump and beam dump pipe.  It doesn't make a lot of sense to me but it is low priority at this point as it doesn't add a lot to the background radiation. If we go with an open polarimeter style then it will need to be checked.  This model was barrowed from another Hall C model.
 	
 Update 1-Oct-2015: Mag Field for Horizontal Bender Magnet  -- Currently NOT implemented.  Do we even need it?  Hall C has a TOSCA map that can be used or we could use a G4UniformMagField if it is desired.
