@@ -1,0 +1,63 @@
+# $Id: npol.mac,v1.1 For running with or without visualization
+# on the nmuNpol simulation 6/24/2016 $
+# 
+# This macro feeds commands to the primary event generator and allows 
+# for changing of the user particle source within the macro.  The user 
+# must supply the particle type and file which contains the biasing data 
+#
+# can be run in batch, without graphic
+# or interactively: Idle> /control/execute macro/PartilceFlux.mac
+
+#/vis/viewer/set/viewpointThetaPhi -45 180 deg
+#/vis/viewer/zoom 1.5
+
+/run/initialize
+/run/verbose 0
+#/event/verbose 0
+/material/verbose 0
+/cuts/verbose 0
+/process/verbose 0
+
+/tracking/verbose 0
+/tracking/storeTrajectory 1
+
+# Particle type  !!! Must be chosen by the user !!!!
+/gps/particle neutron
+
+################################################################
+# Particle source:  The particle source will generally be a plane
+# with dimensions specificed by the user.  The current version 
+# rotates the plane to 28 degrees right of beam line to line up with
+# the polarimeter.  
+
+# Choose wisely here and for the file to load for the particle 
+# distribution. There are two taggers to choose from depending on 
+# if you are just tossing particles at the NPOL or thorugh the entire 
+# NPOL, Magnet, shield house stack.
+######################################################################
+/gps/pos/type Plane
+/gps/pos/shape Rectangle
+#/gps/pos/centre -70.397 0. 132.398 cm  # target tagger
+#/gps/pos/halfx 27.490 cm   		   	   # target tagger
+#/gps/pos/halfy 13.049 cm			   # target tagger
+/gps/pos/centre -321.067 0. 603.839 cm # NPOL tagger
+/gps/pos/halfx 125.332 cm   		   # NPOL tagger
+/gps/pos/halfy 58.9547 cm			   # NPOL tagger
+/gps/pos/rot1 0.882947 0 0.46947
+/gps/pos/rot2 0 1 0
+/gps/direction -0.46947 0 0.882947
+
+# Loads the energy distribution from user supplied data. Currently
+# it uses a linear interpolation method between suppled points.
+/gps/ene/type Arb
+/gps/hist/type energy
+/gps/hist/file macros/particleFluxData/npolEnergy_neutron.dat
+/gps/hist/inter Lin
+
+#
+# Commands below are independent of GPS
+#
+/vis/scene/endOfEventAction accumulate 100
+/run/printProgress 100
+
+/run/beamOn 1000

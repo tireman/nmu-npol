@@ -1,3 +1,6 @@
+
+
+--------------------------------------------------------------------------------
 # Update: 3-Dec-2015
 
 A philosophy error was made with the energy.  The scheme didn't work to find the total energy deposited in a volume.  A change was made to save any event to the ROOT file that has at least 1 step in the polarimeter.  Also, step information such as volume, energy deposit in the volume, and the global time are stored in a new branch vector.  We can now sum up the total energy in each volume and determine the time at which detector fired.  This vector is sorted in time from smallest to largest before the vector is saved.  

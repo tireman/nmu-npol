@@ -72,7 +72,7 @@ int main(int argc,char *argv[]) {
   // mandatory user initialization classes
   runManager->SetUserInitialization(new NpolDetectorConstruction);
   //runManager->SetUserInitialization(new NpolPhysicsList);
-  runManager->SetUserInitialization(new QGSP_BERT_HP); 
+  runManager->SetUserInitialization(new QGSP_BERT); 
   //runManager->SetUserInitialization(new QGSP_INCLXX_HP);
             // Use _HP version for full runs and non-_HP version for tests
   runManager->SetUserInitialization(new NpolActionInitialization);
@@ -94,9 +94,9 @@ int main(int argc,char *argv[]) {
 #ifdef G4UI_USE
     G4UIExecutive *ui = new G4UIExecutive(argc, argv);
 #ifdef G4VIS_USE
-    UImanager->ApplyCommand("/control/execute init_vis.mac");
+    UImanager->ApplyCommand("/control/execute macros/init_vis.mac");
 #else
-    UImanager->ApplyCommand("/control/execute init.mac");
+    UImanager->ApplyCommand("/control/execute macros/init.mac");
 #endif
     ui->SessionStart();
     delete ui;

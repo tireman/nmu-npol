@@ -52,12 +52,13 @@ file(GLOB newsources ${PROJECT_SOURCE_DIR}/src/*.cc)
 set(sources ${sources} ${newsources})
 
 # (5)
-add_executable(Npolapp Npolapp.cc ${sources})
+add_executable(Npolapp Npolapp.cc ${sources} ${headers})
 target_link_libraries(Npolapp ${Geant4_LIBRARIES} ${ROOT_LIBRARIES})
 
 # (6)
 set(Npolapp_FILES
-  npol.mac init.mac init_vis.mac vis.mac 
+  macros/npol.mac macros/init.mac macros/init_vis.mac macros/vis.mac 
+  macros/ParticleFlux.mac macros/ElectronBeam.mac
 )
 
 set(Npolapp_DIRS
@@ -65,6 +66,7 @@ set(Npolapp_DIRS
   root/
   output/
   scripts/
+  macros/
 )
 
 foreach(_dir ${Npolapp_DIRS})

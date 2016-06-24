@@ -2,6 +2,7 @@
 # when running in interactive mode without visualization
 #
 # Set some default verbose
+/control/macroPath macros
 /control/verbose 2
 /control/saveHistory
 /run/verbose 2

@@ -41,7 +41,7 @@ TString OutputDir = "";
 TString InputDir = "";
 
 void ProcessElectrons() {
-  gSystem->Load("libNpolClass.so"); 
+  gSystem->Load("libNpolClasses.so"); 
 
   // Set up the TTrees and their branch addresses
   TChain *npolTree = new TChain("T");
