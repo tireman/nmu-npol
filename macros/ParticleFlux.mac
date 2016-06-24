@@ -51,7 +51,7 @@
 # it uses a linear interpolation method between suppled points.
 /gps/ene/type Arb
 /gps/hist/type energy
-/gps/hist/file macros/particleFluxData/neutronNpolFlux.dat
+/gps/hist/file macros/particleFluxData/npolEnergy_neutron.dat
 /gps/hist/inter Lin
 
 #
@@ -60,4 +60,4 @@
 /vis/scene/endOfEventAction accumulate 100
 /run/printProgress 100
 
-/run/beamOn 100
+/run/beamOn 1000
