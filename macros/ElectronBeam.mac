@@ -1,8 +1,11 @@
 # $Id: npol.mac,v1.1 For running with or without visualization
-# on the nmuNpol simulation 12/4/2013 $
+# on the nmu-Npol simulation 6/24/2016 $
 # 
+# This macro feeds commands to the primary event generator and allows 
+# for changing of beam parameters within the macro. 
+#
 # can be run in batch, without graphic
-# or interactively: Idle> /control/execute npol.mac
+# or interactively: Idle> /control/execute ElectronBeam.mac
 
 #/vis/viewer/set/viewpointThetaPhi -45 180 deg
 #/vis/viewer/zoom 1.5
@@ -17,24 +20,26 @@
 /tracking/verbose 0
 /tracking/storeTrajectory 1
 
+### GPS commands ####
 # Particle type
 /gps/particle e-
 
-# source
-/gps/pos/type Point
+# source: Beam, small diameter, no profile (yet), no rotation
+/gps/pos/type Beam
+/gps/pos/shape Circle
+/gps/pos/radius 2.0 mm
+/gps/pos/sigma_r 0.0 mm
 /gps/pos/centre 0. 0. -300. cm
 /gps/direction 0 0 1
-#/gps/pos/rot1 1 0 0
-#/gps/pos/rot2 0 0 1
 
-# the beam energy is in gaussian profile centered at 4400 MeV
+# the beam energy is at 4400 MeV
 /gps/ene/type Mono
 /gps/ene/mono 4400. MeV
 
 #
 # Commands below are independent of gps
 #
-/vis/scene/endOfEventAction accumulate 50
+/vis/scene/endOfEventAction accumulate 100
 /run/printProgress 100
 
 /run/beamOn 50

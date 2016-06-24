@@ -1,6 +1,10 @@
 # $Id: npol.mac,v1.1 For running with or without visualization
-# on the nmuNpol simulation 6/23/2016 $
+# on the nmuNpol simulation 6/24/2016 $
 # 
+# This macro feeds commands to the primary event generator and allows 
+# for changing of the user particle source within the macro.  The user 
+# must supply the particle type and file which contains the biasing data 
+#
 # can be run in batch, without graphic
 # or interactively: Idle> /control/execute macro/PartilceFlux.mac
 
@@ -17,29 +21,33 @@
 /tracking/verbose 0
 /tracking/storeTrajectory 1
 
-# Particle type
+# Particle type  !!! Must be chosen by the user !!!!
 /gps/particle neutron
 
-# source
+# Particle source:  The particle source will generally be a plane
+# with dimensions specificed by the user.  The current version 
+# rotates the plane to 28 degrees right of beam line to line up with
+# the polarimeter.  
 /gps/pos/type Plane
 /gps/pos/shape Rectangle
-/gps/pos/centre 0. 0. 0. cm
-/gps/pos/halfx 50. cm
-/gps/pos/halfy 30. cm
+/gps/pos/centre -70.397 0. 132.398 cm
+/gps/pos/halfx 27.490 cm
+/gps/pos/halfy 13.049 cm
+/gps/pos/rot1 0.882947 0 0.46947
+/gps/pos/rot2 0 1 0
 /gps/direction -0.46947 0 0.882947
-#/gps/pos/rot1 1 0 0
-#/gps/pos/rot2 0 0 1
 
-# energy distribution from user data
+# Loads the energy distribution from user supplied data. Currently
+# it uses a linear interpolation method between suppled points.
 /gps/ene/type Arb
 /gps/hist/type energy
 /gps/hist/file macros/particleFluxData/neutronNpolFlux.dat
 /gps/hist/inter Lin
 
 #
-# Commands below are independent of gps
+# Commands below are independent of GPS
 #
-/vis/scene/endOfEventAction accumulate 50
+/vis/scene/endOfEventAction accumulate 1000
 /run/printProgress 100
 
-/run/beamOn 50
+/run/beamOn 1000
