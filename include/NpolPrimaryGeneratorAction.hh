@@ -14,7 +14,6 @@
 #include "G4VUserPrimaryGeneratorAction.hh"
 #include "globals.hh"
 
-//class G4ParticleGun;
 class G4GeneralParticleSource;
 class G4Event;
 class G4Box;
@@ -28,7 +27,6 @@ class NpolPrimaryGeneratorAction : public G4VUserPrimaryGeneratorAction
 		virtual void GeneratePrimaries(G4Event*);
 
 	private:
-  //G4ParticleGun *particleGun;
   G4GeneralParticleSource* fParticleGun;
   G4Box *worldBox;
 };
