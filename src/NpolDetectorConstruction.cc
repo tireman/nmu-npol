@@ -45,7 +45,7 @@ NpolDetectorConstruction::NpolDetectorConstruction() {
   detectors.insert(new NpolShieldHut);
   detectors.insert(new NpolHBender);
   detectors.insert(new NpolParticleFluxTagger);
-//  detectors.insert(new NpolBDump);
+  //detectors.insert(new NpolBDump);
 }
 
 NpolDetectorConstruction::~NpolDetectorConstruction() {
