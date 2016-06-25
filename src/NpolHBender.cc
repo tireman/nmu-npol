@@ -69,7 +69,6 @@ void NpolHBender::Place(G4LogicalVolume *motherLV) {
   //PlaceCylindrical(HBCoilLogicLV, motherLV, "HBCoil", PosHB, ShmsAng, 0);
   PlaceCylindrical(HBYorkLogicLV, motherLV, "HBYork", PosHB, ShmsAng, 0);
   PlaceCylindrical(HBCryoBoxLV, motherLV, "HBCyro", PosHB, ShmsAng, 0);
-  PlaceRectangular(SHMSTaggerLV,motherLV, "SHMSTagger", (PosTagger+4.0*cm)*sin(ShmsAng), 
-				   0.0, (PosTagger-4.0*cm)*cos(ShmsAng), 0.0, ShmsAng, 0.0);
+  PlaceRectangular(SHMSTaggerLV,motherLV, "SHMSTagger", (PosTagger+4.0*cm)*sin(ShmsAng),0.0, (PosTagger-4.0*cm)*cos(ShmsAng), 0.0, ShmsAng, 0.0);
 } 
 

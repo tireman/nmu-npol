@@ -123,7 +123,7 @@ void NpolDipole2::ConstructDipole2FieldClamp(){
   G4double Inheight = 0.4699*m, Inwidth = 1.2192*m;
   
   G4Box *Slab = new G4Box("Slab", width/2, height/2, thick/2);
-  G4Box *Hole = new G4Box("Hole", Inwidth/2, Inheight/2, (thick+0.001*m)/2);
+  G4Box *Hole = new G4Box("Hole", (Inwidth+0.10)/2, (Inheight+0.10)/2, (thick+0.001*m)/2);
   
   G4SubtractionSolid *FieldClamp = new G4SubtractionSolid("FieldClamp", Slab, Hole); 
   
