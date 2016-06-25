@@ -31,7 +31,7 @@
 /gps/ang/maxtheta 1.0 deg
 /gps/ang/minphi -1.0 deg
 /gps/ang/maxphi 1.0 deg
-/gps/direction 0 0 1
+#/gps/direction 0 0 1
 
 # the neutron beam energy is at 2100 MeV
 /gps/ene/type Mono

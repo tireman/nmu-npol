@@ -37,12 +37,12 @@
 ######################################################################
 /gps/pos/type Plane
 /gps/pos/shape Rectangle
-#/gps/pos/centre -70.397 0. 132.398 cm  # target tagger
-#/gps/pos/halfx 27.490 cm   		   	   # target tagger
-#/gps/pos/halfy 13.049 cm			   # target tagger
-/gps/pos/centre -321.067 0. 603.839 cm # NPOL tagger
-/gps/pos/halfx 125.332 cm   		   # NPOL tagger
-/gps/pos/halfy 58.9547 cm			   # NPOL tagger
+/gps/pos/centre -70.397 0. 132.398 cm  # target tagger
+/gps/pos/halfx 27.490 cm   		   	   # target tagger
+/gps/pos/halfy 13.049 cm			   # target tagger
+#/gps/pos/centre -321.067 0. 603.839 cm # NPOL tagger
+#/gps/pos/halfx 125.332 cm   		   # NPOL tagger
+#/gps/pos/halfy 58.9547 cm			   # NPOL tagger
 /gps/pos/rot1 0.882947 0 0.46947
 /gps/pos/rot2 0 1 0
 /gps/direction -0.46947 0 0.882947
@@ -51,13 +51,18 @@
 # it uses a linear interpolation method between suppled points.
 /gps/ene/type Arb
 /gps/hist/type energy
-/gps/hist/file macros/particleFluxData/npolEnergy_neutron.dat
+/gps/hist/file macros/particleFluxData/targetEnergy_neutron.dat
 /gps/hist/inter Lin
+
+/gps/hist/type biasx
+/gps/hist/file macros/particleFluxData/targetX_neutron.dat
+/gps/hist/type biasy
+/gps/hist/file macros/particleFluxData/targetY_neutron.dat
 
 #
 # Commands below are independent of GPS
 #
 /vis/scene/endOfEventAction accumulate 100
-/run/printProgress 100
+/run/printProgress 1000
 
-/run/beamOn 1000
+/run/beamOn 100000
