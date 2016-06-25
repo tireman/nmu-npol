@@ -136,7 +136,7 @@ void NpolDipole1::ConstructDipole1FieldClamp1(){
   
   // Create the necessary solids
   G4Box *Slab = new G4Box("Slab", width/2, height/2, thick/2);
-  G4Box *Hole = new G4Box("Hole", Inwidth/2, Inheight/2, (thick+0.01*m)/2);
+  G4Box *Hole = new G4Box("Hole", (Inwidth+0.10)/2, (Inheight+0.10)/2, (thick+0.01*m)/2);
   G4Tubs *BHole = 
 	new G4Tubs("BHole", 0.0*m, radius+0.50*cm, ((CyLen/2)+radius*tan(NpolAng)+10.0*cm), 0.0*deg, 360.*deg);
   
@@ -163,7 +163,7 @@ void NpolDipole1::ConstructDipole1FieldClamp2(){
   G4double Inheight = 0.254*m, Inwidth = 0.56*m;
   
   G4Box *Slab = new G4Box("Slab", width/2, height/2, thick/2);
-  G4Box *Hole = new G4Box("Hole", Inwidth/2, Inheight/2, (thick+0.01*m)/2);
+  G4Box *Hole = new G4Box("Hole", (Inwidth+0.10)/2, (Inheight+0.10)/2, (thick+0.01*m)/2);
 
   G4SubtractionSolid *FieldClamp2 = new G4SubtractionSolid("FieldClamp2", Slab, Hole); 
   
