@@ -5,3 +5,4 @@ project(nmu-npol)
 add_subdirectory(npollib)
 
 add_subdirectory(simulation)
+add_subdirectory(analysis)
