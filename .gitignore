@@ -8,20 +8,6 @@
 *.swo
 *.pcm
 \#*\#
-
-CMakeCache.txt
-CMakeFiles
-CMakeScripts
-Makefile
-cmake_install.cmake
-install_manifest.txt
-
 dict.*
-NpolClass.*
-dEoverE1.cxx
-TaggedParticles.cxx
 
 build/
-root/*.hh
-root/old
-root/PEjobsubmit.sh
