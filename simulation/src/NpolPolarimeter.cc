@@ -248,7 +248,7 @@ void NpolPolarimeter::ConstructBackTagArray(G4LogicalVolume *motherLV) {
 	NpolMaterials::GetInstance()->GetMaterial("Scint"), "BackTagLV",0,0,0);
   
   G4AssemblyVolume *BackTaggerArray = MakePlate(BackTagLV,
-	  12, 0.0*m, 0.55*m, 0.0*m, 0.0*m, 0.10*m, 0.0*m);
+	  16, 0.0*m, 0.75*m, 0.0*m, 0.0*m, 0.10*m, 0.0*m);
 
   //for(unsigned int i=0; i<2; i++)
   ImprintPlate(BackTaggerArray, motherLV, 0.0*m, 0.0*m,1.80*m, 0.0*deg);
