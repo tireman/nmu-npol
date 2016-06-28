@@ -47,22 +47,36 @@
 /gps/pos/rot2 0 1 0
 /gps/direction -0.46947 0 0.882947
 
+# Biasing the (x,y) distribution
+#/gps/hist/type biasx
+#/gps/hist/file macros/particleFluxData/targetX_neutron.dat
+#/gps/hist/type biasy
+#/gps/hist/file macros/particleFluxData/targetY_neutron.dat
+
+# Angular distribution biasing
+##/gps/ang/type user
+
+# Biasing theta
+#/gps/hist/type biast
+#/gps/hist/file macros/particleFluxData/targetTheta_neutron.dat
+
+# Biasing phi
+#/gps/hist/type biasp
+#/gps/hist/file macros/particleFluxData/targetPhi_neutron.dat
+
 # Loads the energy distribution from user supplied data. Currently
 # it uses a linear interpolation method between suppled points.
-/gps/ene/type Arb
-/gps/hist/type energy
-/gps/hist/file macros/particleFluxData/targetEnergy_neutron.dat
-/gps/hist/inter Lin
+#/gps/ene/type Arb
+#/gps/hist/file macros/particleFluxData/targetEnergy_neutron.dat
+#/gps/hist/inter Lin
 
-/gps/hist/type biasx
-/gps/hist/file macros/particleFluxData/targetX_neutron.dat
-/gps/hist/type biasy
-/gps/hist/file macros/particleFluxData/targetY_neutron.dat
+/gps/ene/type Mono
+/gps/energy 2100. MeV
 
 #
 # Commands below are independent of GPS
 #
 /vis/scene/endOfEventAction accumulate 100
-/run/printProgress 1000
+/run/printProgress 10000
 
 /run/beamOn 100000
