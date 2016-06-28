@@ -228,10 +228,10 @@ void NpolPolarimeter::ConstructFrontTagArray(G4LogicalVolume *motherLV) {
 
   for(unsigned int i=0; i<2; i++)
     ImprintPlate(FrontTaggerArray1, motherLV, 0.0*m, 0.0*m, 
-		 (-1.7692+0.65*i)*m, 0.0*deg);
+				 (-1.7692+0.65*i)*m, 0.0*deg); // 1.7692 for 10cm thick Front
   for(unsigned int i=2; i<4; i++)
     ImprintPlate(FrontTaggerArray2, motherLV, 0.0*m, 0.0*m, 
-		 (-1.7692+0.65*i)*m, 0.0*deg);
+				 (-1.7692+0.65*i)*m, 0.0*deg);
   
   G4VisAttributes* FrontTagVisAtt= new G4VisAttributes(G4Colour(1.0,1.0,1.0));
   FrontTagLV->SetVisAttributes(FrontTagVisAtt);
