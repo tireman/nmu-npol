@@ -9,7 +9,7 @@ include_directories(${PROJECT_SOURCE_DIR}/include)
 file(GLOB sources ${PROJECT_SOURCE_DIR}/src/*.cc)
 
 # include Geant4
-find_package(Geant4 REQUIRED gdml)
+find_package(Geant4 REQUIRED gdml ui_all vis_all)
 include(${Geant4_USE_FILE})
 message("    -> GEANT4 Include directory is: ${Geant4_INCLUDE_DIR}")
 
