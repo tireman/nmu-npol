@@ -222,7 +222,6 @@ void NpolAnalysisManager::RecordStep(const G4Step *aStep) {
 		taggedParticle->particleId = aTrack->GetDefinition()->GetPDGEncoding();
 
 		(taggers[volName])->push_back(taggedParticle);
-	buildDir=".";
 	}
 }
 
