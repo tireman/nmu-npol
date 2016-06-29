@@ -95,8 +95,6 @@ int main(int argc,char *argv[]) {
 		// interactive mode
 		const G4String buildDir = NpolAnalysisManager::GetInstance()->GetBuildDir();
 		const G4String macroPathCommand = "/control/macroPath " + buildDir + "macros";
-		G4cout << macroPathCommand << G4endl;
-		G4cout << UImanager->ApplyCommand(macroPathCommand) << G4endl;
 #ifdef G4UI_USE
 		G4UIExecutive *ui = new G4UIExecutive(argc, argv);
 #ifdef G4VIS_USE
