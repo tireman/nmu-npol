@@ -38,82 +38,82 @@
 
 int main(int argc,char *argv[]) {
 
-  // Choose the Random engine
-  //
-  G4Random::setTheEngine(new CLHEP::RanecuEngine);
-  //set random seed with system time
-  //
- 
-  G4long seeds[2];
-  G4long systime = time(NULL);	
-  if(getenv("JOBNUMBER"))
-    systime += atoi(getenv("JOBNUMBER"));
-  seeds[0] = (long) systime;
-  seeds[1] = (long) (systime*G4UniformRand());
-  G4int index = (int) 215*G4UniformRand();
-  G4Random::setTheSeeds(seeds, index);
-  G4cout << " The Index is = " << index << G4endl;
-  G4cout << " Random seed = " << seeds[0] << "    " << seeds[1] <<G4endl;
- 
-  // Give argv[0] to the analysis manager so parts of the program
-  // can find things like the macros and gdml directories
-  NpolAnalysisManager::GetInstance()->SetBuildDir(argv[0]);
+	// Choose the Random engine
+	//
+	G4Random::setTheEngine(new CLHEP::RanecuEngine);
+	//set random seed with system time
+	//
 
-  // RunManager construction
+	G4long seeds[2];
+	G4long systime = time(NULL);	
+	if(getenv("JOBNUMBER"))
+		systime += atoi(getenv("JOBNUMBER"));
+	seeds[0] = (long) systime;
+	seeds[1] = (long) (systime*G4UniformRand());
+	G4int index = (int) 215*G4UniformRand();
+	G4Random::setTheSeeds(seeds, index);
+	G4cout << " The Index is = " << index << G4endl;
+	G4cout << " Random seed = " << seeds[0] << "    " << seeds[1] <<G4endl;
+
+	// Give argv[0] to the analysis manager so parts of the program
+	// can find things like the macros and gdml directories
+	NpolAnalysisManager::GetInstance()->SetBuildDir(argv[0]);
+
+	// RunManager construction
 #ifdef G4MULTITHREADED
-  G4RunManager *runManager = new G4RunManager;
-  //G4MTRunManager *runManager = new G4MTRunManager;
-  //runManager->SetNumberOfThreads(4);
+	G4RunManager *runManager = new G4RunManager;
+	//G4MTRunManager *runManager = new G4MTRunManager;
+	//runManager->SetNumberOfThreads(4);
 #else
-  G4RunManager *runManager = new G4RunManager;
+	G4RunManager *runManager = new G4RunManager;
 #endif
 
 #ifdef G4VIS_USE
-  // Visualization manager construction
-  G4VisManager *visManager = new G4VisExecutive;
-  visManager->Initialize();
+	// Visualization manager construction
+	G4VisManager *visManager = new G4VisExecutive;
+	visManager->Initialize();
 #endif
-  
-  // mandatory user initialization classes
-  runManager->SetUserInitialization(new NpolDetectorConstruction);
-  //runManager->SetUserInitialization(new NpolPhysicsList);
-  runManager->SetUserInitialization(new QGSP_BERT_HP); 
-  //runManager->SetUserInitialization(new QGSP_INCLXX_HP);
-            // Use _HP version for full runs and non-_HP version for tests
-  runManager->SetUserInitialization(new NpolActionInitialization);
-  
-  // initialize Geant4 kernel
-  runManager->Initialize();
-  
-  // Get the pointer to the User Interface manager
-  G4UImanager *UImanager = G4UImanager::GetUIpointer();
- 
-  if(argc != 1) {
-    // batch mode
-    UImanager->ExecuteMacroFile(argv[1]);
-  } else {
-    // interactive mode
-	const G4String buildDir = NpolAnalysisManager::GetInstance()->GetBuildDir();
-	const G4String macroPathCommand = "/control/macroPath " + buildDir + "macros";
-	G4cout << macroPathCommand << G4endl;
-	G4cout << UImanager->ApplyCommand(macroPathCommand) << G4endl;
+
+	// mandatory user initialization classes
+	runManager->SetUserInitialization(new NpolDetectorConstruction);
+	//runManager->SetUserInitialization(new NpolPhysicsList);
+	runManager->SetUserInitialization(new QGSP_BERT_HP); 
+	//runManager->SetUserInitialization(new QGSP_INCLXX_HP);
+	// Use _HP version for full runs and non-_HP version for tests
+	runManager->SetUserInitialization(new NpolActionInitialization);
+
+	// initialize Geant4 kernel
+	runManager->Initialize();
+
+	// Get the pointer to the User Interface manager
+	G4UImanager *UImanager = G4UImanager::GetUIpointer();
+
+	if(argc != 1) {
+		// batch mode
+		UImanager->ExecuteMacroFile(argv[1]);
+	} else {
+		// interactive mode
+		const G4String buildDir = NpolAnalysisManager::GetInstance()->GetBuildDir();
+		const G4String macroPathCommand = "/control/macroPath " + buildDir + "macros";
+		G4cout << macroPathCommand << G4endl;
+		G4cout << UImanager->ApplyCommand(macroPathCommand) << G4endl;
 #ifdef G4UI_USE
-    G4UIExecutive *ui = new G4UIExecutive(argc, argv);
+		G4UIExecutive *ui = new G4UIExecutive(argc, argv);
 #ifdef G4VIS_USE
-    UImanager->ApplyCommand("/control/execute init_vis.mac");
+		UImanager->ApplyCommand("/control/execute init_vis.mac");
 #else
-    UImanager->ApplyCommand("/control/execute init.mac");
+		UImanager->ApplyCommand("/control/execute init.mac");
 #endif
-    ui->SessionStart();
-    delete ui;
+		ui->SessionStart();
+		delete ui;
 #endif
-  }
-  
+	}
+
 #ifdef G4VIS_USE
-  delete visManager;
+	delete visManager;
 #endif
-  delete runManager;
-  
-  return 0;
+	delete runManager;
+
+	return 0;
 }
 
