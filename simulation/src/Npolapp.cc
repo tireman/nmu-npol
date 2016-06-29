@@ -25,6 +25,7 @@
 
 #include "NpolActionInitialization.hh"
 #include "NpolDetectorConstruction.hh"
+#include "NpolAnalysisManager.hh"
 
 #ifdef G4VIS_USE
 #include "G4VisExecutive.hh"
@@ -54,6 +55,10 @@ int main(int argc,char *argv[]) {
   G4cout << " The Index is = " << index << G4endl;
   G4cout << " Random seed = " << seeds[0] << "    " << seeds[1] <<G4endl;
  
+  // Give argv[0] to the analysis manager so parts of the program
+  // can find things like the macros and gdml directories
+  NpolAnalysisManager::GetInstance()->SetBuildDir(argv[0]);
+
   // RunManager construction
 #ifdef G4MULTITHREADED
   G4RunManager *runManager = new G4RunManager;

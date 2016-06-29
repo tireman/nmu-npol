@@ -34,6 +34,8 @@ NpolAnalysisManager *NpolAnalysisManager::GetInstance() {
 NpolAnalysisManager::NpolAnalysisManager() {
 	std::cout << "Constructing NpolAnalysisManager singleton" << std::endl;
 	
+	buildDir = "";
+
 	eventFlag = false;
 
 	tracks = new std::vector<NpolVertex *>();
@@ -220,6 +222,7 @@ void NpolAnalysisManager::RecordStep(const G4Step *aStep) {
 		taggedParticle->particleId = aTrack->GetDefinition()->GetPDGEncoding();
 
 		(taggers[volName])->push_back(taggedParticle);
+	buildDir=".";
 	}
 }
 
@@ -252,6 +255,22 @@ void NpolAnalysisManager::ClearVectors() {
 		}
 		v->clear();
 	}
+}
+
+// Set buildDir to the path of the  build directory containing the gdml and
+// macros directory.  This is done by removing the "Npolapp" from argv[0].
+void NpolAnalysisManager::SetBuildDir(const char *argv0) {
+	buildDir = argv0;
+	for(int i = 0; i < 7; i++)
+		buildDir.pop_back();
+}
+
+G4String NpolAnalysisManager::GetBuildDir() {
+	if(buildDir == "") {
+		G4cout << "Warning: buildDir is an empty string.  Did you set it or is Npolapp in your PATH?" << G4endl;
+		return "./";
+	} else
+	return buildDir;
 }
 
 // Quicksort routine for sorting the steps vector in time order

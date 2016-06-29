@@ -37,6 +37,8 @@ class NpolAnalysisManager {
 		void RecordTrack(const G4Track *aTrack);
 		void RecordStep(const G4Step *aStep);
 		void TrackKilled(const G4int trackID);
+		void SetBuildDir(const char *argv0);
+		G4String GetBuildDir();
 
 	private:
 		NpolAnalysisManager();
@@ -57,6 +59,7 @@ class NpolAnalysisManager {
 		int eventsPerFile;
 		std::map<G4String,std::vector<NpolTagger *> *> taggers;
 		bool eventFlag;
+		G4String buildDir;
 };
 
 int partition(std::vector<NpolStep *> *aVector, int p, int q);

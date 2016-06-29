@@ -12,13 +12,15 @@
 #include "G4ios.hh"
 #include "G4GDMLParser.hh"
 
+#include "NpolAnalysisManager.hh"
 #include "NpolMaterials.hh"
 #include "NpolBDump.hh"
 
 NpolBDump::NpolBDump() {
   G4GDMLParser parser;
   
-  G4String gdmlFilename = "gdml/BeamDump.gdml";
+  G4String buildDir = NpolAnalysisManager::GetInstance()->GetBuildDir();
+  G4String gdmlFilename = buildDir + "gdml/BeamDump.gdml";
   parser.Read(gdmlFilename);
   
   // retrieve the Beam Dump volume from GDML file and place in the

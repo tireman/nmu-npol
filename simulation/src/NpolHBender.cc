@@ -13,12 +13,14 @@
 // Super HMS horizontal bender magnet Constructor file.
 // Created: Daniel Wilbern - March 2015
 
+#include "G4ios.hh"
 #include "G4Material.hh"
 #include "G4LogicalVolume.hh"
 #include "G4VisAttributes.hh"
 #include "G4Colour.hh"
 #include "G4GDMLParser.hh"
 
+#include "NpolAnalysisManager.hh"
 #include "NpolMaterials.hh"
 #include "NpolHBender.hh"
 
@@ -41,8 +43,9 @@ void NpolHBender::ConstructSHMSTagger(){
 
 void NpolHBender::ConstructHBender(){
   G4GDMLParser parser;
-  
-  G4String gdmlFilename = "gdml/HBender.gdml";
+
+  G4String buildDir = NpolAnalysisManager::GetInstance()->GetBuildDir();
+  G4String gdmlFilename = buildDir + "gdml/HBender.gdml";
   parser.Read(gdmlFilename);
   
   HBCryoBoxLV = parser.GetVolume("HBCryoBoxLogic");  
