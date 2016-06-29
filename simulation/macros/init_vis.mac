@@ -8,4 +8,4 @@
 /run/verbose 2
 #
 # Visualization setting
-/control/execute macros/vis.mac
+/control/execute vis.mac

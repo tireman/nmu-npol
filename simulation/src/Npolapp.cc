@@ -90,18 +90,19 @@ int main(int argc,char *argv[]) {
  
   if(argc != 1) {
     // batch mode
-    G4String command = "/control/execute ";
-    G4String fileName = argv[1];
-    UImanager->ApplyCommand(command + fileName);
-    
+    UImanager->ExecuteMacroFile(argv[1]);
   } else {
     // interactive mode
+	const G4String buildDir = NpolAnalysisManager::GetInstance()->GetBuildDir();
+	const G4String macroPathCommand = "/control/macroPath " + buildDir + "macros";
+	G4cout << macroPathCommand << G4endl;
+	G4cout << UImanager->ApplyCommand(macroPathCommand) << G4endl;
 #ifdef G4UI_USE
     G4UIExecutive *ui = new G4UIExecutive(argc, argv);
 #ifdef G4VIS_USE
-    UImanager->ApplyCommand("/control/execute macros/init_vis.mac");
+    UImanager->ApplyCommand("/control/execute init_vis.mac");
 #else
-    UImanager->ApplyCommand("/control/execute macros/init.mac");
+    UImanager->ApplyCommand("/control/execute init.mac");
 #endif
     ui->SessionStart();
     delete ui;
