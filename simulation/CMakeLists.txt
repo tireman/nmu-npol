@@ -15,6 +15,7 @@ message("    -> GEANT4 Include directory is: ${Geant4_INCLUDE_DIR}")
 
 # include ROOT
 find_package(ROOT REQUIRED)
+include(${ROOT_USE_FILE})
 message("    -> ROOT Include directory is: ${ROOT_INCLUDE_DIR}")
 message("    -> ROOT Library Directory is: ${ROOT_LIBRARY_DIR}")
 include_directories(${ROOT_INCLUDE_DIR})
