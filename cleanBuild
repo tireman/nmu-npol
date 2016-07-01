@@ -5,6 +5,7 @@
 
 NPROC=2;           # who doesn't have at least a dual-core machine now...
 BUILDDIR="build"   # build binary here
+GCC_MAJOR_VERSION=`gcc --version | grep ^gcc | cut -d ' ' -f4 | cut -c1`
 
 rm -rf "$BUILDDIR"
 
@@ -16,5 +17,12 @@ set -e
 mkdir "$BUILDDIR"
 cd "$BUILDDIR"
 #cmake --debug-output --trace CMakeLists.txt ../
-cmake CMakeLists.txt ../
+
+if [ $GCC_MAJOR_VERSION \> 4 ]; then
+	echo "GCC version is >= 5.  Using old ABI to workaround a bug in cling."
+	cmake -DCMAKE_CXX_FLAGS=-D_GLIBCXX_USE_CXX11_ABI=0 CMakeLists.txt ../
+else
+	cmake CMakeLists.txt ../
+fi
+
 make -j${NPROC} 
