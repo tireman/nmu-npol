@@ -257,10 +257,11 @@ void NpolAnalysisManager::ClearVectors() {
 }
 
 // Set buildDir to the path of the  build directory containing the gdml and
-// macros directory.  This is done by removing the "Npolapp" from argv[0].
+// macros directory.  This is done by popping characters off from argv[0] until we
+// find a '/'.
 void NpolAnalysisManager::SetBuildDir(const char *argv0) {
 	buildDir = argv0;
-	for(int i = 0; i < 7; i++)
+	while(buildDir.length() != 0 && buildDir.back() != '/')
 		buildDir.pop_back();
 }
 
