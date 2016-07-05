@@ -1,5 +1,6 @@
 *.old
 *.root
+*.dat
 *.d
 *.o
 *.so
