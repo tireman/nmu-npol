@@ -66,12 +66,12 @@
 
 # Loads the energy distribution from user supplied data. Currently
 # it uses a linear interpolation method between suppled points.
-#/gps/ene/type Arb
-#/gps/hist/file macros/particleFluxData/targetEnergy_neutron.dat
-#/gps/hist/inter Lin
+/gps/ene/type Arb
+/gps/hist/file macros/particleFluxData/targetEnergy_neutron.dat
+/gps/hist/inter Lin
 
-/gps/ene/type Mono
-/gps/energy 2100. MeV
+#/gps/ene/type Mono
+#/gps/energy 2100. MeV
 
 #
 # Commands below are independent of GPS
@@ -79,4 +79,4 @@
 /vis/scene/endOfEventAction accumulate 100
 /run/printProgress 10000
 
-/run/beamOn 100000
+/run/beamOn 1000000

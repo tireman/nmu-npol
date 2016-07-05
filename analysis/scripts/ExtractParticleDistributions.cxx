@@ -33,7 +33,7 @@ void ExtractParticleDistributions() {
   std::string histoNames[3][3]={{"pi-","mu+","gamma"},
 								{"neutron","mu-","e+"},
 								{"proton","pi+","e-"}};
-  std::string leadName[1][4] = {{"NpolFlux","TargetFlux","npolXY","targetXY"}};
+  std::string leadName[1][8] = {{"NpolFlux","TargetFlux","targetTheta","targetPhi","npolTheta","npolPhi","npolXY","targetXY"}};
   
   RetrieveENVvariables();
   
@@ -43,7 +43,7 @@ void ExtractParticleDistributions() {
   // Algorthm to load the histograms and generate the *.dat files from the 
   // histogram data.
   //std::string leadName = "NpolFlux";
-  Int_t Nx = 3;  Int_t Ny = 3; Int_t Nk = 4;
+  Int_t Nx = 3;  Int_t Ny = 3; Int_t Nk = 8;
   for(int k = 0; k < Nk; k++){
 	for(int i = 0; i < Nx; i++){
 	  for(int j = 0; j < Ny; j++){
@@ -52,25 +52,34 @@ void ExtractParticleDistributions() {
 				histoNames[i][j].c_str());
 		TH1F *hFrame = (TH1F*) inFile->Get(hname);
 		// Output the bin contents for Simulation
-		if(k < 2){
+		if(k < 6){
 		  std::ofstream txtOut; std::string fileName;
 		  if(k == 0) fileName = "npolEnergy_" + histoNames[i][j] + ".dat";
 		  if(k == 1) fileName = "targetEnergy_" + histoNames[i][j] + ".dat";
+		  if(k == 2) fileName = "targetTheta_" + histoNames[i][j] + ".dat";
+		  if(k == 3) fileName = "targetPhi_" + histoNames[i][j] + ".dat";
+		  if(k == 4) fileName = "npolTheta_" + histoNames[i][j] + ".dat";
+		  if(k == 5) fileName = "npolPhi_" + histoNames[i][j] + ".dat";
 		  txtOut.open(fileName);
 		  txtOut << "0.0 " << " 0.0" << std::endl;
+		  double totalCounts = hFrame->Integral();
+		  double binOut = 0.0;
 		  for(int i = 1; i <= hFrame->GetNbinsX()-2; i++){
 			double oldbincontent = hFrame->GetBinContent(i);
 			double binWidth = hFrame->GetBinWidth(i);
-			txtOut << binWidth*i << "  " << oldbincontent << std::endl; 
+			//if(k == 0 || k == 1) binWidth *= 1000;
+			if(k == 0 || k == 1) binOut += binWidth*1000;
+			if(k > 1) binOut += binWidth/1000;
+			txtOut << binOut << "  " << oldbincontent/totalCounts << std::endl; 
 		  }
 		  txtOut.close();
-		}else if(k >= 2){
+		}else if(k >= 6){
 		  for(int l = 0; l < 2; l++){
 			std::ofstream txtOut; std::string fileName;
-			if(l == 0 && k == 2) fileName = "npolX_" + histoNames[i][j] + ".dat";
-			if(l == 1 && k == 2) fileName = "npolY_" + histoNames[i][j] + ".dat";
-			if(l == 0 && k == 3) fileName = "targetX_" + histoNames[i][j] + ".dat";
-			if(l == 1 && k == 3) fileName = "targetY_" + histoNames[i][j] + ".dat";
+			if(l == 0 && k == 6) fileName = "npolX_" + histoNames[i][j] + ".dat";
+			if(l == 1 && k == 6) fileName = "npolY_" + histoNames[i][j] + ".dat";
+			if(l == 0 && k == 7) fileName = "targetX_" + histoNames[i][j] + ".dat";
+			if(l == 1 && k == 7) fileName = "targetY_" + histoNames[i][j] + ".dat";
 			txtOut.open(fileName);
 			txtOut << "0.0 " << " 0.0" << std::endl;
 			Int_t NbinsX = hFrame->GetNbinsX()-2;
