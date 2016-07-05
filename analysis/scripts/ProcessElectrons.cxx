@@ -18,10 +18,10 @@
 #include <TVectorD.h>
 #include <TString.h>
 
-#include "NpolVertex.hh"
-#include "NpolTagger.hh"
-#include "NpolStatistics.hh"
-#include "NpolStep.hh"
+#include "../../npollib/include/NpolVertex.hh"
+#include "../../npollib/include/NpolTagger.hh"
+#include "../../npollib/include/NpolStatistics.hh"
+#include "../../npollib/include/NpolStep.hh"
 
 void RetrieveENVvariables();
 TString FormInputFile(TString InputDir);
@@ -41,7 +41,7 @@ TString OutputDir = "";
 TString InputDir = "";
 
 void ProcessElectrons() {
-  gSystem->Load("libNpolClasses.so"); 
+  gSystem->Load("../../build/npollib/libNpolClasses.so"); 
 
   // Set up the TTrees and their branch addresses
   TChain *npolTree = new TChain("T");
@@ -108,8 +108,12 @@ void ProcessElectrons() {
   std::map<std::string,TH2F *> targetParticlePOS;
   std::map<std::string,TH2F *> npolParticlePOS;
   std::map<std::string,TH2F *> correlatePOS;
+  std::map<std::string,TH1F *> targetTheta;
+  std::map<std::string,TH1F *> targetPhi;
+  std::map<std::string,TH1F *> npolTheta;
+  std::map<std::string,TH1F *> npolPhi;
 
-  // Allocate KE histograms and Position Histograms
+  // Allocate Theta, Phi, KE and Position Histograms
   std::map<std::string,std::string>::iterator it;
   for(it = fancyNames.begin(); it != fancyNames.end(); it++) {
     std::string targetHistoName = "TargetFlux_" + it->first; 
@@ -118,6 +122,16 @@ void ProcessElectrons() {
     std::string npolHistoTitle = it->second + " Flux vs. KE in NPOL Tagger";
     std::string correlateHistoName = "Correlated_TargetFlux_" + it->first;
     std::string correlateHistoTitle = it->second + " Flux vs. KE Target Tagger Correlated to NPOL Tagger";
+
+	std::string targetThetaName = "targetTheta_" + it->first;
+	std::string targetThetaTitle = it->second + " Particles vs. Theta Angle in Target Tagger";
+	std::string targetPhiName = "targetPhi_" + it->first;
+	std::string targetPhiTitle = it->second + " Particles vs. Phi Angle in Target Tagger";
+
+	std::string npolThetaName = "npolTheta_" + it->first;
+	std::string npolThetaTitle = it->second + " Particles vs. Theta Angle in Npol Tagger";
+	std::string npolPhiName = "npolPhi_" + it->first;
+	std::string npolPhiTitle = it->second + " Particles vs. Phi Angle in Npol Tagger";
 
     std::string targetXYHistoName = "targetXY_" + it->first;
     std::string npolXYHistoName = "npolXY_" + it->first;
@@ -141,6 +155,10 @@ void ProcessElectrons() {
     correlatePOS[it->first] = new TH2F(correlateXYHistoName.c_str(),
      correlateXYTitle.c_str(),120,-30.0,30.0,40,-10,10);
 
+	targetTheta[it->first] = new TH1F(targetThetaName.c_str(),targetThetaTitle.c_str(),600,-3000.,+3000.);
+	targetPhi[it->first] = new TH1F(targetPhiName.c_str(),targetPhiTitle.c_str(),600,-3000.,+3000.);
+	npolTheta[it->first] = new TH1F(npolThetaName.c_str(),npolThetaTitle.c_str(),600,-3000.,+3000.);
+	npolPhi[it->first] = new TH1F(npolPhiName.c_str(),npolPhiTitle.c_str(),600,-3000.,+3000.);
   }  
 
   // Allocate the dTOF histogram
@@ -167,6 +185,7 @@ void ProcessElectrons() {
   
   // loop over all entries (one per event)
   Int_t nentries = npolTree->GetEntries();
+  //Int_t nentries = 100;
   for(int i = 0; i < nentries; i++) {
     npolTree->GetEntry(i);
 	
@@ -207,6 +226,17 @@ void ProcessElectrons() {
 			Fill(npolTagged->energy,fluxscaling);
 		  (npolParticlePOS[particleName])->
 			Fill(npolTagged->lPosX,npolTagged->lPosY);
+
+		  // Calculating the theta and phi angles and saving to histograms
+		  Double_t momx = npolTagged->momX;
+		  Double_t momy = npolTagged->momY;
+		  Double_t momz = npolTagged->momZ;
+		  Double_t momTotal = TMath::Sqrt(TMath::Power(momx,2)+TMath::Power(momy,2)+TMath::Power(momz,2));
+		  Double_t theta = TMath::ACos(momy/momTotal);
+		  Double_t phi = TMath::ATan(momz/momx);
+		  (npolTheta[particleName])->Fill(theta);
+		  (npolPhi[particleName])->Fill(phi);
+		  
 		}
 		npolTrackIDs.insert(npolTagged->trackId);
 		//}
@@ -229,6 +259,16 @@ void ProcessElectrons() {
 			Fill(targetTagged->energy,fluxscaling);
 		  (targetParticlePOS[particleName])->
 			Fill(targetTagged->lPosX,targetTagged->lPosY);
+
+		  // Calculating the theta and phi angles and saving to histograms
+		  Double_t momx = targetTagged->momX;
+		  Double_t momy = targetTagged->momY;
+		  Double_t momz = targetTagged->momZ;
+		  Double_t momTotal = TMath::Sqrt(TMath::Power(momx,2)+TMath::Power(momy,2)+TMath::Power(momz,2));
+		  Double_t theta = TMath::ACos(momy/momTotal);
+		  Double_t phi = TMath::ATan(momz/momx);
+		  (targetTheta[particleName])->Fill(theta);
+		  (targetPhi[particleName])->Fill(phi);
 		  
 		  // Here the correlated histograms are to be filled
 		  if(npolTrackIDs.find(targetTagged->trackId) 
@@ -361,6 +401,26 @@ void ProcessElectrons() {
   std::map<std::string, TH1 *>::iterator it8;
   for(it8 = histograms.begin(); it8 != histograms.end(); it8++) {
     it8->second->Write();
+  }
+
+  std::map<std::string,TH1F *>::iterator it9;
+  for(it9 = targetTheta.begin(); it9 != targetTheta.end(); it9++){
+	it9->second->Write();
+  }
+
+  std::map<std::string,TH1F *>::iterator it10;
+  for(it10 = targetPhi.begin(); it10 != targetPhi.end(); it10++){
+	it10->second->Write();
+  }
+
+  std::map<std::string,TH1F *>::iterator it11;
+  for(it11 = npolTheta.begin(); it11 != npolTheta.end(); it11++){
+	it11->second->Write();
+  }
+
+  std::map<std::string,TH1F *>::iterator it12;
+  for(it12 = npolPhi.begin(); it12 != npolPhi.end(); it12++){
+	it12->second->Write();
   }
 
   delta_TOF->Write();
