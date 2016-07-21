@@ -12,6 +12,7 @@
 #include <G4VPhysicalVolume.hh>
 #include <G4VProcess.hh>
 #include <G4NavigationHistory.hh>
+#include <G4FastTrack.hh>
 
 #include "NpolAnalysisManager.hh"
 #include "NpolFileManager.hh"

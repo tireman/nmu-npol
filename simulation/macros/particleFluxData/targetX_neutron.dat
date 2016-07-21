@@ -1,119 +1,119 @@
-0.0  0.0
-0.5  0
-1  0
-1.5  0
-2  0
-2.5  0
-3  0
-3.5  0
-4  0
-4.5  0
-5  0
-5.5  0
-6  0
-6.5  0
-7  0
-7.5  0
-8  0
-8.5  0
-9  0
-9.5  0
-10  0
-10.5  0
-11  0
-11.5  0
-12  0
-12.5  0
-13  0
-13.5  0
-14  0
-14.5  0
-15  0
-15.5  0
-16  0
-16.5  0
-17  0
-17.5  0
-18  0
-18.5  0
-19  0
-19.5  0
-20  916
-20.5  1155
-21  1313
-21.5  1234
-22  1247
-22.5  1257
-23  1300
-23.5  1173
-24  1248
-24.5  1208
-25  1274
-25.5  1365
-26  1301
-26.5  1288
-27  1285
-27.5  1364
-28  1350
-28.5  1314
-29  1295
-29.5  1321
-30  1381
-30.5  1346
-31  1368
-31.5  1417
-32  1328
-32.5  1404
-33  1475
-33.5  1471
-34  1406
-34.5  1476
-35  1421
-35.5  1392
-36  1438
-36.5  1472
-37  1568
-37.5  1476
-38  1529
-38.5  1444
-39  1539
-39.5  1512
-40  1574
-40.5  1084
-41  0
-41.5  0
-42  0
-42.5  0
-43  0
-43.5  0
-44  0
-44.5  0
-45  0
-45.5  0
-46  0
-46.5  0
-47  0
-47.5  0
-48  0
-48.5  0
-49  0
-49.5  0
-50  0
-50.5  0
-51  0
-51.5  0
-52  0
-52.5  0
-53  0
-53.5  0
-54  0
-54.5  0
-55  0
-55.5  0
-56  0
-56.5  0
-57  0
-57.5  0
-58  0
-58.5  0
-59  0
+/gps/hist/point 0.0  0.0
+/gps/hist/point 0.00847458  0
+/gps/hist/point 0.0169492  0
+/gps/hist/point 0.0254237  0
+/gps/hist/point 0.0338983  0
+/gps/hist/point 0.0423729  0
+/gps/hist/point 0.0508475  0
+/gps/hist/point 0.059322  0
+/gps/hist/point 0.0677966  0
+/gps/hist/point 0.0762712  0
+/gps/hist/point 0.0847458  0
+/gps/hist/point 0.0932203  0
+/gps/hist/point 0.101695  0
+/gps/hist/point 0.110169  0
+/gps/hist/point 0.118644  0
+/gps/hist/point 0.127119  0
+/gps/hist/point 0.135593  0
+/gps/hist/point 0.144068  0
+/gps/hist/point 0.152542  0
+/gps/hist/point 0.161017  0
+/gps/hist/point 0.169492  0
+/gps/hist/point 0.177966  0
+/gps/hist/point 0.186441  0
+/gps/hist/point 0.194915  0
+/gps/hist/point 0.20339  0
+/gps/hist/point 0.211864  0
+/gps/hist/point 0.220339  0
+/gps/hist/point 0.228814  0
+/gps/hist/point 0.237288  0
+/gps/hist/point 0.245763  0
+/gps/hist/point 0.254237  0
+/gps/hist/point 0.262712  0
+/gps/hist/point 0.271186  0
+/gps/hist/point 0.279661  0
+/gps/hist/point 0.288136  0
+/gps/hist/point 0.29661  0
+/gps/hist/point 0.305085  0
+/gps/hist/point 0.313559  0
+/gps/hist/point 0.322034  0
+/gps/hist/point 0.330508  0
+/gps/hist/point 0.338983  916
+/gps/hist/point 0.347458  1155
+/gps/hist/point 0.355932  1313
+/gps/hist/point 0.364407  1234
+/gps/hist/point 0.372881  1247
+/gps/hist/point 0.381356  1257
+/gps/hist/point 0.38983  1300
+/gps/hist/point 0.398305  1173
+/gps/hist/point 0.40678  1248
+/gps/hist/point 0.415254  1208
+/gps/hist/point 0.423729  1274
+/gps/hist/point 0.432203  1365
+/gps/hist/point 0.440678  1301
+/gps/hist/point 0.449153  1288
+/gps/hist/point 0.457627  1285
+/gps/hist/point 0.466102  1364
+/gps/hist/point 0.474576  1350
+/gps/hist/point 0.483051  1314
+/gps/hist/point 0.491525  1295
+/gps/hist/point 0.5  1321
+/gps/hist/point 0.508475  1381
+/gps/hist/point 0.516949  1346
+/gps/hist/point 0.525424  1368
+/gps/hist/point 0.533898  1417
+/gps/hist/point 0.542373  1328
+/gps/hist/point 0.550847  1404
+/gps/hist/point 0.559322  1475
+/gps/hist/point 0.567797  1471
+/gps/hist/point 0.576271  1406
+/gps/hist/point 0.584746  1476
+/gps/hist/point 0.59322  1421
+/gps/hist/point 0.601695  1392
+/gps/hist/point 0.610169  1438
+/gps/hist/point 0.618644  1472
+/gps/hist/point 0.627119  1568
+/gps/hist/point 0.635593  1476
+/gps/hist/point 0.644068  1529
+/gps/hist/point 0.652542  1444
+/gps/hist/point 0.661017  1539
+/gps/hist/point 0.669492  1512
+/gps/hist/point 0.677966  1574
+/gps/hist/point 0.686441  1084
+/gps/hist/point 0.694915  0
+/gps/hist/point 0.70339  0
+/gps/hist/point 0.711864  0
+/gps/hist/point 0.720339  0
+/gps/hist/point 0.728814  0
+/gps/hist/point 0.737288  0
+/gps/hist/point 0.745763  0
+/gps/hist/point 0.754237  0
+/gps/hist/point 0.762712  0
+/gps/hist/point 0.771186  0
+/gps/hist/point 0.779661  0
+/gps/hist/point 0.788136  0
+/gps/hist/point 0.79661  0
+/gps/hist/point 0.805085  0
+/gps/hist/point 0.813559  0
+/gps/hist/point 0.822034  0
+/gps/hist/point 0.830508  0
+/gps/hist/point 0.838983  0
+/gps/hist/point 0.847458  0
+/gps/hist/point 0.855932  0
+/gps/hist/point 0.864407  0
+/gps/hist/point 0.872881  0
+/gps/hist/point 0.881356  0
+/gps/hist/point 0.889831  0
+/gps/hist/point 0.898305  0
+/gps/hist/point 0.90678  0
+/gps/hist/point 0.915254  0
+/gps/hist/point 0.923729  0
+/gps/hist/point 0.932203  0
+/gps/hist/point 0.940678  0
+/gps/hist/point 0.949153  0
+/gps/hist/point 0.957627  0
+/gps/hist/point 0.966102  0
+/gps/hist/point 0.974576  0
+/gps/hist/point 0.983051  0
+/gps/hist/point 0.991525  0
+/gps/hist/point 1  0
