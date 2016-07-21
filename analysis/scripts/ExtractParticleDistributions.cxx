@@ -61,16 +61,25 @@ void ExtractParticleDistributions() {
 		  if(k == 4) fileName = "npolTheta_" + histoNames[i][j] + ".dat";
 		  if(k == 5) fileName = "npolPhi_" + histoNames[i][j] + ".dat";
 		  txtOut.open(fileName);
-		  txtOut << "0.0 " << " 0.0" << std::endl;
-		  double totalCounts = hFrame->Integral();
-		  double binOut = 0.0;
+		  txtOut << "/gps/hist/point " << "0.0 " << " 0.0" << std::endl;
+		  Double_t totalCounts = hFrame->Integral();
+		  Double_t binOut = 0.0;
 		  for(int i = 1; i <= hFrame->GetNbinsX()-2; i++){
-			double oldbincontent = hFrame->GetBinContent(i);
-			double binWidth = hFrame->GetBinWidth(i);
-			//if(k == 0 || k == 1) binWidth *= 1000;
-			if(k == 0 || k == 1) binOut += binWidth*1000;
-			if(k > 1) binOut += binWidth/1000;
-			txtOut << binOut << "  " << oldbincontent/totalCounts << std::endl; 
+			Double_t oldbincontent = hFrame->GetBinContent(i);
+			Double_t binWidth = hFrame->GetBinWidth(i);
+			if(k == 0 || k == 1){
+			  binOut += binWidth;
+			  txtOut << "/gps/hist/point " << binOut << "  " << 
+				oldbincontent << std::endl;
+			}else if(k == 2 || k == 4){
+			  binOut += binWidth;
+			  txtOut << "/gps/hist/point " << /*binOut*/ (1-TMath::Cos(binOut))/2 << "  " << 
+				oldbincontent << std::endl;
+			}else if(k == 3 || k == 5){
+			  binOut += binWidth;
+			  txtOut << "/gps/hist/point " << binOut/(2*TMath::Pi()) << "  " << 
+				oldbincontent << std::endl;
+			} 
 		  }
 		  txtOut.close();
 		}else if(k >= 6){
@@ -81,7 +90,7 @@ void ExtractParticleDistributions() {
 			if(l == 0 && k == 7) fileName = "targetX_" + histoNames[i][j] + ".dat";
 			if(l == 1 && k == 7) fileName = "targetY_" + histoNames[i][j] + ".dat";
 			txtOut.open(fileName);
-			txtOut << "0.0 " << " 0.0" << std::endl;
+			txtOut << "/gps/hist/point " << "0.0 " << " 0.0" << std::endl;
 			Int_t NbinsX = hFrame->GetNbinsX()-2;
 			Int_t NbinsY = hFrame->GetNbinsY()-2;
 			if(l == 1){
@@ -96,7 +105,7 @@ void ExtractParticleDistributions() {
 				else oldbincontent += hFrame->GetBinContent(j,i);
 			  }
 			  binWidth = hFrame->GetXaxis()->GetBinWidth(i);
-			  txtOut << binWidth*i << "  " << oldbincontent << std::endl; 
+			  txtOut << "/gps/hist/point " << ((float)i/NbinsX) << "  " << oldbincontent << std::endl; 
 			}
 			txtOut.close();
 		  }

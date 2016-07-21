@@ -155,10 +155,10 @@ void ProcessElectrons() {
     correlatePOS[it->first] = new TH2F(correlateXYHistoName.c_str(),
      correlateXYTitle.c_str(),120,-30.0,30.0,40,-10,10);
 
-	targetTheta[it->first] = new TH1F(targetThetaName.c_str(),targetThetaTitle.c_str(),600,-3000.,+3000.);
-	targetPhi[it->first] = new TH1F(targetPhiName.c_str(),targetPhiTitle.c_str(),600,-3000.,+3000.);
-	npolTheta[it->first] = new TH1F(npolThetaName.c_str(),npolThetaTitle.c_str(),600,-3000.,+3000.);
-	npolPhi[it->first] = new TH1F(npolPhiName.c_str(),npolPhiTitle.c_str(),600,-3000.,+3000.);
+	targetTheta[it->first] = new TH1F(targetThetaName.c_str(),targetThetaTitle.c_str(),300,0.0,TMath::Pi());
+	targetPhi[it->first] = new TH1F(targetPhiName.c_str(),targetPhiTitle.c_str(),600,0.0,2*TMath::Pi());
+	npolTheta[it->first] = new TH1F(npolThetaName.c_str(),npolThetaTitle.c_str(),300,0.0,TMath::Pi());
+	npolPhi[it->first] = new TH1F(npolPhiName.c_str(),npolPhiTitle.c_str(),600,0.0,2*TMath::Pi());
   }  
 
   // Allocate the dTOF histogram
@@ -232,8 +232,9 @@ void ProcessElectrons() {
 		  Double_t momy = npolTagged->momY;
 		  Double_t momz = npolTagged->momZ;
 		  Double_t momTotal = TMath::Sqrt(TMath::Power(momx,2)+TMath::Power(momy,2)+TMath::Power(momz,2));
-		  Double_t theta = TMath::ACos(momy/momTotal);
-		  Double_t phi = TMath::ATan(momz/momx);
+		  Double_t theta = TMath::ACos(momz/momTotal);
+		  Double_t phi = TMath::Pi()+TMath::ATan(momy/momx);
+		  //Double_t phi = TMath::ACos(momx/(momTotal*TMath::Sin(theta)));
 		  (npolTheta[particleName])->Fill(theta);
 		  (npolPhi[particleName])->Fill(phi);
 		  
@@ -265,8 +266,9 @@ void ProcessElectrons() {
 		  Double_t momy = targetTagged->momY;
 		  Double_t momz = targetTagged->momZ;
 		  Double_t momTotal = TMath::Sqrt(TMath::Power(momx,2)+TMath::Power(momy,2)+TMath::Power(momz,2));
-		  Double_t theta = TMath::ACos(momy/momTotal);
-		  Double_t phi = TMath::ATan(momz/momx);
+		  Double_t theta = TMath::ACos(momz/momTotal);
+		  Double_t phi = TMath::Pi()+TMath::ATan(momy/momx);
+		  //Double_t phi = TMath::ACos(momx/(momTotal*TMath::Sin(theta)));
 		  (targetTheta[particleName])->Fill(theta);
 		  (targetPhi[particleName])->Fill(phi);
 		  
