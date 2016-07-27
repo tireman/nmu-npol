@@ -33,6 +33,9 @@
 #include "NpolDetectorFactory.hh"
 #include "NpolDetectorConstruction.hh"
 
+G4double NpolPolarimeter::NpolBoxPos = 8.7*m;
+G4double NpolPolarimeter::NpolAng = 0.0*deg; //28.0*deg;
+
 NpolPolarimeter::NpolPolarimeter() {
   G4VSolid *PolarimeterBox = new G4Box("PolarimeterBox",1.30*m,1.45*m,1.85*m);
   PolarimeterLV = new G4LogicalVolume(PolarimeterBox,
@@ -260,7 +263,7 @@ void NpolPolarimeter::ConstructBackTagArray(G4LogicalVolume *motherLV) {
 
 
 void NpolPolarimeter::Place(G4LogicalVolume *motherLV) {
-  
-  PlaceCylindrical(PolarimeterLV,motherLV,"Polarimeter",8.7*m,/*-28.0*deg*/ 0.0*deg,0.0*m);
+
+  PlaceCylindrical(PolarimeterLV,motherLV,"Polarimeter", NpolBoxPos, -NpolAng,0.0*m);
 }
 

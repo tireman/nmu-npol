@@ -25,6 +25,8 @@
 #include "NpolMaterials.hh"
 #include "NpolShieldHut.hh"
 
+G4double NpolShieldHut::NpolAng = 0.0*deg;
+
 NpolShieldHut::NpolShieldHut() {
   ConstructHutFrontWall();
   ConstructHutBackWall();
@@ -128,13 +130,13 @@ void NpolShieldHut::ConstructHutRoof() {
 
 void NpolShieldHut::Place(G4LogicalVolume *motherLV) {
   
-  G4double NpolAng = 28.0*deg, PosSide = 9.4025*m, AngSide = 14.0*deg;
-  G4double VertOffSet = 0.3424*m, PosFront = 6.3739*m, PosBack = 11.8739*m; // PosFront = 6.2739*m, PosBack = 11.7739*m;
+  G4double PosSide = 9.4025*m, AngSide = 14.0*deg;
+  G4double VertOffSet = 0.3424*m, PosFront = 6.3739*m, PosBack = 11.8739*m;
   G4double PosRoof = 9.1239*m, OffSetRoof = 3.7776*m;
   G4double PosLead = PosFront - 0.535*m, PosTagger = PosFront + 0.465*m;
 
   //PlaceCylindrical(LeadCurtainLV, motherLV, "LeadCurtain", PosLead,-NpolAng, 0);
-  PlaceCylindrical(NPOLTaggerLV, motherLV, "NPOLTagger", PosTagger, /*-NpolAng*/ 0.0*deg, 0);  
+  PlaceCylindrical(NPOLTaggerLV, motherLV, "NPOLTagger", PosTagger, -NpolAng, 0);  
   //PlaceCylindrical(HutFrontWallLV, motherLV, "HutFrontWall", PosFront,-NpolAng,-VertOffSet);
   //PlaceCylindrical(HutBackWallLV, motherLV, "HutBackWall", PosBack,-NpolAng,-VertOffSet);
   //PlaceRectangular(HutSideWallLV, motherLV, "HutSideWall", -PosSide*sin(AngSide+NpolAng),-VertOffSet, PosSide*cos(AngSide+NpolAng), 0*deg, -NpolAng, 0*deg);

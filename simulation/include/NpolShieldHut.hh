@@ -26,6 +26,8 @@ class NpolShieldHut : public NpolDetectorFactory {
 public:
   NpolShieldHut();
   ~NpolShieldHut();
+
+  static G4double NpolAng;
   
   void ConstructHutSideWall();
   void ConstructHutFrontWall();

@@ -28,6 +28,9 @@ class NpolPolarimeter : public NpolDetectorFactory {
 public:
   NpolPolarimeter();
   ~NpolPolarimeter();
+
+  static G4double NpolAng;
+  static G4double NpolBoxPos;
   
   void ConstructTopDetArray(G4LogicalVolume *motherLV);
   void ConstructTopVetoArray(G4LogicalVolume *motherLV);

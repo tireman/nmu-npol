@@ -26,7 +26,7 @@
 G4double NpolParticleFluxTagger::vertAngle = 4.927*deg;  // 1 degree more than gap height
 G4double NpolParticleFluxTagger::horAngle =  10.385*deg; // 2 degree more than gap width
 G4double NpolParticleFluxTagger::taggerPos = 1.500*m; 
-G4double NpolParticleFluxTagger::NpolAng = 28.0*deg;
+G4double NpolParticleFluxTagger::NpolAng = 0.0*deg; //28.0*deg;
 
 NpolParticleFluxTagger::NpolParticleFluxTagger() {
   ConstructParticleTagger();
@@ -57,7 +57,7 @@ void NpolParticleFluxTagger::ConstructParticleTagger(){
 
 void NpolParticleFluxTagger::Place(G4LogicalVolume *motherLV) {
   
-  PlaceCylindrical(ParticleTaggerLV, motherLV, "ParticleTagger",  taggerPos, /*-NpolAng*/ 0.0*deg, 0);
+  PlaceCylindrical(ParticleTaggerLV, motherLV, "ParticleTagger",  taggerPos, -NpolAng, 0);
 
 }
 
