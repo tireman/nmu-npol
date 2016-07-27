@@ -43,11 +43,13 @@
 #/gps/pos/halfx 27.490 cm   		   	# target tagger
 #/gps/pos/halfy 13.049 cm			    # target tagger
 
-/gps/pos/centre -320.649 0. 603.053 cm  # NPOL tagger
+#/gps/pos/centre -320.649 0. 603.053 cm  # NPOL tagger
+/gps/pos/centre 0. 0. 683.85 cm 		 	 # on axis version
 /gps/pos/halfx 125.332 cm   		    # NPOL tagger
 /gps/pos/halfy 58.9547 cm			    # NPOL tagger
 
-/gps/pos/rot1 0.882947 0 0.46947        # Rotate the source 
+#/gps/pos/rot1 0.882947 0 0.46947        # Rotate the source
+/gps/pos/rot1 1. 0. 0. 	 				# on axis version
 /gps/pos/rot2 0. 1. 0.                  # default
 
 ###### Biasing the (x,y) distribution ######
@@ -61,7 +63,8 @@
 
 ###### Angular distribution biasing ######
 /gps/ang/type iso						# isotropic source
-/gps/ang/rot1 -0.46947 0. 0.882947 		# rotate the source
+#/gps/ang/rot1 -0.46947 0. 0.882947 		# rotate the momentum direction
+/gps/ang/rot1 -1. 0. 0. 	   					# on axis version
 /gps/ang/rot2 0. 1. 0. 	  				# only in one plane
 /gps/ang/user_coor 1					# lock user coordinates in
 /gps/ang/surfnorm 0						# compute with reference to surface
@@ -86,4 +89,4 @@
 /vis/scene/endOfEventAction accumulate 1000
 /run/printProgress 10000
 
-/run/beamOn 50000
+/run/beamOn 100000
