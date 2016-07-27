@@ -24,6 +24,6 @@ do
     fi
 
 	echo "Starting up Job Number $i."
-    $BUILD_DIR/Npolapp $BUILD_DIR/macros/PointSource.mac 1>$NPOLDIR/${NPOLBASENAME}_$i.out 2>$NPOLDIR/${NPOLBASENAME}_$i.err &
+    $BUILD_DIR/Npolapp $BUILD_DIR/macros/ParticleFlux.mac 1>$NPOLDIR/${NPOLBASENAME}_$i.out 2>$NPOLDIR/${NPOLBASENAME}_$i.err &
     sleep 5s
 done
