@@ -1,6 +1,11 @@
+# Update: 27-July-2016
 
+Several updates and changes.  Analysis now has a file manager to take care of file names and separate if rom the analysis manager.  The field clamps for the dipole magnets have been opened up a bit more to reduce interference with the particles from the target. 
 
---------------------------------------------------------------------------------
+The new setup splits the simulation and analysis sections up.  The cleanBuild script attempts to build both simulation (dumped in build/simulation) and the analysis (dumped in build/analysis) all at once.  The user can then remake either simulation or analysis by cd'ing to the build diectory for that build and typing "make".  Analysis was broken out from the is simulation and can be compiled and run in fully functional ROOT analysis program.
+
+Major change: The particle gun was replaced with a generalized particle source.  This allows for the particle generator to be changed in a Macro file rather than in the primary particle generator class.  This has also led us to be able to bias particle distributions from analysis of electron-scattering data. See README.md file for more details.
+
 # Update: 3-Dec-2015
 
 A philosophy error was made with the energy.  The scheme didn't work to find the total energy deposited in a volume.  A change was made to save any event to the ROOT file that has at least 1 step in the polarimeter.  Also, step information such as volume, energy deposit in the volume, and the global time are stored in a new branch vector.  We can now sum up the total energy in each volume and determine the time at which detector fired.  This vector is sorted in time from smallest to largest before the vector is saved.  
