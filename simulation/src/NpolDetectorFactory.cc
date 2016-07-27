@@ -35,7 +35,7 @@ G4VPhysicalVolume *NpolDetectorFactory::PlaceRectangular(G4LogicalVolume *detLV,
   Tr = G4Transform3D(Rm,Tv);
   
   G4VPhysicalVolume *detPV = new G4PVPlacement(Tr, detLV,
-       detName, motherLV, false, 0,false); // last bool for overlap check
+	detName, motherLV, false, 0,false); // last bool for overlap check
   
   return detPV;
 }
