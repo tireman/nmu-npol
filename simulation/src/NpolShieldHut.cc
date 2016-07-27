@@ -53,7 +53,7 @@ void NpolShieldHut::ConstructLeadCurtain(){
 
 // Construct a thin air box so we can tag particles passing through the collimator.  Place it just a millimeter off the front steel wall
 void NpolShieldHut::ConstructNPOLTagger(){
-  G4double xlen = 0.98*m; G4double ylen = 0.600*m; G4double zlen = 0.010*cm;
+  G4double xlen = 0.98*m; G4double ylen = 0.600*m; G4double zlen = 0.200*cm;
 
   G4Box *NPOLTagger = new G4Box("NPOLTagger",xlen/2,ylen/2,zlen/2);
   NPOLTaggerLV = 
@@ -66,7 +66,7 @@ void NpolShieldHut::ConstructNPOLTagger(){
 // will simplfy here to a 3 foot deep wall that is 16 feet wide and 15 feet high
 void NpolShieldHut::ConstructHutFrontWall() {
   // constants for sizing and positioning
-  G4double xlen = 4.8768*m, ylen = 7.3152*m, zlen = 0.9144*m;
+  G4double xlen = 4.8768*m, ylen = 7.3152*m, zlen = 0.90*m;
   G4double xlen1 = 0.81854*m, xlen2 = 0.97618*m;
   G4double ylen1 = 0.5012*m, ylen2 = 0.59574*m, VertOffSet = 0.3424*m;
 
@@ -133,12 +133,12 @@ void NpolShieldHut::Place(G4LogicalVolume *motherLV) {
   G4double PosRoof = 9.1239*m, OffSetRoof = 3.7776*m;
   G4double PosLead = PosFront - 0.535*m, PosTagger = PosFront + 0.465*m;
 
-  PlaceCylindrical(LeadCurtainLV, motherLV, "LeadCurtain", PosLead,-NpolAng, 0);
-  PlaceCylindrical(NPOLTaggerLV, motherLV, "NPOLTagger", PosTagger, -NpolAng, 0);
-  PlaceCylindrical(HutFrontWallLV, motherLV, "HutFrontWall", PosFront,-NpolAng,-VertOffSet);
-  PlaceCylindrical(HutBackWallLV, motherLV, "HutBackWall", PosBack,-NpolAng,-VertOffSet);
-  PlaceRectangular(HutSideWallLV, motherLV, "HutSideWall", -PosSide*sin(AngSide+NpolAng),-VertOffSet, PosSide*cos(AngSide+NpolAng), 0*deg, -NpolAng, 0*deg);
-  PlaceRectangular(HutSideWallLV, motherLV, "HutSideWall", -PosSide*sin(AngSide),-VertOffSet, PosSide*cos(AngSide), 0*deg, -NpolAng, 0);
-  PlaceCylindrical(HutRoofLV, motherLV, "HutRoof", PosRoof, -NpolAng, OffSetRoof);
+  //PlaceCylindrical(LeadCurtainLV, motherLV, "LeadCurtain", PosLead,-NpolAng, 0);
+  PlaceCylindrical(NPOLTaggerLV, motherLV, "NPOLTagger", PosTagger, /*-NpolAng*/ 0.0*deg, 0);  
+  //PlaceCylindrical(HutFrontWallLV, motherLV, "HutFrontWall", PosFront,-NpolAng,-VertOffSet);
+  //PlaceCylindrical(HutBackWallLV, motherLV, "HutBackWall", PosBack,-NpolAng,-VertOffSet);
+  //PlaceRectangular(HutSideWallLV, motherLV, "HutSideWall", -PosSide*sin(AngSide+NpolAng),-VertOffSet, PosSide*cos(AngSide+NpolAng), 0*deg, -NpolAng, 0*deg);
+  //PlaceRectangular(HutSideWallLV, motherLV, "HutSideWall", -PosSide*sin(AngSide),-VertOffSet, PosSide*cos(AngSide), 0*deg, -NpolAng, 0);
+  //PlaceCylindrical(HutRoofLV, motherLV, "HutRoof", PosRoof, -NpolAng, OffSetRoof);
 }
 

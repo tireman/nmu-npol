@@ -57,7 +57,7 @@ void NpolParticleFluxTagger::ConstructParticleTagger(){
 
 void NpolParticleFluxTagger::Place(G4LogicalVolume *motherLV) {
   
-  PlaceCylindrical(ParticleTaggerLV, motherLV, "ParticleTagger",  taggerPos, -NpolAng, 0);
+  PlaceCylindrical(ParticleTaggerLV, motherLV, "ParticleTagger",  taggerPos, /*-NpolAng*/ 0.0*deg, 0);
 
 }
 

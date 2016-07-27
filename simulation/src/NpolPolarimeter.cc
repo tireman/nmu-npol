@@ -127,8 +127,8 @@ void NpolPolarimeter::ConstructTopVetoArray(G4LogicalVolume *motherLV) {
   G4AssemblyVolume *TopVetoArray1 = MakePlate(TopVetoLV, 13, 0.0*m, 0.0*m, 0.60*m, 0.0*m, 0.0*m, 0.10*m);
   G4AssemblyVolume *TopVetoArray2 = MakePlate(TopVetoLV, 14, 0.0*m, 0.0*m, 0.60*m, 0.0*m, 0.0*m, 0.10*m);
   
-  ImprintPlate(TopVetoArray1, motherLV, 0.0*m, 0.32*m, -1.15*m, 0.0*deg);
-  ImprintPlate(TopVetoArray2, motherLV, 0.0*m, 0.42*m, 0.30*m, 0.0*deg);
+  ImprintPlate(TopVetoArray1, motherLV, 0.0*m, 0.32*m, -1.150*m, 0.0*deg);
+  ImprintPlate(TopVetoArray2, motherLV, 0.0*m, 0.42*m, 0.300*m, 0.0*deg);
   
   G4VisAttributes* TopaVisAtt= new G4VisAttributes(G4Colour(0.0,1.0,1.0));
   TopVetoLV->SetVisAttributes(TopaVisAtt);
@@ -174,8 +174,8 @@ void NpolPolarimeter::ConstructBottomVetoArray(G4LogicalVolume *motherLV) {
   G4AssemblyVolume *BottomVetoArray2 = MakePlate(BottomVetoLV,
 	14, 0.0*m, 0.0*m, 0.60*m, 0.0*m, 0.0*m, 0.10*m);
 
-  ImprintPlate(BottomVetoArray1, motherLV, 0.0*m, -0.32*m, -1.15*m, 0.0*deg);
-  ImprintPlate(BottomVetoArray2, motherLV, 0.0*m, -0.42*m, 0.30*m, 0.0*deg);
+  ImprintPlate(BottomVetoArray1, motherLV, 0.0*m, -0.32*m, -1.150*m, 0.0*deg);
+  ImprintPlate(BottomVetoArray2, motherLV, 0.0*m, -0.42*m, 0.300*m, 0.0*deg);
   
   G4VisAttributes* BotaVisAtt= new G4VisAttributes(G4Colour(0.0,1.0,1.0));
   BottomVetoLV->SetVisAttributes(BotaVisAtt);
@@ -186,7 +186,7 @@ void NpolPolarimeter::ConstructFrontDetArray(G4LogicalVolume *motherLV) {
   G4ThreeVector Tm;
   G4Transform3D Tr;
   
-  G4VSolid *FrontDet = new G4Box("FrontDet",0.50*m,0.0508*m,0.0508*m);
+  G4VSolid *FrontDet = new G4Box("FrontDet",0.50*m,0.0508*m, /*0.0750*m*/ 0.0508*m);
   G4LogicalVolume *FrontDetLV = new G4LogicalVolume(FrontDet,
 	NpolMaterials::GetInstance()->GetMaterial("Scint"), "FrontDetLV",0,0,0);
   
@@ -261,6 +261,6 @@ void NpolPolarimeter::ConstructBackTagArray(G4LogicalVolume *motherLV) {
 
 void NpolPolarimeter::Place(G4LogicalVolume *motherLV) {
   
-  PlaceCylindrical(PolarimeterLV,motherLV,"Polarimeter",8.7*m,-28.0*deg,0.0*m);
+  PlaceCylindrical(PolarimeterLV,motherLV,"Polarimeter",8.7*m,/*-28.0*deg*/ 0.0*deg,0.0*m);
 }
 
