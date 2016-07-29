@@ -45,8 +45,9 @@ void NpolSteppingAction::UserSteppingAction(const G4Step *aStep) {
  
   // Kill tracks that reach certian volumes and won't produce background in 
   // the polarimeter
-  if(volName == "Cap" || postStepVolume == NULL){
-	//|| volName == "HallShellRoof" ||volName == "HallShellFloor" || volName == "HallShellWall" || 
+  if(volName == "Cap" || postStepVolume == NULL ||
+	 volName == "HallShellRoof" ||volName == "HallShellFloor" || volName == "HallShellWall" || 
+	 volName == "BeamLineBlocker"){
  	analysisMan->TrackKilled(aTrack->GetTrackID());
 	aTrack->SetTrackStatus(fStopAndKill);
   }

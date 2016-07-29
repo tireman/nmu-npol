@@ -25,7 +25,7 @@
 #include "NpolMaterials.hh"
 #include "NpolShieldHut.hh"
 
-G4double NpolShieldHut::NpolAng = 0.0*deg;
+G4double NpolShieldHut::NpolAng = 28.0*deg;
 
 NpolShieldHut::NpolShieldHut() {
   ConstructHutFrontWall();
