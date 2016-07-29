@@ -6,11 +6,11 @@ export Energy=4.4
 export Bfield=4
 export BUILD_DIR=/home/tireman/simulation/jlab/npol/nmu-npol/build
 export NPOLBASENAME=npol
-export NPOLDIR=/data1/cgen/NeutronOnly/PointSource/test2
+export NPOLDIR=/data1/cgen/NeutronOnly/PointSource/10cmScint
 #export NPOLDIR=/home/tireman/simulation/jlab/npol/analysis/test2
 #export NPOLDIR=/data1/cgen/JlabSimData/4.4GeV/4Bdl/Lead15cm
 
-export NPOLWORKDIR=/data1/cgen/NeutronOnly/PointSource/test2
+export NPOLWORKDIR=/data1/cgen/NeutronOnly/PointSource/10cmScint
 #export NPOLWORKDIR=/home/tireman/simulation/jlab/npol/analysis/test
 
 export OutputDir=$NPOLDIR/histos
