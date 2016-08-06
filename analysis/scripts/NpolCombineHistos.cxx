@@ -30,6 +30,9 @@ std::map<std::string, TH1 *> histograms;
 std::map<std::string, TVectorD *> vectors;
 std::map<std::string, TChain *> treechain;
 
+void RetrieveENVvariables();
+//TString FormInputFile(TString InputDir);
+TString FormOutputFile(TString OutputDir);
 void MergeRootObjects(TDirectory *TargetFile, TFile *InFile);
 void WriteMergeObjects( TFile *TargetFile );
 
@@ -39,33 +42,42 @@ bool isRootFile(char *filename) {
   return strcmp(&(filename[len-5]),".root") == 0;
 }
 
+TString BaseName = "";
+TString JobNum = "";
+TString Lead = ""; 
+TString Energy = "";
+TString Bfield = "";
+TString OutputDir = "";
+TString InputDir = "";
+
 void NpolCombineHistos() {
   
   // THis first line of variables needs to be set in order to combine the correct files together.
-  std::string Lead = "15"; std::string Energy = "4.4"; std::string Bfield = "4"; 
+  //std::string Lead = "15"; std::string Energy = "4.4"; std::string Bfield = "4"; 
   
-  std::string OutputDir = "/home/tireman/simulation/jlab/npol/analysis/test/histos";
-  std::string InputDir = "/home/tireman/simulation/jlab/npol/analysis/test/histos";
-  std::string OutputFile;
+  //std::string OutputDir = "/data2/cgen/JlabSimData/Summer2016Run/NoNpolArm/4.4GeV/histos";
+  //std::string InputDir = "/data2/cgen/JlabSimData/Summer2016Run/NoNpolArm/4.4GeV/histos";
+  RetrieveENVvariables();
+  TString OutputFile = FormOutputFile(OutputDir);
 
-  OutputFile = OutputDir +"/" + "npol_" + Energy + "GeV_Lead" + Lead + "cm_" + Bfield + "Bdl_Histos.root";
+  //OutputFile = OutputDir +"/" + "electronBeam_" + Energy + "GeV" + /*_Lead" + Lead + "cm_" + Bfield + "Bdl*/ + "_Histos.root";
 
-  TargetFile = TFile::Open( OutputFile.c_str(), "RECREATE" );
+  TargetFile = TFile::Open( OutputFile, "RECREATE" );
 
   DIR *d = NULL;
   struct dirent *dir = NULL;
  
-  d = opendir(InputDir.c_str());
+  d = opendir(InputDir);
   if(d == NULL) {
     std::cerr << "Cannot open directory " << InputDir << std::endl;
     return;
   }
   
   while((dir = readdir(d)) != NULL) {
-	std::string InFile = InputDir + "/" + dir->d_name;
+	TString InFile = InputDir + "/" + dir->d_name;
 
 	if(isRootFile(dir->d_name)) {
-	  InputFile = TFile::Open( InFile.c_str(), "READ" );
+	  InputFile = TFile::Open( InFile, "READ" );
 	  if(InputFile->IsZombie()){
 		std::cout << "File was found to be zombie so skipping. " << dir->d_name << std::endl;
 		continue;
@@ -204,7 +216,72 @@ void MergeRootObjects( TDirectory *TargetFile, TFile *InFile ){
   
 }
 
+TString FormInputFile(TString InputDir){
+  
+  TString fileName = InputDir + "/" + BaseName + "_" /*+ "Lead" + Lead + "cm_"*/ + Energy + "GeV_" /*+ Bfield + "Bdl_"*/ + "NoNpol_" + JobNum + ".root";
+  
+  return fileName;
+}
 
+TString FormOutputFile(TString OutputDir){
+  
+  TString fileName =  InputDir + "/" + BaseName + "_" + Energy + "GeV_"/*Lead" + Lead + "cm_" + Bfield + "Bdl_*/ + "Histos.root";
+  
+  return fileName;
+}
+
+void RetrieveENVvariables() {
+
+ if(getenv("JOBNUMBER")){
+    JobNum = getenv("JOBNUMBER");
+  }else{
+    JobNum = "99999"; // default job number is 99999
+  }
+
+  std::cout << "Processing job number: " << JobNum << std::endl;
+
+  if(getenv("NPOLBASENAME")){
+	BaseName = getenv("NPOLBASENAME");
+  }else{
+	std::cout << "Npol Base Name environmental variable not set" << std::endl; 
+	return; // Return error if not found
+  }
+
+  if(getenv("Lead")){
+    Lead = getenv("Lead");
+  }else{
+     std::cout << "Lead environmental variable not set" << std::endl;
+     return; // Return error if not found
+  }
+
+  if(getenv("Energy")){
+    Energy = getenv("Energy");
+  }else{
+    std::cout << "Energy environmental variable not set" << std::endl;
+     return; // Return error if not found
+  }
+  
+  if(getenv("Bfield")){
+    Bfield = getenv("Bfield");
+  }else{
+    std::cout << "Bfield environmental variable not set" << std::endl;
+     return; // Return error if not found
+  }
+  
+  if(getenv("WorkOutputDir")){
+	OutputDir = getenv("WorkOutputDir");
+  }else{
+	std::cout << "Output Directory environmental varilable not set" << std::endl;
+	return;
+  }
+
+  if(getenv("WorkInputDir")){
+	InputDir = getenv("WorkInputDir");
+  }else{
+	std::cout << "Input Directory environmental varilable not set" << std::endl;
+	return;
+  }
+}
 
 
 

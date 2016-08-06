@@ -43,8 +43,8 @@
 #/gps/pos/halfx 27.490 cm   		   	# target tagger
 #/gps/pos/halfy 13.049 cm			    # target tagger
 
-#/gps/pos/centre -320.649 0. 603.053 cm  # NPOL tagger
-/gps/pos/centre 0. 0. 683.85 cm 		 	 # on axis version
+#/gps/pos/centre -321.067 0. 603.839 cm  # NPOL tagger
+/gps/pos/centre 0. 0. 683.89 cm 		 	 # on axis version
 /gps/pos/halfx 125.332 cm   		    # NPOL tagger
 /gps/pos/halfy 58.9547 cm			    # NPOL tagger
 

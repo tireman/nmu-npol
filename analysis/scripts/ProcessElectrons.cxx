@@ -47,8 +47,8 @@ void ProcessElectrons() {
   TChain *npolTree = new TChain("T");
   TChain *statsTree = new TChain("T2");
 
-  npolTree->SetCacheSize(500000000);
-  statsTree->SetCacheSize(500000000);
+  npolTree->SetCacheSize(50000000);
+  statsTree->SetCacheSize(50000000);
   
   RetrieveENVvariables();
 
@@ -500,7 +500,7 @@ double *AntilogBins(const int nbins, const double xmin, const double xmax) {
 
 TString FormInputFile(TString InputDir){
   
-  TString fileName = InputDir + "/" + BaseName + "_" + "Lead" + Lead + "cm_" + Energy + "GeV_" + Bfield + "Bdl_" + JobNum + ".root";
+  TString fileName = InputDir + "/" + BaseName + "_" /*+ "Lead" + Lead + "cm_"*/ + Energy + "GeV_" /*+ Bfield + "Bdl_"*/ + "NoNpol_" + JobNum + ".root";
   
   return fileName;
 }
@@ -565,8 +565,8 @@ void RetrieveENVvariables() {
   }
 }
 
-int main(){
+//int main(){
 
- ProcessElectrons();
- return 0;
-}
+//ProcessElectrons();
+//return 0;
+//}
