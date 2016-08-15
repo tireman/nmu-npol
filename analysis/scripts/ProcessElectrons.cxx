@@ -47,6 +47,8 @@ void ProcessElectrons() {
   TChain *npolTree = new TChain("T");
   TChain *statsTree = new TChain("T2");
 
+  Double_t NpolAng = 0.488692; // radians (28 degrees)
+
   npolTree->SetCacheSize(50000000);
   statsTree->SetCacheSize(50000000);
   
@@ -143,17 +145,17 @@ void ProcessElectrons() {
     targetParticleKE[it->first] = new TH1F(
      targetHistoName.c_str(), targetHistoTitle.c_str(),nbins,bins);
     targetParticlePOS[it->first] = new TH2F(targetXYHistoName.c_str(),
-     targetXYHistoTitle.c_str(),120,-30.0,30.0,40,-10,10);  
+	 targetXYHistoTitle.c_str(),400,-27.4895,27.4895,400,-12.9307,12.9307);  
 
     npolParticleKE[it->first] = new TH1F(
 	  npolHistoName.c_str(), npolHistoTitle.c_str(),nbins,bins);
     npolParticlePOS[it->first] = new TH2F(npolXYHistoName.c_str(),
-     npolXYHistoTitle.c_str(),260,-65.0,65.0,280,-70,70);
+	  npolXYHistoTitle.c_str(),400,-49.0, 49.0, 400, -30.0, 30.0);
 
     correlateKE[it->first] = new TH1F(
      correlateHistoName.c_str(), correlateHistoTitle.c_str(),nbins,bins);
     correlatePOS[it->first] = new TH2F(correlateXYHistoName.c_str(),
-     correlateXYTitle.c_str(),120,-30.0,30.0,40,-10,10);
+     correlateXYTitle.c_str(),400,-27.4895,27.4895,400,-12.9307,12.9307);
 
 	targetTheta[it->first] = new TH1F(targetThetaName.c_str(),targetThetaTitle.c_str(),300,0.0,TMath::Pi());
 	targetPhi[it->first] = new TH1F(targetPhiName.c_str(),targetPhiTitle.c_str(),600,0.0,2*TMath::Pi());
@@ -196,7 +198,7 @@ void ProcessElectrons() {
 
 	// loop over all vertex entries to find particles created in
 	// the lead curtain or front wall of shield hut
-/*	std::vector<NpolVertex *>::iterator v_it;
+	/*std::vector<NpolVertex *>::iterator v_it;
 	for(v_it = vertexEntry->begin(); v_it != vertexEntry->end(); v_it++){
 	  NpolVertex *aVertex = *v_it;
 	  if(aVertex == NULL) continue;
@@ -204,7 +206,8 @@ void ProcessElectrons() {
 	  std::string processName = aVertex->process;
 	  Int_t PID = aVertex->parentId;
 	  //if(volumeName == "TargetFluid" && processName == "electronNuclear") std::cout << "Process name is: " << processName << std::endl;
-	  if((volumeName == "TargetFluid") && (processName == "electronNuclear") && (PID == 1)){
+	  //if((volumeName == "TargetFluid") && (processName == "electronNuclear") && (PID == 1)){
+	  if(PID == 0){
 		vertexTrackIDs.insert(aVertex->trackId);
 	  }
 	  } */
@@ -221,24 +224,23 @@ void ProcessElectrons() {
 		continue;
 	  Double_t fluxscaling = 1;
 	  //if(vertexTrackIDs.find(npolTagged->trackId) != vertexTrackIDs.end()){
-		if((abs(npolTagged->lPosX) <= npolxMax) && (abs(npolTagged->lPosY) <= npolyMax)){
-		  (npolParticleKE[particleName])->
-			Fill(npolTagged->energy,fluxscaling);
-		  (npolParticlePOS[particleName])->
-			Fill(npolTagged->lPosX,npolTagged->lPosY);
-
-		  // Calculating the theta and phi angles and saving to histograms
-		  Double_t momx = npolTagged->momX;
-		  Double_t momy = npolTagged->momY;
-		  Double_t momz = npolTagged->momZ;
-		  Double_t momTotal = TMath::Sqrt(TMath::Power(momx,2)+TMath::Power(momy,2)+TMath::Power(momz,2));
-		  Double_t theta = TMath::ACos(momz/momTotal);
-		  Double_t phi = TMath::Pi()+TMath::ATan(momy/momx);
-		  //Double_t phi = TMath::ACos(momx/(momTotal*TMath::Sin(theta)));
-		  (npolTheta[particleName])->Fill(theta);
-		  (npolPhi[particleName])->Fill(phi);
-		  
-		}
+	  //if((abs(npolTagged->lPosX) <= npolxMax) && (abs(npolTagged->lPosY) <= npolyMax)){
+	  (npolParticleKE[particleName])->
+		Fill(npolTagged->energy,fluxscaling);
+	  (npolParticlePOS[particleName])->
+		Fill(npolTagged->lPosX,npolTagged->lPosY);
+	  
+	  // Calculating the theta and phi angles and saving to histograms
+	  Double_t momx = npolTagged->momX*TMath::Sin(NpolAng);
+	  Double_t momy = npolTagged->momY;
+	  Double_t momz = npolTagged->momZ*TMath::Cos(NpolAng);
+	  Double_t momTotal = TMath::Sqrt(TMath::Power(momx,2)+TMath::Power(momy,2)+TMath::Power(momz,2));
+	  Double_t theta = TMath::ACos(momz/momTotal);
+	  Double_t phi = TMath::Pi()+TMath::ATan(momy/momx);
+	  (npolTheta[particleName])->Fill(theta);
+	  (npolPhi[particleName])->Fill(phi);
+	  
+		  //}
 		npolTrackIDs.insert(npolTagged->trackId);
 		//}
 	}
@@ -255,33 +257,32 @@ void ProcessElectrons() {
 		continue;
 	  Double_t fluxscaling = 1;
 	  //if(vertexTrackIDs.find(targetTagged->trackId) != vertexTrackIDs.end()){
-		if((abs(targetTagged->lPosX) <= targetxMax) && (abs(targetTagged->lPosY) <= targetyMax)){
-		  (targetParticleKE[particleName])->
-			Fill(targetTagged->energy,fluxscaling);
-		  (targetParticlePOS[particleName])->
-			Fill(targetTagged->lPosX,targetTagged->lPosY);
-
-		  // Calculating the theta and phi angles and saving to histograms
-		  Double_t momx = targetTagged->momX;
-		  Double_t momy = targetTagged->momY;
-		  Double_t momz = targetTagged->momZ;
-		  Double_t momTotal = TMath::Sqrt(TMath::Power(momx,2)+TMath::Power(momy,2)+TMath::Power(momz,2));
-		  Double_t theta = TMath::ACos(momz/momTotal);
-		  Double_t phi = TMath::Pi()+TMath::ATan(momy/momx);
-		  //Double_t phi = TMath::ACos(momx/(momTotal*TMath::Sin(theta)));
-		  (targetTheta[particleName])->Fill(theta);
-		  (targetPhi[particleName])->Fill(phi);
-		  
-		  // Here the correlated histograms are to be filled
-		  if(npolTrackIDs.find(targetTagged->trackId) 
-			 != npolTrackIDs.end()){  
-			
-			(correlateKE[particleName])->
-			  Fill(targetTagged->energy,fluxscaling);
-			(correlatePOS[particleName])->
-			  Fill(targetTagged->lPosX,targetTagged->lPosY);
-		  }
-		}
+	  //if((abs(targetTagged->lPosX) <= targetxMax) && (abs(targetTagged->lPosY) <= targetyMax)){
+	  (targetParticleKE[particleName])->
+		Fill(targetTagged->energy,fluxscaling);
+	  (targetParticlePOS[particleName])->
+		Fill(targetTagged->lPosX,targetTagged->lPosY);
+	  
+	  // Calculating the theta and phi angles and saving to histograms
+	  Double_t momx = targetTagged->momX*TMath::Sin(NpolAng);;
+	  Double_t momy = targetTagged->momY;
+	  Double_t momz = targetTagged->momZ*TMath::Cos(NpolAng);;
+	  Double_t momTotal = TMath::Sqrt(TMath::Power(momx,2)+TMath::Power(momy,2)+TMath::Power(momz,2));
+	  Double_t theta = TMath::ACos(momz/momTotal);
+	  Double_t phi = TMath::Pi()+TMath::ATan(momy/momx);
+	  (targetTheta[particleName])->Fill(theta);
+	  (targetPhi[particleName])->Fill(phi);
+	  
+	  // Here the correlated histograms are to be filled
+	  if(npolTrackIDs.find(targetTagged->trackId) 
+		 != npolTrackIDs.end()){  
+		
+		(correlateKE[particleName])->
+		  Fill(targetTagged->energy,fluxscaling);
+		(correlatePOS[particleName])->
+		  Fill(targetTagged->lPosX,targetTagged->lPosY);
+	  }
+	  //}
 		//}
 	}
 	npolTrackIDs.clear();
@@ -500,7 +501,7 @@ double *AntilogBins(const int nbins, const double xmin, const double xmax) {
 
 TString FormInputFile(TString InputDir){
   
-  TString fileName = InputDir + "/" + BaseName + "_" /*+ "Lead" + Lead + "cm_"*/ + Energy + "GeV_" /*+ Bfield + "Bdl_"*/ + "NoNpol_" + JobNum + ".root";
+  TString fileName = InputDir + "/" + BaseName + "_" + "Lead" + Lead + "cm_" + Energy + "GeV_" + Bfield + "Bdl_" + JobNum + ".root";
   
   return fileName;
 }

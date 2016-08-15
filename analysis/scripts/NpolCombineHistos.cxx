@@ -52,15 +52,8 @@ TString InputDir = "";
 
 void NpolCombineHistos() {
   
-  // THis first line of variables needs to be set in order to combine the correct files together.
-  //std::string Lead = "15"; std::string Energy = "4.4"; std::string Bfield = "4"; 
-  
-  //std::string OutputDir = "/data2/cgen/JlabSimData/Summer2016Run/NoNpolArm/4.4GeV/histos";
-  //std::string InputDir = "/data2/cgen/JlabSimData/Summer2016Run/NoNpolArm/4.4GeV/histos";
   RetrieveENVvariables();
   TString OutputFile = FormOutputFile(OutputDir);
-
-  //OutputFile = OutputDir +"/" + "electronBeam_" + Energy + "GeV" + /*_Lead" + Lead + "cm_" + Bfield + "Bdl*/ + "_Histos.root";
 
   TargetFile = TFile::Open( OutputFile, "RECREATE" );
 
@@ -75,14 +68,16 @@ void NpolCombineHistos() {
   
   while((dir = readdir(d)) != NULL) {
 	TString InFile = InputDir + "/" + dir->d_name;
-
+	
+	if(InFile == OutputFile) continue;
 	if(isRootFile(dir->d_name)) {
 	  InputFile = TFile::Open( InFile, "READ" );
 	  if(InputFile->IsZombie()){
 		std::cout << "File was found to be zombie so skipping. " << dir->d_name << std::endl;
+		InputFile->Close();
 		continue;
 	  }
-
+	  
 	  std::cout << "Filename: " << dir->d_name << std::endl;
 	  MergeRootObjects(TargetFile, InputFile);	
 	  TargetFile->SaveSelf(kTRUE);
@@ -218,14 +213,14 @@ void MergeRootObjects( TDirectory *TargetFile, TFile *InFile ){
 
 TString FormInputFile(TString InputDir){
   
-  TString fileName = InputDir + "/" + BaseName + "_" /*+ "Lead" + Lead + "cm_"*/ + Energy + "GeV_" /*+ Bfield + "Bdl_"*/ + "NoNpol_" + JobNum + ".root";
+  TString fileName = InputDir + "/" + BaseName + "_" + "Lead" + Lead + "cm_" + Energy + "GeV_" + Bfield + "Bdl_" + JobNum + ".root";
   
   return fileName;
 }
 
 TString FormOutputFile(TString OutputDir){
   
-  TString fileName =  InputDir + "/" + BaseName + "_" + Energy + "GeV_"/*Lead" + Lead + "cm_" + Bfield + "Bdl_*/ + "Histos.root";
+  TString fileName =  InputDir + "/" + BaseName + "_" + Energy + "GeV_Lead" + Lead + "cm_" + Bfield + "Bdl_Histos.root";
   
   return fileName;
 }
