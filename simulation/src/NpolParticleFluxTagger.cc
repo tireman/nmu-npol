@@ -45,7 +45,7 @@ G4String NpolParticleFluxTagger::GetName() {
 // target tagger will encompass more than just the opening.
 void NpolParticleFluxTagger::ConstructParticleTagger(){  
 
-  G4double xlen = 2*taggerPos*tan(horAngle); G4double ylen = 2*taggerPos*tan(vertAngle); G4double zlen = 0.010*cm;
+  G4double xlen = 2*taggerPos*tan(horAngle); G4double ylen = 2*taggerPos*tan(vertAngle); G4double zlen = 0.10*cm;
 
 
   G4Box *ParticleTagger = new G4Box("ParticleTagger",xlen/2,ylen/2,zlen/2);

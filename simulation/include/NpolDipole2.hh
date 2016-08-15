@@ -52,6 +52,7 @@ public:
   static G4double gapHeight;
   static G4double gapLength;
   static G4double dipole2FieldY;
+  static G4double NpolAng;
 
 private: 
   G4LogicalVolume *Dipole2YokeLV, *Dipole2CuBarLV, *Dipole2CuEndLV;

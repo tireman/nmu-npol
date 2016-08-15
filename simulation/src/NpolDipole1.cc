@@ -38,6 +38,7 @@
 #include "NpolBeamlineDown.hh"
 #include "NpolDetectorConstruction.hh"
 
+G4double NpolDipole1::NpolAng = 28.0*deg;
 G4double NpolDipole1::yokeLength = 1.22*m;
 G4double NpolDipole1::gapWidth = 0.56*m;
 G4double NpolDipole1::gapLength = 1.22*m;
@@ -132,7 +133,7 @@ void NpolDipole1::ConstructDipole1FieldClamp1(){
   
   G4double height = 1.528*m, width = 2.35*m, thick = 0.0508*m;
   G4double Inheight = 0.254*m, Inwidth = 0.56*m;
-  G4double radius = 1.0*cm + NpolBeamlineDown::SecA2OutRadius, CyLen = 10.0*cm, NpolAng = 28.0*deg;
+  G4double radius = 1.0*cm + NpolBeamlineDown::SecA2OutRadius, CyLen = 10.0*cm;
   
   // Create the necessary solids
   G4Box *Slab = new G4Box("Slab", width/2, height/2, thick/2);
@@ -185,7 +186,7 @@ void NpolDipole1::ConstructDipole1Field(){
 }
 
 void NpolDipole1::Place(G4LogicalVolume *motherLV) {
-  G4double PosD1 = 2.5096*m, NpolAng = 28.0*deg, BarOffSet = 0.47*m;
+  G4double PosD1 = 2.5096*m, BarOffSet = 0.47*m;
   G4double EndOffSet = +0.735*m, ClampOffSet = 0.9398*m;
    
   // Place 4 of the Copper bars in the magnet

@@ -34,6 +34,7 @@
 #include "NpolMaterials.hh"
 #include "NpolDipole2.hh"
 
+G4double NpolDipole2::NpolAng = 28.0*deg;
 G4double NpolDipole2::yokeLength = 0.6096*m;
 G4double NpolDipole2::gapWidth = 1.22*m;
 G4double NpolDipole2::gapLength = 1.22*m;
@@ -145,7 +146,7 @@ void NpolDipole2::ConstructDipole2Field(){
 }
 
 void NpolDipole2::Place(G4LogicalVolume *motherLV) {
-  G4double PosD2 = 4.6866*m, NpolAng = 28.0*deg, BarOffSet = +0.7730*m;
+  G4double PosD2 = 4.6866*m, BarOffSet = +0.7730*m;
   G4double VertOffSet = 0.231/2*m, EndOffSet = +0.8235*m;
   G4double ClampOffSet = 1.05*m;
   
