@@ -32,14 +32,14 @@
 /gps/pos/centre 0. 0. -300. cm
 /gps/direction 0 0 1
 
-# the beam energy is at 4400 MeV
+# the beam energy 
 /gps/ene/type Mono
-/gps/ene/mono 4400. MeV
+/gps/ene/mono 11000. MeV
 
 #
 # Commands below are independent of gps
 #
 /vis/scene/endOfEventAction accumulate 100
-/run/printProgress 100
+/run/printProgress 10000
 
-/run/beamOn 50000
+/run/beamOn 5000000
