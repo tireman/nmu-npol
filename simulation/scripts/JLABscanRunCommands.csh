@@ -21,6 +21,6 @@ foreach j (`seq $NUM1 1 $NUM2`)
   setenv JOBNUMBER $j
 
      echo "    Processing Job Number $j"
-     root -b -q $BUILD_DIR/../root/ProcessElectronsJLAB4Bdl0cm.cxx+
+     root -b -q $BUILD_DIR/../root/ProcessElectrons.cxx+
 
   echo "Done processing job $j"

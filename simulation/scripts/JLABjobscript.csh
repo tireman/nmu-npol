@@ -6,10 +6,10 @@ cat > jsubfile_$i << EOF1
 PROJECT: cgen
 TRACK : simulation
 OS : centos65
-JOBNAME : CGEN-4.4GeV_NoNpol_$i
+JOBNAME : CGEN-Lead15cm_11GeV_4Bdl_$i
 MAIL: tireman@jlab.org
-TIME: 4320
-MEMORY: 1500 MB
+TIME: 2000
+MEMORY: 1700 MB
 COMMAND : source JLABsimRunCommands.csh $i
 OTHER_FILES : /u/home/tireman/simulation/e11_12_009/background/nmu-npol/build/simulation/scripts/JLABsimRunCommands.csh
 EOF1
