@@ -60,14 +60,14 @@ void NpolCombineHistos() {
   DIR *d = NULL;
   struct dirent *dir = NULL;
  
-  d = opendir(InputDir);
+  d = opendir(OutputDir);
   if(d == NULL) {
-    std::cerr << "Cannot open directory " << InputDir << std::endl;
+    std::cerr << "Cannot open directory " << OutputDir << std::endl;
     return;
   }
   
   while((dir = readdir(d)) != NULL) {
-	TString InFile = InputDir + "/" + dir->d_name;
+	TString InFile = OutputDir + "/" + dir->d_name;
 	
 	if(InFile == OutputFile) continue;
 	if(isRootFile(dir->d_name)) {
@@ -220,7 +220,7 @@ TString FormInputFile(TString InputDir){
 
 TString FormOutputFile(TString OutputDir){
   
-  TString fileName =  InputDir + "/" + BaseName + "_" + Energy + "GeV_Lead" + Lead + "cm_" + Bfield + "Bdl_Histos.root";
+  TString fileName =  OutputDir + "/" + BaseName + "_" + Energy + "GeV_Lead" + Lead + "cm_" + Bfield + "Bdl_Histos.root";
   
   return fileName;
 }

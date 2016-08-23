@@ -41,7 +41,7 @@ TString OutputDir = "";
 TString InputDir = "";
 
 void ProcessElectrons() {
-  gSystem->Load("../../build/npollib/libNpolClasses.so"); 
+  gSystem->Load("libNpolClasses.so"); 
 
   // Set up the TTrees and their branch addresses
   TChain *npolTree = new TChain("T");
@@ -49,8 +49,8 @@ void ProcessElectrons() {
 
   Double_t NpolAng = 0.488692; // radians (28 degrees)
 
-  npolTree->SetCacheSize(50000000);
-  statsTree->SetCacheSize(50000000);
+  //npolTree->SetCacheSize(50000000);
+  //statsTree->SetCacheSize(50000000);
   
   RetrieveENVvariables();
 
@@ -237,6 +237,7 @@ void ProcessElectrons() {
 	  Double_t momTotal = TMath::Sqrt(TMath::Power(momx,2)+TMath::Power(momy,2)+TMath::Power(momz,2));
 	  Double_t theta = TMath::ACos(momz/momTotal);
 	  Double_t phi = TMath::Pi()+TMath::ATan(momy/momx);
+	  if(theta > TMath::Pi()/2) continue;
 	  (npolTheta[particleName])->Fill(theta);
 	  (npolPhi[particleName])->Fill(phi);
 	  
@@ -270,6 +271,7 @@ void ProcessElectrons() {
 	  Double_t momTotal = TMath::Sqrt(TMath::Power(momx,2)+TMath::Power(momy,2)+TMath::Power(momz,2));
 	  Double_t theta = TMath::ACos(momz/momTotal);
 	  Double_t phi = TMath::Pi()+TMath::ATan(momy/momx);
+	  if(theta > TMath::Pi()/2) continue;
 	  (targetTheta[particleName])->Fill(theta);
 	  (targetPhi[particleName])->Fill(phi);
 	  
@@ -552,7 +554,7 @@ void RetrieveENVvariables() {
   }
   
   if(getenv("WorkOutputDir")){
-	OutputDir = getenv("WorkInputDir");
+	OutputDir = getenv("WorkOutputDir");
   }else{
 	std::cout << "Output Directory environmental varilable not set" << std::endl;
 	return;
