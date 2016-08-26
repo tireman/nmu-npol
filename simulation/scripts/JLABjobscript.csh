@@ -4,7 +4,7 @@ foreach i (`seq $1 1 $2`)
 
 cat > jsubfile_$i << EOF1
 PROJECT: cgen
-TRACK : simulation
+TRACK : debug
 OS : centos65
 JOBNAME : CGEN-Lead15cm_11GeV_4Bdl_$i
 MAIL: tireman@jlab.org
@@ -19,7 +19,6 @@ foreach j (`seq $1 1 $2`)
 
   jsub jsubfile_$j
   sleep 1s
+  rm jsubfile_$j
 
 end
-
-rm jsubfile_*
