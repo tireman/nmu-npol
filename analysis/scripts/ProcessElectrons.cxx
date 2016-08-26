@@ -224,16 +224,16 @@ void ProcessElectrons() {
 		continue;
 	  Double_t fluxscaling = 1;
 	  //if(vertexTrackIDs.find(npolTagged->trackId) != vertexTrackIDs.end()){
-	  //if((abs(npolTagged->lPosX) <= npolxMax) && (abs(npolTagged->lPosY) <= npolyMax)){
+	  if((abs(npolTagged->lPosX) <= npolxMax) && (abs(npolTagged->lPosY) <= npolyMax)){
 		(npolParticleKE[particleName])->
 		  Fill(npolTagged->energy,fluxscaling);
 		(npolParticlePOS[particleName])->
 		  Fill(npolTagged->lPosX,npolTagged->lPosY);
 		
 		// Calculating the theta and phi angles and saving to histograms
-		Double_t momx = npolTagged->momX*TMath::Sin(NpolAng);
+		Double_t momx = npolTagged->momX*TMath::Cos(NpolAng) + npolTagged->momZ*TMath::Sin(NpolAng);
 		Double_t momy = npolTagged->momY;
-		Double_t momz = npolTagged->momZ*TMath::Cos(NpolAng);
+		Double_t momz = npolTagged->momX*(-1)*TMath::Sin(NpolAng) + npolTagged->momZ*TMath::Cos(NpolAng);
 		Double_t momTotal = TMath::Sqrt(TMath::Power(momx,2)+TMath::Power(momy,2)+TMath::Power(momz,2));
 		Double_t theta = TMath::ACos(momz/momTotal);
 		Double_t phi = TMath::Pi()+TMath::ATan(momy/momx);
@@ -241,7 +241,7 @@ void ProcessElectrons() {
 		(npolTheta[particleName])->Fill(theta);
 		(npolPhi[particleName])->Fill(phi);
 		
-		//}
+		}
 	  npolTrackIDs.insert(npolTagged->trackId);
 	  //}
 	}
@@ -258,16 +258,16 @@ void ProcessElectrons() {
 		continue;
 	  Double_t fluxscaling = 1;
 	  //if(vertexTrackIDs.find(targetTagged->trackId) != vertexTrackIDs.end()){
-	  //if((abs(targetTagged->lPosX) <= targetxMax) && (abs(targetTagged->lPosY) <= targetyMax)){
+	  if((abs(targetTagged->lPosX) <= targetxMax) && (abs(targetTagged->lPosY) <= targetyMax)){
 		(targetParticleKE[particleName])->
 		  Fill(targetTagged->energy,fluxscaling);
 		(targetParticlePOS[particleName])->
 		  Fill(targetTagged->lPosX,targetTagged->lPosY);
 		
 		// Calculating the theta and phi angles and saving to histograms
-		Double_t momx = targetTagged->momX*TMath::Sin(NpolAng);;
+		Double_t momx = targetTagged->momX*TMath::Cos(NpolAng) + targetTagged->momZ*TMath::Sin(NpolAng);
 		Double_t momy = targetTagged->momY;
-		Double_t momz = targetTagged->momZ*TMath::Cos(NpolAng);;
+		Double_t momz = targetTagged->momX*(-1)*TMath::Sin(NpolAng) + targetTagged->momZ*TMath::Cos(NpolAng);
 		Double_t momTotal = TMath::Sqrt(TMath::Power(momx,2)+TMath::Power(momy,2)+TMath::Power(momz,2));
 		Double_t theta = TMath::ACos(momz/momTotal);
 		Double_t phi = TMath::Pi()+TMath::ATan(momy/momx);
@@ -284,7 +284,7 @@ void ProcessElectrons() {
 		  (correlatePOS[particleName])->
 			Fill(targetTagged->lPosX,targetTagged->lPosY);
 		}
-		//}
+		}
 		//}
 	}
 	npolTrackIDs.clear();
@@ -553,15 +553,15 @@ void RetrieveENVvariables() {
      return; // Return error if not found
   }
   
-  if(getenv("WorkOutputDir")){
-	OutputDir = getenv("WorkOutputDir");
+  if(getenv("HistoOutputDir")){
+	OutputDir = getenv("HistoOutputDir");
   }else{
 	std::cout << "Output Directory environmental varilable not set" << std::endl;
 	return;
   }
 
-  if(getenv("InputDir")){
-	InputDir = getenv("InputDir");
+  if(getenv("RawDataDir")){
+	InputDir = getenv("RawDataDir");
   }else{
 	std::cout << "Input Directory environmental varilable not set" << std::endl;
 	return;
