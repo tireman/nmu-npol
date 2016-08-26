@@ -237,7 +237,7 @@
 /gps/hist/point 0.393333  0
 /gps/hist/point 0.395  0
 /gps/hist/point 0.396667  0
-/gps/hist/point 0.398333  0
+/gps/hist/point 0.398333  1
 /gps/hist/point 0.4  0
 /gps/hist/point 0.401667  0
 /gps/hist/point 0.403333  0
@@ -264,9 +264,9 @@
 /gps/hist/point 0.438333  0
 /gps/hist/point 0.44  0
 /gps/hist/point 0.441667  0
-/gps/hist/point 0.443333  1
+/gps/hist/point 0.443333  0
 /gps/hist/point 0.445  0
-/gps/hist/point 0.446667  0
+/gps/hist/point 0.446667  2
 /gps/hist/point 0.448333  0
 /gps/hist/point 0.45  0
 /gps/hist/point 0.451667  0
@@ -283,8 +283,8 @@
 /gps/hist/point 0.47  0
 /gps/hist/point 0.471667  0
 /gps/hist/point 0.473333  0
-/gps/hist/point 0.475  1
-/gps/hist/point 0.476667  1
+/gps/hist/point 0.475  0
+/gps/hist/point 0.476667  0
 /gps/hist/point 0.478333  0
 /gps/hist/point 0.48  0
 /gps/hist/point 0.481667  0

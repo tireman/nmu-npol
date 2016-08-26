@@ -229,7 +229,7 @@
 /gps/hist/point 0.38  0
 /gps/hist/point 0.381667  0
 /gps/hist/point 0.383333  0
-/gps/hist/point 0.385  0
+/gps/hist/point 0.385  1
 /gps/hist/point 0.386667  0
 /gps/hist/point 0.388333  0
 /gps/hist/point 0.39  0
@@ -241,7 +241,7 @@
 /gps/hist/point 0.4  0
 /gps/hist/point 0.401667  0
 /gps/hist/point 0.403333  0
-/gps/hist/point 0.405  1
+/gps/hist/point 0.405  0
 /gps/hist/point 0.406667  0
 /gps/hist/point 0.408333  0
 /gps/hist/point 0.41  0
