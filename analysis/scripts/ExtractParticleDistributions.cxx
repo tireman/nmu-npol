@@ -170,15 +170,15 @@ void RetrieveENVvariables() {
      return; // Return error if not found
   }
   
-  if(getenv("WorkOutputDir")){
-	OutputDir = getenv("WorkOutputDir");
+  if(getenv("HistoOutputDir")){
+	OutputDir = getenv("HistoOutputDir");
   }else{
 	std::cout << "Output Directory environmental varilable not set" << std::endl;
 	return;
   }
 
-  if(getenv("WorkInputDir")){
-	InputDir = getenv("WorkInputDir");
+  if(getenv("HistoInputDir")){
+	InputDir = getenv("HistoInputDir");
   }else{
 	std::cout << "Input Directory environmental varilable not set" << std::endl;
 	return;
