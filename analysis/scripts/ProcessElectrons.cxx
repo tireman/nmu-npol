@@ -41,7 +41,8 @@ TString OutputDir = "";
 TString InputDir = "";
 
 void ProcessElectrons() {
-  gSystem->Load("libNpolClasses.so"); 
+  TString analysisDir = getenv("NPOLLIB_DIR");
+  gSystem->Load(analysisDir + "/" + "libNpolClasses.so"); 
 
   // Set up the TTrees and their branch addresses
   TChain *npolTree = new TChain("T");
@@ -224,7 +225,7 @@ void ProcessElectrons() {
 		continue;
 	  Double_t fluxscaling = 1;
 	  //if(vertexTrackIDs.find(npolTagged->trackId) != vertexTrackIDs.end()){
-	  if((abs(npolTagged->lPosX) <= npolxMax) && (abs(npolTagged->lPosY) <= npolyMax)){
+	  //if((abs(npolTagged->lPosX) <= npolxMax) && (abs(npolTagged->lPosY) <= npolyMax)){
 		(npolParticleKE[particleName])->
 		  Fill(npolTagged->energy,fluxscaling);
 		(npolParticlePOS[particleName])->
@@ -233,15 +234,17 @@ void ProcessElectrons() {
 		// Calculating the theta and phi angles and saving to histograms
 		Double_t momx = npolTagged->momX*TMath::Cos(NpolAng) + npolTagged->momZ*TMath::Sin(NpolAng);
 		Double_t momy = npolTagged->momY;
-		Double_t momz = npolTagged->momX*(-1)*TMath::Sin(NpolAng) + npolTagged->momZ*TMath::Cos(NpolAng);
+		Double_t momz = (-1)*npolTagged->momX*TMath::Sin(NpolAng) + npolTagged->momZ*TMath::Cos(NpolAng);
 		Double_t momTotal = TMath::Sqrt(TMath::Power(momx,2)+TMath::Power(momy,2)+TMath::Power(momz,2));
-		Double_t theta = TMath::ACos(momz/momTotal);
-		Double_t phi = TMath::Pi()+TMath::ATan(momy/momx);
+		Double_t theta = TMath::ACos(momz/momTotal);		
+		Double_t phi=0;
+		if(momy >= 0) phi = TMath::ACos(momx/(momTotal*TMath::Sin(theta)));
+		if(momy < 0) phi = 2*TMath::Pi()-TMath::ACos(momx/(momTotal*TMath::Sin(theta)));
 		if(theta > TMath::Pi()/2) continue;
 		(npolTheta[particleName])->Fill(theta);
 		(npolPhi[particleName])->Fill(phi);
 		
-		}
+		//}
 	  npolTrackIDs.insert(npolTagged->trackId);
 	  //}
 	}
@@ -258,7 +261,7 @@ void ProcessElectrons() {
 		continue;
 	  Double_t fluxscaling = 1;
 	  //if(vertexTrackIDs.find(targetTagged->trackId) != vertexTrackIDs.end()){
-	  if((abs(targetTagged->lPosX) <= targetxMax) && (abs(targetTagged->lPosY) <= targetyMax)){
+	  //if((abs(targetTagged->lPosX) <= targetxMax) && (abs(targetTagged->lPosY) <= targetyMax)){
 		(targetParticleKE[particleName])->
 		  Fill(targetTagged->energy,fluxscaling);
 		(targetParticlePOS[particleName])->
@@ -267,10 +270,12 @@ void ProcessElectrons() {
 		// Calculating the theta and phi angles and saving to histograms
 		Double_t momx = targetTagged->momX*TMath::Cos(NpolAng) + targetTagged->momZ*TMath::Sin(NpolAng);
 		Double_t momy = targetTagged->momY;
-		Double_t momz = targetTagged->momX*(-1)*TMath::Sin(NpolAng) + targetTagged->momZ*TMath::Cos(NpolAng);
+		Double_t momz = (-1)*targetTagged->momX*TMath::Sin(NpolAng) + targetTagged->momZ*TMath::Cos(NpolAng);
 		Double_t momTotal = TMath::Sqrt(TMath::Power(momx,2)+TMath::Power(momy,2)+TMath::Power(momz,2));
 		Double_t theta = TMath::ACos(momz/momTotal);
-		Double_t phi = TMath::Pi()+TMath::ATan(momy/momx);
+		Double_t phi=0;
+		if(momy >= 0) phi = TMath::ACos(momx/(momTotal*TMath::Sin(theta)));
+		if(momy < 0) phi = 2*TMath::Pi()-TMath::ACos(momx/(momTotal*TMath::Sin(theta)));
 		if(theta > TMath::Pi()/2) continue;
 		(targetTheta[particleName])->Fill(theta);
 		(targetPhi[particleName])->Fill(phi);
@@ -284,7 +289,7 @@ void ProcessElectrons() {
 		  (correlatePOS[particleName])->
 			Fill(targetTagged->lPosX,targetTagged->lPosY);
 		}
-		}
+		//}
 		//}
 	}
 	npolTrackIDs.clear();
@@ -568,8 +573,3 @@ void RetrieveENVvariables() {
   }
 }
 
-//int main(){
-
-//ProcessElectrons();
-//return 0;
-//}
