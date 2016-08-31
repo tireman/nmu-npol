@@ -34,7 +34,7 @@
 #include "NpolDetectorConstruction.hh"
 
 G4double NpolPolarimeter::NpolBoxPos = 8.7*m;
-G4double NpolPolarimeter::NpolAng = 0.0*deg; //28.0*deg;
+G4double NpolPolarimeter::NpolAng = 28.0*deg; //28.0*deg;
 
 NpolPolarimeter::NpolPolarimeter() {
   G4VSolid *PolarimeterBox = new G4Box("PolarimeterBox",1.30*m,1.45*m,1.85*m);

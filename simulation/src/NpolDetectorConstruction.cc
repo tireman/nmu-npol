@@ -30,20 +30,18 @@
 #include "NpolHBender.hh"
 #include "NpolBDump.hh"
 #include "NpolParticleFluxTagger.hh"
-#include "NpolBeamLineBlocker.hh"
 #include "NpolAnalysisManager.hh"
 
 NpolDetectorConstruction::NpolDetectorConstruction() {
   
   G4cout << "Constructing volumes." << G4endl;
   world = new NpolWorld();
-  //detectors.insert(new NpolPolarimeter());
+  detectors.insert(new NpolPolarimeter());
   //detectors.insert(new NpolPolarimeter6Layer()); // invoke this when studying 6 layers
   //detectors.insert(new NpolScatteringChamber);
   //detectors.insert(new NpolHallShell);
   //detectors.insert(new NpolBeamlineUpper);
   //detectors.insert(new NpolBeamlineDown);
-  //detectors.insert(new NpolBeamLineBlocker);
   detectors.insert(new NpolDipole1);
   detectors.insert(new NpolDipole2);
   detectors.insert(new NpolShieldHut);
