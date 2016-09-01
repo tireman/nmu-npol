@@ -225,7 +225,7 @@ void ProcessElectrons() {
 		continue;
 	  Double_t fluxscaling = 1;
 	  //if(vertexTrackIDs.find(npolTagged->trackId) != vertexTrackIDs.end()){
-	  //if((abs(npolTagged->lPosX) <= npolxMax) && (abs(npolTagged->lPosY) <= npolyMax)){
+	  if((abs(npolTagged->lPosX) <= npolxMax) && (abs(npolTagged->lPosY) <= npolyMax)){
 		(npolParticleKE[particleName])->
 		  Fill(npolTagged->energy,fluxscaling);
 		(npolParticlePOS[particleName])->
@@ -240,11 +240,11 @@ void ProcessElectrons() {
 		Double_t phi=0;
 		if(momy >= 0) phi = TMath::ACos(momx/(momTotal*TMath::Sin(theta)));
 		if(momy < 0) phi = 2*TMath::Pi()-TMath::ACos(momx/(momTotal*TMath::Sin(theta)));
-		if(theta > TMath::Pi()/2) continue;
+		//if(theta > TMath::Pi()/2) continue;
 		(npolTheta[particleName])->Fill(theta);
 		(npolPhi[particleName])->Fill(phi);
 		
-		//}
+		}
 	  npolTrackIDs.insert(npolTagged->trackId);
 	  //}
 	}
@@ -261,7 +261,7 @@ void ProcessElectrons() {
 		continue;
 	  Double_t fluxscaling = 1;
 	  //if(vertexTrackIDs.find(targetTagged->trackId) != vertexTrackIDs.end()){
-	  //if((abs(targetTagged->lPosX) <= targetxMax) && (abs(targetTagged->lPosY) <= targetyMax)){
+	  if((abs(targetTagged->lPosX) <= targetxMax) && (abs(targetTagged->lPosY) <= targetyMax)){
 		(targetParticleKE[particleName])->
 		  Fill(targetTagged->energy,fluxscaling);
 		(targetParticlePOS[particleName])->
@@ -276,7 +276,7 @@ void ProcessElectrons() {
 		Double_t phi=0;
 		if(momy >= 0) phi = TMath::ACos(momx/(momTotal*TMath::Sin(theta)));
 		if(momy < 0) phi = 2*TMath::Pi()-TMath::ACos(momx/(momTotal*TMath::Sin(theta)));
-		if(theta > TMath::Pi()/2) continue;
+		//if(theta > TMath::Pi()/2) continue;
 		(targetTheta[particleName])->Fill(theta);
 		(targetPhi[particleName])->Fill(phi);
 	  
@@ -289,7 +289,7 @@ void ProcessElectrons() {
 		  (correlatePOS[particleName])->
 			Fill(targetTagged->lPosX,targetTagged->lPosY);
 		}
-		//}
+		}
 		//}
 	}
 	npolTrackIDs.clear();

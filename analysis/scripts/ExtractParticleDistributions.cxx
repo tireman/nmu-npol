@@ -60,7 +60,7 @@ void ExtractParticleDistributions() {
 		  if(k == 3) fileName = "targetPhi_" + histoNames[i][j] + ".dat";
 		  if(k == 4) fileName = "npolTheta_" + histoNames[i][j] + ".dat";
 		  if(k == 5) fileName = "npolPhi_" + histoNames[i][j] + ".dat";
-		  txtOut.open(fileName);
+		  txtOut.open(OutputDir + "/" + fileName);
 		  txtOut << "/gps/hist/point " << "0.0 " << " 0.0" << std::endl;
 		  Double_t totalCounts = hFrame->Integral();
 		  Double_t binOut = 0.0;
@@ -89,7 +89,7 @@ void ExtractParticleDistributions() {
 			if(l == 1 && k == 6) fileName = "npolY_" + histoNames[i][j] + ".dat";
 			if(l == 0 && k == 7) fileName = "targetX_" + histoNames[i][j] + ".dat";
 			if(l == 1 && k == 7) fileName = "targetY_" + histoNames[i][j] + ".dat";
-			txtOut.open(fileName);
+			txtOut.open(OutputDir + "/" + fileName);
 			txtOut << "/gps/hist/point " << "0.0 " << " 0.0" << std::endl;
 			Int_t NbinsX = hFrame->GetNbinsX()-2;
 			Int_t NbinsY = hFrame->GetNbinsY()-2;
@@ -170,8 +170,8 @@ void RetrieveENVvariables() {
      return; // Return error if not found
   }
   
-  if(getenv("HistoOutputDir")){
-	OutputDir = getenv("HistoOutputDir");
+  if(getenv("OutputDir")){
+	OutputDir = getenv("OutputDir");
   }else{
 	std::cout << "Output Directory environmental varilable not set" << std::endl;
 	return;
