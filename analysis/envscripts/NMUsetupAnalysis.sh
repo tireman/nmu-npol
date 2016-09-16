@@ -7,11 +7,11 @@ export Bfield=4
 export BUILD_DIR=/home/tireman/simulation/jlab/npol/nmu-npol/build/simulation
 export NPOLLIB_DIR=/home/tireman/simulation/jlab/npol/nmu-npol/build/npollib
 export NPOLBASENAME=sourceNeutron
-export NPOLDIR=/data2/cgen/JlabSimData/Summer2016Run/TargetTaggerSource/4.4GeV/4Bdl
+export NPOLDIR=/data1/cgen/NeutronOnly/RealisticSource/10cmScint
 #export NPOLDIR=/home/tireman/simulation/jlab/npol/analysis/test2
 #export NPOLDIR=/data2/cgen/JlabSimData/Summer2016Run/FullGeometry/4.4GeV
 
-export NPOLWORKDIR=/data2/cgen/JlabSimData/Summer2016Run/TargetTaggerSource/4.4GeV/4Bdl
+export NPOLWORKDIR=/data1/cgen/NeutronOnly/RealisticSource/10cmScint
 #export NPOLWORKDIR=/data2/cgen/JlabSimData/Summer2016Run/FullGeometry/4.4GeV
 
 export OutputDir=$NPOLDIR/histos

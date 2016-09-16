@@ -85,7 +85,7 @@ void NpolDipole1::ConstructDipole1Yoke() {
        NpolMaterials::GetInstance()->GetMaterial("Fe"),"Dipole1YokeLV",0,0,0);
 
   G4VisAttributes *Dipole1YokeVisAtt= 
-    new G4VisAttributes(G4Colour(1.0,0.0,0.00));
+    new G4VisAttributes(G4Colour(0.0,0.0,1.0));
   Dipole1YokeLV->SetVisAttributes(Dipole1YokeVisAtt);
 }
 
