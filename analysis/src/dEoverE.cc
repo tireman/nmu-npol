@@ -357,25 +357,43 @@ IF YOU WOULD LIKE TO USE THE DATA FOR THE SIX LAYER DESIGN, YOU MUST COPY THE SC
 
 //int dEoverE() {
   //gSystem->Load("../../build/npollib/libNpolClasses.so");
-  int main(int argc, char *argv[]) {
-    //OLD DATA - Still exists!
-    //std::string inFilename = "/data1/cgen/NeutronOnly/PointSource/5cmScint/root/*.root";
-    //NEW DATA
-    //5cm Data
-    //std::string inFilename = "/data1/cgen/NeutronOnly/RealisticSource/5cmScint/root/*.root";
+int main(int argc, char *argv[]) {
+  
   std::string JobNum;
   if(getenv("JOBNUMBER")){
     JobNum = getenv("JOBNUMBER");
   }else{
     JobNum = "99999"; // default job number is 99999
   }
+  
+  std::string InputDir;
+  if(getenv("RawDataDir")){
+    InputDir = getenv("RawDataDir");
+  }else{
+    InputDir = "output"; 
+  }
+  
+  std::string BaseName;
+  if(getenv("NPOLBASENAME")){
+    BaseName = getenv("NPOLBASENAME");
+  }else{
+    BaseName = "output"; 
+  }
+  
+  std::string HistoDIR;
+  if(getenv("HistoOutputDir")){
+	HistoDIR = getenv("HistoOutputDir");
+  }else{
+	HistoDIR = "output";
+  }
+  
+  TString inFilename = InputDir + "/" + BaseName + "_" + JobNum + ".root";
+  TString outFilename = HistoDIR + "/" + BaseName + "_HistoCuts_" + JobNum + ".root";
 
- 
-	//10cm Data
-	//std::string inFilename = "/data1/cgen/NeutronOnly/RealisticSource/5cmScint/root/npol_Lead15cm_4.4GeV_4Bd.root";
-	//15cm Data
-	std::string inFilename = "/data1/cgen/NeutronOnly/RealisticSource/10cmScint/root/*.root";
-	std::string outFilenamePrefix = "dEoverE_NeutronOnly_RealisticSource_10cm_Elastic.root"; 
+  //TString inFilename ="/data1/cgen/NeutronOnly/RealisticSource/10cmScint/root/sourceNeutron_Lead15cm_4.4GeV_4Bdl_51.root";
+  //TString outFilename ="/data1/cgen/NeutronOnly/RealisticSource/10cmScint/histos/output.root";
+
+
 	std::ofstream txtOut;
 	//txtOut.open("/data1/dEoverE_txt_files/" + outFilenamePrefix + ".txt");
 	txtOut.open("/dev/null");
@@ -383,8 +401,8 @@ IF YOU WOULD LIKE TO USE THE DATA FOR THE SIX LAYER DESIGN, YOU MUST COPY THE SC
 	TChain *npolTree = new TChain("T");
 	TChain *statsTree = new TChain("T2");
 //	npolTree->Add("/data2/cgen/NMUSimData/NeutronOnly/2.1GeV/root/neutron_2.1GeV_*.root");
-	npolTree->Add(inFilename.c_str());
-	statsTree->Add(inFilename.c_str());
+	npolTree->Add(inFilename);
+	statsTree->Add(inFilename);
 
 	std::vector<NpolStep *> *steps = NULL;
 	std::vector<NpolVertex *> *verts = NULL;
@@ -392,7 +410,7 @@ IF YOU WOULD LIKE TO USE THE DATA FOR THE SIX LAYER DESIGN, YOU MUST COPY THE SC
 	npolTree->SetBranchAddress("steps",&steps);
 	npolTree->SetBranchAddress("tracks",&verts);
 	statsTree->SetBranchAddress("stats",&stats);
-	TFile *outFile = new TFile(("~/dEoverE_out/" + outFilenamePrefix + ".root").c_str(),"RECREATE");
+	TFile *outFile = new TFile(outFilename,"RECREATE");
 	TH2F *h_dEoverE_TopHigh = new TH2F("dEoverE_Top", "dE over E for top array - HIGHEST PV ONLY", 200,0,150,400,0,20);
 	TH2F *h_dEoverE_BotHigh = new TH2F("dEoverE_Bot", "dE over E for bottom array - HIGHEST PV ONLY", 200,0,150,400,0,20);
 	TH2F *h_dEoverEtop = new TH2F("dEoverEtop", "dE over E for top array", 200,0,150,400,0,20);

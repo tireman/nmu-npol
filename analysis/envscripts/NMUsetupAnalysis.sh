@@ -6,7 +6,8 @@ export Energy=4.4
 export Bfield=4
 export BUILD_DIR=/home/tireman/simulation/jlab/npol/nmu-npol/build/simulation
 export NPOLLIB_DIR=/home/tireman/simulation/jlab/npol/nmu-npol/build/npollib
-export NPOLBASENAME=sourceNeutron
+export NPOLBASENAME=sourceNeutron_Lead$Lead\cm_$Energy\GeV_$Bfield\Bdl 
+#sourceNeutron
 export NPOLDIR=/data1/cgen/NeutronOnly/RealisticSource/10cmScint
 #export NPOLDIR=/home/tireman/simulation/jlab/npol/analysis/test2
 #export NPOLDIR=/data2/cgen/JlabSimData/Summer2016Run/FullGeometry/4.4GeV

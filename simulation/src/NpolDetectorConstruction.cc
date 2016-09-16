@@ -42,9 +42,9 @@ NpolDetectorConstruction::NpolDetectorConstruction() {
   //detectors.insert(new NpolHallShell);
   //detectors.insert(new NpolBeamlineUpper);
   //detectors.insert(new NpolBeamlineDown);
-  //detectors.insert(new NpolDipole1);
-  //detectors.insert(new NpolDipole2);
-  //detectors.insert(new NpolShieldHut);
+  detectors.insert(new NpolDipole1);
+  detectors.insert(new NpolDipole2);
+  detectors.insert(new NpolShieldHut);
   //detectors.insert(new NpolHBender);
   //detectors.insert(new NpolParticleFluxTagger);
   //detectors.insert(new NpolBDump);
