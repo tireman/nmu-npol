@@ -40,8 +40,8 @@
 /gps/pos/shape Rectangle
 
 /gps/pos/centre -70.421 0. 132.442 cm  # target tagger
-/gps/pos/halfx 27.490 cm   		   	   # target tagger
-/gps/pos/halfy 13.049 cm			    # target tagger
+/gps/pos/halfx 35.00 cm   		    # target tagger
+/gps/pos/halfy 15.00 cm			    # target tagger
 
 #/gps/pos/centre -321.067 0. 603.839 cm  # NPOL tagger
 #/gps/pos/halfx 49.00 cm   		        # NPOL tagger
@@ -86,4 +86,5 @@
 /vis/scene/endOfEventAction accumulate 100
 /run/printProgress 10000
 
-/run/beamOn 17333
+/run/beamOn 1000000
+
