@@ -143,22 +143,26 @@ void ProcessElectrons() {
     std::string correlateXYHistoName = "Correlated_targetXY_" + it->first;
     std::string correlateXYTitle = it->second + " XY position in Target Tagger Correlated to NPOL Tagger";
 
-    targetParticleKE[it->first] = new TH1F(
-     targetHistoName.c_str(), targetHistoTitle.c_str(),nbins,bins);
+	// First field clamp is 25.4 cm tall and 56.0 cm wide, select 30.0cm tall and 70.0 cm wides
+    targetParticleKE[it->first] = 
+	  new TH1F(targetHistoName.c_str(), targetHistoTitle.c_str(),nbins,bins);
     targetParticlePOS[it->first] = 
-	  new TH2F(targetXYHistoName.c_str(),targetXYHistoTitle.c_str(),400,-55.,55.0,400,-40.0,40.0); //max size
-	//targetXYHistoTitle.c_str(),400,-27.4895,27.4895,400,-12.9307,12.9307);  
+	  new TH2F(targetXYHistoName.c_str(),targetXYHistoTitle.c_str(),400,-35.0,35.0,400,-15.0,15.0);
+	//targetXYHistoTitle.c_str(),400,-55.,55.0,400,-40.0,40.0); //max size
+	//targetXYHistoTitle.c_str(),400,-10.375,10.375,400,-5.0389,5.0389);  // small limit from geometry
 
-    npolParticleKE[it->first] = new TH1F(
-	  npolHistoName.c_str(), npolHistoTitle.c_str(),nbins,bins);
+    npolParticleKE[it->first] = 
+	  new TH1F(npolHistoName.c_str(), npolHistoTitle.c_str(),nbins,bins);
     npolParticlePOS[it->first] = 
 	  new TH2F(npolXYHistoName.c_str(),npolXYHistoTitle.c_str(),400,-49.0, 49.0, 400, -30.0, 30.0);
+	//npolXYHistoTitle.c_str(),400,-47.303, 47.303, 400, -22.973, 22.973);
 
-    correlateKE[it->first] = new TH1F(
-     correlateHistoName.c_str(), correlateHistoTitle.c_str(),nbins,bins);
+    correlateKE[it->first] = 
+	  new TH1F(correlateHistoName.c_str(), correlateHistoTitle.c_str(),nbins,bins);
     correlatePOS[it->first] = 
-	  new TH2F(correlateXYHistoName.c_str(),correlateXYTitle.c_str(),400,-55.,55.0,400,-40.0,40.0); //max size
-	//correlateXYTitle.c_str(),400,-27.4895,27.4895,400,-12.9307,12.9307);
+	  new TH2F(correlateXYHistoName.c_str(),correlateXYTitle.c_str(),400,-35.0,35.0,400,-15.0,15.0);
+	//correlateXYTitle.c_str(),400,-55.,55.0,400,-40.0,40.0); //max size
+	//correlateXYTitle.c_str(),400,-10.375,10.375,400,-5.0389,5.0389);
 
 	targetTheta[it->first] = new TH1F(targetThetaName.c_str(),targetThetaTitle.c_str(),300,0.0,TMath::Pi());
 	targetPhi[it->first] = new TH1F(targetPhiName.c_str(),targetPhiTitle.c_str(),600,0.0,2*TMath::Pi());
@@ -216,8 +220,8 @@ void ProcessElectrons() {
 	  } */
 	
     // loop over all tagged particles (min. one step in NPOL tagger volume)
-	Double_t npolxMax = npolTaggerPos*tan(theta/2); 
-	Double_t npolyMax = npolTaggerPos*tan(phi/2);
+	Double_t npolxMax = 49.0; //npolTaggerPos*tan(theta/2); 
+	Double_t npolyMax = 30.0; //npolTaggerPos*tan(phi/2);
     std::vector<NpolTagger *>::iterator n_it;
     for(n_it = npolEntry->begin(); n_it != npolEntry->end(); n_it++){
       NpolTagger *npolTagged = *n_it;
@@ -227,7 +231,7 @@ void ProcessElectrons() {
 		continue;
 	  Double_t fluxscaling = 1;
 	  //if(vertexTrackIDs.find(npolTagged->trackId) != vertexTrackIDs.end()){
-	  //if((abs(npolTagged->lPosX) <= npolxMax) && (abs(npolTagged->lPosY) <= npolyMax)){
+	  if((abs(npolTagged->lPosX) <= npolxMax) && (abs(npolTagged->lPosY) <= npolyMax)){
 		(npolParticleKE[particleName])->
 		  Fill(npolTagged->energy,fluxscaling);
 		(npolParticlePOS[particleName])->
@@ -246,14 +250,14 @@ void ProcessElectrons() {
 		(npolTheta[particleName])->Fill(theta);
 		(npolPhi[particleName])->Fill(phi);
 		
-		//}
+		}
 	  npolTrackIDs.insert(npolTagged->trackId);
 	  //}
 	}
 	
     // loop over all tagged particles (min. one step in target tagger volume)
-	Double_t targetxMax = targetTaggerPos*tan(theta/2); 
-	Double_t targetyMax = targetTaggerPos*tan(phi/2);
+	Double_t targetxMax = 35.0; //targetTaggerPos*tan(theta/2); 
+	Double_t targetyMax = 15.0; //targetTaggerPos*tan(phi/2);
     std::vector<NpolTagger *>::iterator t_it;
     for(t_it = targetEntry->begin(); t_it != targetEntry->end(); t_it++){
       NpolTagger *targetTagged = *t_it;
@@ -263,7 +267,7 @@ void ProcessElectrons() {
 		continue;
 	  Double_t fluxscaling = 1;
 	  //if(vertexTrackIDs.find(targetTagged->trackId) != vertexTrackIDs.end()){
-	  //if((abs(targetTagged->lPosX) <= targetxMax) && (abs(targetTagged->lPosY) <= targetyMax)){
+	  if((abs(targetTagged->lPosX) <= targetxMax) && (abs(targetTagged->lPosY) <= targetyMax)){
 		(targetParticleKE[particleName])->
 		  Fill(targetTagged->energy,fluxscaling);
 		(targetParticlePOS[particleName])->
@@ -291,7 +295,7 @@ void ProcessElectrons() {
 		  (correlatePOS[particleName])->
 			Fill(targetTagged->lPosX,targetTagged->lPosY);
 		}
-		//}
+		}
 		//}
 	}
 	npolTrackIDs.clear();
