@@ -25,5 +25,5 @@ do
 
 	echo "Starting up Job Number $i."
     $BUILD_DIR/../analysis/NpolAnalysis 1>$HistoOutputDir/${NPOLBASENAME}_$i.out 2>$HistoOutputDir/${NPOLBASENAME}_$i.err &
-    sleep 5s
+    
 done
