@@ -111,7 +111,7 @@ void FrontTaggerCountRates() {
      sprintf(htitle,"#splitline{Energy Deposited}{Front Tagger %i, Layer %i}",pvNum+1, imprNum);
      hFrame->SetTitle(htitle);     
      // y axis range
-     hFrame->GetYaxis()->SetRangeUser(0.2,0.5e6);
+     hFrame->GetYaxis()->SetRangeUser(0.2,5e3);
      
      // Format for y axis
      hFrame->GetYaxis()->SetTitle("Events");
@@ -187,7 +187,7 @@ void FrontTaggerCountRates() {
      gr->GetYaxis()->SetTitleSize(16);
      gr->GetYaxis()->SetTitleOffset(5);
      gr->GetYaxis()->CenterTitle(); 
-     gr->GetYaxis()->SetRangeUser(0.000,0.06);
+     gr->GetYaxis()->SetRangeUser(0.000,0.08);
 
      // Clean up X axis
      gr->GetXaxis()->SetTitle("Threshold Energy (MeV)");

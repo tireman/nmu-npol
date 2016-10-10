@@ -114,7 +114,7 @@ void SimulationFigures() {
   plotSettings.Ranges.insert(std::pair<std::string, Double_t>("xLow",1e-1)); 
   plotSettings.Ranges.insert(std::pair<std::string, Double_t>("xHigh",1e4));
   plotSettings.Ranges.insert(std::pair<std::string, Double_t>("yLow",2e-15)); 
-  plotSettings.Ranges.insert(std::pair<std::string, Double_t>("yHigh",4e-10));
+  plotSettings.Ranges.insert(std::pair<std::string, Double_t>("yHigh",8e-8));
   plotSettings.Ranges.insert(std::pair<std::string, Double_t>("zLow",0.0)); 
   plotSettings.Ranges.insert(std::pair<std::string, Double_t>("zHigh",1000.0));
   
@@ -140,7 +140,7 @@ void SimulationFigures() {
   plotSettings.Ranges.insert(std::pair<std::string, Double_t>("xLow",1e-1)); 
   plotSettings.Ranges.insert(std::pair<std::string, Double_t>("xHigh",1e4));
   plotSettings.Ranges.insert(std::pair<std::string, Double_t>("yLow",2e-15)); 
-  plotSettings.Ranges.insert(std::pair<std::string, Double_t>("yHigh",4e-10));
+  plotSettings.Ranges.insert(std::pair<std::string, Double_t>("yHigh",8e-8));
   plotSettings.Ranges.insert(std::pair<std::string, Double_t>("zLow",0.0)); 
   plotSettings.Ranges.insert(std::pair<std::string, Double_t>("zHigh",1000.0));
  
@@ -301,6 +301,7 @@ void FillCanvas(TCanvas *C, Double_t scaleFactor, TFile *inFile, std::string his
   if((*plotSettings.plotFlags.find("zAxis")).second) pad[i][j]->SetLogy();
   pad[i][j]->SetFillStyle(4000);
   pad[i][j]->SetFrameFillStyle(4000);
+  pad[i][j]->SetGrid(1,1);
   pad[i][j]->cd();
   // Size factors
   Float_t xFactor = pad[0][0]->GetAbsWNDC()/pad[i][j]->GetAbsWNDC();
@@ -345,7 +346,7 @@ void FillCanvas(TCanvas *C, Double_t scaleFactor, TFile *inFile, std::string his
   hFrame->GetYaxis()->SetTitleFont(43);
   hFrame->GetYaxis()->SetTitleSize(16);
   hFrame->GetYaxis()->SetTitleOffset(5);
-  
+  //hFrame->SetGridY();
   hFrame->GetYaxis()->CenterTitle();
   hFrame->GetYaxis()->SetNdivisions(505);
   
@@ -360,6 +361,7 @@ void FillCanvas(TCanvas *C, Double_t scaleFactor, TFile *inFile, std::string his
   hFrame->GetXaxis()->SetTitleFont(43);
   hFrame->GetXaxis()->SetTitleSize(16);
   hFrame->GetXaxis()->SetTitleOffset(5);
+  
   hFrame->GetXaxis()->CenterTitle();
   hFrame->GetXaxis()->SetNdivisions(505);
   

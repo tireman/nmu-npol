@@ -110,7 +110,7 @@ void FrontDetectorCountRates() {
      sprintf(htitle,"#splitline{Energy Deposited}{Front Detector %i, Layer %i}",pvNum+1, imprNum);
      hFrame->SetTitle(htitle);     
      // y axis range
-     hFrame->GetYaxis()->SetRangeUser(0.2,5.0e4);
+     hFrame->GetYaxis()->SetRangeUser(0.2,5.0e3);
      
      // Format for y axis
      hFrame->GetYaxis()->SetTitle("Events");
@@ -186,7 +186,7 @@ void FrontDetectorCountRates() {
      gr->GetYaxis()->SetTitleSize(16);
      gr->GetYaxis()->SetTitleOffset(5);
      gr->GetYaxis()->CenterTitle(); 
-     gr->GetYaxis()->SetRangeUser(0.0,0.24);
+     gr->GetYaxis()->SetRangeUser(0.0,0.20);
 
      // Clean up X axis
      gr->GetXaxis()->SetTitle("Threshold Energy (MeV)");
