@@ -4,9 +4,9 @@ foreach i (`seq $1 1 $2`)
 
 cat > jsubfile_$i << EOF1
 PROJECT: cgen
-TRACK : debug
+TRACK : simulation
 OS : centos65
-JOBNAME : CGEN-Lead15cm_11GeV_4Bdl_$i
+JOBNAME : Neutron-NPOL-4.4GeV-4Bdl_$i
 MAIL: tireman@jlab.org
 TIME: 2000
 MEMORY: 1700 MB
