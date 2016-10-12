@@ -50,8 +50,8 @@ void ProcessElectrons() {
 
   Double_t NpolAng = 0.488692; // radians (28 degrees)
 
-  //npolTree->SetCacheSize(50000000);
-  //statsTree->SetCacheSize(50000000);
+  npolTree->SetCacheSize(10000000);
+  statsTree->SetCacheSize(10000000);
   
   RetrieveENVvariables();
 
@@ -223,8 +223,8 @@ void ProcessElectrons() {
 	  } */
 	
     // loop over all tagged particles (min. one step in NPOL tagger volume)
-	Double_t npolxMax = npolTaggerPos*tan(theta/2); // 49.0;
-	Double_t npolyMax = npolTaggerPos*tan(phi/2); // 30.0;
+	Double_t npolxMax = 49.0; //npolTaggerPos*tan(theta/2); // 49.0;
+	Double_t npolyMax = 30.0; //npolTaggerPos*tan(phi/2); // 30.0;
     std::vector<NpolTagger *>::iterator n_it;
     for(n_it = npolEntry->begin(); n_it != npolEntry->end(); n_it++){
       NpolTagger *npolTagged = *n_it;
@@ -259,8 +259,8 @@ void ProcessElectrons() {
 	}
 	
     // loop over all tagged particles (min. one step in target tagger volume)
-	Double_t targetxMax = 28.0; //targetTaggerPos*tan(theta/2); // 35.0;  
-	Double_t targetyMax = 10.5; //targetTaggerPos*tan(phi/2); // 15.0;
+	Double_t targetxMax = 28.0; //targetTaggerPos*tan(theta/2); 
+	Double_t targetyMax = 10.5; //targetTaggerPos*tan(phi/2); 
     std::vector<NpolTagger *>::iterator t_it;
     for(t_it = targetEntry->begin(); t_it != targetEntry->end(); t_it++){
       NpolTagger *targetTagged = *t_it;
@@ -517,14 +517,14 @@ double *AntilogBins(const int nbins, const double xmin, const double xmax) {
 
 TString FormInputFile(TString InputDir){
   
-  TString fileName = InputDir + "/" + BaseName + "_" + "Lead" + Lead + "cm_" + Energy + "GeV_" + Bfield + "Bdl_" + JobNum + ".root";
+  TString fileName = InputDir + "/" + BaseName + "_" /*+ "Lead" + Lead + "cm_" + Energy + "GeV_" + Bfield + "Bdl_"*/ + JobNum + ".root";
   
   return fileName;
 }
 
 TString FormOutputFile(TString OutputDir){
   
-  TString fileName =  OutputDir + "/" + BaseName + "_" + Energy + "GeV_Lead" + Lead + "cm_" + Bfield + "Bdl_Histos_" + JobNum + ".root";
+  TString fileName =  OutputDir + "/" + BaseName + "_" /*+ Energy + "GeV_Lead" + Lead + "cm_" + Bfield + "Bdl_"*/ + "Histos_" + JobNum + ".root";
   
   return fileName;
 }

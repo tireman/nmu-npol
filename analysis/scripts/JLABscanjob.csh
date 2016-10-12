@@ -8,17 +8,16 @@ TRACK : simulation
 OS : centos65
 JOBNAME : SCAN-Electron_4.4GeV_4Bdl_15cm_$i
 MAIL: tireman@jlab.org
-TIME: 90
+TIME: 180
 MEMORY: 1200 MB
 COMMAND : source JLABscanRunCommands.csh $i
-OTHER_FILES : /u/home/tireman/simulation/e11_12_009/background/nmu-npol/build/simulation/scripts/JLABscanRunCommands.csh
+OTHER_FILES : /u/home/tireman/simulation/e11_12_009/background/nmu-npol/build/analysis/scripts/JLABscanRunCommands.csh
 EOF1
 end
 
 foreach j (`seq $1 1 $2`)
 
 	jsub jsubscan_$j
-	sleep 1s
 	rm jsubscan_$j
 end
 
