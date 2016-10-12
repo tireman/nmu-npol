@@ -1,33 +1,31 @@
 #!/bin/tsch
 
-setenv Lead 15
-setenv Energy 4.4
-setenv Bfield 4
-setenv ANALYSIS_DIR /u/home/tireman/simulation/e11_12_009/background/nmu-npol/analysis
-setenv INPUT_DIR /volatile/hallc/cgen/tireman/$Energy\GeV/MagField_$Bfield\Bdl/Lead$Lead\cm
-setenv OUTPUT_DIR /volatile/hallc/cgen/tireman/$Energy\GeV/MagField_$Bfield\Bdl/Lead$Lead\cm
-setenv DATA_DIR /volatile/hallc/cgen/tireman/$Energy\GeV/MagField_$Bfield\Bdl/Lead$Lead\cm 
+setenv BUILD_DIR /home/tireman/simulation/e11_12_009/background/nmu-npol/build/simulation
+setenv INPUT_DIR /volatile/hallc/cgen/tireman/4.4GeV/MagField_4Bdl/Lead0cm
+setenv OUTPUT_DIR /volatile/hallc/cgen/tireman/4.4GeV/MagField_4Bdl/Lead0cm
+setenv DATA_DIR /volatile/hallc/cgen/tireman/4.4GeV/MagField_4Bdl/Lead0cm 
 
-cp $ANALYSIS_DIR/../build/npollib/libNpolClasses.so .
-cp $ANALYSIS_DIR/../build/npollib/NpolClassDict_rdict.pcm .
-cp $ANALYSIS_DIR/../npollib/include/NpolStatistics.hh .
-cp $ANALYSIS_DIR/../npollib/include/NpolTagger.hh . 
-cp $ANALYSIS_DIR/../npollib/include/NpolVertex.hh .
-cp $ANALYSIS_DIR/../npollib/include/NpolStep.hh .
+cp -R $BUILD_DIR/gdml .
+cp -R $BUILD_DIR/macros .
+cp -R $BUILD_DIR/../../simulation/include .
+cp -R $BUILD_DIR/../../npollib/include/*.hh .
+cp $BUILD_DIR/../npollib/libNpolClasses.so .
+cp $BUILD_DIR/../../simulation/include/*.hh .
 
-source $ANALYSIS_DIR/envscripts/JLABsetupAnalysis.csh
 source /site/12gev_phys/production.csh
 use root/6.06.02
+source $BUILD_DIR/../../analysis/envscripts/JLABsetupAnalysis2.csh
 
-@ NUM1 = ( $1 - 1 ) * 50 + 1
-@ NUM2 = $1 * 50
+@ NUM1 = ( $1 - 1 ) * 25 + 1
+@ NUM2 = $1 * 25
 
 foreach j (`seq $NUM1 1 $NUM2`)
   
   setenv JOBNUMBER $j
 
      echo "    Processing Job Number $j"
-     root -b -q $ANALYSIS_DIR/scripts/ProcessElectrons.cxx+
+	 root -b -q $BUILD_DIR/analysis/scripts/ProcessElectrons.cxx+
+ 	 #$BUILD_DIR/build/analysis/NpolAnalysis
 
   echo "Done processing job $j"
 
