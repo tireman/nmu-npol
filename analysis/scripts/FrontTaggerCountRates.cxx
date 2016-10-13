@@ -327,14 +327,14 @@ int GetPlacementNumber(const std::string &volName) {
 
 TString FormInputFile(TString InputDir){
   
-  TString fileName = InputDir + "/histos/" + BaseName /*+ "_" + Energy + "GeV_" +"Lead" + Lead + "cm_" +  Bfield + "Bdl*/ + "_Histos.root";
+  TString fileName = InputDir + "/histos/" + BaseName + "_Histos.root";
   
   return fileName;
 }
 
 TString FormOutputFile(TString OutputDir){
   
-  TString fileName =  OutputDir + "/Plots/" + BaseName /*+ Energy + "GeV_Lead" + Lead + "cm_" + Bfield + "Bdl*/ + "_FrontTaggerRates.root";
+  TString fileName =  OutputDir + "/Plots/" + BaseName + "_FrontTaggerRates.root";
   
   return fileName;
 }
