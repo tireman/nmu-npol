@@ -213,14 +213,14 @@ void MergeRootObjects( TDirectory *TargetFile, TFile *InFile ){
 
 TString FormInputFile(TString InputDir){
   
-  TString fileName = InputDir + "/" + BaseName + "_" + "Lead" + Lead + "cm_" + Energy + "GeV_" + Bfield + "Bdl_" + JobNum + ".root";
+  TString fileName = InputDir + "/" + BaseName + "_" + JobNum + ".root";
   
   return fileName;
 }
 
 TString FormOutputFile(TString OutputDir){
   
-  TString fileName =  OutputDir + "/" + BaseName + "_" + Energy + "GeV_Lead" + Lead + "cm_" + Bfield + "Bdl_Histos.root";
+  TString fileName =  OutputDir + "/" + BaseName + "_Histos.root";
   
   return fileName;
 }

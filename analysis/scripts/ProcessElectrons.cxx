@@ -147,9 +147,10 @@ void ProcessElectrons() {
     targetParticleKE[it->first] = 
 	  new TH1F(targetHistoName.c_str(), targetHistoTitle.c_str(),nbins,bins);
     targetParticlePOS[it->first] = 
-	  new TH2F(targetXYHistoName.c_str(),targetXYHistoTitle.c_str(),400, -28.0,+28.0,400,-10.5,+10.5);
+	  new TH2F(targetXYHistoName.c_str(),targetXYHistoTitle.c_str(),400,-35.0,35.0,400,-15.0,15.0); // max size of target tagger
+			   //,400, -28.0,+28.0,400,-10.5,+10.5); // minimum tagger size for bias runs
 
-			   //,400,-35.0,35.0,400,-15.0,15.0);
+			   //,400,-35.0,35.0,400,-15.0,15.0); // max size of target tagger
 	//targetXYHistoTitle.c_str(),400,-55.,55.0,400,-40.0,40.0); //max size
 	//targetXYHistoTitle.c_str(),400,-10.375,10.375,400,-5.0389,5.0389);  // small limit from geometry
 
@@ -162,10 +163,11 @@ void ProcessElectrons() {
     correlateKE[it->first] = 
 	  new TH1F(correlateHistoName.c_str(), correlateHistoTitle.c_str(),nbins,bins);
     correlatePOS[it->first] = 
-	  new TH2F(correlateXYHistoName.c_str(),correlateXYTitle.c_str(),400, -28.0,+28.0,400,-10.5,+10.5);
-	//400,-35.0,35.0,400,-15.0,15.0);
+	  new TH2F(correlateXYHistoName.c_str(),correlateXYTitle.c_str(),400,-35.0,35.0,400,-15.0,15.0); // max size of target tagger
+			   //,400, -28.0,+28.0,400,-10.5,+10.5); // minimum tagger size for bias runs
+	//400,-35.0,35.0,400,-15.0,15.0); // max size of target tagger
 	//correlateXYTitle.c_str(),400,-55.,55.0,400,-40.0,40.0); //max size
-	//correlateXYTitle.c_str(),400,-10.375,10.375,400,-5.0389,5.0389);
+	//correlateXYTitle.c_str(),400,-10.375,10.375,400,-5.0389,5.0389); // small limit from geometry
 
 	targetTheta[it->first] = new TH1F(targetThetaName.c_str(),targetThetaTitle.c_str(),300,0.0,TMath::Pi());
 	targetPhi[it->first] = new TH1F(targetPhiName.c_str(),targetPhiTitle.c_str(),600,0.0,2*TMath::Pi());
@@ -259,8 +261,8 @@ void ProcessElectrons() {
 	}
 	
     // loop over all tagged particles (min. one step in target tagger volume)
-	Double_t targetxMax = 28.0; //targetTaggerPos*tan(theta/2); 
-	Double_t targetyMax = 10.5; //targetTaggerPos*tan(phi/2); 
+	Double_t targetxMax = 35.0; //targetTaggerPos*tan(theta/2); 
+	Double_t targetyMax = 15.0; //targetTaggerPos*tan(phi/2); 
     std::vector<NpolTagger *>::iterator t_it;
     for(t_it = targetEntry->begin(); t_it != targetEntry->end(); t_it++){
       NpolTagger *targetTagged = *t_it;
@@ -517,14 +519,14 @@ double *AntilogBins(const int nbins, const double xmin, const double xmax) {
 
 TString FormInputFile(TString InputDir){
   
-  TString fileName = InputDir + "/" + BaseName + "_" /*+ "Lead" + Lead + "cm_" + Energy + "GeV_" + Bfield + "Bdl_"*/ + JobNum + ".root";
+  TString fileName = InputDir + "/" + BaseName + "_" + JobNum + ".root";
   
   return fileName;
 }
 
 TString FormOutputFile(TString OutputDir){
   
-  TString fileName =  OutputDir + "/" + BaseName + "_" /*+ Energy + "GeV_Lead" + Lead + "cm_" + Bfield + "Bdl_"*/ + "Histos_" + JobNum + ".root";
+  TString fileName =  OutputDir + "/" + BaseName + "_Histos_" + JobNum + ".root";
   
   return fileName;
 }

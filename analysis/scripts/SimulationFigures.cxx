@@ -379,7 +379,7 @@ void FillCanvas(TCanvas *C, Double_t scaleFactor, TFile *inFile, std::string his
 
 TString FormInputFile(TString InputDir){
   
-  TString fileName = InputDir + "/" + BaseName + "_" + Energy + "GeV_" + "Lead" + Lead + "cm_" + Bfield + "Bdl_Histos.root";
+  TString fileName = InputDir + "/histos/" + BaseName + "_Histos.root";
 
   return fileName;
   
@@ -387,7 +387,7 @@ TString FormInputFile(TString InputDir){
 
 TString FormOutputFile(TString OutputDir){
   
-  TString fileName =  OutputDir + "/" + BaseName + Energy + "GeV_Lead" + Lead + "cm_" + Bfield + "Bdl_Fig21-23.root";
+  TString fileName =  OutputDir + "/Plots/" + BaseName + "_Fig21-23.root";
   
   return fileName;
 }
