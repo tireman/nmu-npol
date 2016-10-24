@@ -20,7 +20,7 @@
 /tracking/storeTrajectory 1
 
 # Particle type  !!! Must be chosen by the user !!!!
-/gps/particle e-
+/gps/particle pi-
 
 ################################################################
 # Particle source:  The particle source will generally be a plane
@@ -52,12 +52,12 @@
 
 ###### Biasing the (x,y) distribution ######
 /gps/hist/type biasx
-/control/execute macros/particleFluxData/4.4GeV/targetX_e-.dat
-#/control/execute macros/particleFluxData/4.4GeV/npolX_e-.dat
+/control/execute macros/particleFluxData/4.4GeV/targetX_pi-.dat
+#/control/execute macros/particleFluxData/4.4GeV/npolX_pi-.dat
 
 /gps/hist/type biasy
-/control/execute macros/particleFluxData/4.4GeV/targetY_e-.dat
-#/control/execute macros/particleFluxData/4.4GeV/npolY_e-.dat
+/control/execute macros/particleFluxData/4.4GeV/targetY_pi-.dat
+#/control/execute macros/particleFluxData/4.4GeV/npolY_pi-.dat
 
 ###### Angular distribution biasing ######
 /gps/ang/type iso						# isotropic source
@@ -68,24 +68,24 @@
 
 ###### Biasing theta ######
 /gps/hist/type biast					# bias theta
-/control/execute macros/particleFluxData/4.4GeV/targetTheta_e-.dat
-#/control/execute macros/particleFluxData/4.4GeV/npolTheta_e-.dat
+/control/execute macros/particleFluxData/4.4GeV/targetTheta_pi-.dat
+#/control/execute macros/particleFluxData/4.4GeV/npolTheta_pi-.dat
 
 ###### Biasing phi ######
 /gps/hist/type biasp					# bias phi
-/control/execute macros/particleFluxData/4.4GeV/targetPhi_e-.dat
-#/control/execute macros/particleFluxData/4.4GeV/npolPhi_e-.dat	
+/control/execute macros/particleFluxData/4.4GeV/targetPhi_pi-.dat
+#/control/execute macros/particleFluxData/4.4GeV/npolPhi_pi-.dat	
 
 ###### Loads the energy distribution from user supplied data. ######
 /gps/ene/type User
 /gps/hist/type energy
-/control/execute macros/particleFluxData/4.4GeV/targetEnergy_e-.dat
-#/control/execute macros/particleFluxData/4.4GeV/npolEnergy_e-.dat
+/control/execute macros/particleFluxData/4.4GeV/targetEnergy_pi-.dat
+#/control/execute macros/particleFluxData/4.4GeV/npolEnergy_pi-.dat
 
 ###### Commands below are independent of GPS ######
 /vis/scene/endOfEventAction accumulate 100
 /run/printProgress 10000
 
-/run/beamOn 7255700
+/run/beamOn 16248
 
 

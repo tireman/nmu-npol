@@ -54,7 +54,7 @@ void FrontTaggerCountRates() {
   // effective electron time on target per micro amp of beam
 
   TVectorD *v = (TVectorD*)inFile->Get("TVectorT<double>");
-  Double_t totalElectrons = ((*v))[0];
+  Double_t totalElectrons = 3.49967e10; //((*v))[0];
   Double_t electronTime = totalElectrons/(6.242e12); //6.242e12 e-/s at 1 microAmp
   //Double_t fluxscaling = 1/(totalElectrons*1.602e-13*(98*60));
   std::cout << "Electron beam time at 1 micro-amp is " << electronTime << " s " << std::endl;
@@ -108,7 +108,7 @@ void FrontTaggerCountRates() {
      imprNum = GetImprNumber(hname);
      pvNum = GetPlacementNumber(hname);
      char htitle[80];
-     sprintf(htitle,"#splitline{Energy Deposited}{Front Tagger %i, Layer %i}",pvNum+1, imprNum);
+     sprintf(htitle,"#splitline{Energy Deposited}{Front Veto %i, Layer %i}",pvNum+1, imprNum);
      hFrame->SetTitle(htitle);     
      // y axis range
      hFrame->GetYaxis()->SetRangeUser(0.2,5e3);
@@ -175,7 +175,7 @@ void FrontTaggerCountRates() {
      TGraph *gr = new TGraph(nThresh,x,y); 
      // Set Good Graph Title
      char gtitle[80];
-     sprintf(gtitle,"#splitline{Count Rate VS. Threshold}{Front Tagger %i, Layer %i}",pvNum+1, imprNum);
+     sprintf(gtitle,"#splitline{Count Rate VS. Threshold}{Front Veto %i, Layer %i}",pvNum+1, imprNum);
      gr->SetTitle(gtitle);   
 
      // Clean up Y axis
@@ -187,7 +187,7 @@ void FrontTaggerCountRates() {
      gr->GetYaxis()->SetTitleSize(16);
      gr->GetYaxis()->SetTitleOffset(5);
      gr->GetYaxis()->CenterTitle(); 
-     gr->GetYaxis()->SetRangeUser(0.000,0.08);
+     gr->GetYaxis()->SetRangeUser(0.000,.08);
 
      // Clean up X axis
      gr->GetXaxis()->SetTitle("Threshold Energy (MeV)");

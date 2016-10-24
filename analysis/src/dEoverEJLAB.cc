@@ -401,7 +401,10 @@ int main(int argc, char *argv[]) {
 
 	TChain *npolTree = new TChain("T");
 	TChain *statsTree = new TChain("T2");
-//	npolTree->Add("/data2/cgen/NMUSimData/NeutronOnly/2.1GeV/root/neutron_2.1GeV_*.root");
+
+	npolTree->SetCacheSize(500000000);
+	statsTree->SetCacheSize(500000000);
+
 	npolTree->Add(inFilename);
 	statsTree->Add(inFilename);
 
@@ -429,7 +432,7 @@ int main(int argc, char *argv[]) {
 	  title = title + std::to_string(i + 1);
 	  std::string name = "sectionEfficiencyLocalPosition";
 	  name = name + std::to_string(i + 1);
-	  h_sectionEfficiencyLocalPositions[i] = new TH1F(name.c_str(), title.c_str(),200, -5.0, 5.0);
+	  h_sectionEfficiencyLocalPositions[i] = new TH1F(name.c_str(), title.c_str(),200, -7.5, 7.5);
 	}
 	
 	// BEGIN STATS LOOP
@@ -468,10 +471,10 @@ int main(int argc, char *argv[]) {
 	  // END VERTICES LOOP - 
 	  // !elasticFlag is false (eventsFailed -> inelastic) file -> Elastic
 	  // elasticFlag is true (eventsFailed -> elastic) file -> Inelastic
-	  //if(!elasticFlag) {
-	  // eventsFailed++;
-	  //  continue;
-	  //} 
+	  if(elasticFlag) {
+		eventsFailed++;
+		continue;
+	  } 
 	  
 	  
 	  /*for(v_it = verts->begin(); v_it != verts->end(); v_it++) { // BEGIN VERTICES LOOP

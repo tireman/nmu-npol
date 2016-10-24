@@ -5,24 +5,23 @@ export Energy=4.4
 export Bfield=4
 export BUILD_DIR=/home/tireman/simulation/jlab/npol/nmu-npol/build/simulation
 export NPOLLIB_DIR=/home/tireman/simulation/jlab/npol/nmu-npol/build/npollib
-export NPOLBASENAME=sourceTotal
+export NPOLBASENAME=sourceNeutron_Lead$Lead\cm_$Energy\GeV_$Bfield\Bdl
 
-#sourceNeutron_Lead$Lead\cm_$Energy\GeV_$Bfield\Bdl 
-export NPOLDIR=/data2/cgen/JlabSimData/Summer2016Run/TargetTaggerSource/4.4GeV/4Bdl
+#export NPOLDIR=/data2/cgen/JlabSimData/Summer2016Run/FullGeometry/4.4GeV/4Bdl
+#export NPOLDIR=/data2/cgen/JlabSimData/Summer2016Run/TargetTaggerSource/4.4GeV/$Bfield\Bdl/SmallTargetTagger
+export NPOLDIR=/data2/cgen/NeutronOnly/RealisticSource/15cmThickScint
 
-#export NPOLDIR=/data2/cgen/JlabSimData/Summer2016Run/FullGeometry/4.4GeV/JustBigEnough
+#export NPOLWORKDIR=/data2/cgen/JlabSimData/Summer2016Run/FullGeometry/4.4GeV/4Bdl
+#export NPOLWORKDIR=/data2/cgen/JlabSimData/Summer2016Run/TargetTaggerSource/4.4GeV/$Bfield\Bdl/SmallTargetTagger
+export NPOLWORKDIR=/data2/cgen/NeutronOnly/RealisticSource/15cmThickScint/Inelastic
 
-export NPOLWORKDIR=/data2/cgen/JlabSimData/Summer2016Run/TargetTaggerSource/4.4GeV/4Bdl
-
-#export NPOLWORKDIR=/data2/cgen/JlabSimData/Summer2016Run/FullGeometry/4.4GeV/JustBigEnough
-
-export OutputDir=$NPOLDIR/histos
+export OutputDir=$NPOLDIR/Output
 export InputDir=$NPOLDIR/root
-export WorkOutputDir=$NPOLWORKDIR/Plots
-export WorkInputDir=$NPOLWORKDIR/histos
+export WorkOutputDir=$NPOLWORKDIR
+export WorkInputDir=$NPOLWORKDIR
 export RawDataDir=$NPOLDIR/root
-export HistoOutputDir=$NPOLDIR/histos
-export HistoInputDir=$NPOLDIR/histos
+export HistoOutputDir=$NPOLWORKDIR/histos
+export HistoInputDir=$NPOLWORKDIR/histos
 
 if [ ! -e $NPOLDIR ]
 then
