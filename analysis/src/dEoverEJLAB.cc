@@ -401,7 +401,10 @@ int main(int argc, char *argv[]) {
 
 	TChain *npolTree = new TChain("T");
 	TChain *statsTree = new TChain("T2");
-//	npolTree->Add("/data2/cgen/NMUSimData/NeutronOnly/2.1GeV/root/neutron_2.1GeV_*.root");
+
+	npolTree->SetCacheSize(500000000);
+	statsTree->SetCacheSize(500000000);
+
 	npolTree->Add(inFilename);
 	statsTree->Add(inFilename);
 
