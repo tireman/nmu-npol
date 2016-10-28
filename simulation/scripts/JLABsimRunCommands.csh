@@ -1,11 +1,7 @@
 #!/bin/tsch
 
-setenv Lead 15
-setenv Energy 4.4
-setenv Bfield 4
 setenv BUILD_DIR /home/tireman/simulation/e11_12_009/background/nmu-npol/build/simulation
-setenv NPOLDIR /volatile/hallc/cgen/tireman/Summer2016Run/TargetTaggerSource/NeutronSource/4.4GeV/4Bdl/test
-setenv NPOLBASENAME sourceNeutron_Lead$Lead\cm_$Energy\GeV_$Bfield\Bdl
+source $BUILD_DIR/../../simulation/scripts/JLABsetupRun.csh
 
 setenv JOBNUMBER $1
 
@@ -17,6 +13,7 @@ cp $BUILD_DIR/../npollib/libNpolClasses.so .
 cp $BUILD_DIR/../../simulation/include/*.hh .
 
 source /site/12gev_phys/production.csh 
+use root/6.06.02
 
 if ( ! -e $NPOLDIR/root ) then
 	mkdir $NPOLDIR/root
@@ -30,5 +27,7 @@ hadd -f -k $NPOLDIR/root/$NPOLBASENAME\_$1.root $NPOLDIR/root/$NPOLBASENAME\_$1\
 
 rm $NPOLDIR/root/$NPOLBASENAME\_$1\_*.root
 
-source $BUILD_DIR/../../analysis/envscripts/JLABsetupAnalysis.csh
-$BUILD_DIR/build/analysis/NpolAnalysis
+#$BUILD_DIR/../analysis/NpolAnalysis
+#root -b -q $BUILD_DIR/../../analysis/scripts/ProcessElectrons.cxx+
+
+#rm $NPOLDIR/root/$NPOLBASENAME\_$1.root

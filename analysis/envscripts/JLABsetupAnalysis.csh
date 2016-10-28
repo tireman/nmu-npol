@@ -1,7 +1,7 @@
 #!/bin/tsch
 
 setenv Lead 15
-setenv Energy 4.4
+setenv Energy 11
 setenv Bfield 4
 
 setenv NPOLLIB_DIR $BUILD_DIR/../npollib

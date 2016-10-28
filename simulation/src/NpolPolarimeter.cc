@@ -189,7 +189,7 @@ void NpolPolarimeter::ConstructFrontDetArray(G4LogicalVolume *motherLV) {
   G4ThreeVector Tm;
   G4Transform3D Tr;
   
-  G4VSolid *FrontDet = new G4Box("FrontDet",0.50*m,0.0508*m, /*0.0750*m*/ 0.0508*m /*0.0254*m*/);
+  G4VSolid *FrontDet = new G4Box("FrontDet",0.50*m,0.0508*m,/* 0.0750*m*/ 0.0508*m /*0.0254*m*/);
   G4LogicalVolume *FrontDetLV = new G4LogicalVolume(FrontDet,
 	NpolMaterials::GetInstance()->GetMaterial("Scint"), "FrontDetLV",0,0,0);
   

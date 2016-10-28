@@ -13,8 +13,8 @@ cp $BUILD_DIR/../../simulation/include/*.hh .
 source /site/12gev_phys/production.csh
 use root/6.06.02
 
-@ NUM1 = ( $1 - 1 ) * 25 + 1
-@ NUM2 = $1 * 25
+@ NUM1 = ( $1 - 1 ) * 1 + 1
+@ NUM2 = $1 * 1
 
 foreach j (`seq $NUM1 1 $NUM2`)
   

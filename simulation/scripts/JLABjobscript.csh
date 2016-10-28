@@ -8,8 +8,8 @@ TRACK : simulation
 OS : centos65
 JOBNAME : Neutron-NPOL-4.4GeV-4Bdl_$i
 MAIL: tireman@jlab.org
-TIME: 2000
-MEMORY: 1700 MB
+TIME: 90
+MEMORY: 1800 MB
 COMMAND : source JLABsimRunCommands.csh $i
 OTHER_FILES : /u/home/tireman/simulation/e11_12_009/background/nmu-npol/build/simulation/scripts/JLABsimRunCommands.csh
 EOF1
