@@ -382,14 +382,14 @@ int main(int argc, char *argv[]) {
   }
   
   std::string HistoDIR;
-  if(getenv("HistoOutputDir")){
-	HistoDIR = getenv("HistoOutputDir");
+  if(getenv("OutputDir")){
+	HistoDIR = getenv("OutputDir");
   }else{
 	HistoDIR = "output";
   }
   
   TString inFilename = InputDir + "/" + BaseName + "_" + JobNum + ".root";
-  TString outFilename = HistoDIR + "/" + BaseName + "_HistoCuts_" + JobNum + ".root";
+  TString outFilename = HistoDIR + "/" + BaseName + "_NpolEff_" + JobNum + ".root";
 
   //TString inFilename ="/data1/cgen/NeutronOnly/RealisticSource/10cmScint/root/sourceNeutron_Lead15cm_4.4GeV_4Bdl_51.root";
   //TString outFilename ="/data1/cgen/NeutronOnly/RealisticSource/10cmScint/histos/output.root";
@@ -468,10 +468,10 @@ int main(int argc, char *argv[]) {
 	  // END VERTICES LOOP - 
 	  // !elasticFlag is false (eventsFailed -> inelastic) file -> Elastic
 	  // elasticFlag is true (eventsFailed -> elastic) file -> Inelastic
-	  //if(!elasticFlag) {
-	  // eventsFailed++;
-	  //  continue;
-	  //} 
+	  if(!elasticFlag) {
+		eventsFailed++;
+	    continue;
+	  } 
 	  
 	  
 	  /*for(v_it = verts->begin(); v_it != verts->end(); v_it++) { // BEGIN VERTICES LOOP

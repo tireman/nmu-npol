@@ -147,12 +147,11 @@ void ProcessElectrons() {
     targetParticleKE[it->first] = 
 	  new TH1F(targetHistoName.c_str(), targetHistoTitle.c_str(),nbins,bins);
     targetParticlePOS[it->first] = 
-	  new TH2F(targetXYHistoName.c_str(),targetXYHistoTitle.c_str(),400,-35.0,35.0,400,-15.0,15.0); // max size of target tagger
-			   //,400, -28.0,+28.0,400,-10.5,+10.5); // minimum tagger size for bias runs
-
-			   //,400,-35.0,35.0,400,-15.0,15.0); // max size of target tagger
-	//targetXYHistoTitle.c_str(),400,-55.,55.0,400,-40.0,40.0); //max size
-	//targetXYHistoTitle.c_str(),400,-10.375,10.375,400,-5.0389,5.0389);  // small limit from geometry
+	  new TH2F(targetXYHistoName.c_str(),targetXYHistoTitle.c_str(),400, -28.0,+28.0,400,-10.5,+10.5); // minimum tagger size for bias runs
+	//,400, -28.0,+28.0,400,-10.5,+10.5); // minimum tagger size for bias runs
+	//,400,-35.0,35.0,400,-15.0,15.0); // max size of target tagger
+	//,400,-55.,55.0,400,-40.0,40.0); //max size
+	//,400,-10.375,10.375,400,-5.0389,5.0389);  // small limit from geometry
 
     npolParticleKE[it->first] = 
 	  new TH1F(npolHistoName.c_str(), npolHistoTitle.c_str(),nbins,bins);
@@ -163,11 +162,11 @@ void ProcessElectrons() {
     correlateKE[it->first] = 
 	  new TH1F(correlateHistoName.c_str(), correlateHistoTitle.c_str(),nbins,bins);
     correlatePOS[it->first] = 
-	  new TH2F(correlateXYHistoName.c_str(),correlateXYTitle.c_str(),400,-35.0,35.0,400,-15.0,15.0); // max size of target tagger
-			   //,400, -28.0,+28.0,400,-10.5,+10.5); // minimum tagger size for bias runs
-	//400,-35.0,35.0,400,-15.0,15.0); // max size of target tagger
-	//correlateXYTitle.c_str(),400,-55.,55.0,400,-40.0,40.0); //max size
-	//correlateXYTitle.c_str(),400,-10.375,10.375,400,-5.0389,5.0389); // small limit from geometry
+	  new TH2F(correlateXYHistoName.c_str(),correlateXYTitle.c_str(),400, -28.0,+28.0,400,-10.5,+10.5); // minimum tagger size for bias runs
+	//,400, -28.0,+28.0,400,-10.5,+10.5); // minimum tagger size for bias runs
+	//,400,-35.0,35.0,400,-15.0,15.0); // max size of target tagger
+	//,400,-55.,55.0,400,-40.0,40.0); //max size
+	//,400,-10.375,10.375,400,-5.0389,5.0389); // small limit from geometry
 
 	targetTheta[it->first] = new TH1F(targetThetaName.c_str(),targetThetaTitle.c_str(),300,0.0,TMath::Pi());
 	targetPhi[it->first] = new TH1F(targetPhiName.c_str(),targetPhiTitle.c_str(),600,0.0,2*TMath::Pi());
@@ -225,8 +224,8 @@ void ProcessElectrons() {
 	  } */
 	
     // loop over all tagged particles (min. one step in NPOL tagger volume)
-	Double_t npolxMax = 49.0; //npolTaggerPos*tan(theta/2); // 49.0;
-	Double_t npolyMax = 30.0; //npolTaggerPos*tan(phi/2); // 30.0;
+	Double_t npolxMax = 28.0; //npolTaggerPos*tan(theta/2); acceptance limit // 49.0; max size // 28.0; bias run
+	Double_t npolyMax = 10.5; //npolTaggerPos*tan(phi/2); acceptance limit // 30.0; max size // 10.5; bias run
     std::vector<NpolTagger *>::iterator n_it;
     for(n_it = npolEntry->begin(); n_it != npolEntry->end(); n_it++){
       NpolTagger *npolTagged = *n_it;
@@ -261,8 +260,8 @@ void ProcessElectrons() {
 	}
 	
     // loop over all tagged particles (min. one step in target tagger volume)
-	Double_t targetxMax = 35.0; //targetTaggerPos*tan(theta/2); 
-	Double_t targetyMax = 15.0; //targetTaggerPos*tan(phi/2); 
+	Double_t targetxMax = 35.0; //targetTaggerPos*tan(theta/2); acceptance limit 
+	Double_t targetyMax = 15.0; //targetTaggerPos*tan(phi/2); acceptance limit
     std::vector<NpolTagger *>::iterator t_it;
     for(t_it = targetEntry->begin(); t_it != targetEntry->end(); t_it++){
       NpolTagger *targetTagged = *t_it;
