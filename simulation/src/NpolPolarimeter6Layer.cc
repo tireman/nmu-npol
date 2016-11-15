@@ -129,9 +129,9 @@ void NpolPolarimeter6Layer::ConstructTopVetoArray(G4LogicalVolume *motherLV) {
   G4AssemblyVolume *TopVetoArray1 = MakePlate(TopVetoLV, 13, 0.0*m, 0.0*m, 0.60*m, 0.0*m, 0.0*m, 0.10*m);
   G4AssemblyVolume *TopVetoArray2 = MakePlate(TopVetoLV, 14, 0.0*m, 0.0*m, 0.60*m, 0.0*m, 0.0*m, 0.10*m);
   
-  ImprintPlate(TopVetoArray1, motherLV, 0.0*m, 0.32*m, -2.16*m, 0.0*deg);
-  ImprintPlate(TopVetoArray1, motherLV, 0.0*m, 0.42*m, -0.86*m, 0.0*deg);
-  ImprintPlate(TopVetoArray2, motherLV, 0.0*m, 0.52*m, 0.56*m, 0.0*deg);
+  ImprintPlate(TopVetoArray1, motherLV, 0.0*m, 0.32*m, -2.115*m, 0.0*deg); // -2.13 cm
+  ImprintPlate(TopVetoArray1, motherLV, 0.0*m, 0.42*m, -0.815*m, 0.0*deg);  // -0.83 cm
+  ImprintPlate(TopVetoArray2, motherLV, 0.0*m, 0.52*m, 0.615*m, 0.0*deg);  // 0.59 cm
   
   G4VisAttributes* TopaVisAtt= new G4VisAttributes(G4Colour(0.0,1.0,1.0));
   TopVetoLV->SetVisAttributes(TopaVisAtt);
@@ -179,9 +179,9 @@ void NpolPolarimeter6Layer::ConstructBottomVetoArray(G4LogicalVolume *motherLV) 
   G4AssemblyVolume *BottomVetoArray2 = MakePlate(BottomVetoLV,
 	14, 0.0*m, 0.0*m, 0.60*m, 0.0*m, 0.0*m, 0.10*m);
 
-  ImprintPlate(BottomVetoArray1, motherLV, 0.0*m, -0.32*m, -2.16*m, 0.0*deg);
-  ImprintPlate(BottomVetoArray1, motherLV, 0.0*m, -0.42*m, -0.86*m, 0.0*deg);
-  ImprintPlate(BottomVetoArray2, motherLV, 0.0*m, -0.52*m, 0.56*m, 0.0*deg);
+  ImprintPlate(BottomVetoArray1, motherLV, 0.0*m, -0.32*m, -2.115*m, 0.0*deg); // -2.13 cm
+  ImprintPlate(BottomVetoArray1, motherLV, 0.0*m, -0.42*m, -0.815*m, 0.0*deg); // -0.83 cm
+  ImprintPlate(BottomVetoArray2, motherLV, 0.0*m, -0.52*m, 0.615*m, 0.0*deg);  // 0.59 cm
   
   G4VisAttributes* BotaVisAtt= new G4VisAttributes(G4Colour(0.0,1.0,1.0));
   BottomVetoLV->SetVisAttributes(BotaVisAtt);
@@ -192,7 +192,7 @@ void NpolPolarimeter6Layer::ConstructFrontDetArray(G4LogicalVolume *motherLV) {
   G4ThreeVector Tm;
   G4Transform3D Tr;
   
-  G4VSolid *FrontDet = new G4Box("FrontDet",0.50*m,0.0508*m,0.0750*m/*0.0508*m*/);
+  G4VSolid *FrontDet = new G4Box("FrontDet",0.50*m,0.0508*m,/*0.0750*m*/ /*0.0508*m*/ 0.0254*m);
   G4LogicalVolume *FrontDetLV = new G4LogicalVolume(FrontDet,
 	NpolMaterials::GetInstance()->GetMaterial("Scint"), "FrontDetLV",0,0,0);
   
@@ -236,11 +236,11 @@ void NpolPolarimeter6Layer::ConstructFrontTagArray(G4LogicalVolume *motherLV) {
   G4AssemblyVolume *FrontTaggerArray3 = MakePlate(FrontTagLV,10, 0.0*m, 0.45*m, 0.0*m, 0.0*m, 0.10*m, 0.0*m);
 
   for(unsigned int i=0; i<2; i++)
-    ImprintPlate(FrontTaggerArray1, motherLV, 0.0*m, 0.0*m,(-2.7942+0.65*i)*m, 0.0*deg); // 1.7692 for 10cm thick Front
+    ImprintPlate(FrontTaggerArray1, motherLV, 0.0*m, 0.0*m,(-2.7442+0.65*i)*m, 0.0*deg); // 1.7692 for 10cm thick Front
   for(unsigned int i=2; i<4; i++)
-    ImprintPlate(FrontTaggerArray2, motherLV, 0.0*m, 0.0*m,(-2.7942+0.65*i)*m, 0.0*deg);
+    ImprintPlate(FrontTaggerArray2, motherLV, 0.0*m, 0.0*m,(-2.7442+0.65*i)*m, 0.0*deg);
   for(unsigned int i=4; i<6; i++)
-    ImprintPlate(FrontTaggerArray3, motherLV, 0.0*m, 0.0*m,(-2.7942+0.65*i)*m, 0.0*deg);
+    ImprintPlate(FrontTaggerArray3, motherLV, 0.0*m, 0.0*m,(-2.7442+0.65*i)*m, 0.0*deg);
   
 
   G4VisAttributes* FrontTagVisAtt= new G4VisAttributes(G4Colour(1.0,1.0,1.0));
@@ -272,6 +272,6 @@ void NpolPolarimeter6Layer::ConstructBackTagArray(G4LogicalVolume *motherLV) {
 
 void NpolPolarimeter6Layer::Place(G4LogicalVolume *motherLV) {
   
-  PlaceCylindrical(PolarimeterLV,motherLV,"Polarimeter",9.7*m,/*-28.0*/0.0*deg,0.0*m);
+  PlaceCylindrical(PolarimeterLV,motherLV,"Polarimeter",9.7*m,-28.0*deg /*0.0*deg*/,0.0*m);
 }
 
