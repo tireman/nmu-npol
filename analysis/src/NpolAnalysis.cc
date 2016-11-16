@@ -1,8 +1,5 @@
-
-/* *************IMPORTANT DISCLAIMER*****************
-   THIS FILE HAS BEEN MODIFIED TO ACCOMIDATE THE FOUR LAYER POLARIMETER DESIGN
-   IF YOU WOULD LIKE TO USE THE DATA FOR THE SIX LAYER DESIGN, YOU MUST COPY THE SCRIPT FROM THE FILE "dEoverE_SixLayer" 
-   INTO THIS FILE
+/* Npol Analysis Script is designed to analyze the neutron flux on the NPOL polarimeter being designed by the CGEN 
+   collaboration at Jefferson National Laboratory.
 */
 
 #include <iostream>
@@ -31,6 +28,7 @@
 #include "NpolDetectorEvent.hh"
 
 #define EDEP_THRESHOLD 1.0 /*MeV*/
+#define LAYER_NUM 6        /* number of analyzer layers; not general; only good for 4 and 6 layers */
 
 enum PolarimeterDetector {
   analyzer = 0,
@@ -73,80 +71,128 @@ int GetPlacementNumber(const std::string &volName) {
     return -1;
 }
 
-// The NPOL polarimeter is divided into four sections.  This function takes a volume name and returns the section number that the detector belongs to, or 0 if the volume does not belong in the polarimeter.
+// The NPOL polarimeter is divided into 4 or 6 sections.  This function takes a volume name and returns the section number that the detector belongs to, or -1 if the volume does not belong in the polarimeter.
 int sectionNumber(const std::string &volName) {
   int avNum, imprNum, pvNum;
   if((avNum = GetAVNumber(volName)) == -1) return 0;
-  switch(avNum) {
-  case 1: // Top E array 1 & 2
-  case 5: // Bottom E array 1 & 2
-    pvNum = GetPlacementNumber(volName);
-    imprNum = GetImprNumber(volName);
-    if((imprNum == 1) || (imprNum == 2)){
-      if(pvNum <= 12 && pvNum >= 6) return 0;  // section 1
-      else if(pvNum <= 5 && pvNum >= 0) return 1;  // section 2
-    }else if((imprNum == 3) || (imprNum == 4)){
-       if(pvNum <= 12 && pvNum >= 6) return 2;  // section 3
-       else if(pvNum <= 5 && pvNum >= 0) return 3;  // section 4
-    }else{
+
+  if(LAYER_NUM == 4){
+    switch(avNum) {
+    case 1: // Top E array 1 
+    case 5: // Bottom E array 1
+    case 3: // Top dE array 1 
+    case 7: // Bottom dE array 1 
+      pvNum = GetPlacementNumber(volName);
+      if(pvNum <= 12 && pvNum >= 6) {return 0;}  // section 1
+      else if(pvNum <= 5 && pvNum >= 0) {return 1;}  // section 2
+      else {return -1;}
+    case 2: // Top E array 2
+    case 4: // Top dE array 2
+    case 6: // Bottom E array 2
+    case 8: // Bottom dE array 2
+      pvNum = GetPlacementNumber(volName);
+      if(pvNum <= 13 && pvNum >= 6) {return 2;}  // section 3
+      else if(pvNum <= 5 && pvNum >= 0) {return 3;}  // section 4
+      else {return -1;}
+    case 9: // Front array 1
+    case 11: // Front tag array 1
+      imprNum = GetImprNumber(volName);
+      if(imprNum == 1) return 0;  // section 1
+      else if(imprNum == 2) return 1;  // section 2
+      else return -1;
+    case 10: // Front array 2
+    case 12: // Front tag array 2
+      imprNum = GetImprNumber(volName);
+      if(imprNum == 1) return 2;  // section 3
+      else if(imprNum == 2) return 3;  // section 4
+      else return -1;
+    default:
       return -1;
     }
-  case 3: // Top dE array 1 & 2
-  case 7: // Bottom dE array 1 & 2
-    pvNum = GetPlacementNumber(volName);
-    imprNum = GetImprNumber(volName);
-    if(imprNum == 1){
-      if(pvNum <= 12 && pvNum >= 6) return 0;  // section 1
-      else if(pvNum <= 5 && pvNum >= 0) return 1;  // section 2
-    }else if(imprNum == 2){
-       if(pvNum <= 12 && pvNum >= 6) return 2;  // section 3
-       else if(pvNum <= 5 && pvNum >= 0) return 3;  // section 4
-    }else{
+  }else if(LAYER_NUM == 6){
+    switch(avNum) {
+    case 1: // Top E array 1 & 2
+    case 5: // Bottom E array 1 & 2
+      pvNum = GetPlacementNumber(volName);
+      imprNum = GetImprNumber(volName);
+      if((imprNum == 1) || (imprNum == 2)){
+	if(pvNum <= 12 && pvNum >= 6) return 0;  // section 1
+	else if(pvNum <= 5 && pvNum >= 0) return 1;  // section 2
+      }else if((imprNum == 3) || (imprNum == 4)){
+	if(pvNum <= 12 && pvNum >= 6) return 2;  // section 3
+	else if(pvNum <= 5 && pvNum >= 0) return 3;  // section 4
+      }else{
+	return -1;
+      }
+    case 3: // Top dE array 1 & 2
+    case 7: // Bottom dE array 1 & 2
+      pvNum = GetPlacementNumber(volName);
+      imprNum = GetImprNumber(volName);
+      if(imprNum == 1){
+	if(pvNum <= 12 && pvNum >= 6) return 0;  // section 1
+	else if(pvNum <= 5 && pvNum >= 0) return 1;  // section 2
+      }else if(imprNum == 2){
+	if(pvNum <= 12 && pvNum >= 6) return 2;  // section 3
+	else if(pvNum <= 5 && pvNum >= 0) return 3;  // section 4
+      }else{
+	return -1;
+      }
+    case 2: // Top E array 3
+    case 4: // Top dE array 3
+    case 6: // Bottom E array 3
+    case 8: // Bottom dE array 3
+      pvNum = GetPlacementNumber(volName);
+      if(pvNum <= 13 && pvNum >= 6) return 4;  // section 5
+      else if(pvNum <= 5 && pvNum >= 0) return 5;  // section 6
+      else return -1;
+    case 9: // Front array 1
+    case 12: // Front tag array 1
+      imprNum = GetImprNumber(volName);
+      if(imprNum == 1) return 0;  // section 1
+      else if(imprNum == 2) return 1;  // section 2
+      else return -1;
+    case 10: // Front array 2
+    case 13: // Front tag array 2
+      imprNum = GetImprNumber(volName);
+      if(imprNum == 1) return 2;  // section 3
+      else if(imprNum == 2) return 3;  // section 4
+      else return -1;
+    case 11:  // Front array 3
+    case 14:  // Front tag array 4
+      imprNum = GetImprNumber(volName);
+      if(imprNum == 1) return 4;  // section 5
+      else if(imprNum == 2) return 5;  // section 6
+      else return -1;
+    default:
       return -1;
     }
-  case 2: // Top E array 3
-  case 4: // Top dE array 3
-  case 6: // Bottom E array 3
-  case 8: // Bottom dE array 3
-    pvNum = GetPlacementNumber(volName);
-    if(pvNum <= 13 && pvNum >= 6) return 4;  // section 5
-    else if(pvNum <= 5 && pvNum >= 0) return 5;  // section 6
-    else return -1;
-  case 9: // Front array 1
-  case 12: // Front tag array 1
-    imprNum = GetImprNumber(volName);
-    if(imprNum == 1) return 0;  // section 1
-    else if(imprNum == 2) return 1;  // section 2
-    else return -1;
-  case 10: // Front array 2
-  case 13: // Front tag array 2
-    imprNum = GetImprNumber(volName);
-    if(imprNum == 1) return 2;  // section 3
-    else if(imprNum == 2) return 3;  // section 4
-    else return -1;
-  case 11:  // Front array 3
-  case 14:  // Front tag array 4
-    imprNum = GetImprNumber(volName);
-    if(imprNum == 1) return 4;  // section 5
-    else if(imprNum == 2) return 5;  // section 6
-    else return -1;
-    
-  default:
-    return -1;
   }
 }
 
 PolarimeterDetector detectorType(const std::string &volName) {
   int avNum = GetAVNumber(volName);
-  switch(avNum) {
-  case 9: case 10: case 11: return analyzer;
-  case 12: case 13: case 14: return tagger;
-  case 1: case 2: return topEArray;
-  case 5: case 6: return botEArray;
-  case 3: case 4: return topdEArray;
-  case 7: case 8: return botdEArray;
-  case 15: return backPlane;
-  default: return unknown;
+  if(LAYER_NUM == 4){
+    switch(avNum) {
+    case 1: case 2: return topEArray;
+    case 5: case 6: return botEArray;
+    case 3: case 4: return topdEArray;
+    case 7: case 8: return botdEArray;
+    case 9: case 10: analyzer;
+    case 11: case 12: return tagger;
+    case 13: return backPlane;
+    default: return unknown;
+    }
+  }else if(LAYER_NUM == 6){
+    switch(avNum) {
+    case 1: case 2: return topEArray;
+    case 5: case 6: return botEArray;
+    case 3: case 4: return topdEArray;
+    case 7: case 8: return botdEArray;
+    case 9: case 10: case 11: return analyzer;
+    case 12: case 13: case 14: return tagger;
+    case 15: return backPlane;
+    default: return unknown;
+    }
   }
 }
 
@@ -181,7 +227,7 @@ PolarimeterDetector detectorType(const std::string &volName) {
 // If -1 is returned, then no section passed requirements 1 and 2.
 int getSectionOfInterest(const std::map<std::string,NpolDetectorEvent *> *detEvents) {
   int sectionOfInterest = -1;
-  for(int section = 5; section >= 0; section--) {
+  for(int section = (LAYER_NUM - 1); section >= 0; section--) {
     std::map<std::string,NpolDetectorEvent *>::const_iterator it;
     bool analyzerFlag = false;
     bool topEArrayFlag = false;
@@ -367,15 +413,6 @@ void OutputTracks(const std::vector<NpolVertex *> *verticies, std::ofstream &txt
   } // END VERTICES LOOP
 }
 
-/**************IMPORTANT DISCLAIMER*****************
-
-  THIS FILE HAS BEEN MODIFIED TO ACCOMIDATE THE FOUR LAYER POLARIMETER DESIGN
-IF YOU WOULD LIKE TO USE THE DATA FOR THE SIX LAYER DESIGN, YOU MUST COPY THE SCRIPT FROM THE FILE "dEoverE_SixLayer" 
-     INTO THIS FILE
-
-*/
-
-
 int main(int argc, char *argv[]) {
   
   std::string JobNum;
@@ -438,13 +475,13 @@ int main(int argc, char *argv[]) {
   TH1F *h_sectionEfficiency3 = new TH1F("sectionEfficiency3","Polarimeter section efficiency after array energy total cuts",13,0.25,6.75);
   TH1F *h_sectionEfficiency4 = new TH1F("sectionEfficiency4","Polarimeter section efficiency after angle cut",13,0.25,6.75);
   TH1F *h_dTOF = new TH1F("dTOF","Delta time-of-flight",600,-30,120);
-  TH1F *h_sectionEfficiencyLocalPositions[6]; 
-  for(int i = 0; i <= 5; i++) {
+  TH1F *h_sectionEfficiencyLocalPositions[LAYER_NUM]; 
+  for(int i = 0; i <= (LAYER_NUM-1); i++) {
     std::string title = "Polarimeter Efficiency - Section ";
     title = title + std::to_string(i + 1);
     std::string name = "sectionEfficiencyLocalPosition";
     name = name + std::to_string(i + 1);
-    h_sectionEfficiencyLocalPositions[i] = new TH1F(name.c_str(), title.c_str(),200, -5.0, 5.0);
+    h_sectionEfficiencyLocalPositions[i] = new TH1F(name.c_str(), title.c_str(),200, -2.5, 2.5);
   }
 	
   // BEGIN STATS LOOP
@@ -592,10 +629,10 @@ int main(int argc, char *argv[]) {
 	
   std::cout << eventsPassed << " events passed requirements.  "
 	    << eventsFailed << " failed." << std::endl;
-  h_sectionEfficiency1->Scale(1.0); ///eventInteraction);
-  h_sectionEfficiency2->Scale(1.0); ///eventInteraction);
-  h_sectionEfficiency3->Scale(1.0); ///eventInteraction);
-  h_sectionEfficiency4->Scale(1.0); ///eventInteraction);
+  h_sectionEfficiency1->Scale(1.0); 
+  h_sectionEfficiency2->Scale(1.0); 
+  h_sectionEfficiency3->Scale(1.0); 
+  h_sectionEfficiency4->Scale(1.0); 
 	
   TVectorD runStatistics(4);
   runStatistics[0] = totalEvents;
@@ -611,7 +648,7 @@ int main(int argc, char *argv[]) {
   h_sectionEfficiency2->Write();
   h_sectionEfficiency3->Write();
   h_sectionEfficiency4->Write();
-  for(int i = 0; i <= 5; i++) {
+  for(int i = 0; i <= (LAYER_NUM - 1); i++) {
     (h_sectionEfficiencyLocalPositions[i])->Write();
   }
   h_dTOF->Write();
