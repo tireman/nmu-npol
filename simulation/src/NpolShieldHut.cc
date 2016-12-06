@@ -26,11 +26,12 @@
 #include "NpolShieldHut.hh"
 
 G4double NpolShieldHut::NpolAng = 28.0*deg;
-G4double NpolShieldHut::vertAngle = 0.1000*rad; // 0.06716*rad;
-G4double NpolShieldHut::horAngle = 0.1200*rad; // 0.14226*rad;
-G4double NpolShieldHut::PosFront = 6.3739*m;
-G4double NpolShieldHut::PosLead = PosFront - 0.535*m;
-G4double NpolShieldHut::PosTagger = PosFront + 0.465*m;
+G4double NpolShieldHut::vertAngle = 0.1000*rad; // 0.06716*rad;  // vertical acceptance angle
+G4double NpolShieldHut::horAngle = 0.1200*rad; // 0.14226*rad;   // horizontal acceptance angle
+G4double NpolShieldHut::PosFront = 6.3739*m;  // position of front wall (center)
+G4double NpolShieldHut::PosLead = PosFront - 0.535*m;  // position of lead curtain (center)
+G4double NpolShieldHut::PosTagger = PosFront + 0.465*m;  // position of NPOL tagger (center)
+G4double NpolShieldHut::leadThickness = 15.0*cm;  // thickness of the lead curtain
 
 NpolShieldHut::NpolShieldHut() {
   ConstructHutFrontWall();
@@ -49,10 +50,11 @@ G4String NpolShieldHut::GetName() {
 
 // Construct a lead shield for in front of the polarimeter
 void NpolShieldHut::ConstructLeadCurtain(){
-  G4double xlen = 2*(PosLead)*tan(horAngle/2) + 5.0*cm, ylen = 2*(PosLead)*tan(vertAngle/2) + 5.0*cm; 
-  G4double zlen = 0.150*m;
 
-  G4Box *LeadCurtain = new G4Box("LeadCurtain",xlen/2,ylen/2,zlen/2);
+  // Make lead curtain wider/taller than the collimator
+  G4double xlen = 2*(PosLead)*tan(horAngle/2) + 5.0*cm, ylen = 2*(PosLead)*tan(vertAngle/2) + 5.0*cm; 
+
+  G4Box *LeadCurtain = new G4Box("LeadCurtain",xlen/2,ylen/2,leadThickness/2);
   LeadCurtainLV = 
 	new G4LogicalVolume(LeadCurtain,NpolMaterials::GetInstance()->GetMaterial("Pb"),"LeadCurtainLV",0,0,0);
   G4VisAttributes *LeadCurtainVisAtt = new G4VisAttributes(G4Colour(1.0, 0.7, 0.2));
@@ -62,6 +64,9 @@ void NpolShieldHut::ConstructLeadCurtain(){
 // Construct a thin air box so we can tag particles passing through the collimator.  
 // Place it just a millimeter off the front steel wall
 void NpolShieldHut::ConstructNPOLTagger(){
+  
+  // Make the NPOL tagger wider/taller than the collimator to assure it covers all particles
+  // Limit particle flux in post run analysis
   G4double xlen = 2*(PosTagger)*tan(horAngle/2) + 5.0*cm, ylen = 2*(PosTagger)*tan(vertAngle/2) + 5.0*cm; 
   G4double zlen = 0.200*cm;
 
@@ -76,7 +81,9 @@ void NpolShieldHut::ConstructNPOLTagger(){
 // will simplfy here to a 3 foot deep wall that is 16 feet wide and 15 feet high
 void NpolShieldHut::ConstructHutFrontWall() {
   // constants for sizing and positioning
-  G4double xlen = 4.8768*m, ylen = 7.3152*m, zlen = 0.90*m;
+  // front wall sizes
+  G4double xlen = 4.8768*m, ylen = 7.3152*m, zlen = 0.900*m;
+  // collimator sizing
   G4double xlen1 = 2*(PosFront-zlen/2)*tan(horAngle/2), xlen2 = 2*(PosFront+zlen/2)*tan(horAngle/2);
   G4double ylen1 = 2*(PosFront-zlen/2)*tan(vertAngle/2), ylen2 = 2*(PosFront+zlen/2)*tan(vertAngle/2);
   G4double VertOffSet = 0.3424*m;
@@ -103,7 +110,8 @@ void NpolShieldHut::ConstructHutFrontWall() {
 // Construct the back wall of the shield hut from concrete blocks here we
 // will simplfy to a 3 foot deep wall that is 16 feet wide and 24 feet high
 void NpolShieldHut::ConstructHutBackWall() {
-  G4double xlen = 4.8768*m, ylen = 7.3152*m, zlen = 0.9144*m;
+  // Back wall sizes
+  G4double xlen = 4.8768*m, ylen = 7.3152*m, zlen = 0.900*m;
   
   G4Box *HutBackWall = new G4Box("HutBackWall",xlen/2, ylen/2, zlen/2);
   HutBackWallLV = new G4LogicalVolume(HutBackWall,

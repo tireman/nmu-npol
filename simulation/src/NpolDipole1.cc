@@ -38,13 +38,19 @@
 #include "NpolBeamlineDown.hh"
 #include "NpolDetectorConstruction.hh"
 
+G4double NpolDipole1::dipole1FieldY = 4*0.40984*tesla; // 1 B.dl = 0.40984*tesla so 4 * 1 B.dl = 1.639*tesla
+
 G4double NpolDipole1::NpolAng = 28.0*deg;
 G4double NpolDipole1::yokeLength = 1.22*m;
 G4double NpolDipole1::gapWidth = 0.56*m;
 G4double NpolDipole1::gapLength = 1.22*m;
-G4double NpolDipole1::gapHeight = 0.20965*m;  // using 8.25 inch gap
+G4double NpolDipole1::gapHeight = 0.20965*m;  // using 8.25 inch gap, Charybdis can do 10.25 inch as well
 G4double NpolDipole1::yokeGap = 0.1016*m;
-G4double NpolDipole1::dipole1FieldY = 4*0.40984*tesla; // 1 B.dl = 0.40984*tesla 4 B.dl = 1.639*tesla
+G4double NpolDipole1::fieldClampHeight = 152.8*cm; 
+G4double NpolDipole1::fieldClampWidth = 235.0*cm;
+G4double NpolDipole1::fieldClampThick = 5.08*cm ;
+G4double NpolDipole1::fieldClampInheight = 0.254*m;
+G4double NpolDipole1::fieldClampInwidth = 0.56*m;
 
 NpolDipole1::NpolDipole1() {
   ConstructDipole1Yoke();
@@ -131,13 +137,11 @@ void NpolDipole1::ConstructDipole1FieldClamp1(){
   // Constructor for the Charybdis field clamp in front of the magnet
   // Needs a "hole" on the left side to get the beam pipe through
   
-  G4double height = 1.528*m, width = 2.35*m, thick = 0.0508*m;
-  G4double Inheight = 0.254*m, Inwidth = 0.56*m;
-  G4double radius = 1.0*cm + NpolBeamlineDown::SecA2OutRadius, CyLen = 10.0*cm;
+   G4double radius = 1.0*cm + NpolBeamlineDown::SecA2OutRadius, CyLen = 10.0*cm;
   
   // Create the necessary solids
-  G4Box *Slab = new G4Box("Slab", width/2, height/2, thick/2);
-  G4Box *Hole = new G4Box("Hole", (Inwidth+0.10)/2, (Inheight+0.10)/2, (thick+0.01*m)/2);
+  G4Box *Slab = new G4Box("Slab", fieldClampWidth/2, fieldClampHeight/2, fieldClampThick/2);
+  G4Box *Hole = new G4Box("Hole", (fieldClampInwidth+0.10)/2, (fieldClampInheight+0.10)/2, (fieldClampThick+0.01*m)/2);
   G4Tubs *BHole = 
 	new G4Tubs("BHole", 0.0*m, radius+0.50*cm, ((CyLen/2)+radius*tan(NpolAng)+10.0*cm), 0.0*deg, 360.*deg);
   
@@ -160,11 +164,8 @@ void NpolDipole1::ConstructDipole1FieldClamp1(){
 void NpolDipole1::ConstructDipole1FieldClamp2(){
   // Constructor for the Charybdis field clamp in back of the magnet
   
-  G4double height = 1.528*m, width = 2.35*m, thick = 0.0508*m;
-  G4double Inheight = 0.254*m, Inwidth = 0.56*m;
-  
-  G4Box *Slab = new G4Box("Slab", width/2, height/2, thick/2);
-  G4Box *Hole = new G4Box("Hole", (Inwidth+0.10)/2, (Inheight+0.10)/2, (thick+0.01*m)/2);
+  G4Box *Slab = new G4Box("Slab", fieldClampWidth/2, fieldClampHeight/2, fieldClampThick/2);
+  G4Box *Hole = new G4Box("Hole", (fieldClampInwidth+0.10)/2, (fieldClampInheight+0.10)/2, (fieldClampThick+0.01*m)/2);
 
   G4SubtractionSolid *FieldClamp2 = new G4SubtractionSolid("FieldClamp2", Slab, Hole); 
   
