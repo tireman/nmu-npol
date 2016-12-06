@@ -33,8 +33,8 @@
 #include "NpolDetectorFactory.hh"
 #include "NpolDetectorConstruction.hh"
 
-G4double NpolPolarimeter::NpolBoxPos = 8.7*m;
-G4double NpolPolarimeter::NpolAng = 28.0*deg; //28.0*deg;
+G4double NpolPolarimeter::NpolBoxPos = 8.70*m;
+G4double NpolPolarimeter::NpolAng = 28.0*deg; // 28.0*deg; // nominal angle
 
 NpolPolarimeter::NpolPolarimeter() {
   G4VSolid *PolarimeterBox = new G4Box("PolarimeterBox",1.30*m,1.45*m,1.85*m);
@@ -215,7 +215,6 @@ void NpolPolarimeter::ConstructFrontDetArray(G4LogicalVolume *motherLV) {
 // 1.0 cm by 10.0 cm by 100.0 cm
 //----------------------------------------------------------------------
 void NpolPolarimeter::ConstructFrontTagArray(G4LogicalVolume *motherLV) {
-  
   
   G4ThreeVector Tm;
   G4Transform3D Tr; 

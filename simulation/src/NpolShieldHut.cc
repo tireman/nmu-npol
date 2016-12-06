@@ -26,6 +26,11 @@
 #include "NpolShieldHut.hh"
 
 G4double NpolShieldHut::NpolAng = 28.0*deg;
+G4double NpolShieldHut::vertAngle = 0.1000*rad; // 0.06716*rad;
+G4double NpolShieldHut::horAngle = 0.1200*rad; // 0.14226*rad;
+G4double NpolShieldHut::PosFront = 6.3739*m;
+G4double NpolShieldHut::PosLead = PosFront - 0.535*m;
+G4double NpolShieldHut::PosTagger = PosFront + 0.465*m;
 
 NpolShieldHut::NpolShieldHut() {
   ConstructHutFrontWall();
@@ -44,7 +49,8 @@ G4String NpolShieldHut::GetName() {
 
 // Construct a lead shield for in front of the polarimeter
 void NpolShieldHut::ConstructLeadCurtain(){
-  G4double xlen = 0.85*m; G4double ylen = 0.55*m; G4double zlen = 0.150*m;
+  G4double xlen = 2*(PosLead)*tan(horAngle/2) + 5.0*cm, ylen = 2*(PosLead)*tan(vertAngle/2) + 5.0*cm; 
+  G4double zlen = 0.150*m;
 
   G4Box *LeadCurtain = new G4Box("LeadCurtain",xlen/2,ylen/2,zlen/2);
   LeadCurtainLV = 
@@ -53,9 +59,11 @@ void NpolShieldHut::ConstructLeadCurtain(){
   LeadCurtainLV->SetVisAttributes(LeadCurtainVisAtt);
 }
 
-// Construct a thin air box so we can tag particles passing through the collimator.  Place it just a millimeter off the front steel wall
+// Construct a thin air box so we can tag particles passing through the collimator.  
+// Place it just a millimeter off the front steel wall
 void NpolShieldHut::ConstructNPOLTagger(){
-  G4double xlen = 0.98*m; G4double ylen = 0.600*m; G4double zlen = 0.200*cm;
+  G4double xlen = 2*(PosTagger)*tan(horAngle/2) + 5.0*cm, ylen = 2*(PosTagger)*tan(vertAngle/2) + 5.0*cm; 
+  G4double zlen = 0.200*cm;
 
   G4Box *NPOLTagger = new G4Box("NPOLTagger",xlen/2,ylen/2,zlen/2);
   NPOLTaggerLV = 
@@ -69,12 +77,13 @@ void NpolShieldHut::ConstructNPOLTagger(){
 void NpolShieldHut::ConstructHutFrontWall() {
   // constants for sizing and positioning
   G4double xlen = 4.8768*m, ylen = 7.3152*m, zlen = 0.90*m;
-  G4double xlen1 = 0.81854*m, xlen2 = 0.97618*m;
-  G4double ylen1 = 0.5012*m, ylen2 = 0.59574*m, VertOffSet = 0.3424*m;
+  G4double xlen1 = 2*(PosFront-zlen/2)*tan(horAngle/2), xlen2 = 2*(PosFront+zlen/2)*tan(horAngle/2);
+  G4double ylen1 = 2*(PosFront-zlen/2)*tan(vertAngle/2), ylen2 = 2*(PosFront+zlen/2)*tan(vertAngle/2);
+  G4double VertOffSet = 0.3424*m;
 
   // Create the necessary solids
   G4Box *Sheet = new G4Box("Sheet",xlen/2, ylen/2, zlen/2);
-  G4Trd *Collimator = new G4Trd("Collimator",xlen1/2, xlen2/2, ylen1/2, ylen2/2, (zlen+0.10*m)/2);
+  G4Trd *Collimator = new G4Trd("Collimator",xlen1/2, xlen2/2, ylen1/2, ylen2/2, (zlen+0.5*m)/2);
   
   // Rotation and translation information for the hole for the beam line
   G4RotationMatrix *yRot = new G4RotationMatrix;
@@ -131,9 +140,8 @@ void NpolShieldHut::ConstructHutRoof() {
 void NpolShieldHut::Place(G4LogicalVolume *motherLV) {
   
   G4double PosSide = 9.4025*m, AngSide = 14.0*deg;
-  G4double VertOffSet = 0.3424*m, PosFront = 6.3739*m, PosBack = 11.8739*m;
+  G4double VertOffSet = 0.3424*m, PosBack = 11.8739*m;
   G4double PosRoof = 9.1239*m, OffSetRoof = 3.7776*m;
-  G4double PosLead = PosFront - 0.535*m, PosTagger = PosFront + 0.465*m;
 
   PlaceCylindrical(LeadCurtainLV, motherLV, "LeadCurtain", PosLead,-NpolAng, 0);
   PlaceCylindrical(NPOLTaggerLV, motherLV, "NPOLTagger", PosTagger, -NpolAng, 0);  
