@@ -49,6 +49,17 @@ void ProcessElectrons() {
   TChain *statsTree = new TChain("T2");
 
   Double_t NpolAng = 0.488692; // radians (28 degrees)
+  Double_t targetTaggerPos = 150.0;  // Position of target tagger (cm)
+  Double_t npolTaggerPos = 683.86;  // Position of Npol Tagger (cm)
+  Double_t theta = 0.060; //0.13812; // horizontal angular accecptance (radians)
+  Double_t phi = 0.050; // using the Dipole 1 limit // 0.08466; // vertical angular acceptance (radians)
+  Double_t targetW = 2*targetTaggerPos*TMath::Tan(theta/2);  // width of target tagger (cm)
+  Double_t targetH = 2*targetTaggerPos*TMath::Tan(phi/2);   // height of target tagger (cm)
+  Double_t npolW = 2*npolTaggerPos*TMath::Tan(theta/2);  // width of npol tagger (cm)
+  Double_t npolH = 2*npolTaggerPos*TMath::Tan(phi/2);  // height of npol tagger (cm)
+
+  Double_t targetAlpha = targetW/(4*targetTaggerPos);  // Constant needed for solid angle
+  Double_t npolAlpha = npolW/(4*npolTaggerPos);  // Constant needed for solid angle
 
   npolTree->SetCacheSize(100000000);
   statsTree->SetCacheSize(100000000);
@@ -147,7 +158,7 @@ void ProcessElectrons() {
     targetParticleKE[it->first] = 
 	  new TH1F(targetHistoName.c_str(), targetHistoTitle.c_str(),nbins,bins);
     targetParticlePOS[it->first] = 
-	  new TH2F(targetXYHistoName.c_str(),targetXYHistoTitle.c_str(),400,-10.375,10.375,400,-5.0389,5.0389);  // small limit from geometry
+	  new TH2F(targetXYHistoName.c_str(),targetXYHistoTitle.c_str(),400,-targetW,targetW,400,-targetH,targetH);  // small limit from geometry
 	//,400,-35.0,35.0,400,-15.0,15.0); // max size of target tagger
 	//,400, -28.0,+28.0,400,-10.5,+10.5); // minimum tagger size for bias runs
 	//,400,-55.,55.0,400,-40.0,40.0); //max size
@@ -156,15 +167,15 @@ void ProcessElectrons() {
     npolParticleKE[it->first] = 
 	  new TH1F(npolHistoName.c_str(), npolHistoTitle.c_str(),nbins,bins);
     npolParticlePOS[it->first] = 
-	  new TH2F(npolXYHistoName.c_str(),npolXYHistoTitle.c_str(),400,-47.303, 47.303, 400, -22.973, 22.973); // small limit from geometry
+	  new TH2F(npolXYHistoName.c_str(),npolXYHistoTitle.c_str(),400,-npolW,npolW, 400, -npolH,npolH); // small limit from geometry
 			   
 	//,400,-49.0, 49.0, 400, -30.0, 30.0); // max size of NPOL tagger
-	//,400,-47.303, 47.303, 400, -22.973, 22.973); // small limit from geometry
+	//,400,-41.08, 41.08, 400, -34.22, 34.22); // small limit from geometry
 
     correlateKE[it->first] = 
 	  new TH1F(correlateHistoName.c_str(), correlateHistoTitle.c_str(),nbins,bins);
     correlatePOS[it->first] = 
-	  new TH2F(correlateXYHistoName.c_str(),correlateXYTitle.c_str(),400,-10.375,10.375,400,-5.0389,5.0389); // small limit from geometry
+	  new TH2F(correlateXYHistoName.c_str(),correlateXYTitle.c_str(),400,-npolW,npolW,400,-npolH,npolH); // small limit from geometry
 
 	//,400,-35.0,35.0,400,-15.0,15.0); // max size of target tagger
 	//,400, -28.0,+28.0,400,-10.5,+10.5); // minimum tagger size for bias runs
@@ -184,21 +195,9 @@ void ProcessElectrons() {
   delta_TOF->GetYaxis()->SetTitle("Events");
   delta_TOF->GetXaxis()->SetTitle("Analyzer to Top/Bottom Array Time-of-Flight (ns)");
 
-  Double_t targetTaggerPos = 150.0;  // Position of target tagger (cm)
-  Double_t npolTaggerPos = 683.86;  // Position of Npol Tagger (cm)
-  Double_t theta = 0.13812; //0.13812; // horizontal angular accecptance (radians)
-  Double_t phi = 0.06716; // using the Dipole 1 limit // 0.08466; // vertical angular acceptance (radians)
-  Double_t targetW = 2*targetTaggerPos*TMath::Tan(theta/2);  // height of target tagger (cm)
-  Double_t targetL = 2*targetTaggerPos*TMath::Tan(phi/2);   // width of target tagger (cm)
-  Double_t npolW = 2*npolTaggerPos*TMath::Tan(theta/2);  // height of npol tagger (cm)
-  Double_t npolL = 2*npolTaggerPos*TMath::Tan(phi/2);  // width of npol tagger (cm)
-
-  Double_t targetAlpha = targetW/(4*targetTaggerPos);  // Constant needed for solid angle
-  Double_t npolAlpha = npolW/(4*npolTaggerPos);  // Constant needed for solid angle
-
   // Solid angle calculation! 
-  Double_t targetSolidAngle = 8*(TMath::ATan(targetL/targetW)-TMath::ASin(targetL/TMath::Sqrt((1+TMath::Power(targetAlpha,2))*(TMath::Power(targetL,2)+TMath::Power(targetW,2)))));
-  Double_t npolSolidAngle = 8*(TMath::ATan(npolL/npolW)-TMath::ASin(npolL/TMath::Sqrt((1+TMath::Power(npolAlpha,2))*(TMath::Power(npolL,2)+TMath::Power(npolW,2)))));
+  Double_t targetSolidAngle = 8*(TMath::ATan(targetH/targetW)-TMath::ASin(targetH/TMath::Sqrt((1+TMath::Power(targetAlpha,2))*(TMath::Power(targetH,2)+TMath::Power(targetW,2)))));
+  Double_t npolSolidAngle = 8*(TMath::ATan(npolH/npolW)-TMath::ASin(npolH/TMath::Sqrt((1+TMath::Power(npolAlpha,2))*(TMath::Power(npolH,2)+TMath::Power(npolW,2)))));
   
   // loop over all entries (one per event)
   Int_t nentries = npolTree->GetEntries();
@@ -228,8 +227,8 @@ void ProcessElectrons() {
 	  } */
 	
     // loop over all tagged particles (min. one step in NPOL tagger volume)
-	Double_t npolxMax = 28.0; //npolTaggerPos*tan(theta/2); acceptance limit // 49.0; max size // 28.0; bias run
-	Double_t npolyMax = 10.5; //npolTaggerPos*tan(phi/2); acceptance limit // 30.0; max size // 10.5; bias run
+	Double_t npolxMax = npolW/2; //npolTaggerPos*tan(theta/2); acceptance limit // 49.0; max size // 28.0; bias run
+	Double_t npolyMax = npolH/2; //npolTaggerPos*tan(phi/2); acceptance limit // 30.0; max size // 10.5; bias run
     std::vector<NpolTagger *>::iterator n_it;
     for(n_it = npolEntry->begin(); n_it != npolEntry->end(); n_it++){
       NpolTagger *npolTagged = *n_it;
