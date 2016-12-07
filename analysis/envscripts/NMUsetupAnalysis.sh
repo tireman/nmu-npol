@@ -5,15 +5,15 @@ export Energy=4.4
 export Bfield=4
 export BUILD_DIR=/home/tireman/simulation/jlab/npol/nmu-npol/build/simulation
 export NPOLLIB_DIR=/home/tireman/simulation/jlab/npol/nmu-npol/build/npollib
-export NPOLBASENAME=sourceNeutron_Lead$Lead\cm_$Energy\GeV_$Bfield\Bdl
+export NPOLBASENAME=sourceTotal_Lead$Lead\cm_$Energy\GeV_$Bfield\Bdl
 
 #export NPOLDIR=/data2/cgen/JlabSimData/Summer2016Run/FullGeometry/4.4GeV/4Bdl
-#export NPOLDIR=/data2/cgen/JlabSimData/Summer2016Run/TargetTaggerSource/4.4GeV/$Bfield\Bdl/SmallTargetTagger
-export NPOLDIR=/data2/cgen/NeutronOnly/RealisticSource/15cmThickScint
+export NPOLDIR=/data2/cgen/JlabSimData/Summer2016Run/TargetTaggerSource/4.4GeV/$Bfield\Bdl/SmallTargetTagger
+#export NPOLDIR=/data1/cgen/NeutronOnly/RealisticSource/10cmThickScint
 
 #export NPOLWORKDIR=/data2/cgen/JlabSimData/Summer2016Run/FullGeometry/4.4GeV/4Bdl
-#export NPOLWORKDIR=/data2/cgen/JlabSimData/Summer2016Run/TargetTaggerSource/4.4GeV/$Bfield\Bdl/SmallTargetTagger
-export NPOLWORKDIR=/data2/cgen/NeutronOnly/RealisticSource/15cmThickScint/Inelastic
+export NPOLWORKDIR=/data2/cgen/JlabSimData/Summer2016Run/TargetTaggerSource/4.4GeV/$Bfield\Bdl/SmallTargetTagger
+#export NPOLWORKDIR=/data1/cgen/NeutronOnly/RealisticSource/10cmThickScint
 
 export OutputDir=$NPOLDIR/Output
 export InputDir=$NPOLDIR/root

@@ -28,6 +28,9 @@ public:
   ~NpolShieldHut();
 
   static G4double NpolAng;
+  static G4double vertAngle, horAngle;
+  static G4double PosFront, PosLead, PosTagger;
+  static G4double leadThickness;
   
   void ConstructHutSideWall();
   void ConstructHutFrontWall();

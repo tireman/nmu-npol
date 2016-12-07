@@ -51,6 +51,11 @@ public:
   static G4double gapWidth;
   static G4double gapHeight;
   static G4double gapLength;
+  static G4double fieldClampHeight;
+  static G4double fieldClampWidth;
+  static G4double fieldClampThick;
+  static G4double fieldClampInheight;
+  static G4double fieldClampInwidth;
   static G4double dipole2FieldY;
   static G4double NpolAng;
 
