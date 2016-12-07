@@ -7,9 +7,9 @@ export BUILD_DIR=/home/tireman/simulation/jlab/npol/nmu-npol/build/simulation
 export NPOLLIB_DIR=/home/tireman/simulation/jlab/npol/nmu-npol/build/npollib
 export NPOLBASENAME=sourceNeutron_Lead$Lead\cm_$Energy\GeV_$Bfield\Bdl
 
-export NPOLDIR=/home/tireman/output/neutron/4.4GeV/4Bdl/Lead15cm/5cm6Layer
+export NPOLDIR=/home/tireman/output/neutron/4.4GeV/4Bdl/Lead15cm/15cm6Layer
 
-export NPOLWORKDIR=/home/tireman/output/neutron/4.4GeV/4Bdl/Lead15cm/5cm6Layer
+export NPOLWORKDIR=/home/tireman/output/neutron/4.4GeV/4Bdl/Lead15cm/15cm6Layer
 
 export OutputDir=$NPOLDIR/Output
 export InputDir=$NPOLDIR/root

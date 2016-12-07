@@ -481,7 +481,7 @@ int main(int argc, char *argv[]) {
     title = title + std::to_string(i + 1);
     std::string name = "sectionEfficiencyLocalPosition";
     name = name + std::to_string(i + 1);
-    h_sectionEfficiencyLocalPositions[i] = new TH1F(name.c_str(), title.c_str(),200, -2.5, 2.5);
+    h_sectionEfficiencyLocalPositions[i] = new TH1F(name.c_str(), title.c_str(),200, -7.5, 7.5);
   }
 	
   // BEGIN STATS LOOP
