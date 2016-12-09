@@ -54,7 +54,7 @@ void FrontTaggerCountRates() {
   // effective electron time on target per micro amp of beam
 
   TVectorD *v = (TVectorD*)inFile->Get("TVectorT<double>");
-  Double_t totalElectrons = 3.49967e10; //((*v))[0];
+  Double_t totalElectrons = 5*3.49967e10; //((*v))[0];
   Double_t electronTime = totalElectrons/(6.242e12); //6.242e12 e-/s at 1 microAmp
   //Double_t fluxscaling = 1/(totalElectrons*1.602e-13*(98*60));
   std::cout << "Electron beam time at 1 micro-amp is " << electronTime << " s " << std::endl;

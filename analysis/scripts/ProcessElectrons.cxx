@@ -48,21 +48,34 @@ void ProcessElectrons() {
   TChain *npolTree = new TChain("T");
   TChain *statsTree = new TChain("T2");
 
-  Double_t NpolAng = 0.488692; // radians (28 degrees)
+  Double_t NpolAng = 0.488692; // radians (28 degrees) NPOL angle from beamline
   Double_t targetTaggerPos = 150.0;  // Position of target tagger (cm)
-  Double_t npolTaggerPos = 683.86;  // Position of Npol Tagger (cm)
-  Double_t theta = 0.060; //0.13812; // horizontal angular accecptance (radians)
-  Double_t phi = 0.050; // using the Dipole 1 limit // 0.08466; // vertical angular acceptance (radians)
-  Double_t targetW = 2*targetTaggerPos*TMath::Tan(theta/2);  // width of target tagger (cm)
-  Double_t targetH = 2*targetTaggerPos*TMath::Tan(phi/2);   // height of target tagger (cm)
+  Double_t npolTaggerPos = 683.86;  // Position of NPOL Tagger (cm)
+  Double_t theta = 0.120; //0.13812; // NPOL horizontal angular accecptance (radians)
+  Double_t phi = 0.100; // using the Dipole 1 limit // 0.08466; // NPOL vertical angular acceptance (radians)
+  
+  // ******* Tagger acceptance computations.  ALL SIZES ARE FULL WIDTH/HEIGHT ******** //
+  // Compute or Manually set the size of the histograms and cuts for filling histograms (X,Y) position
+  // Must be done carefully to assure you are extracting the desired area of the tagger in question
+  // This may be a different acceptance for both NPOL and Target Taggers
+
+  // This version uses the fixed angular acceptance for the sizing of the collimator
+  //Double_t targetW = 2*targetTaggerPos*TMath::Tan(theta/2);  // width of target tagger (cm)
+  //Double_t targetH = 2*targetTaggerPos*TMath::Tan(phi/2);   // height of target tagger (cm)
+  //Double_t npolW = 2*npolTaggerPos*TMath::Tan(theta/2);  // width of npol tagger (cm)
+  //Double_t npolH = 2*npolTaggerPos*TMath::Tan(phi/2);  // height of npol tagger (cm)
+
+  // This version allows for fixing the size manually
+  Double_t targetW = 56.0;  // width of target tagger (cm)
+  Double_t targetH = 21.0;  // height of target tagger (cm)
   Double_t npolW = 2*npolTaggerPos*TMath::Tan(theta/2);  // width of npol tagger (cm)
   Double_t npolH = 2*npolTaggerPos*TMath::Tan(phi/2);  // height of npol tagger (cm)
 
   Double_t targetAlpha = targetW/(4*targetTaggerPos);  // Constant needed for solid angle
   Double_t npolAlpha = npolW/(4*npolTaggerPos);  // Constant needed for solid angle
-
-  npolTree->SetCacheSize(100000000);
-  statsTree->SetCacheSize(100000000);
+  
+  npolTree->SetCacheSize(500000000);
+  statsTree->SetCacheSize(500000000);
   
   RetrieveENVvariables();
 
@@ -154,34 +167,23 @@ void ProcessElectrons() {
     std::string correlateXYHistoName = "Correlated_targetXY_" + it->first;
     std::string correlateXYTitle = it->second + " XY position in Target Tagger Correlated to NPOL Tagger";
 
-	// First field clamp is 25.4 cm tall and 56.0 cm wide, select 30.0cm tall and 70.0 cm wides
     targetParticleKE[it->first] = 
 	  new TH1F(targetHistoName.c_str(), targetHistoTitle.c_str(),nbins,bins);
     targetParticlePOS[it->first] = 
-	  new TH2F(targetXYHistoName.c_str(),targetXYHistoTitle.c_str(),400,-targetW,targetW,400,-targetH,targetH);  // small limit from geometry
-	//,400,-35.0,35.0,400,-15.0,15.0); // max size of target tagger
-	//,400, -28.0,+28.0,400,-10.5,+10.5); // minimum tagger size for bias runs
-	//,400,-55.,55.0,400,-40.0,40.0); //max size
-	//,400,-10.375,10.375,400,-5.0389,5.0389);  // small limit from geometry
+	  new TH2F(targetXYHistoName.c_str(),targetXYHistoTitle.c_str()
+			   ,400,-targetW/2,targetW/2,400,-targetH/2,targetH/2);
 
     npolParticleKE[it->first] = 
 	  new TH1F(npolHistoName.c_str(), npolHistoTitle.c_str(),nbins,bins);
     npolParticlePOS[it->first] = 
-	  new TH2F(npolXYHistoName.c_str(),npolXYHistoTitle.c_str(),400,-npolW,npolW, 400, -npolH,npolH); // small limit from geometry
-			   
-	//,400,-49.0, 49.0, 400, -30.0, 30.0); // max size of NPOL tagger
-	//,400,-41.08, 41.08, 400, -34.22, 34.22); // small limit from geometry
+	  new TH2F(npolXYHistoName.c_str(),npolXYHistoTitle.c_str()
+			   ,400,-npolW/2,npolW/2, 400, -npolH/2,npolH/2);
 
     correlateKE[it->first] = 
 	  new TH1F(correlateHistoName.c_str(), correlateHistoTitle.c_str(),nbins,bins);
     correlatePOS[it->first] = 
-	  new TH2F(correlateXYHistoName.c_str(),correlateXYTitle.c_str(),400,-npolW,npolW,400,-npolH,npolH); // small limit from geometry
-
-	//,400,-35.0,35.0,400,-15.0,15.0); // max size of target tagger
-	//,400, -28.0,+28.0,400,-10.5,+10.5); // minimum tagger size for bias runs
-	//,400,-35.0,35.0,400,-15.0,15.0); // max size of target tagger
-	//,400,-55.,55.0,400,-40.0,40.0); //max size
-	//,400,-10.375,10.375,400,-5.0389,5.0389); // small limit from geometry
+	  new TH2F(correlateXYHistoName.c_str(),correlateXYTitle.c_str()
+			   ,400,-npolW/2,npolW/2,400,-npolH/2,npolH/2); 
 
 	targetTheta[it->first] = new TH1F(targetThetaName.c_str(),targetThetaTitle.c_str(),300,0.0,TMath::Pi());
 	targetPhi[it->first] = new TH1F(targetPhiName.c_str(),targetPhiTitle.c_str(),600,0.0,2*TMath::Pi());
@@ -204,22 +206,23 @@ void ProcessElectrons() {
   //Int_t nentries = 100;
   for(int i = 0; i < nentries; i++) {
     npolTree->GetEntry(i);
-	
 	PrintEventNumber(nentries,i);
 
 	std::set<int> npolTrackIDs;
-	//std::set<int> vertexTrackIDs;
-
+	
+	// ***** tHIS SECTION IS USED TO SELECT PARTICULAR EVENTS FROM THE TRACKS VECTOR ***** //
 	// loop over all vertex entries to find particles created in
 	// the lead curtain or front wall of shield hut
-	/*std::vector<NpolVertex *>::iterator v_it;
+	/*std::set<int> vertexTrackIDs;
+	std::vector<NpolVertex *>::iterator v_it;
 	for(v_it = vertexEntry->begin(); v_it != vertexEntry->end(); v_it++){
 	  NpolVertex *aVertex = *v_it;
 	  if(aVertex == NULL) continue;
 	  std::string volumeName = aVertex->volume;
 	  std::string processName = aVertex->process;
 	  Int_t PID = aVertex->parentId;
-	  //if(volumeName == "TargetFluid" && processName == "electronNuclear") std::cout << "Process name is: " << processName << std::endl;
+	  //if(volumeName == "TargetFluid" && processName == "electronNuclear") 
+	  //std::cout << "Process name is: " << processName << std::endl;
 	  //if((volumeName == "TargetFluid") && (processName == "electronNuclear") && (PID == 1)){
 	  if(PID == 0){
 		vertexTrackIDs.insert(aVertex->trackId);
@@ -227,8 +230,8 @@ void ProcessElectrons() {
 	  } */
 	
     // loop over all tagged particles (min. one step in NPOL tagger volume)
-	Double_t npolxMax = npolW/2; //npolTaggerPos*tan(theta/2); acceptance limit // 49.0; max size // 28.0; bias run
-	Double_t npolyMax = npolH/2; //npolTaggerPos*tan(phi/2); acceptance limit // 30.0; max size // 10.5; bias run
+	Double_t npolxMax = npolW/2; // acceptance limit
+	Double_t npolyMax = npolH/2; // acceptance limit
     std::vector<NpolTagger *>::iterator n_it;
     for(n_it = npolEntry->begin(); n_it != npolEntry->end(); n_it++){
       NpolTagger *npolTagged = *n_it;
@@ -263,8 +266,8 @@ void ProcessElectrons() {
 	}
 	
     // loop over all tagged particles (min. one step in target tagger volume)
-	Double_t targetxMax = 35.0; //targetTaggerPos*tan(theta/2); acceptance limit 
-	Double_t targetyMax = 15.0; //targetTaggerPos*tan(phi/2); acceptance limit
+	Double_t targetxMax = targetW/2; // acceptance limit 
+	Double_t targetyMax = targetH/2; // acceptance limit
     std::vector<NpolTagger *>::iterator t_it;
     for(t_it = targetEntry->begin(); t_it != targetEntry->end(); t_it++){
       NpolTagger *targetTagged = *t_it;
