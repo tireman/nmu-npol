@@ -50,7 +50,7 @@ void ProcessElectrons() {
 
   Double_t NpolAng = 0.488692; // radians (28 degrees) NPOL angle from beamline
   Double_t targetTaggerPos = 150.0;  // Position of target tagger (cm)
-  Double_t npolTaggerPos = 683.86;  // Position of NPOL Tagger (cm)
+  Double_t npolTaggerPos = 637.86;  // Position of NPOL Tagger (cm)
   Double_t theta = 0.120; //0.13812; // NPOL horizontal angular accecptance (radians)
   Double_t phi = 0.100; // using the Dipole 1 limit // 0.08466; // NPOL vertical angular acceptance (radians)
   
