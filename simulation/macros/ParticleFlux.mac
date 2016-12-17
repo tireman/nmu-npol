@@ -44,8 +44,8 @@
 #/gps/pos/halfy 10.5 cm			    # target tagger
 
 /gps/pos/centre -321.067 0. 603.839 cm  # NPOL tagger
-/gps/pos/halfx 43.32 cm   		    # NPOL tagger
-/gps/pos/halfy 36.92 cm		    # NPOL tagger
+/gps/pos/halfx 43.32 cm   		        # NPOL tagger
+/gps/pos/halfy 36.92 cm			    # NPOL tagger
 
 /gps/pos/rot1 0.882947 0 0.46947        # Rotate the source
 /gps/pos/rot2 0. 1. 0.                  # default
