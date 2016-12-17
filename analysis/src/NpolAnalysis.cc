@@ -28,7 +28,7 @@
 #include "NpolDetectorEvent.hh"
 
 #define EDEP_THRESHOLD 1.0 /*MeV*/
-#define LAYER_NUM 6        /* number of analyzer layers; not general; only good for 4 and 6 layers */
+#define LAYER_NUM 4        /* number of analyzer layers; not general; only good for 4 and 6 layers */
 
 enum PolarimeterDetector {
   analyzer = 0,
@@ -91,8 +91,8 @@ int sectionNumber(const std::string &volName) {
     case 6: // Bottom E array 2
     case 8: // Bottom dE array 2
       pvNum = GetPlacementNumber(volName);
-      if(pvNum <= 13 && pvNum >= 6) {return 2;}  // section 3
-      else if(pvNum <= 5 && pvNum >= 0) {return 3;}  // section 4
+      if(pvNum <= 13 && pvNum >= 7) {return 2;}  // section 3
+      else if(pvNum <= 6 && pvNum >= 0) {return 3;}  // section 4
       else {return -1;}
     case 9: // Front array 1
     case 11: // Front tag array 1
@@ -177,7 +177,7 @@ PolarimeterDetector detectorType(const std::string &volName) {
     case 5: case 6: return botEArray;
     case 3: case 4: return topdEArray;
     case 7: case 8: return botdEArray;
-    case 9: case 10: analyzer;
+    case 9: case 10: return analyzer;
     case 11: case 12: return tagger;
     case 13: return backPlane;
     default: return unknown;
@@ -413,6 +413,22 @@ void OutputTracks(const std::vector<NpolVertex *> *verticies, std::ofstream &txt
   } // END VERTICES LOOP
 }
 
+//method that checks if the event is elastic or inelastic and then places it in the 
+//  correct histogram
+void fillEvent1DHisto(TH1F* elastic, TH1F* inelastic, bool flag, double someInfo) {
+
+  if(flag) elastic->Fill(someInfo);
+  else if(!flag) inelastic->Fill(someInfo);
+
+}
+
+void fillEvent2DHisto(TH2F* elastic, TH2F* inelastic, bool flag, double someInfo, double moreInfo) {
+
+  if(flag) elastic->Fill(someInfo, moreInfo);
+  else if(!flag) inelastic->Fill(someInfo, moreInfo);
+
+}
+
 int main(int argc, char *argv[]) {
   
   std::string JobNum;
@@ -481,7 +497,44 @@ int main(int argc, char *argv[]) {
     title = title + std::to_string(i + 1);
     std::string name = "sectionEfficiencyLocalPosition";
     name = name + std::to_string(i + 1);
-    h_sectionEfficiencyLocalPositions[i] = new TH1F(name.c_str(), title.c_str(),200, -7.5, 7.5);
+    h_sectionEfficiencyLocalPositions[i] = new TH1F(name.c_str(), title.c_str(),200, -5.0, 5.0);
+  }
+  //elastic ONLY histos
+  TH2F *h_dEoverE_TopHigh_Elastic = new TH2F("dEoverE_Top_Elastic", "dE over E for top array - HIGHEST PV ONLY(Elastic Events)", 400,0,150,400,0,20);
+  TH2F *h_dEoverE_BotHigh_Elastic = new TH2F("dEoverE_Bot_Elastic", "dE over E for bottom array - HIGHEST PV ONLY(Elastic Events)", 400,0,150,400,0,20);
+  TH2F *h_dEoverEtop_Elastic = new TH2F("dEoverEtop_Elastic", "dE over E for top array(Elastic Events)", 400,0,150,400,0,20);
+  TH2F *h_dEoverEbot_Elastic = new TH2F("dEoverEbot_Elastic", "dE over E for bottom array(Elastic Events)", 400,0,150,400,0,20);
+  TH1F *h_sectionEfficiency1_Elastic = new TH1F("sectionEfficiency1_Elastic","Polarimeter section efficiency before cuts (Elastic Events)",13,0.25,6.75);
+  TH1F *h_sectionEfficiency2_Elastic = new TH1F("sectionEfficiency2_Elastic","Polarimeter section efficiency after asymmetry cut (Elastic Events)",13,0.25,6.75);
+  TH1F *h_sectionEfficiency3_Elastic = new TH1F("sectionEfficiency3_Elastic","Polarimeter section efficiency after array energy total cuts (Elastic Events)",13,0.25,6.75);
+  TH1F *h_sectionEfficiency4_Elastic = new TH1F("sectionEfficiency4_Elastic","Polarimeter section efficiency after angle cut (Elastic Events)",13,0.25,6.75);
+  TH1F *h_dTOF_Elastic = new TH1F("dTOF_Elastic","Delta time-of-flight (Elastic Events)",600,-30,120);
+  TH1F *h_sectionEfficiencyLocalPositions_Elastic[LAYER_NUM]; 
+  for(int i = 0; i <= (LAYER_NUM-1); i++) {
+    std::string title = "Polarimeter Efficiency (Elastic Events)- Section ";
+    title = title + std::to_string(i + 1);
+    std::string name = "sectionEfficiencyLocalPosition_Elastic";
+    name = name + std::to_string(i + 1);
+    h_sectionEfficiencyLocalPositions_Elastic[i] = new TH1F(name.c_str(), title.c_str(),200, -2.5, 2.5);
+  }
+
+  //inelastic ONLY histos
+  TH2F *h_dEoverE_TopHigh_Inelastic = new TH2F("dEoverE_Top_Inelastic", "dE over E for top array - HIGHEST PV ONLY(Inelastic Events)", 400,0,150,400,0,20);
+  TH2F *h_dEoverE_BotHigh_Inelastic = new TH2F("dEoverE_Bot_Inelastic", "dE over E for bottom array - HIGHEST PV ONLY(Inelastic Events)", 400,0,150,400,0,20);
+  TH2F *h_dEoverEtop_Inelastic = new TH2F("dEoverEtop_Inelastic", "dE over E for top array(Inelastic Events)", 400,0,150,400,0,20);
+  TH2F *h_dEoverEbot_Inelastic = new TH2F("dEoverEbot_Inelastic", "dE over E for bottom array(Inelastic Events)", 400,0,150,400,0,20);
+  TH1F *h_sectionEfficiency1_Inelastic = new TH1F("sectionEfficiency1_Inelastic","Polarimeter section efficiency before cuts (Inelastic Events)",13,0.25,6.75);
+  TH1F *h_sectionEfficiency2_Inelastic = new TH1F("sectionEfficiency2_Inelastic","Polarimeter section efficiency after asymmetry cut (Inelastic Events)",13,0.25,6.75);
+  TH1F *h_sectionEfficiency3_Inelastic = new TH1F("sectionEfficiency3_Inelastic","Polarimeter section efficiency after array energy total cuts (Inelastic Events)",13,0.25,6.75);
+  TH1F *h_sectionEfficiency4_Inelastic = new TH1F("sectionEfficiency4_Inelastic","Polarimeter section efficiency after angle cut (Inelastic Events)",13,0.25,6.75);
+  TH1F *h_dTOF_Inelastic = new TH1F("dTOF_Inelastic","Delta time-of-flight (Inelastic Events)",600,-30,120);
+  TH1F *h_sectionEfficiencyLocalPositions_Inelastic[LAYER_NUM];
+  for(int i = 0; i <= (LAYER_NUM-1); i++) {
+    std::string title = "Polarimeter Efficiency(Inelastic Events)  - Section ";
+    title = title + std::to_string(i + 1);
+    std::string name = "sectionEfficiencyLocalPosition_Inelastic";
+    name = name + std::to_string(i + 1);
+    h_sectionEfficiencyLocalPositions_Inelastic[i] = new TH1F(name.c_str(), title.c_str(),200, -2.5, 2.5);
   }
 	
   // BEGIN STATS LOOP
@@ -516,7 +569,6 @@ int main(int argc, char *argv[]) {
 	break;
       }
 		
-    } 
     // END VERTICES LOOP - 
     // !elasticFlag is false (eventsFailed -> inelastic) file -> Elastic
     // elasticFlag is true (eventsFailed -> elastic) file -> Inelastic
@@ -532,8 +584,8 @@ int main(int argc, char *argv[]) {
       if((detectorType(aVertex->volume) == analyzer) && (aVertex->parentId == 0)) {
       eventInteraction++;
       break;
-      }
-      } // END VERTICES LOOP */
+      }// END VERTICES LOOP */
+	} 
 
     // BEGIN STEPS LOOP
     std::vector<NpolStep *>::iterator s_it;
@@ -568,7 +620,8 @@ int main(int argc, char *argv[]) {
     eDepArrayTotal[botdEArray] = 0.0;
     if(sectionOfInterest != -1) {
       eventInteraction++;
-      h_sectionEfficiency1->Fill(sectionOfInterest+1);
+      h_sectionEfficiency1->Fill(sectionOfInterest+1); // Fill
+	  fillEvent1DHisto(h_sectionEfficiency1_Elastic, h_sectionEfficiency1_Inelastic, elasticFlag, sectionOfInterest+1);
       for(e_it = detEvents.begin(); e_it != detEvents.end(); e_it++) {
 	if(sectionNumber(e_it->first) == sectionOfInterest) {
 	  PolarimeterDetector detector = detectorType(e_it->first);
@@ -589,7 +642,8 @@ int main(int argc, char *argv[]) {
 	dEArrayOfInterest = botdEArray;
       }
       if(EArrayOfInterest != unknown) {
-	h_sectionEfficiency2->Fill(sectionOfInterest+1);
+		h_sectionEfficiency2->Fill(sectionOfInterest+1); //Fill
+		fillEvent1DHisto(h_sectionEfficiency2_Elastic, h_sectionEfficiency2_Inelastic, elasticFlag, sectionOfInterest+1);
 	double eDepAnalyzer = eDepArrayTotal[analyzer];
 	double eDepE = eDepArrayTotal[EArrayOfInterest];// energy for array filled here 
 	double eDepdE = eDepArrayTotal[dEArrayOfInterest];
@@ -598,18 +652,27 @@ int main(int argc, char *argv[]) {
 	double dEDepHighest = highestEDepPV(&detEvents, sectionOfInterest, dEArrayOfInterest);
 	double eDepHighest = highestEDepPV(&detEvents, sectionOfInterest, EArrayOfInterest);
 	if(eDepAnalyzer > 4.0 /*MeV*/ && eDepE > 5.0 /*MeV */ && eDepTotal >= 50.0 /*MeV*/) { // Requirements 3 and 4
-	  h_sectionEfficiency3->Fill(sectionOfInterest+1);
+	  h_sectionEfficiency3->Fill(sectionOfInterest+1); //FILL
+	  fillEvent1DHisto(h_sectionEfficiency3_Elastic, h_sectionEfficiency3_Inelastic, elasticFlag, sectionOfInterest+1);
 	  if(CheckAngleRequirement(txtOut,verts->at(1),&detEvents,sectionOfInterest,EArrayOfInterest,&dTOF)) {
 	    OutputTracks(verts,txtOut,eventCounter,&eDepArrayTotal,sectionOfInterest);
-	    h_sectionEfficiency4->Fill(sectionOfInterest+1);
-	    h_dTOF->Fill(dTOF);
+	    h_sectionEfficiency4->Fill(sectionOfInterest+1); //FILL
+		fillEvent1DHisto(h_sectionEfficiency4_Elastic, h_sectionEfficiency4_Inelastic, elasticFlag, sectionOfInterest+1);
+	    h_dTOF->Fill(dTOF);//FILL
+		fillEvent1DHisto(h_dTOF_Elastic, h_dTOF_Inelastic, elasticFlag, dTOF);
 	    sectionEffLocalCoordinates(h_sectionEfficiencyLocalPositions[sectionOfInterest],&detEvents,sectionOfInterest,analyzer);
+		sectionEffLocalCoordinates(h_sectionEfficiencyLocalPositions_Elastic[sectionOfInterest],&detEvents,sectionOfInterest,analyzer);
+		sectionEffLocalCoordinates(h_sectionEfficiencyLocalPositions_Inelastic[sectionOfInterest],&detEvents,sectionOfInterest,analyzer);
 	    if(EArrayOfInterest == topEArray) {// this is where histo for top dE/E gets filled
-	      h_dEoverEtop->Fill(eDepE,eDepdE);
-	      h_dEoverE_TopHigh->Fill(eDepHighest, dEDepHighest);
-	    } else if(EArrayOfInterest == botEArray) { // bottom dE/E gets filled
-	      h_dEoverEbot->Fill(eDepE,eDepdE);
-	      h_dEoverE_BotHigh->Fill(eDepHighest, dEDepHighest);
+	      h_dEoverEtop->Fill(eDepE,eDepdE); //FILL
+		  fillEvent2DHisto(h_dEoverEtop_Elastic, h_dEoverEtop_Inelastic, elasticFlag, eDepE, eDepdE);
+	      h_dEoverE_TopHigh->Fill(eDepHighest, dEDepHighest); //FILL
+		  fillEvent2DHisto(h_dEoverE_TopHigh_Elastic, h_dEoverE_TopHigh_Inelastic, elasticFlag, eDepE, eDepdE);
+	    } else if(EArrayOfInterest == botEArray) { 
+	      h_dEoverEbot->Fill(eDepE,eDepdE);//FILL
+		  fillEvent2DHisto(h_dEoverEbot_Elastic, h_dEoverEbot_Inelastic, elasticFlag, eDepE, eDepdE);
+	      h_dEoverE_BotHigh->Fill(eDepHighest, dEDepHighest);//FILL
+		  fillEvent2DHisto(h_dEoverE_BotHigh_Elastic, h_dEoverE_BotHigh_Inelastic, elasticFlag, eDepE, eDepdE);
 	    }
 			  
 	    eventsPassed++;
@@ -652,7 +715,34 @@ int main(int argc, char *argv[]) {
     (h_sectionEfficiencyLocalPositions[i])->Write();
   }
   h_dTOF->Write();
+  //write elastic only
+  h_dEoverE_TopHigh_Elastic->Write();
+  h_dEoverE_BotHigh_Elastic->Write();
+  h_dEoverEtop_Elastic->Write();
+  h_dEoverEbot_Elastic->Write();
+  h_sectionEfficiency1_Elastic->Write();
+  h_sectionEfficiency2_Elastic->Write();
+  h_sectionEfficiency3_Elastic->Write();
+  h_sectionEfficiency4_Elastic->Write();
+  for(int i = 0; i <= (LAYER_NUM - 1); i++) {
+	(h_sectionEfficiencyLocalPositions_Elastic[i])->Write();
+  }
+  h_dTOF_Elastic->Write();
+  //write inelastic only
+  h_dEoverE_TopHigh_Inelastic->Write();
+  h_dEoverE_BotHigh_Inelastic->Write();
+  h_dEoverEtop_Inelastic->Write();
+  h_dEoverEbot_Inelastic->Write();
+  h_sectionEfficiency1_Inelastic->Write();
+  h_sectionEfficiency2_Inelastic->Write();
+  h_sectionEfficiency3_Inelastic->Write();
+  h_sectionEfficiency4_Inelastic->Write();
+  for(int i = 0; i <= (LAYER_NUM - 1); i++) {
+	(h_sectionEfficiencyLocalPositions_Inelastic[i])->Write();
+  }
+  h_dTOF_Inelastic->Write();
   outFile->Close();
   txtOut.close();
   return 0;
 }
+

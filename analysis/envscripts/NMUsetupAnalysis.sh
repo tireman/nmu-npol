@@ -3,17 +3,13 @@
 export Lead=15
 export Energy=4.4
 export Bfield=4
-export BUILD_DIR=/home/tireman/simulation/jlab/npol/nmu-npol/build/simulation
-export NPOLLIB_DIR=/home/tireman/simulation/jlab/npol/nmu-npol/build/npollib
-export NPOLBASENAME=sourceTotal_Lead$Lead\cm_$Energy\GeV_$Bfield\Bdl
+export BUILD_DIR=/home/aadzima/nmu-npol/build/simulation
+export NPOLLIB_DIR=/home/aadzima/nmu-npol/build/npollib
+export NPOLBASENAME=sourceNeutron_Lead$Lead\cm_$Energy\GeV_$Bfield\Bdl
 
-#export NPOLDIR=/data2/cgen/JlabSimData/Summer2016Run/FullGeometry/4.4GeV/4Bdl
-export NPOLDIR=/data2/cgen/JlabSimData/December2016/TargetTaggerSource/$Energy\GeV/$Bfield\Bdl/TargetTagger56by21
-#export NPOLDIR=/data1/cgen/NeutronOnly/RealisticSource/10cmThickScint
+export NPOLDIR=/data1/cgen/NeutronOnly/RealisticSource/10cmThickScint
 
-#export NPOLWORKDIR=/data2/cgen/JlabSimData/Summer2016Run/FullGeometry/4.4GeV/4Bdl
-export NPOLWORKDIR=/data2/cgen/JlabSimData/December2016/TargetTaggerSource/$Energy\GeV/$Bfield\Bdl/TargetTagger56by21
-#export NPOLWORKDIR=/data1/cgen/NeutronOnly/RealisticSource/10cmThickScint
+export NPOLWORKDIR=/data1/cgen/NeutronOnly/RealisticSource/10cmThickScint
 
 export OutputDir=$NPOLDIR/Output
 export InputDir=$NPOLDIR/root
@@ -55,3 +51,4 @@ if [ ! -e $NPOLWORKDIR/histos ]
 then
 	mkdir $NPOLWORKDIR/histos
 fi
+
