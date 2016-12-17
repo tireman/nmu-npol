@@ -1,12 +1,12 @@
 #! /bin/bash
 #
 #$ -V
-#$ -t 1-500
+#$ -t 1-76
 #$ -cwd
 
+export Lead=15
 export Energy=4.4
 export Bfield=4
-export Lead=15
 
 export BUILD_DIR=/home/tireman/simulation/jlab/nmu-npol/build
 export NPOLLIB_DIR=$BUILD_DIR/npollib
