@@ -222,9 +222,9 @@ void NpolPolarimeter::ConstructFrontDetArray(G4LogicalVolume *motherLV) {
   Rm.rotateY(0.0*deg);
   
   for(unsigned int i=0; i<2; i++)
-    ImprintPlate(FrontDetArray1, motherLV, 0.0*m, 0.0*m, (-FrontDetOffset+FrontDetSpacing*i)*m, 0.0*deg);
+    ImprintPlate(FrontDetArray1, motherLV, 0.0*m, 0.0*m, (-FrontDetOffset+FrontDetSpacing*i), 0.0*deg);
   for(unsigned int i=2; i<4; i++)
-    ImprintPlate(FrontDetArray2, motherLV, 0.0*m, 0.0*m, (-FrontDetOffset+FrontDetSpacing*i)*m, 0.0*deg);
+    ImprintPlate(FrontDetArray2, motherLV, 0.0*m, 0.0*m, (-FrontDetOffset+FrontDetSpacing*i), 0.0*deg);
   
   G4VisAttributes* FrontDetVisAtt= new G4VisAttributes(G4Colour(1.0,1.0,0.0));
   FrontDetLV->SetVisAttributes(FrontDetVisAtt);
@@ -251,10 +251,10 @@ void NpolPolarimeter::ConstructFrontVetoArray(G4LogicalVolume *motherLV) {
 
   for(unsigned int i=0; i<2; i++)
     ImprintPlate(FrontVetoArray1, motherLV, 0.0*m, 0.0*m, 
-				 (-FrontVetoOffset+FrontDetSpacing*i)*m, 0.0*deg); // 1.77 for 10cm thick Front
+		 (-FrontVetoOffset+FrontDetSpacing*i), 0.0*deg); // 1.77 for 10cm thick Front
   for(unsigned int i=2; i<4; i++)
     ImprintPlate(FrontVetoArray2, motherLV, 0.0*m, 0.0*m, 
-				 (-FrontVetoOffset+FrontDetSpacing*i)*m, 0.0*deg);
+		 (-FrontVetoOffset+FrontDetSpacing*i), 0.0*deg);
   
   G4VisAttributes* FrontVetoVisAtt= new G4VisAttributes(G4Colour(1.0,1.0,1.0));
   FrontVetoLV->SetVisAttributes(FrontVetoVisAtt);
