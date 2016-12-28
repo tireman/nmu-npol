@@ -31,13 +31,23 @@ public:
 
   static G4double NpolAng;
   static G4double NpolBoxPos;
+  static G4double NDetThickness;
+  static G4double NVetoThickness;
+  static G4double NDetHeight;
+  static G4double NDetStandardLength;
+  static G4double EArrayVertOffset;
+  static G4double dEArrayVertOffset;
+  static G4double EarrayRotAngle;
+  static G4double EArrayHoriOffset;
+  static G4double BackTaggerzPos;
+  static G4double Array1zPos; static G4double Array2zPos;
   
   void ConstructTopDetArray(G4LogicalVolume *motherLV);
   void ConstructTopVetoArray(G4LogicalVolume *motherLV);
   void ConstructBottomDetArray(G4LogicalVolume *motherLV);
   void ConstructBottomVetoArray(G4LogicalVolume *motherLV);
   void ConstructFrontDetArray(G4LogicalVolume *motherLV);
-  void ConstructFrontTagArray(G4LogicalVolume *motherLV);
+  void ConstructFrontVetoArray(G4LogicalVolume *motherLV);
   void ConstructBackTagArray(G4LogicalVolume *motherLV);
 
   virtual G4String GetName();
