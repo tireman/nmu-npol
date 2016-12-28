@@ -40,10 +40,13 @@ G4double NpolPolarimeter::NDetHeight = 10.0*cm;
 G4double NpolPolarimeter::NDetStandardLength = 100.0*cm;
 G4double NpolPolarimeter::EArrayVertOffset = 0.90*m;
 G4double NpolPolarimeter::dEArrayVertOffset = 0.50*m; // orig was 0.32*m
-G4double NpolPolarimeter::EArrayHoriOffset = 0.602*m; // computed offset
+G4double NpolPolarimeter::EArrayHoriOffset = 0.602*m; // computed offset 0.601*m
 G4double NpolPolarimeter::Array1zPos = -1.10*m;
 G4double NpolPolarimeter::Array2zPos = +0.300*m;
 G4double NpolPolarimeter::EarrayRotAngle = 45.0*deg;
+G4double NpolPolarimeter::FrontDetSpacing = 0.65*m;
+G4double NpolPolarimeter::FrontDetOffset = 1.70*m;
+G4double NpolPolarimeter::FrontVetoOffset = 1.77*m;
 G4double NpolPolarimeter::BackTaggerzPos = 1.80*m;
 G4double NpolPolarimeter::NpolAng = 28.0*deg; //28.0*deg;
 
@@ -145,8 +148,8 @@ void NpolPolarimeter::ConstructTopVetoArray(G4LogicalVolume *motherLV) {
   G4AssemblyVolume *TopVetoArray1 = MakePlate(TopVetoLV, 13, 0.0*m, 0.0*m, 0.60*m, 0.0*m, 0.0*m, 0.10*m);
   G4AssemblyVolume *TopVetoArray2 = MakePlate(TopVetoLV, 14, 0.0*m, 0.0*m, 0.60*m, 0.0*m, 0.0*m, 0.10*m);
   
-  ImprintPlate(TopVetoArray1, motherLV, 0.0*m, VertPos1, Array1zPos, 0.0*deg); // -1.150*m
-  ImprintPlate(TopVetoArray2, motherLV, 0.0*m, VertPos2, Array2zPos, 0.0*deg);  // 0.300*m
+  ImprintPlate(TopVetoArray1, motherLV, 0.0*m, VertPos1, Array1zPos, 0.0*deg); 
+  ImprintPlate(TopVetoArray2, motherLV, 0.0*m, VertPos2, Array2zPos, 0.0*deg); 
   
   G4VisAttributes* TopaVisAtt= new G4VisAttributes(G4Colour(0.0,1.0,1.0));
   TopVetoLV->SetVisAttributes(TopaVisAtt);
@@ -194,8 +197,8 @@ void NpolPolarimeter::ConstructBottomVetoArray(G4LogicalVolume *motherLV) {
   G4AssemblyVolume *BottomVetoArray2 = MakePlate(BottomVetoLV,
 	14, 0.0*m, 0.0*m, 0.60*m, 0.0*m, 0.0*m, 0.10*m);
 
-  ImprintPlate(BottomVetoArray1, motherLV, 0.0*m, VertPos1, Array1zPos, 0.0*deg); //1.150*m
-  ImprintPlate(BottomVetoArray2, motherLV, 0.0*m, VertPos2, Array2zPos, 0.0*deg);  // 0.300*m
+  ImprintPlate(BottomVetoArray1, motherLV, 0.0*m, VertPos1, Array1zPos, 0.0*deg); 
+  ImprintPlate(BottomVetoArray2, motherLV, 0.0*m, VertPos2, Array2zPos, 0.0*deg); 
   
   G4VisAttributes* BotaVisAtt= new G4VisAttributes(G4Colour(0.0,1.0,1.0));
   BottomVetoLV->SetVisAttributes(BotaVisAtt);
@@ -219,9 +222,9 @@ void NpolPolarimeter::ConstructFrontDetArray(G4LogicalVolume *motherLV) {
   Rm.rotateY(0.0*deg);
   
   for(unsigned int i=0; i<2; i++)
-    ImprintPlate(FrontDetArray1, motherLV, 0.0*m, 0.0*m, (-1.70+0.65*i)*m, 0.0*deg);
+    ImprintPlate(FrontDetArray1, motherLV, 0.0*m, 0.0*m, (-FrontDetOffset+FrontDetSpacing*i)*m, 0.0*deg);
   for(unsigned int i=2; i<4; i++)
-    ImprintPlate(FrontDetArray2, motherLV, 0.0*m, 0.0*m, (-1.70+0.65*i)*m, 0.0*deg);
+    ImprintPlate(FrontDetArray2, motherLV, 0.0*m, 0.0*m, (-FrontDetOffset+FrontDetSpacing*i)*m, 0.0*deg);
   
   G4VisAttributes* FrontDetVisAtt= new G4VisAttributes(G4Colour(1.0,1.0,0.0));
   FrontDetLV->SetVisAttributes(FrontDetVisAtt);
@@ -248,10 +251,10 @@ void NpolPolarimeter::ConstructFrontVetoArray(G4LogicalVolume *motherLV) {
 
   for(unsigned int i=0; i<2; i++)
     ImprintPlate(FrontVetoArray1, motherLV, 0.0*m, 0.0*m, 
-				 (-1.77+0.65*i)*m, 0.0*deg); // 1.77 for 10cm thick Front
+				 (-FrontVetoOffset+FrontDetSpacing*i)*m, 0.0*deg); // 1.77 for 10cm thick Front
   for(unsigned int i=2; i<4; i++)
     ImprintPlate(FrontVetoArray2, motherLV, 0.0*m, 0.0*m, 
-				 (-1.77+0.65*i)*m, 0.0*deg);
+				 (-FrontVetoOffset+FrontDetSpacing*i)*m, 0.0*deg);
   
   G4VisAttributes* FrontVetoVisAtt= new G4VisAttributes(G4Colour(1.0,1.0,1.0));
   FrontVetoLV->SetVisAttributes(FrontVetoVisAtt);

@@ -39,25 +39,25 @@
 /gps/pos/type Plane
 /gps/pos/shape Rectangle
 
-/gps/pos/centre -70.421 0. 132.442 cm  # target tagger
-/gps/pos/halfx 28.00 cm   		    # target tagger
-/gps/pos/halfy 10.5 cm			    # target tagger
+#/gps/pos/centre -70.421 0. 132.442 cm  # target tagger
+#/gps/pos/halfx 28.00 cm   		    # target tagger
+#/gps/pos/halfy 10.5 cm			    # target tagger
 
-#/gps/pos/centre -321.067 0. 603.839 cm  # NPOL tagger
-#/gps/pos/halfx 43.32 cm   		        # NPOL tagger
-#/gps/pos/halfy 36.92 cm			    # NPOL tagger
+/gps/pos/centre -321.067 0. 603.839 cm  # NPOL tagger
+/gps/pos/halfx 43.32 cm   		        # NPOL tagger
+/gps/pos/halfy 36.92 cm			    # NPOL tagger
 
 /gps/pos/rot1 0.882947 0 0.46947        # Rotate the source
 /gps/pos/rot2 0. 1. 0.                  # default
 
 ###### Biasing the (x,y) distribution ######
 /gps/hist/type biasx
-/control/execute macros/particleFluxData/4.4GeV/targetX_neutron.dat
-#/control/execute macros/particleFluxData/4.4GeV/npolX_neutron.dat
+#/control/execute macros/particleFluxData/4.4GeV/targetX_neutron.dat
+/control/execute macros/particleFluxData/4.4GeV/npolX_neutron.dat
 
 /gps/hist/type biasy
-/control/execute macros/particleFluxData/4.4GeV/targetY_neutron.dat
-#/control/execute macros/particleFluxData/4.4GeV/npolY_neutron.dat
+#/control/execute macros/particleFluxData/4.4GeV/targetY_neutron.dat
+/control/execute macros/particleFluxData/4.4GeV/npolY_neutron.dat
 
 ###### Angular distribution biasing ######
 /gps/ang/type iso						# isotropic source
@@ -68,22 +68,23 @@
 
 ###### Biasing theta ######
 /gps/hist/type biast					# bias theta
-/control/execute macros/particleFluxData/4.4GeV/targetTheta_neutron.dat
-#/control/execute macros/particleFluxData/4.4GeV/npolTheta_neutron.dat
+#/control/execute macros/particleFluxData/4.4GeV/targetTheta_neutron.dat
+/control/execute macros/particleFluxData/4.4GeV/npolTheta_neutron.dat
 
 ###### Biasing phi ######
 /gps/hist/type biasp					# bias phi
-/control/execute macros/particleFluxData/4.4GeV/targetPhi_neutron.dat
-#/control/execute macros/particleFluxData/4.4GeV/npolPhi_neutron.dat	
+#/control/execute macros/particleFluxData/4.4GeV/targetPhi_neutron.dat
+/control/execute macros/particleFluxData/4.4GeV/npolPhi_neutron.dat	
 
 ###### Loads the energy distribution from user supplied data. ######
 /gps/ene/type User
 /gps/hist/type energy
-/control/execute macros/particleFluxData/4.4GeV/targetEnergy_neutron.dat
-#/control/execute macros/particleFluxData/4.4GeV/npolEnergy_neutron.dat
+#/control/execute macros/particleFluxData/4.4GeV/targetEnergy_neutron.dat
+/control/execute macros/particleFluxData/4.4GeV/npolEnergy_neutron.dat
 
 ###### Commands below are independent of GPS ######
 /vis/scene/endOfEventAction accumulate 100
 /run/printProgress 10000
 
-/run/beamOn 102315
+/run/beamOn 500000
+

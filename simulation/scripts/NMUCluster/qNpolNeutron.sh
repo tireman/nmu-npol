@@ -1,7 +1,7 @@
 #! /bin/bash
 #
 #$ -V
-#$ -t 1-26
+#$ -t 1-1
 #$ -cwd
 
 export Lead=15
@@ -68,5 +68,9 @@ rm /scratch/root/$NPOLBASENAME\_$SGE_TASK_ID\_*.root
 
 $BUILD_DIR/analysis/NpolAnalysis
 $BUILD_DIR/analysis2/NpolProcessEvents
+
+mv /scratch/histos/$NPOLBASENAME\_Histos_$SGE_TASK_ID.root /home/tireman/output/NpolTaggerBaised/4.4GeV/NeutronOnly/ArrayOption_1/NpolEvents/histos
+
+mv /scratch/histos/$NPOLBASENAME\_NpolEff_$SGE_TASK_ID.root /home/tireman/output/NpolTaggerBaised/4.4GeV/NeutronOnly/ArrayOption_1/NpolEff/histos
 
 rm /scratch/root/$NPOLBASENAME\_$SGE_TASK_ID.root
