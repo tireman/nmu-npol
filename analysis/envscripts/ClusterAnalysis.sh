@@ -1,15 +1,15 @@
 #!/bin/sh
 
-export Lead=15
-export Energy=4.4
+export Lead=5
+export Energy=11
 export Bfield=4
 export BUILD_DIR=/home/tireman/simulation/jlab/npol/nmu-npol/build/simulation
 export NPOLLIB_DIR=/home/tireman/simulation/jlab/npol/nmu-npol/build/npollib
-export NPOLBASENAME=sourceNeutron_Lead$Lead\cm_$Energy\GeV_$Bfield\Bdl
+export NPOLBASENAME=sourceTotal_Lead$Lead\cm_$Energy\GeV_$Bfield\Bdl
 
-export NPOLDIR=/home/tireman/output/neutron/4.4GeV/4Bdl/Lead15cm/15cm6Layer
+export NPOLDIR=/home/tireman/output/TargetTaggerBiased/$Energy\GeV/Lead$Lead\cm/NpolEvents
 
-export NPOLWORKDIR=/home/tireman/output/neutron/4.4GeV/4Bdl/Lead15cm/15cm6Layer
+export NPOLWORKDIR=/home/tireman/output/TargetTaggerBiased/$Energy\GeV/Lead$Lead\cm/NpolEvents
 
 export OutputDir=$NPOLDIR/Output
 export InputDir=$NPOLDIR/root
