@@ -18,10 +18,10 @@
 #include <TVectorD.h>
 #include <TString.h>
 
-//#include "../../npollib/include/NpolVertex.hh"
-//#include "../../npollib/include/NpolTagger.hh"
-//#include "../../npollib/include/NpolStatistics.hh"
-//#include "../../npollib/include/NpolStep.hh"
+#include "NpolVertex.hh"
+#include "NpolTagger.hh"
+#include "NpolStatistics.hh"
+#include "NpolStep.hh"
 
 void RetrieveENVvariables();
 TString FormInputFile(TString InputDir);
@@ -40,13 +40,9 @@ TString Bfield = "";
 TString OutputDir = "";
 TString InputDir = "";
 
-void ProcessElectrons() {
-  TString analysisDir = getenv("NPOLLIB_DIR");
-  gSystem->Load(analysisDir + "/" + "libNpolClasses.so"); 
-  #include analysisDir + "/include/NpolVertex.hh"
-  #include analysisDir + "/include/NpolTagger.hh"
-  #include analysisDir + "/include/NpolStatistics.hh"
-  #include analysisDir + "/include/NpolStep.hh"
+int main(int argc, char *argv[]) {
+  //TString analysisDir = getenv("NPOLLIB_DIR");
+  //gSystem->Load(analysisDir + "/" + "libNpolClasses.so"); 
   
   // Set up the TTrees and their branch addresses
   TChain *npolTree = new TChain("T");

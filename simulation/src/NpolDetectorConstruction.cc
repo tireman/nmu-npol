@@ -39,7 +39,7 @@ NpolDetectorConstruction::NpolDetectorConstruction() {
   detectors.insert(new NpolPolarimeter());
   //detectors.insert(new NpolPolarimeter6Layer()); // invoke this when studying 6 layers
   //detectors.insert(new NpolScatteringChamber);
-  // detectors.insert(new NpolHallShell);
+  detectors.insert(new NpolHallShell);
   //detectors.insert(new NpolBeamlineUpper);
   //detectors.insert(new NpolBeamlineDown);
   //detectors.insert(new NpolDipole1);

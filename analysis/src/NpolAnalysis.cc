@@ -1,4 +1,5 @@
-/* Npol Analysis Script is designed to analyze the neutron flux on the NPOL polarimeter being designed by the CGEN 
+/* Npol Analysis Script is designed to analyze the neutron flux on the NPOL 
+   polarimeter being designed by the CGEN 
    collaboration at Jefferson National Laboratory.
 */
 
@@ -21,6 +22,7 @@
 #include "TCanvas.h"
 #include "TStyle.h"
 #include "TSystem.h"
+#include "TString.h"
 
 #include "NpolVertex.hh"
 #include "NpolStep.hh"

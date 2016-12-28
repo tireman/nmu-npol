@@ -5,10 +5,15 @@ export Energy=4.4
 export Bfield=4
 export BUILD_DIR=/home/tireman/simulation/jlab/npol/nmu-npol/build/simulation
 export NPOLLIB_DIR=/home/tireman/simulation/jlab/npol/nmu-npol/build/npollib
-export NPOLBASENAME=sourceTotal_Lead$Lead\cm_$Energy\GeV_$Bfield\Bdl
+export NPOLBASENAME=electronBeam_Lead$Lead\cm_$Energy\GeV_$Bfield\Bdl
 
-export NPOLDIR=/home/tireman/output/NpolTaggerBiased/$Energy\GeV/NeutronOnly/NpolEff
-export NPOLWORKDIR=/home/tireman/output/NpolTaggerBiased/$Energy\GeV/NeutronOnly/NpolEff
+export NPOLDIR=/data2/cgen/JlabSimData/Summer2016Run/FullGeometry/$Energy\GeV/$Bfield\Bdl
+#export NPOLDIR=/data2/cgen/JlabSimData/Summer2016Run/TargetTaggerSource/4.4GeV/$Bfield\Bdl/SmallTargetTagger
+#export NPOLDIR=/data1/cgen/NeutronOnly/RealisticSource
+
+export NPOLWORKDIR=/data2/cgen/JlabSimData/Summer2016Run/FullGeometry/$Energy\GeV/$Bfield\Bdl
+#export NPOLWORKDIR=/data2/cgen/JlabSimData/Summer2016Run/TargetTaggerSource/4.4GeV/$Bfield\Bdl/SmallTargetTagger
+#export NPOLWORKDIR=/data1/cgen/NeutronOnly/RealisticSource/10cmThickScint/Elastic
 
 export OutputDir=$NPOLDIR/Output
 export InputDir=$NPOLDIR/root
