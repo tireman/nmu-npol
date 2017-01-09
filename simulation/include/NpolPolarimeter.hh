@@ -39,6 +39,7 @@ public:
   static G4double dEArrayVertOffset;
   static G4double EarrayRotAngle;
   static G4double EArrayHoriOffset;
+  static G4double dEArrayHoriOffset;
   static G4double FrontDetSpacing;
   static G4double FrontDetOffset;
   static G4double FrontVetoOffset;
