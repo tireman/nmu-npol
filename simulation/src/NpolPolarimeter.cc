@@ -39,8 +39,9 @@ G4double NpolPolarimeter::NVetoThickness = 1.00*cm;
 G4double NpolPolarimeter::NDetHeight = 10.0*cm;
 G4double NpolPolarimeter::NDetStandardLength = 100.0*cm;
 G4double NpolPolarimeter::EArrayVertOffset = 0.90*m;
-G4double NpolPolarimeter::dEArrayVertOffset = 0.50*m; // orig was 0.32*m
+G4double NpolPolarimeter::dEArrayVertOffset = 0.42*m; // orig was 0.32*m
 G4double NpolPolarimeter::EArrayHoriOffset = 0.602*m; // computed offset 0.601*m
+G4double NpolPolarimeter::dEArrayHoriOffset = 0.4288*m; // computed offset is 0.569*m
 G4double NpolPolarimeter::Array1zPos = -1.10*m;
 G4double NpolPolarimeter::Array2zPos = +0.300*m;
 G4double NpolPolarimeter::EarrayRotAngle = 45.0*deg;
@@ -118,7 +119,7 @@ void NpolPolarimeter::ConstructTopDetArray(G4LogicalVolume *motherLV) {
   G4double VertPos1 = EArrayVertOffset; 
   G4double VertPos2 = EArrayVertOffset + 0.10*m;
  
-  G4VSolid *TopDet = new G4Box("TopDet",(NDetStandardLength+60.0*cm)/2,NDetHeight/2,NDetThickness/2);
+  G4VSolid *TopDet = new G4Box("TopDet",(NDetStandardLength + 60.0*cm)/2,NDetHeight/2,NDetThickness/2);
   G4LogicalVolume *TopDetLV = new G4LogicalVolume(TopDet,
 	  NpolMaterials::GetInstance()->GetMaterial("Scint"),"TopDetLV",0,0,0);
 
@@ -141,15 +142,21 @@ void NpolPolarimeter::ConstructTopDetArray(G4LogicalVolume *motherLV) {
 void NpolPolarimeter::ConstructTopVetoArray(G4LogicalVolume *motherLV) {
   G4double VertPos1 = dEArrayVertOffset; 
   G4double VertPos2 = dEArrayVertOffset + 0.10*m;
-  G4VSolid *TopVeto = new G4Box("TopVeto",(NDetStandardLength+60.0*cm)/2,NVetoThickness/2,NDetHeight/2);
+  G4VSolid *TopVeto = new G4Box("TopVeto",(NDetStandardLength + 60.0*cm)/2,NVetoThickness/2,NDetHeight/2);
   G4LogicalVolume *TopVetoLV = new G4LogicalVolume(TopVeto,
 	NpolMaterials::GetInstance()->GetMaterial("Scint"), "TopVetoLV",0,0,0);
   
   G4AssemblyVolume *TopVetoArray1 = MakePlate(TopVetoLV, 13, 0.0*m, 0.0*m, 0.60*m, 0.0*m, 0.0*m, 0.10*m);
   G4AssemblyVolume *TopVetoArray2 = MakePlate(TopVetoLV, 14, 0.0*m, 0.0*m, 0.60*m, 0.0*m, 0.0*m, 0.10*m);
   
-  ImprintPlate(TopVetoArray1, motherLV, 0.0*m, VertPos1, Array1zPos, 0.0*deg); 
+  ImprintPlate(TopVetoArray1, motherLV, 0.0*m, VertPos1, Array1zPos, 0.0*deg); // originals!
   ImprintPlate(TopVetoArray2, motherLV, 0.0*m, VertPos2, Array2zPos, 0.0*deg); 
+
+  // for the new "angled" version 
+  /*ImprintPlate(TopVetoArray1, motherLV, dEArrayHoriOffset, VertPos1, Array1zPos, -EarrayRotAngle);
+  ImprintPlate(TopVetoArray1, motherLV, -dEArrayHoriOffset, VertPos1, Array1zPos, EarrayRotAngle);
+  ImprintPlate(TopVetoArray2, motherLV, dEArrayHoriOffset, VertPos2, Array2zPos, -EarrayRotAngle);
+  ImprintPlate(TopVetoArray2, motherLV, -dEArrayHoriOffset, VertPos2, Array2zPos, EarrayRotAngle);*/
   
   G4VisAttributes* TopaVisAtt= new G4VisAttributes(G4Colour(0.0,1.0,1.0));
   TopVetoLV->SetVisAttributes(TopaVisAtt);
@@ -163,7 +170,7 @@ void NpolPolarimeter::ConstructTopVetoArray(G4LogicalVolume *motherLV) {
 void NpolPolarimeter::ConstructBottomDetArray(G4LogicalVolume *motherLV) {
   G4double VertPos1 = -1*EArrayVertOffset; 
   G4double VertPos2 = -1*(EArrayVertOffset + 0.10*m);
-  G4VSolid *BottomDet = new G4Box("BottomDet",(NDetStandardLength+60.0*cm)/2,NDetHeight/2,NDetThickness/2);
+  G4VSolid *BottomDet = new G4Box("BottomDet",(NDetStandardLength + 60.0*cm)/2,NDetHeight/2,NDetThickness/2);
   G4LogicalVolume *BottomDetLV = new G4LogicalVolume(BottomDet,
 	NpolMaterials::GetInstance()->GetMaterial("Scint"), "BottomDetLV",0,0,0);
   
@@ -188,7 +195,7 @@ void NpolPolarimeter::ConstructBottomDetArray(G4LogicalVolume *motherLV) {
 void NpolPolarimeter::ConstructBottomVetoArray(G4LogicalVolume *motherLV) {
   G4double VertPos1 = -1*dEArrayVertOffset; 
   G4double VertPos2 = -1*(dEArrayVertOffset + 0.10*m);
-  G4VSolid *BottomVeto = new G4Box("BottomVeto",(NDetStandardLength+60.0*cm)/2,NVetoThickness/2,NDetHeight/2);
+  G4VSolid *BottomVeto = new G4Box("BottomVeto",(NDetStandardLength + 60.0*cm)/2,NVetoThickness/2,NDetHeight/2);
   G4LogicalVolume *BottomVetoLV = new G4LogicalVolume(BottomVeto,
 	NpolMaterials::GetInstance()->GetMaterial("Scint"), "BottomVetoLV",0,0,0);
 
@@ -197,9 +204,15 @@ void NpolPolarimeter::ConstructBottomVetoArray(G4LogicalVolume *motherLV) {
   G4AssemblyVolume *BottomVetoArray2 = MakePlate(BottomVetoLV,
 	14, 0.0*m, 0.0*m, 0.60*m, 0.0*m, 0.0*m, 0.10*m);
 
-  ImprintPlate(BottomVetoArray1, motherLV, 0.0*m, VertPos1, Array1zPos, 0.0*deg); 
+  ImprintPlate(BottomVetoArray1, motherLV, 0.0*m, VertPos1, Array1zPos, 0.0*deg); // originals!
   ImprintPlate(BottomVetoArray2, motherLV, 0.0*m, VertPos2, Array2zPos, 0.0*deg); 
   
+  // For new Angled version
+  /*ImprintPlate(BottomVetoArray1, motherLV, dEArrayHoriOffset, VertPos1, Array1zPos, EarrayRotAngle);
+  ImprintPlate(BottomVetoArray1, motherLV, -dEArrayHoriOffset, VertPos1, Array1zPos, EarrayRotAngle + 90*deg);
+  ImprintPlate(BottomVetoArray2, motherLV, dEArrayHoriOffset, VertPos2, Array2zPos, EarrayRotAngle);
+  ImprintPlate(BottomVetoArray2, motherLV, -dEArrayHoriOffset, VertPos2, Array2zPos, EarrayRotAngle + 90*deg);*/
+
   G4VisAttributes* BotaVisAtt= new G4VisAttributes(G4Colour(0.0,1.0,1.0));
   BottomVetoLV->SetVisAttributes(BotaVisAtt);
 }
