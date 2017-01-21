@@ -1,6 +1,6 @@
 /* Npol Analysis Script is designed to analyze the neutron flux on the NPOL 
    polarimeter being designed by the CGEN 
-   collaboration at Jefferson National Laboratory.
+   collaboration at Jefferson National Laboratory. (2016)
 */
 
 #include <iostream>
@@ -229,6 +229,7 @@ PolarimeterDetector detectorType(const std::string &volName) {
 // If -1 is returned, then no section passed requirements 1 and 2.
 int getSectionOfInterest(const std::map<std::string,NpolDetectorEvent *> *detEvents) {
   int sectionOfInterest = -1;
+  bool multiscatter = false;
   for(int section = (LAYER_NUM - 1); section >= 0; section--) {
     std::map<std::string,NpolDetectorEvent *>::const_iterator it;
     bool analyzerFlag = false;
@@ -250,12 +251,23 @@ int getSectionOfInterest(const std::map<std::string,NpolDetectorEvent *> *detEve
 	}
       }
     }
-
-    if(analyzerFlag) sectionOfInterest = -1; // If one of this section's analyzers took a hit, then any section after this fails requirement 2.
-    if((analyzerFlag && topEArrayFlag && topdEArrayFlag && !taggerFlag) || (analyzerFlag && botEArrayFlag && botdEArrayFlag && !taggerFlag)) sectionOfInterest = section; // If this section passes requirement 1, then it may be the section of interest
+    // Mod: Tireman (2017-January-18) to test if multiscattering counts are playing havoc on efficiencies
+    //if(analyzerFlag) sectionOfInterest = -1; // If one of this section's analyzers took a hit, then any section after this fails requirement 2.
+    if((analyzerFlag && topEArrayFlag && topdEArrayFlag && !taggerFlag) || (analyzerFlag && botEArrayFlag && botdEArrayFlag && !taggerFlag)) {
+      if(sectionOfInterest != -1){
+	multiscatter = true;
+      } else {
+	sectionOfInterest = section; // If this section passes requirement 1, then it may be the section of interest
+      }
+    }
   }
 
-  return sectionOfInterest;
+  if(multiscatter){
+    sectionOfInterest = -1;
+    return sectionOfInterest;
+  } else {
+    return sectionOfInterest;
+  }
 }
 
 // If requirement 5 is passed, return the E array of interest (top or bottom).  If requirement 5 does not pass, unknown is returned.
@@ -433,28 +445,28 @@ void fillEvent2DHisto(TH2F* elastic, TH2F* inelastic, bool flag, double someInfo
 
 int main(int argc, char *argv[]) {
   
-  std::string JobNum;
+  TString JobNum;
   if(getenv("JOBNUMBER")){
     JobNum = getenv("JOBNUMBER");
   }else{
     JobNum = "99999"; // default job number is 99999
   }
   
-  std::string InputDir;
+  TString InputDir;
   if(getenv("RawDataDir")){
     InputDir = getenv("RawDataDir");
   }else{
     InputDir = "output"; 
   }
   
-  std::string BaseName;
+  TString BaseName;
   if(getenv("NPOLBASENAME")){
     BaseName = getenv("NPOLBASENAME");
   }else{
     BaseName = "output"; 
   }
   
-  std::string HistoDIR;
+  TString HistoDIR;
   if(getenv("HistoOutputDir")){
     HistoDIR = getenv("HistoOutputDir");
   }else{
