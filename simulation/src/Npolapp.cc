@@ -11,6 +11,7 @@
 #ifdef G4MULTITHREADED
 #include "G4MTRunManager.hh"
 #include "G4Threading.hh"
+#include "G4RunManager.hh"
 #else
 #include "G4RunManager.hh"
 #endif
@@ -36,7 +37,7 @@
 #endif
 
 
-int main(int argc,char *argv[]) {
+int main(int argc,char **argv) {
 
 	// Choose the Random engine
 	//
@@ -63,7 +64,7 @@ int main(int argc,char *argv[]) {
 #ifdef G4MULTITHREADED
 	G4RunManager *runManager = new G4RunManager;
 	//G4MTRunManager *runManager = new G4MTRunManager;
-	//runManager->SetNumberOfThreads(4);
+	//runManager->SetNumberOfThreads(5);
 #else
 	G4RunManager *runManager = new G4RunManager;
 #endif
@@ -88,25 +89,25 @@ int main(int argc,char *argv[]) {
 	G4UImanager *UImanager = G4UImanager::GetUIpointer();
 
 	if(argc != 1) {
-		// batch mode
-		UImanager->ExecuteMacroFile(argv[1]);
+	  // batch mode
+	  UImanager->ExecuteMacroFile(argv[1]);
 	} else {
-		// interactive mode
-		const G4String buildDir = NpolAnalysisManager::GetInstance()->GetBuildDir();
-		const G4String macroPathCommand = "/control/macroPath " + buildDir + "/macros";
-		UImanager->ApplyCommand(macroPathCommand);
+	  // interactive mode
+	  const G4String buildDir = NpolAnalysisManager::GetInstance()->GetBuildDir();
+	  const G4String macroPathCommand = "/control/macroPath " + buildDir + "/macros";
+	  UImanager->ApplyCommand(macroPathCommand);
 #ifdef G4UI_USE
-		G4UIExecutive *ui = new G4UIExecutive(argc, argv);
+	  G4UIExecutive *ui = new G4UIExecutive(argc, argv);
 #ifdef G4VIS_USE
-		UImanager->ApplyCommand("/control/execute init_vis.mac");
+	  UImanager->ApplyCommand("/control/execute init_vis.mac");
 #else
-		UImanager->ApplyCommand("/control/execute init.mac");
+	  UImanager->ApplyCommand("/control/execute init.mac");
 #endif
-		ui->SessionStart();
-		delete ui;
+	  ui->SessionStart();
+	  delete ui;
 #endif
 	}
-
+	
 #ifdef G4VIS_USE
 	delete visManager;
 #endif
