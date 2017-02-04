@@ -83,8 +83,7 @@
 /control/execute macros/particleFluxData/4.4GeV/npolEnergy_neutron.dat
 
 ###### Commands below are independent of GPS ######
-/vis/scene/endOfEventAction accumulate 100
-/run/printProgress 10000
+/run/printProgress 100
 
-/run/beamOn 500000
+/run/beamOn 500
 
