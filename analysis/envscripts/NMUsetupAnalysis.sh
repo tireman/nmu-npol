@@ -3,13 +3,13 @@
 export Lead=15
 export Energy=4.4
 export Bfield=4
-export BUILD_DIR=/home/aadzima/nmu-npol/build/simulation
-export NPOLLIB_DIR=/home/aadzima/nmu-npol/build/npollib
+export BUILD_DIR=/home/tireman/simulation/jlab/npol/nmu-npol/build/simulation
+export NPOLLIB_DIR=/home/tireman/simulation/jlab/npol/nmu-npol/build/npollib
 export NPOLBASENAME=sourceNeutron_Lead$Lead\cm_$Energy\GeV_$Bfield\Bdl
 
-export NPOLDIR=/data1/cgen/NeutronOnly/RealisticSource/10cmThickScint
+export NPOLDIR=/data2/cgen/JlabSimData/December2016/NpolTaggerSource/4.4GeV/4Bdl/Lead15cm/Neutron
 
-export NPOLWORKDIR=/data1/cgen/NeutronOnly/RealisticSource/10cmThickScint
+export NPOLWORKDIR=/data2/cgen/JlabSimData/December2016/NpolTaggerSource/4.4GeV/4Bdl/Lead15cm/Neutron
 
 export OutputDir=$NPOLDIR/Output
 export InputDir=$NPOLDIR/root
