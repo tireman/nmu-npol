@@ -254,7 +254,7 @@ int getSectionOfInterest(const std::map<std::string,NpolDetectorEvent *> *detEve
 	
 	// Mod: Tireman (2017-January-18) to test if multiscattering counts are playing havoc on efficiences
 	//if(analyzerFlag) sectionOfInterest = -1; // If one of this section's analyzers took a hit, then any section after this fails requirement 2.
-    if((analyzerFlag && topEArrayFlag && topdEArrayFlag && !taggerFlag) || (analyzerFlag && botEArrayFlag && botdEArrayFlag && !taggerFlag)) {
+    if((analyzerFlag && topEArrayFlag && topdEArrayFlag && !taggerFlag)!= (analyzerFlag && botEArrayFlag && botdEArrayFlag && !taggerFlag)) {
 	  if(sectionOfInterest != -1){
 		multiscatter = true;
 	  } else {
