@@ -5,6 +5,7 @@
 #include "NpolAnalysisManager.hh"
 
 NpolTrackingAction::NpolTrackingAction() {}
+
 NpolTrackingAction::~NpolTrackingAction() {}
 
 void NpolTrackingAction::PreUserTrackingAction(const G4Track *aTrack) {

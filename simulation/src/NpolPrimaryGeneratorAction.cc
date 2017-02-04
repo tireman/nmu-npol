@@ -14,24 +14,23 @@
 // Created: William Tireman
 // Modified: 26-June-2016  Changed to General Particle Source -- W.T.
 
-#include "G4SystemOfUnits.hh"
 #include "G4Event.hh"
 #include "G4GeneralParticleSource.hh"
 #include "G4ParticleTable.hh"
 #include "G4ParticleDefinition.hh"
-#include "G4Box.hh"
-#include "Randomize.hh"
+#include "globals.hh"
 
 #include "NpolPrimaryGeneratorAction.hh"
 
 NpolPrimaryGeneratorAction::NpolPrimaryGeneratorAction()
-  : G4VUserPrimaryGeneratorAction(), fParticleGun(0), worldBox(NULL)
+  : G4VUserPrimaryGeneratorAction(), fParticleGun(0)
 {
   fParticleGun = new G4GeneralParticleSource(); 
 }
 
 NpolPrimaryGeneratorAction::~NpolPrimaryGeneratorAction()
 {
+  std::cout << "Deleting Particle Gun" << std::endl;
   delete fParticleGun;
 }
 

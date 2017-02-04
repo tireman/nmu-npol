@@ -30,7 +30,7 @@ NpolSteppingAction::NpolSteppingAction(NpolEventAction* evt, NpolRunAction* run)
 
 NpolSteppingAction::~NpolSteppingAction() 
 {
-  G4cout<< "Shutting Down Stepping Action" << G4endl;
+  G4cout<< "Deleting Stepping Action" << G4endl;
 }
 
 void NpolSteppingAction::UserSteppingAction(const G4Step *aStep) {

@@ -31,7 +31,7 @@
 /vis/scene/add/hits
 #
 # To superimpose all of the events from a given run:
-/vis/scene/endOfEventAction accumulate
+/vis/scene/endOfEventAction accumulate 100
 #
 # Decorations
 # Name

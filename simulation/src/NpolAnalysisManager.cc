@@ -123,6 +123,8 @@ void NpolAnalysisManager::BeginRun(const G4int runID) {}
 // Clean up at the end of the run.
 void NpolAnalysisManager::EndRun(const G4int runID) {
 	statsTree->Fill();
+	ClearVectors();
+	statsTree=NULL;
 	NpolFileManager::GetInstance()->CloseFile();
 }
 

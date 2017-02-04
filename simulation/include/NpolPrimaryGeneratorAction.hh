@@ -12,11 +12,9 @@
 #define Npol_PrimaryGeneratorAction_h
 
 #include "G4VUserPrimaryGeneratorAction.hh"
-#include "globals.hh"
 
 class G4GeneralParticleSource;
 class G4Event;
-class G4Box;
 
 class NpolPrimaryGeneratorAction : public G4VUserPrimaryGeneratorAction
 {
@@ -28,7 +26,6 @@ class NpolPrimaryGeneratorAction : public G4VUserPrimaryGeneratorAction
 
 	private:
   G4GeneralParticleSource* fParticleGun;
-  G4Box *worldBox;
 };
 
 #endif
