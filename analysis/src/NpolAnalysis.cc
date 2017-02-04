@@ -1,6 +1,6 @@
 /* Npol Analysis Script is designed to analyze the neutron flux on the NPOL 
    polarimeter being designed by the CGEN 
-   collaboration at Jefferson National Laboratory.
+   collaboration at Jefferson National Laboratory. (2016)
 */
 
 #include <iostream>
@@ -278,7 +278,6 @@ int getSectionOfInterest(const std::map<std::string,NpolDetectorEvent *> *detEve
 		}
       }
     }
-
 	
 	// Mod: Tireman (2017-January-18) to test if multiscattering counts are playing havoc on efficiences
 	//if(analyzerFlag) sectionOfInterest = -1; // If one of this section's analyzers took a hit, then any section after this fails requirement 2.
@@ -486,28 +485,28 @@ void fillEvent2DHisto(TH2F* elastic, TH2F* inelastic, bool flag, double someInfo
 
 int main(int argc, char *argv[]) {
   
-  std::string JobNum;
+  TString JobNum;
   if(getenv("JOBNUMBER")){
     JobNum = getenv("JOBNUMBER");
   }else{
     JobNum = "99999"; // default job number is 99999
   }
   
-  std::string InputDir;
+  TString InputDir;
   if(getenv("RawDataDir")){
     InputDir = getenv("RawDataDir");
   }else{
     InputDir = "output"; 
   }
   
-  std::string BaseName;
+  TString BaseName;
   if(getenv("NPOLBASENAME")){
     BaseName = getenv("NPOLBASENAME");
   }else{
     BaseName = "output"; 
   }
   
-  std::string HistoDIR;
+  TString HistoDIR;
   if(getenv("HistoOutputDir")){
     HistoDIR = getenv("HistoOutputDir");
   }else{
