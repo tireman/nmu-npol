@@ -31,17 +31,18 @@ void NpolActionInitialization::BuildForMaster() const {
 }
 
 void NpolActionInitialization::Build() const {
-   
-  SetUserAction(new NpolPrimaryGeneratorAction);
-  
-  NpolEventAction* event_action = new NpolEventAction();
-  SetUserAction(event_action);
   NpolRunAction* run_action = new NpolRunAction();
   SetUserAction(run_action);
+
+  SetUserAction(new NpolPrimaryGeneratorAction);
+
+  NpolEventAction* event_action = new NpolEventAction();
+  SetUserAction(event_action);
+
   NpolTrackingAction *tracking_action = new NpolTrackingAction();
   SetUserAction(tracking_action);
-  NpolSteppingAction* step_action = new NpolSteppingAction
-    (event_action, run_action);
+
+  NpolSteppingAction* step_action = new NpolSteppingAction(event_action, run_action);
   SetUserAction(step_action);
 }
 
