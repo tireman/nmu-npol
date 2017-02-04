@@ -198,6 +198,32 @@ PolarimeterDetector detectorType(const std::string &volName) {
   }
 }
 
+bool checkEarrayHits(const std::map<std::string,NpolDetectorEvent *> *detEvents){
+  std::map<std::string,NpolDetectorEvent *>::const_iterator it;
+  int countTop = 0;
+  int countBottom = 0;
+  for(it = detEvents->begin(); it != detEvents->end(); it++) {
+	if((detectorType(it->first) == topEArray) && (it->second->thresholdExceeded == true)) countTop++;
+	if((detectorType(it->first) == botEArray) && (it->second->thresholdExceeded == true)) countBottom++;
+  }
+  //std::cout << "Number Top E-Array Detectors 'Hit' =  " << countTop << std::endl;
+  //std::cout << "Number Bottom E-Array Detectors 'Hit' =  " << countBottom << std::endl;
+  return true;
+}
+
+bool checkdEarrayHits(const std::map<std::string,NpolDetectorEvent *> *detEvents){
+  std::map<std::string,NpolDetectorEvent *>::const_iterator it;
+  int countTop = 0;
+  int countBottom = 0;
+  for(it = detEvents->begin(); it != detEvents->end(); it++) {
+	if((detectorType(it->first) == topdEArray) && (it->second->thresholdExceeded == true)) countTop++;
+	if((detectorType(it->first) == botdEArray) && (it->second->thresholdExceeded == true)) countBottom++;
+  }
+  //std::cout << "Number Top dE-Array Detectors 'Hit' =  " << countTop << std::endl;
+  //std::cout << "Number Bottom dE-Array Detectors 'Hit' =  " << countBottom << std::endl;
+  return true;
+}
+
 // Requirement 1: At least one hit (energy deposition >= 1 MeV) in some detector in the
 // analyzer and an energy deposition of >= 1 MeV in some detectors in the dE and E arrays
 // (both top or both bottom) in the same section.
@@ -228,47 +254,61 @@ PolarimeterDetector detectorType(const std::string &volName) {
 // Return the frontmost polarimeter section that passes requirements 1 and 2.
 // If -1 is returned, then no section passed requirements 1 and 2.
 int getSectionOfInterest(const std::map<std::string,NpolDetectorEvent *> *detEvents) {
-  int sectionOfInterest = -1;
+  int sectionOfInterest = -1; 
   bool multiscatter = false;
   for(int section = (LAYER_NUM - 1); section >= 0; section--) {
     std::map<std::string,NpolDetectorEvent *>::const_iterator it;
+	int countTdE=0; int countTE=0; int countBdE=0; int countBE =0;
     bool analyzerFlag = false;
     bool topEArrayFlag = false;
     bool topdEArrayFlag = false;
     bool botEArrayFlag = false;
     bool botdEArrayFlag = false;
     bool taggerFlag = false;
-    for(it = detEvents->begin(); it != detEvents->end(); it++) {
+	for(it = detEvents->begin(); it != detEvents->end(); it++) {
       if(sectionNumber(it->first) == section) {
-	switch(detectorType(it->first)) {
-	case analyzer: analyzerFlag |= it->second->totEnergyDep >= EDEP_THRESHOLD; break;
-	case tagger: taggerFlag |= it->second->totEnergyDep >= EDEP_THRESHOLD; break;
-	case topEArray: topEArrayFlag |= it->second->totEnergyDep >= EDEP_THRESHOLD; break;
-	case topdEArray: topdEArrayFlag |= it->second->totEnergyDep >= EDEP_THRESHOLD; break;
-	case botEArray: botEArrayFlag |= it->second->totEnergyDep >= EDEP_THRESHOLD; break;
-	case botdEArray: botdEArrayFlag |= it->second->totEnergyDep >= EDEP_THRESHOLD; break;
-	default: break;
+		switch(detectorType(it->first)) {
+		case analyzer: analyzerFlag |= it->second->thresholdExceeded == true; break;
+		case tagger: taggerFlag |= it->second->thresholdExceeded == true; break;
+		case topEArray: topEArrayFlag |= it->second->thresholdExceeded == true; countTE++; break;
+		case topdEArray: topdEArrayFlag |= it->second->thresholdExceeded == true; countTdE++; break;
+		case botEArray: botEArrayFlag |= it->second->thresholdExceeded == true; countBE++; break;
+		case botdEArray: botdEArrayFlag |= it->second->thresholdExceeded == true; countBdE++; break;
+		default: break;
+		}
+      }
+    }
+	
+	// Mod: Tireman (2017-January-18) to test if multiscattering counts are playing havoc on efficiences
+	//if(analyzerFlag) sectionOfInterest = -1; // If one of this section's analyzers took a hit, then any section after this fails requirement 2.
+    if((analyzerFlag && topEArrayFlag && topdEArrayFlag && !taggerFlag) != (analyzerFlag && botEArrayFlag && botdEArrayFlag && !taggerFlag)) {
+	  if(sectionOfInterest != -1){
+		multiscatter = true;
+	  } else {
+		if((topEArrayFlag || topdEArrayFlag) != (botEArrayFlag || botdEArrayFlag)){
+		  sectionOfInterest = section; // If this section passes requirement 1, then it may be the section of interest
+		} else {
+		  sectionOfInterest = -1;
+		}
+		//if(checkEarrayHits(detEvents) && checkdEarrayHits(detEvents)){
+		//std::cout << "Number Top E-Array Detectors 'Hit' =  " << countTE << std::endl;	
+		//std::cout << "Number Top dE-Array Detectors 'Hit' =  " << countTdE << std::endl;
+		//std::cout << "Number Bottom E-Array Detectors 'Hit' =  " << countBE << std::endl;
+		//std::cout << "Number Bottom dE-Array Detectors 'Hit' =  " << countBdE << std::endl;
+		//}
+	  }
 	}
-      }
-    }
-    // Mod: Tireman (2017-January-18) to test if multiscattering counts are playing havoc on efficiencies
-    //if(analyzerFlag) sectionOfInterest = -1; // If one of this section's analyzers took a hit, then any section after this fails requirement 2.
-    if((analyzerFlag && topEArrayFlag && topdEArrayFlag && !taggerFlag) || (analyzerFlag && botEArrayFlag && botdEArrayFlag && !taggerFlag)) {
-      if(sectionOfInterest != -1){
-	multiscatter = true;
-      } else {
-	sectionOfInterest = section; // If this section passes requirement 1, then it may be the section of interest
-      }
-    }
   }
 
-  if(multiscatter){
-    sectionOfInterest = -1;
-    return sectionOfInterest;
+  if(multiscatter) {
+	sectionOfInterest = -1;
+	return sectionOfInterest;
   } else {
-    return sectionOfInterest;
+  return sectionOfInterest;
   }
 }
+
+
 
 // If requirement 5 is passed, return the E array of interest (top or bottom).  If requirement 5 does not pass, unknown is returned.
 PolarimeterDetector getEArrayOfInterest(std::map<PolarimeterDetector, double> *eDepArrayTotal, int sectionOfInterest) {
@@ -483,9 +523,6 @@ int main(int argc, char *argv[]) {
   TChain *npolTree = new TChain("T");
   TChain *statsTree = new TChain("T2");
 
-  npolTree->SetCacheSize(50000000);
-  statsTree->SetCacheSize(50000000);
-
   npolTree->Add(inFilename);
   statsTree->Add(inFilename);
 
@@ -577,28 +614,10 @@ int main(int argc, char *argv[]) {
     for(v_it = verts->begin(); v_it != verts->end(); v_it++) {
       NpolVertex *aVertex = *v_it;
       if(aVertex == NULL) continue;
-		
-      if(aVertex->parentId == 1 && aVertex->process == "hadElastic" && aVertex->particle == "proton") {
-	elasticFlag = true;
-	break;
+	  if(aVertex->parentId == 1 && aVertex->process == "hadElastic" && aVertex->particle == "proton") {
+		elasticFlag = true;
+		break;
       }
-		
-    // END VERTICES LOOP - 
-    // !elasticFlag is false (eventsFailed -> inelastic) file -> Elastic
-    // elasticFlag is true (eventsFailed -> elastic) file -> Inelastic
-    //if(!elasticFlag) {
-    //	eventsFailed++;
-    //	continue;
-    //} 
-	  
-	  
-    /*for(v_it = verts->begin(); v_it != verts->end(); v_it++) { // BEGIN VERTICES LOOP
-      NpolVertex *aVertex = *v_it;
-      if(aVertex == NULL) continue;
-      if((detectorType(aVertex->volume) == analyzer) && (aVertex->parentId == 0)) {
-      eventInteraction++;
-      break;
-      }// END VERTICES LOOP */
 	} 
 
     // BEGIN STEPS LOOP
@@ -607,21 +626,21 @@ int main(int argc, char *argv[]) {
       NpolStep *aStep = *s_it;
 		
       if(detEvents.find(aStep->volume) == detEvents.end())
-	detEvents[aStep->volume] = new NpolDetectorEvent();
-		
+		detEvents[aStep->volume] = new NpolDetectorEvent();
+	  
       (detEvents[aStep->volume])->totEnergyDep += aStep->eDep;
-		
+	  
       if(!(detEvents[aStep->volume])->thresholdExceeded && (detEvents[aStep->volume])->totEnergyDep >= EDEP_THRESHOLD) {
-	(detEvents[aStep->volume])->thresholdExceeded = true;
-	(detEvents[aStep->volume])->lPosX = aStep->lPosX;
-	(detEvents[aStep->volume])->gPosX = aStep->gPosX;
-	(detEvents[aStep->volume])->gPosY = aStep->gPosY;
-	(detEvents[aStep->volume])->gPosZ = aStep->gPosZ;
-	(detEvents[aStep->volume])->lPosZ = aStep->lPosZ;
-	(detEvents[aStep->volume])->time = aStep->time;
+		(detEvents[aStep->volume])->thresholdExceeded = true;
+		(detEvents[aStep->volume])->lPosX = aStep->lPosX;
+		(detEvents[aStep->volume])->gPosX = aStep->gPosX;
+		(detEvents[aStep->volume])->gPosY = aStep->gPosY;
+		(detEvents[aStep->volume])->gPosZ = aStep->gPosZ;
+		(detEvents[aStep->volume])->lPosZ = aStep->lPosZ;
+		(detEvents[aStep->volume])->time = aStep->time;
       }
     } // END STEPS LOOP
-	  
+	
     std::map<std::string,NpolDetectorEvent *>::iterator e_it;
     //double totalEnergyDep = getTotalEnergyDep(&detEvents);
     int sectionOfInterest = getSectionOfInterest(&detEvents);
@@ -637,80 +656,81 @@ int main(int argc, char *argv[]) {
       h_sectionEfficiency1->Fill(sectionOfInterest+1); // Fill
 	  fillEvent1DHisto(h_sectionEfficiency1_Elastic, h_sectionEfficiency1_Inelastic, elasticFlag, sectionOfInterest+1);
       for(e_it = detEvents.begin(); e_it != detEvents.end(); e_it++) {
-	if(sectionNumber(e_it->first) == sectionOfInterest) {
-	  PolarimeterDetector detector = detectorType(e_it->first);
-	  if(detector == analyzer || detector == tagger || detector == topEArray || detector == topdEArray || detector == botEArray || detector == botdEArray) {
-	    eDepArrayTotal[detector] += e_it->second->totEnergyDep;
-	  }
-	}
+		if(sectionNumber(e_it->first) == sectionOfInterest) {
+		  PolarimeterDetector detector = detectorType(e_it->first);
+		  if(detector == analyzer || detector == tagger || detector == topEArray 
+			 || detector == topdEArray || detector == botEArray || detector == botdEArray) {
+			eDepArrayTotal[detector] += e_it->second->totEnergyDep;
+		  }
+		}
       }
-		
+	  
       PolarimeterDetector EArrayOfInterest = getEArrayOfInterest(&eDepArrayTotal,sectionOfInterest);
       PolarimeterDetector dEArrayOfInterest;
-		
-		
+	  
+	  
       if(EArrayOfInterest == topEArray) {
-	dEArrayOfInterest = topdEArray;
+		dEArrayOfInterest = topdEArray;
       }
       else {
-	dEArrayOfInterest = botdEArray;
+		dEArrayOfInterest = botdEArray;
       }
       if(EArrayOfInterest != unknown) {
 		h_sectionEfficiency2->Fill(sectionOfInterest+1); //Fill
 		fillEvent1DHisto(h_sectionEfficiency2_Elastic, h_sectionEfficiency2_Inelastic, elasticFlag, sectionOfInterest+1);
-	double eDepAnalyzer = eDepArrayTotal[analyzer];
-	double eDepE = eDepArrayTotal[EArrayOfInterest];// energy for array filled here 
-	double eDepdE = eDepArrayTotal[dEArrayOfInterest];
-	double eDepTotal = eDepAnalyzer + eDepE + eDepdE;
-	double dTOF = -100.0;
-	double dEDepHighest = highestEDepPV(&detEvents, sectionOfInterest, dEArrayOfInterest);
-	double eDepHighest = highestEDepPV(&detEvents, sectionOfInterest, EArrayOfInterest);
-	if(eDepAnalyzer > 4.0 /*MeV*/ && eDepE > 5.0 /*MeV */ && eDepTotal >= 50.0 /*MeV*/) { // Requirements 3 and 4
-	  h_sectionEfficiency3->Fill(sectionOfInterest+1); //FILL
-	  fillEvent1DHisto(h_sectionEfficiency3_Elastic, h_sectionEfficiency3_Inelastic, elasticFlag, sectionOfInterest+1);
-	  if(CheckAngleRequirement(txtOut,verts->at(1),&detEvents,sectionOfInterest,EArrayOfInterest,&dTOF)) {
-	    OutputTracks(verts,txtOut,eventCounter,&eDepArrayTotal,sectionOfInterest);
-	    h_sectionEfficiency4->Fill(sectionOfInterest+1); //FILL
-		fillEvent1DHisto(h_sectionEfficiency4_Elastic, h_sectionEfficiency4_Inelastic, elasticFlag, sectionOfInterest+1);
-	    h_dTOF->Fill(dTOF);//FILL
-		fillEvent1DHisto(h_dTOF_Elastic, h_dTOF_Inelastic, elasticFlag, dTOF);
-	    sectionEffLocalCoordinates(h_sectionEfficiencyLocalPositions[sectionOfInterest],&detEvents,sectionOfInterest,analyzer);
-		sectionEffLocalCoordinates(h_sectionEfficiencyLocalPositions_Elastic[sectionOfInterest],&detEvents,sectionOfInterest,analyzer);
-		sectionEffLocalCoordinates(h_sectionEfficiencyLocalPositions_Inelastic[sectionOfInterest],&detEvents,sectionOfInterest,analyzer);
-	    if(EArrayOfInterest == topEArray) {// this is where histo for top dE/E gets filled
-	      h_dEoverEtop->Fill(eDepE,eDepdE); //FILL
-		  fillEvent2DHisto(h_dEoverEtop_Elastic, h_dEoverEtop_Inelastic, elasticFlag, eDepE, eDepdE);
-	      h_dEoverE_TopHigh->Fill(eDepHighest, dEDepHighest); //FILL
-		  fillEvent2DHisto(h_dEoverE_TopHigh_Elastic, h_dEoverE_TopHigh_Inelastic, elasticFlag, eDepE, eDepdE);
-	    } else if(EArrayOfInterest == botEArray) { 
-	      h_dEoverEbot->Fill(eDepE,eDepdE);//FILL
-		  fillEvent2DHisto(h_dEoverEbot_Elastic, h_dEoverEbot_Inelastic, elasticFlag, eDepE, eDepdE);
-	      h_dEoverE_BotHigh->Fill(eDepHighest, dEDepHighest);//FILL
-		  fillEvent2DHisto(h_dEoverE_BotHigh_Elastic, h_dEoverE_BotHigh_Inelastic, elasticFlag, eDepE, eDepdE);
-	    }
-			  
-	    eventsPassed++;
-	  } else eventsFailed++;// TVector3 no longer works
-	} else eventsFailed++;
+		double eDepAnalyzer = eDepArrayTotal[analyzer];
+		double eDepE = eDepArrayTotal[EArrayOfInterest];// energy for array filled here 
+		double eDepdE = eDepArrayTotal[dEArrayOfInterest];
+		double eDepTotal = eDepAnalyzer + eDepE + eDepdE;
+		double dTOF = -100.0;
+		double dEDepHighest = highestEDepPV(&detEvents, sectionOfInterest, dEArrayOfInterest);
+		double eDepHighest = highestEDepPV(&detEvents, sectionOfInterest, EArrayOfInterest);
+		if(eDepAnalyzer > 4.0 /*MeV*/ && eDepE > 5.0 /*MeV */ && eDepTotal >= 50.0 /*MeV*/) { // Requirements 3 and 4
+		  h_sectionEfficiency3->Fill(sectionOfInterest+1); //FILL
+		  fillEvent1DHisto(h_sectionEfficiency3_Elastic, h_sectionEfficiency3_Inelastic, elasticFlag, sectionOfInterest+1);
+		  if(CheckAngleRequirement(txtOut,verts->at(1),&detEvents,sectionOfInterest,EArrayOfInterest,&dTOF)) {
+			OutputTracks(verts,txtOut,eventCounter,&eDepArrayTotal,sectionOfInterest);
+			h_sectionEfficiency4->Fill(sectionOfInterest+1); //FILL
+			fillEvent1DHisto(h_sectionEfficiency4_Elastic, h_sectionEfficiency4_Inelastic, elasticFlag, sectionOfInterest+1);
+			h_dTOF->Fill(dTOF);//FILL
+			fillEvent1DHisto(h_dTOF_Elastic, h_dTOF_Inelastic, elasticFlag, dTOF);
+			sectionEffLocalCoordinates(h_sectionEfficiencyLocalPositions[sectionOfInterest],&detEvents,sectionOfInterest,analyzer);
+			sectionEffLocalCoordinates(h_sectionEfficiencyLocalPositions_Elastic[sectionOfInterest],&detEvents,sectionOfInterest,analyzer);
+			sectionEffLocalCoordinates(h_sectionEfficiencyLocalPositions_Inelastic[sectionOfInterest],&detEvents,sectionOfInterest,analyzer);
+			if(EArrayOfInterest == topEArray) {// this is where histo for top dE/E gets filled
+			  h_dEoverEtop->Fill(eDepE,eDepdE); //FILL
+			  fillEvent2DHisto(h_dEoverEtop_Elastic, h_dEoverEtop_Inelastic, elasticFlag, eDepE, eDepdE);
+			  h_dEoverE_TopHigh->Fill(eDepHighest, dEDepHighest); //FILL
+			  fillEvent2DHisto(h_dEoverE_TopHigh_Elastic, h_dEoverE_TopHigh_Inelastic, elasticFlag, eDepE, eDepdE);
+			} else if(EArrayOfInterest == botEArray) { 
+			  h_dEoverEbot->Fill(eDepE,eDepdE);//FILL
+			  fillEvent2DHisto(h_dEoverEbot_Elastic, h_dEoverEbot_Inelastic, elasticFlag, eDepE, eDepdE);
+			  h_dEoverE_BotHigh->Fill(eDepHighest, dEDepHighest);//FILL
+			  fillEvent2DHisto(h_dEoverE_BotHigh_Elastic, h_dEoverE_BotHigh_Inelastic, elasticFlag, eDepE, eDepdE);
+			}
+			
+			eventsPassed++;
+		  } else eventsFailed++;// TVector3 no longer works
+		} else eventsFailed++;
       } else eventsFailed++;
     } else eventsFailed++;
-	  
+	
     if(sectionOfInterest != -1) eventsPassed ++;
-	  
+	
     // Clear out the map for the next event
     eDepArrayTotal.clear();
     for(e_it = detEvents.begin(); e_it != detEvents.end(); e_it++)
       delete e_it->second;
     detEvents.clear();
   } // END EVENT LOOP
-	
+  
   std::cout << eventsPassed << " events passed requirements.  "
-	    << eventsFailed << " failed." << std::endl;
+			<< eventsFailed << " failed." << std::endl;
   h_sectionEfficiency1->Scale(1.0); 
   h_sectionEfficiency2->Scale(1.0); 
   h_sectionEfficiency3->Scale(1.0); 
   h_sectionEfficiency4->Scale(1.0); 
-	
+  
   TVectorD runStatistics(4);
   runStatistics[0] = totalEvents;
   runStatistics[1] = eventInteraction;

@@ -1,6 +1,7 @@
 
 #include <cstdlib>
 #include <iostream>
+#include <fstream>
 #include <string>
 #include <vector>
 #include <map>
@@ -54,7 +55,7 @@ void FrontTaggerCountRates() {
   // effective electron time on target per micro amp of beam
 
   TVectorD *v = (TVectorD*)inFile->Get("TVectorT<double>");
-  Double_t totalElectrons = 5*3.49967e10; //((*v))[0];
+  Double_t totalElectrons = 10*3.49967e10; //((*v))[0];
   Double_t electronTime = totalElectrons/(6.242e12); //6.242e12 e-/s at 1 microAmp
   //Double_t fluxscaling = 1/(totalElectrons*1.602e-13*(98*60));
   std::cout << "Electron beam time at 1 micro-amp is " << electronTime << " s " << std::endl;
@@ -76,7 +77,10 @@ void FrontTaggerCountRates() {
 
   TPad *pad[Nx][Ny];
   TPad *pad1[Nx][Ny];
-    
+
+  std::ofstream txtOut;
+  txtOut.open(OutputDir + "/Output/FrontVetos" + Lead + "cm.out");
+ 
   for(int i = 0; i < Nx; i++){
    for(int j = 0; j < Ny; j++){
      c1->cd(0);
@@ -111,7 +115,8 @@ void FrontTaggerCountRates() {
      sprintf(htitle,"#splitline{Energy Deposited}{Front Veto %i, Layer %i}",pvNum+1, imprNum);
      hFrame->SetTitle(htitle);     
      // y axis range
-     hFrame->GetYaxis()->SetRangeUser(0.2,5e3);
+	 double FirstBinHeight= hFrame->GetBinContent(hFrame->GetMaximumBin());
+     hFrame->GetYaxis()->SetRangeUser(0.2,5.0*FirstBinHeight);
      
      // Format for y axis
      hFrame->GetYaxis()->SetTitle("Events");
@@ -154,9 +159,9 @@ void FrontTaggerCountRates() {
        
        CTagger[i][j] = hFrame->Integral((Threshold/binWidth),nBins);    
        CountRates[k][i][j] = CTagger[i][j];
-       cout << "First Tagger layer, detector " << pvNum << " counts/s for 1 microAmp of Beam " 
+       cout << "First Veto layer, detector " << pvNum << " counts/s for 1 microAmp of Beam " 
 	    << CTagger[i][j]/electronTime/(1e6) << " MHz" << endl;
-       cout << "First Tagger layer, detector " << pvNum << " counts/s for 80 microAmp of Beam " 
+       cout << "First Veto layer, detector " << pvNum << " counts/s for 80 microAmp of Beam " 
 	    << 80*CTagger[i][j]/electronTime/(1e6) << " MHz" << endl;    
        cout << " " << endl;
      }
@@ -168,9 +173,11 @@ void FrontTaggerCountRates() {
      pad1[i][j] = (TPad*) gROOT->FindObject(pname2);
      pad1[i][j]->Draw();
      pad1[i][j]->cd();
+	 txtOut << "First-Veto-Layer detector-" << pvNum << std::endl;
      for(int k = 0; k < nThresh; k++){
        x[k] = Thresholds[k];
        y[k] = CountRates[k][i][j]/electronTime/(1e6);
+	   txtOut << Thresholds[k] << "      " << 80*CountRates[k][i][j]/electronTime/(1e6) << std::endl;
      }
      TGraph *gr = new TGraph(nThresh,x,y); 
      // Set Good Graph Title
@@ -187,7 +194,7 @@ void FrontTaggerCountRates() {
      gr->GetYaxis()->SetTitleSize(16);
      gr->GetYaxis()->SetTitleOffset(5);
      gr->GetYaxis()->CenterTitle(); 
-     gr->GetYaxis()->SetRangeUser(0.000,.08);
+     gr->GetYaxis()->SetRangeUser(0.000,1.1*y[0]);
 
      // Clean up X axis
      gr->GetXaxis()->SetTitle("Threshold Energy (MeV)");
@@ -206,7 +213,7 @@ void FrontTaggerCountRates() {
    }
   }
   
-  
+  txtOut.close();
   c1->Write();
   c2->Write();
   outFile->Close(); 

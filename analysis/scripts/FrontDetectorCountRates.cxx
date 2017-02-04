@@ -1,6 +1,7 @@
 
 #include <cstdlib>
 #include <iostream>
+#include <fstream>
 #include <string>
 #include <vector>
 #include <map>
@@ -53,7 +54,7 @@ void FrontDetectorCountRates() {
   // effective electron time on target per micro amp of beam
 
   TVectorD *v = (TVectorD*)inFile->Get("TVectorT<double>");
-  Double_t totalElectrons =  5*3.49967e10; //((*v))[0];
+  Double_t totalElectrons =  10*3.49967e10; //((*v))[0];
   Double_t electronTime = totalElectrons/(6.242e12); //6.242e12 e-/s at 1 microAmp
   //Double_t fluxscaling = 1/(totalElectrons*1.602e-13*(98*60));
   std::cout << "Electron beam time at 1 micro-amp is " << electronTime << " s " << std::endl;
@@ -61,6 +62,7 @@ void FrontDetectorCountRates() {
 
   TCanvas *c1 = new TCanvas("c1","Front Detector Energy Plots at Polarimeter Angle 28.0 Deg, E = 4.4 GeV",1000,900);
   TCanvas *c2 = new TCanvas("c2","Front Detector Count Rate vs. Threshold plots",1000,900);
+  TCanvas *c3 = new TCanvas("c3","Front Detector Count Rate vs. Threshold plots",1000,900);
 
   Int_t Nx = 3, Ny = 2, nThresh = 10, fillStyle = 1001;
   int pvNum, avNum, imprNum;
@@ -72,9 +74,14 @@ void FrontDetectorCountRates() {
 
   CanvasPartition(c1,Nx,Ny,lMargin,rMargin,bMargin,tMargin,vSpacing,hSpacing);
   CanvasPartition(c2,Nx,Ny,lMargin,rMargin,bMargin,tMargin,vSpacing,hSpacing);
+  CanvasPartition(c3,Nx,Ny,lMargin,rMargin,bMargin,tMargin,vSpacing,hSpacing);
 
   TPad *pad[Nx][Ny];
   TPad *pad1[Nx][Ny];
+  TPad *pad2[Nx][Ny];
+
+std::ofstream txtOut;
+  txtOut.open(OutputDir + "/Output/FrontAnalyzers" + Lead +"cm.out");
     
   for(int i = 0; i < Nx; i++){
    for(int j = 0; j < Ny; j++){
@@ -110,8 +117,9 @@ void FrontDetectorCountRates() {
      sprintf(htitle,"#splitline{Energy Deposited}{Front Detector %i, Layer %i}",pvNum+1, imprNum);
      hFrame->SetTitle(htitle);     
      // y axis range
-     hFrame->GetYaxis()->SetRangeUser(0.2,5.0e3);
-     
+	 double FirstBinHeight= hFrame->GetBinContent(hFrame->GetMaximumBin());
+     hFrame->GetYaxis()->SetRangeUser(0.2,5.0*FirstBinHeight);
+       
      // Format for y axis
      hFrame->GetYaxis()->SetTitle("Events");
      hFrame->GetYaxis()->SetLabelFont(43);
@@ -167,9 +175,11 @@ void FrontDetectorCountRates() {
      pad1[i][j] = (TPad*) gROOT->FindObject(pname2);
      pad1[i][j]->Draw();
      pad1[i][j]->cd();
+	 txtOut << "First-Analyzer-Layer detector-" << pvNum << std::endl;
      for(int k = 0; k < nThresh; k++){
        x[k] = Thresholds[k];
        y[k] = CountRates[k][i][j]/electronTime/(1e6);
+	   txtOut << Thresholds[k] << "      " << 80*CountRates[k][i][j]/electronTime/(1e6) << std::endl;
      }
      TGraph *gr = new TGraph(nThresh,x,y); 
      // Set Good Graph Title
@@ -186,7 +196,7 @@ void FrontDetectorCountRates() {
      gr->GetYaxis()->SetTitleSize(16);
      gr->GetYaxis()->SetTitleOffset(5);
      gr->GetYaxis()->CenterTitle(); 
-     gr->GetYaxis()->SetRangeUser(0.0,0.30);
+     gr->GetYaxis()->SetRangeUser(0.0,1.1*y[0]);
 
      // Clean up X axis
      gr->GetXaxis()->SetTitle("Threshold Energy (MeV)");
@@ -208,6 +218,7 @@ void FrontDetectorCountRates() {
   
   c1->Write();
   c2->Write();
+  c3->Write();
   outFile->Close(); 
   //inFile->Close();
 
