@@ -198,6 +198,32 @@ PolarimeterDetector detectorType(const std::string &volName) {
   }
 }
 
+bool checkEarrayHits(const std::map<std::string,NpolDetectorEvent *> *detEvents){
+  std::map<std::string,NpolDetectorEvent *>::const_iterator it;
+  int countTop = 0;
+  int countBottom = 0;
+  for(it = detEvents->begin(); it != detEvents->end(); it++) {
+	if((detectorType(it->first) == topEArray) && (it->second->thresholdExceeded == true)) countTop++;
+	if((detectorType(it->first) == botEArray) && (it->second->thresholdExceeded == true)) countBottom++;
+  }
+  //std::cout << "Number Top E-Array Detectors 'Hit' =  " << countTop << std::endl;
+  //std::cout << "Number Bottom E-Array Detectors 'Hit' =  " << countBottom << std::endl;
+  return true;
+}
+
+bool checkdEarrayHits(const std::map<std::string,NpolDetectorEvent *> *detEvents){
+  std::map<std::string,NpolDetectorEvent *>::const_iterator it;
+  int countTop = 0;
+  int countBottom = 0;
+  for(it = detEvents->begin(); it != detEvents->end(); it++) {
+	if((detectorType(it->first) == topdEArray) && (it->second->thresholdExceeded == true)) countTop++;
+	if((detectorType(it->first) == botdEArray) && (it->second->thresholdExceeded == true)) countBottom++;
+  }
+  //std::cout << "Number Top dE-Array Detectors 'Hit' =  " << countTop << std::endl;
+  //std::cout << "Number Bottom dE-Array Detectors 'Hit' =  " << countBottom << std::endl;
+  return true;
+}
+
 // Requirement 1: At least one hit (energy deposition >= 1 MeV) in some detector in the
 // analyzer and an energy deposition of >= 1 MeV in some detectors in the dE and E arrays
 // (both top or both bottom) in the same section.
@@ -228,10 +254,11 @@ PolarimeterDetector detectorType(const std::string &volName) {
 // Return the frontmost polarimeter section that passes requirements 1 and 2.
 // If -1 is returned, then no section passed requirements 1 and 2.
 int getSectionOfInterest(const std::map<std::string,NpolDetectorEvent *> *detEvents) {
-  int sectionOfInterest = -1;
+  int sectionOfInterest = -1; 
   bool multiscatter = false;
   for(int section = (LAYER_NUM - 1); section >= 0; section--) {
     std::map<std::string,NpolDetectorEvent *>::const_iterator it;
+	int countTdE=0; int countTE=0; int countBdE=0; int countBE =0;
     bool analyzerFlag = false;
     bool topEArrayFlag = false;
     bool topdEArrayFlag = false;
@@ -243,22 +270,33 @@ int getSectionOfInterest(const std::map<std::string,NpolDetectorEvent *> *detEve
 		switch(detectorType(it->first)) {
 		case analyzer: analyzerFlag |= it->second->thresholdExceeded == true; break;
 		case tagger: taggerFlag |= it->second->thresholdExceeded == true; break;
-		case topEArray: topEArrayFlag |= it->second->thresholdExceeded == true; break;
-		case topdEArray: topdEArrayFlag |= it->second->thresholdExceeded == true; break;
-		case botEArray: botEArrayFlag |= it->second->thresholdExceeded == true; break;
-		case botdEArray: botdEArrayFlag |= it->second->thresholdExceeded == true; break;
+		case topEArray: topEArrayFlag |= it->second->thresholdExceeded == true; countTE++; break;
+		case topdEArray: topdEArrayFlag |= it->second->thresholdExceeded == true; countTdE++; break;
+		case botEArray: botEArrayFlag |= it->second->thresholdExceeded == true; countBE++; break;
+		case botdEArray: botdEArrayFlag |= it->second->thresholdExceeded == true; countBdE++; break;
 		default: break;
 		}
       }
     }
+
 	
 	// Mod: Tireman (2017-January-18) to test if multiscattering counts are playing havoc on efficiences
 	//if(analyzerFlag) sectionOfInterest = -1; // If one of this section's analyzers took a hit, then any section after this fails requirement 2.
-    if((analyzerFlag && topEArrayFlag && topdEArrayFlag && !taggerFlag)!= (analyzerFlag && botEArrayFlag && botdEArrayFlag && !taggerFlag)) {
+    if((analyzerFlag && topEArrayFlag && topdEArrayFlag && !taggerFlag) != (analyzerFlag && botEArrayFlag && botdEArrayFlag && !taggerFlag)) {
 	  if(sectionOfInterest != -1){
 		multiscatter = true;
 	  } else {
-		sectionOfInterest = section; // If this section passes requirement 1, then it may be the section of interest
+		if((topEArrayFlag || topdEArrayFlag) != (botEArrayFlag || botdEArrayFlag)){
+		  sectionOfInterest = section; // If this section passes requirement 1, then it may be the section of interest
+		} else {
+		  sectionOfInterest = -1;
+		}
+		//if(checkEarrayHits(detEvents) && checkdEarrayHits(detEvents)){
+		//std::cout << "Number Top E-Array Detectors 'Hit' =  " << countTE << std::endl;	
+		//std::cout << "Number Top dE-Array Detectors 'Hit' =  " << countTdE << std::endl;
+		//std::cout << "Number Bottom E-Array Detectors 'Hit' =  " << countBE << std::endl;
+		//std::cout << "Number Bottom dE-Array Detectors 'Hit' =  " << countBdE << std::endl;
+		//}
 	  }
 	}
   }
@@ -270,6 +308,8 @@ int getSectionOfInterest(const std::map<std::string,NpolDetectorEvent *> *detEve
   return sectionOfInterest;
   }
 }
+
+
 
 // If requirement 5 is passed, return the E array of interest (top or bottom).  If requirement 5 does not pass, unknown is returned.
 PolarimeterDetector getEArrayOfInterest(std::map<PolarimeterDetector, double> *eDepArrayTotal, int sectionOfInterest) {
