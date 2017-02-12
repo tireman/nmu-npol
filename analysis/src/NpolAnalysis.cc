@@ -30,6 +30,7 @@
 #include "NpolDetectorEvent.hh"
 
 #define EDEP_THRESHOLD 1.0 /*MeV*/
+#define LOW_THRESHOLD 0.040 /*MeV This threshold is a per detector low value in SOI selection */
 #define LAYER_NUM 4        /* number of analyzer layers; not general; only good for 4 and 6 layers */
 
 enum PolarimeterDetector {
@@ -97,13 +98,13 @@ int sectionNumber(const std::string &volName) {
       else if(pvNum <= 6 && pvNum >= 0) {return 3;}  // section 4
       else {return -1;}
     case 9: // Front array 1
-    case 11: // Front tag array 1
+    case 11: // Front Veto array 1
       imprNum = GetImprNumber(volName);
       if(imprNum == 1) return 0;  // section 1
       else if(imprNum == 2) return 1;  // section 2
       else return -1;
     case 10: // Front array 2
-    case 12: // Front tag array 2
+    case 12: // Front Veto array 2
       imprNum = GetImprNumber(volName);
       if(imprNum == 1) return 2;  // section 3
       else if(imprNum == 2) return 3;  // section 4
@@ -254,57 +255,79 @@ bool checkdEarrayHits(const std::map<std::string,NpolDetectorEvent *> *detEvents
 // Return the frontmost polarimeter section that passes requirements 1 and 2.
 // If -1 is returned, then no section passed requirements 1 and 2.
 int getSectionOfInterest(const std::map<std::string,NpolDetectorEvent *> *detEvents) {
-  int sectionOfInterest = -1; 
+  int sectionOfInterest = -1; int countTdE=0; int countTE=0; int countBdE=0; int countBE =0; int countA = 0; int countV = 0;
   bool multiscatter = false;
   for(int section = (LAYER_NUM - 1); section >= 0; section--) {
     std::map<std::string,NpolDetectorEvent *>::const_iterator it;
-	int countTdE=0; int countTE=0; int countBdE=0; int countBE =0;
     bool analyzerFlag = false;
     bool topEArrayFlag = false;
     bool topdEArrayFlag = false;
     bool botEArrayFlag = false;
     bool botdEArrayFlag = false;
     bool taggerFlag = false;
-	for(it = detEvents->begin(); it != detEvents->end(); it++) {
+    for(it = detEvents->begin(); it != detEvents->end(); it++) {
       if(sectionNumber(it->first) == section) {
-		switch(detectorType(it->first)) {
-		case analyzer: analyzerFlag |= it->second->thresholdExceeded == true; break;
-		case tagger: taggerFlag |= it->second->thresholdExceeded == true; break;
-		case topEArray: topEArrayFlag |= it->second->thresholdExceeded == true; countTE++; break;
-		case topdEArray: topdEArrayFlag |= it->second->thresholdExceeded == true; countTdE++; break;
-		case botEArray: botEArrayFlag |= it->second->thresholdExceeded == true; countBE++; break;
-		case botdEArray: botdEArrayFlag |= it->second->thresholdExceeded == true; countBdE++; break;
-		default: break;
-		}
+	switch(detectorType(it->first)) {
+	case analyzer: analyzerFlag |= it->second->thresholdExceeded == true;
+	  if(it->second->totEnergyDep >= LOW_THRESHOLD) countA++;
+	  break;
+	case tagger: taggerFlag |= it->second->thresholdExceeded == true; 
+	  if(it->second->totEnergyDep >= LOW_THRESHOLD) countV++;
+	  break;
+	case topEArray: topEArrayFlag |= it->second->thresholdExceeded == true; 
+	  if(it->second->totEnergyDep >= LOW_THRESHOLD) countTE++; 
+	  break;
+	case topdEArray: topdEArrayFlag |= it->second->thresholdExceeded == true; 
+	  if(it->second->totEnergyDep >= LOW_THRESHOLD) countTdE++; 
+	  break;
+	case botEArray: botEArrayFlag |= it->second->thresholdExceeded == true; 
+	  if(it->second->totEnergyDep >= LOW_THRESHOLD) countBE++; 
+	  break;
+	case botdEArray: botdEArrayFlag |= it->second->thresholdExceeded == true; 
+	  if(it->second->totEnergyDep >= LOW_THRESHOLD) countBdE++; 
+	  break;
+	default: break;
+	}
       }
     }
-	
-	// Mod: Tireman (2017-January-18) to test if multiscattering counts are playing havoc on efficiences
-	//if(analyzerFlag) sectionOfInterest = -1; // If one of this section's analyzers took a hit, then any section after this fails requirement 2.
+    
+    // Mod: Tireman (2017-January-18) to test if multiscattering counts are playing havoc on efficiences
+    // If one of this section's analyzers took a hit, then any section after this fails requirement 2.
+    // Note: Here we check if SOI has been set and then set Multiscatter = true; remove this check to allow multiscatter
+    if(analyzerFlag) {
+      if(sectionOfInterest != -1) multiscatter = true;
+      sectionOfInterest = -1;
+    }
     if((analyzerFlag && topEArrayFlag && topdEArrayFlag && !taggerFlag) != (analyzerFlag && botEArrayFlag && botdEArrayFlag && !taggerFlag)) {
-	  if(sectionOfInterest != -1){
-		multiscatter = true;
-	  } else {
-		if((topEArrayFlag || topdEArrayFlag) != (botEArrayFlag || botdEArrayFlag)){
-		  sectionOfInterest = section; // If this section passes requirement 1, then it may be the section of interest
-		} else {
-		  sectionOfInterest = -1;
-		}
-		//if(checkEarrayHits(detEvents) && checkdEarrayHits(detEvents)){
-		//std::cout << "Number Top E-Array Detectors 'Hit' =  " << countTE << std::endl;	
-		//std::cout << "Number Top dE-Array Detectors 'Hit' =  " << countTdE << std::endl;
-		//std::cout << "Number Bottom E-Array Detectors 'Hit' =  " << countBE << std::endl;
-		//std::cout << "Number Bottom dE-Array Detectors 'Hit' =  " << countBdE << std::endl;
-		//}
-	  }
-	}
-  }
+      //if((topEArrayFlag || topdEArrayFlag) != (botEArrayFlag || botdEArrayFlag)){
+      sectionOfInterest = section; // If this section passes requirement 1, then it may be the section of interest
+    }
+    
 
-  if(multiscatter) {
-	sectionOfInterest = -1;
-	return sectionOfInterest;
+    //  Code inserted for future "checks" of the E-array and dE-array if necessary
+    //if(checkEarrayHits(detEvents) && checkdEarrayHits(detEvents)){ } 
+	
+    // Print out the counters for checks
+    //std::cout << "Number Top E-Array Detectors 'Hit' =  " << countTE << std::endl;	
+    //std::cout << "Number Top dE-Array Detectors 'Hit' =  " << countTdE << std::endl;
+    //std::cout << "Number Bottom E-Array Detectors 'Hit' =  " << countBE << std::endl;
+    //std::cout << "Number Bottom dE-Array Detectors 'Hit' =  " << countBdE << std::endl;
+    
+  }
+ 
+  // Reject events with hits in multiple sections of interest
+  // Reject events with more than 40 detectors with hits above 1 MeV
+  // Otherwise return the ID'd section of interest
+  if(multiscatter) {  
+    sectionOfInterest = -1;
+    //std::cout << "Multi-hit: Event rejected!" << std::endl;
+    return sectionOfInterest;
+  } else if((countA + countTE + countBE + countV + countTdE + countBdE) >= 40) { 
+    std::cout << "Event Rejected! Total number of detectors with 40 keV or greater: " << (countA + countTE + countBE + countV + countTdE + countBdE) << std::endl;
+    sectionOfInterest = -1;
+    return sectionOfInterest;
   } else {
-  return sectionOfInterest;
+    return sectionOfInterest;
   }
 }
 
@@ -433,7 +456,7 @@ bool CheckAngleRequirement(std::ofstream &txtOut, NpolVertex *incNeutronVert, st
 				   analyzerPt[0],analyzerPt[1],analyzerPt[2],
 				   EarrayPt[0],EarrayPt[1],EarrayPt[2]);
 
-  txtOut << azAngle << " deg" << std::endl;
+  //txtOut << azAngle << " deg" << std::endl;
   //	std::cout << "(" << targetPt[0] << "," << targetPt[1] << "," << targetPt[2] << ")   "
   //		<< "(" << analyzerPt[0] << "," << analyzerPt[1] << "," << analyzerPt[2] << ")   "
   //		<< "(" << EarrayPt[0] << "," << EarrayPt[1] << "," << EarrayPt[2] << ")   "
@@ -551,10 +574,10 @@ int main(int argc, char *argv[]) {
     h_sectionEfficiencyLocalPositions[i] = new TH1F(name.c_str(), title.c_str(),200, -5.0, 5.0);
   }
   //elastic ONLY histos
-  TH2F *h_dEoverE_TopHigh_Elastic = new TH2F("dEoverE_Top_Elastic", "dE over E for top array - HIGHEST PV ONLY(Elastic Events)", 400,0,150,400,0,20);
-  TH2F *h_dEoverE_BotHigh_Elastic = new TH2F("dEoverE_Bot_Elastic", "dE over E for bottom array - HIGHEST PV ONLY(Elastic Events)", 400,0,150,400,0,20);
-  TH2F *h_dEoverEtop_Elastic = new TH2F("dEoverEtop_Elastic", "dE over E for top array(Elastic Events)", 400,0,150,400,0,20);
-  TH2F *h_dEoverEbot_Elastic = new TH2F("dEoverEbot_Elastic", "dE over E for bottom array(Elastic Events)", 400,0,150,400,0,20);
+  TH2F *h_dEoverE_TopHigh_Elastic = new TH2F("dEoverE_Top_Elastic", "dE over E for top array - HIGHEST PV ONLY(Elastic Events)", 200,0,150,200,0,20);
+  TH2F *h_dEoverE_BotHigh_Elastic = new TH2F("dEoverE_Bot_Elastic", "dE over E for bottom array - HIGHEST PV ONLY(Elastic Events)", 200,0,150,200,0,20);
+  TH2F *h_dEoverEtop_Elastic = new TH2F("dEoverEtop_Elastic", "dE over E for top array(Elastic Events)", 200,0,150,200,0,20);
+  TH2F *h_dEoverEbot_Elastic = new TH2F("dEoverEbot_Elastic", "dE over E for bottom array(Elastic Events)", 200,0,150,200,0,20);
   TH1F *h_sectionEfficiency1_Elastic = new TH1F("sectionEfficiency1_Elastic","Polarimeter section efficiency before cuts (Elastic Events)",13,0.25,6.75);
   TH1F *h_sectionEfficiency2_Elastic = new TH1F("sectionEfficiency2_Elastic","Polarimeter section efficiency after asymmetry cut (Elastic Events)",13,0.25,6.75);
   TH1F *h_sectionEfficiency3_Elastic = new TH1F("sectionEfficiency3_Elastic","Polarimeter section efficiency after array energy total cuts (Elastic Events)",13,0.25,6.75);
@@ -570,10 +593,10 @@ int main(int argc, char *argv[]) {
   }
 
   //inelastic ONLY histos
-  TH2F *h_dEoverE_TopHigh_Inelastic = new TH2F("dEoverE_Top_Inelastic", "dE over E for top array - HIGHEST PV ONLY(Inelastic Events)", 400,0,150,400,0,20);
-  TH2F *h_dEoverE_BotHigh_Inelastic = new TH2F("dEoverE_Bot_Inelastic", "dE over E for bottom array - HIGHEST PV ONLY(Inelastic Events)", 400,0,150,400,0,20);
-  TH2F *h_dEoverEtop_Inelastic = new TH2F("dEoverEtop_Inelastic", "dE over E for top array(Inelastic Events)", 400,0,150,400,0,20);
-  TH2F *h_dEoverEbot_Inelastic = new TH2F("dEoverEbot_Inelastic", "dE over E for bottom array(Inelastic Events)", 400,0,150,400,0,20);
+  TH2F *h_dEoverE_TopHigh_Inelastic = new TH2F("dEoverE_Top_Inelastic", "dE over E for top array - HIGHEST PV ONLY(Inelastic Events)", 200,0,150,200,0,20);
+  TH2F *h_dEoverE_BotHigh_Inelastic = new TH2F("dEoverE_Bot_Inelastic", "dE over E for bottom array - HIGHEST PV ONLY(Inelastic Events)", 200,0,150,200,0,20);
+  TH2F *h_dEoverEtop_Inelastic = new TH2F("dEoverEtop_Inelastic", "dE over E for top array(Inelastic Events)", 200,0,150,200,0,20);
+  TH2F *h_dEoverEbot_Inelastic = new TH2F("dEoverEbot_Inelastic", "dE over E for bottom array(Inelastic Events)", 200,0,150,200,0,20);
   TH1F *h_sectionEfficiency1_Inelastic = new TH1F("sectionEfficiency1_Inelastic","Polarimeter section efficiency before cuts (Inelastic Events)",13,0.25,6.75);
   TH1F *h_sectionEfficiency2_Inelastic = new TH1F("sectionEfficiency2_Inelastic","Polarimeter section efficiency after asymmetry cut (Inelastic Events)",13,0.25,6.75);
   TH1F *h_sectionEfficiency3_Inelastic = new TH1F("sectionEfficiency3_Inelastic","Polarimeter section efficiency after array energy total cuts (Inelastic Events)",13,0.25,6.75);
@@ -666,8 +689,7 @@ int main(int argc, char *argv[]) {
       }
 	  
       PolarimeterDetector EArrayOfInterest = getEArrayOfInterest(&eDepArrayTotal,sectionOfInterest);
-      PolarimeterDetector dEArrayOfInterest;
-	  
+      PolarimeterDetector dEArrayOfInterest;	  
 	  
       if(EArrayOfInterest == topEArray) {
 		dEArrayOfInterest = topdEArray;
@@ -689,7 +711,7 @@ int main(int argc, char *argv[]) {
 		  h_sectionEfficiency3->Fill(sectionOfInterest+1); //FILL
 		  fillEvent1DHisto(h_sectionEfficiency3_Elastic, h_sectionEfficiency3_Inelastic, elasticFlag, sectionOfInterest+1);
 		  if(CheckAngleRequirement(txtOut,verts->at(1),&detEvents,sectionOfInterest,EArrayOfInterest,&dTOF)) {
-			OutputTracks(verts,txtOut,eventCounter,&eDepArrayTotal,sectionOfInterest);
+		    //OutputTracks(verts,txtOut,eventCounter,&eDepArrayTotal,sectionOfInterest);
 			h_sectionEfficiency4->Fill(sectionOfInterest+1); //FILL
 			fillEvent1DHisto(h_sectionEfficiency4_Elastic, h_sectionEfficiency4_Inelastic, elasticFlag, sectionOfInterest+1);
 			h_dTOF->Fill(dTOF);//FILL
