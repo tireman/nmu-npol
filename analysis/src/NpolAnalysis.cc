@@ -56,7 +56,7 @@ int GetAVNumber(const std::string &volName) {
 int GetImprNumber(const std::string &volName) {
   if(volName.substr(0,3) == "av_") {
     int underscorePos = volName.find_first_of("_",1+
-					      volName.find_first_of("_",3));
+											  volName.find_first_of("_",3));
     return atoi(volName.substr(underscorePos+1,1).c_str());
   } else
     return -1;
@@ -65,10 +65,10 @@ int GetImprNumber(const std::string &volName) {
 int GetPlacementNumber(const std::string &volName) {
   if(volName.substr(0,3) == "av_") {
     int underscorePos = volName.find_first_of("_",1+
-      volName.find_first_of("_",1+
-      volName.find_first_of("_",1+
-      volName.find_first_of("_",1+
-      volName.find_first_of("_",3)))));
+											  volName.find_first_of("_",1+
+																	volName.find_first_of("_",1+
+																						  volName.find_first_of("_",1+
+																												volName.find_first_of("_",3)))));
     return atoi(volName.substr(underscorePos+1,std::string::npos).c_str());
   } else
     return -1;
@@ -119,26 +119,26 @@ int sectionNumber(const std::string &volName) {
       pvNum = GetPlacementNumber(volName);
       imprNum = GetImprNumber(volName);
       if((imprNum == 1) || (imprNum == 2)){
-	if(pvNum <= 12 && pvNum >= 6) return 0;  // section 1
-	else if(pvNum <= 5 && pvNum >= 0) return 1;  // section 2
+		if(pvNum <= 12 && pvNum >= 6) return 0;  // section 1
+		else if(pvNum <= 5 && pvNum >= 0) return 1;  // section 2
       }else if((imprNum == 3) || (imprNum == 4)){
-	if(pvNum <= 12 && pvNum >= 6) return 2;  // section 3
-	else if(pvNum <= 5 && pvNum >= 0) return 3;  // section 4
+		if(pvNum <= 12 && pvNum >= 6) return 2;  // section 3
+		else if(pvNum <= 5 && pvNum >= 0) return 3;  // section 4
       }else{
-	return -1;
+		return -1;
       }
     case 3: // Top dE array 1 & 2
     case 7: // Bottom dE array 1 & 2
       pvNum = GetPlacementNumber(volName);
       imprNum = GetImprNumber(volName);
       if(imprNum == 1){
-	if(pvNum <= 12 && pvNum >= 6) return 0;  // section 1
-	else if(pvNum <= 5 && pvNum >= 0) return 1;  // section 2
+		if(pvNum <= 12 && pvNum >= 6) return 0;  // section 1
+		else if(pvNum <= 5 && pvNum >= 0) return 1;  // section 2
       }else if(imprNum == 2){
-	if(pvNum <= 12 && pvNum >= 6) return 2;  // section 3
-	else if(pvNum <= 5 && pvNum >= 0) return 3;  // section 4
+		if(pvNum <= 12 && pvNum >= 6) return 2;  // section 3
+		else if(pvNum <= 5 && pvNum >= 0) return 3;  // section 4
       }else{
-	return -1;
+		return -1;
       }
     case 2: // Top E array 3
     case 4: // Top dE array 3
@@ -267,27 +267,27 @@ int getSectionOfInterest(const std::map<std::string,NpolDetectorEvent *> *detEve
     bool taggerFlag = false;
     for(it = detEvents->begin(); it != detEvents->end(); it++) {
       if(sectionNumber(it->first) == section) {
-	switch(detectorType(it->first)) {
-	case analyzer: analyzerFlag |= it->second->thresholdExceeded == true;
-	  if(it->second->totEnergyDep >= LOW_THRESHOLD) countA++;
-	  break;
-	case tagger: taggerFlag |= it->second->thresholdExceeded == true; 
-	  if(it->second->totEnergyDep >= LOW_THRESHOLD) countV++;
-	  break;
-	case topEArray: topEArrayFlag |= it->second->thresholdExceeded == true; 
-	  if(it->second->totEnergyDep >= LOW_THRESHOLD) countTE++; 
-	  break;
-	case topdEArray: topdEArrayFlag |= it->second->thresholdExceeded == true; 
-	  if(it->second->totEnergyDep >= LOW_THRESHOLD) countTdE++; 
-	  break;
-	case botEArray: botEArrayFlag |= it->second->thresholdExceeded == true; 
-	  if(it->second->totEnergyDep >= LOW_THRESHOLD) countBE++; 
-	  break;
-	case botdEArray: botdEArrayFlag |= it->second->thresholdExceeded == true; 
-	  if(it->second->totEnergyDep >= LOW_THRESHOLD) countBdE++; 
-	  break;
-	default: break;
-	}
+		switch(detectorType(it->first)) {
+		case analyzer: analyzerFlag |= it->second->thresholdExceeded == true;
+		  if(it->second->totEnergyDep >= LOW_THRESHOLD) countA++;
+		  break;
+		case tagger: taggerFlag |= it->second->thresholdExceeded == true; 
+		  if(it->second->totEnergyDep >= LOW_THRESHOLD) countV++;
+		  break;
+		case topEArray: topEArrayFlag |= it->second->thresholdExceeded == true; 
+		  if(it->second->totEnergyDep >= LOW_THRESHOLD) countTE++; 
+		  break;
+		case topdEArray: topdEArrayFlag |= it->second->thresholdExceeded == true; 
+		  if(it->second->totEnergyDep >= LOW_THRESHOLD) countTdE++; 
+		  break;
+		case botEArray: botEArrayFlag |= it->second->thresholdExceeded == true; 
+		  if(it->second->totEnergyDep >= LOW_THRESHOLD) countBE++; 
+		  break;
+		case botdEArray: botdEArrayFlag |= it->second->thresholdExceeded == true; 
+		  if(it->second->totEnergyDep >= LOW_THRESHOLD) countBdE++; 
+		  break;
+		default: break;
+		}
       }
     }
     
@@ -299,20 +299,11 @@ int getSectionOfInterest(const std::map<std::string,NpolDetectorEvent *> *detEve
       sectionOfInterest = -1;
     }
     if((analyzerFlag && topEArrayFlag && topdEArrayFlag && !taggerFlag) != (analyzerFlag && botEArrayFlag && botdEArrayFlag && !taggerFlag)) {
-      //if((topEArrayFlag || topdEArrayFlag) != (botEArrayFlag || botdEArrayFlag)){
-      sectionOfInterest = section; // If this section passes requirement 1, then it may be the section of interest
+	  sectionOfInterest = section; // If this section passes requirement 1, then it may be the section of interest
     }
     
-
     //  Code inserted for future "checks" of the E-array and dE-array if necessary
-    //if(checkEarrayHits(detEvents) && checkdEarrayHits(detEvents)){ } 
-	
-    // Print out the counters for checks
-    //std::cout << "Number Top E-Array Detectors 'Hit' =  " << countTE << std::endl;	
-    //std::cout << "Number Top dE-Array Detectors 'Hit' =  " << countTdE << std::endl;
-    //std::cout << "Number Bottom E-Array Detectors 'Hit' =  " << countBE << std::endl;
-    //std::cout << "Number Bottom dE-Array Detectors 'Hit' =  " << countBdE << std::endl;
-    
+    //if(checkEarrayHits(detEvents) && checkdEarrayHits(detEvents)){ } 	
   }
  
   // Reject events with hits in multiple sections of interest
@@ -322,7 +313,7 @@ int getSectionOfInterest(const std::map<std::string,NpolDetectorEvent *> *detEve
     sectionOfInterest = -1;
     //std::cout << "Multi-hit: Event rejected!" << std::endl;
     return sectionOfInterest;
-  } else if((countA + countTE + countBE + countV + countTdE + countBdE) >= 40) { 
+  } else if((countA + countTE + countBE + countV + countTdE + countBdE) >= 20) { 
     std::cout << "Event Rejected! Total number of detectors with 40 keV or greater: " << (countA + countTE + countBE + countV + countTdE + countBdE) << std::endl;
     sectionOfInterest = -1;
     return sectionOfInterest;
@@ -358,7 +349,7 @@ double highestEDepPV(const std::map<std::string,NpolDetectorEvent *> *detEvents,
   for(it = detEvents->begin(); it != detEvents->end(); it++) {
     if((sectionOfInterest == sectionNumber(it->first)) && (detectorOfInterest == detectorType(it->first))) { 
       if((it->second->totEnergyDep) > highestE_Dep) 
-	highestE_Dep = it->second->totEnergyDep;
+		highestE_Dep = it->second->totEnergyDep;
 
     }
   }
@@ -397,7 +388,7 @@ void sectionEffLocalCoordinates(TH1F *h_sectionEfficiencyLocalPositions, const s
 // (p3x,p3y,p3z) - a point along the trajectory of the scattered proton (in the E array)
 // The calculation is done by forming a triangle with these points and using the law of cosines
 double getAzimuthAngle(std::ofstream &txtOut, const double p1x, const double p1y, const double p1z,
-		       const double p2x, const double p2y, const double p2z, const double p3x, const double p3y, const double p3z) {
+					   const double p2x, const double p2y, const double p2z, const double p3x, const double p3y, const double p3z) {
   double s1, s2, s3; // the lengths of the triangle's three sides
   s1 = TMath::Sqrt(TMath::Power(p2x-p1x,2) + TMath::Power(p2y-p1y,2) + TMath::Power(p2z-p1z,2));
   s2 = TMath::Sqrt(TMath::Power(p3x-p2x,2) + TMath::Power(p3y-p2y,2) + TMath::Power(p3z-p2z,2));
@@ -420,11 +411,11 @@ void GetPoI(double *ret, double *time, const int section, const PolarimeterDetec
   for(it = detEvents->begin(); it != detEvents->end(); it++) {
     if(sectionNumber(it->first) == section && detectorType(it->first) == type) {
       if(it->second->thresholdExceeded) {
-	ret[0] += (it->second->totEnergyDep)*(it->second->gPosX);
-	ret[1] += (it->second->totEnergyDep)*(it->second->gPosY);
-	ret[2] += (it->second->totEnergyDep)*(it->second->gPosZ);
-	*time += (it->second->totEnergyDep)*(it->second->time);
-	totEdepSoFar += it->second->totEnergyDep;
+		ret[0] += (it->second->totEnergyDep)*(it->second->gPosX);
+		ret[1] += (it->second->totEnergyDep)*(it->second->gPosY);
+		ret[2] += (it->second->totEnergyDep)*(it->second->gPosZ);
+		*time += (it->second->totEnergyDep)*(it->second->time);
+		totEdepSoFar += it->second->totEnergyDep;
       }
     }
   }
@@ -453,8 +444,8 @@ bool CheckAngleRequirement(std::ofstream &txtOut, NpolVertex *incNeutronVert, st
   GetPoI(EarrayPt,&EarrayTime,section,EArrayOfInterest,detEvents);
 
   double azAngle = getAzimuthAngle(txtOut,targetPt[0],targetPt[1], targetPt[2],
-				   analyzerPt[0],analyzerPt[1],analyzerPt[2],
-				   EarrayPt[0],EarrayPt[1],EarrayPt[2]);
+								   analyzerPt[0],analyzerPt[1],analyzerPt[2],
+								   EarrayPt[0],EarrayPt[1],EarrayPt[2]);
 
   //txtOut << azAngle << " deg" << std::endl;
   //	std::cout << "(" << targetPt[0] << "," << targetPt[1] << "," << targetPt[2] << ")   "
@@ -623,6 +614,7 @@ int main(int argc, char *argv[]) {
   int eventCounter = 0;
   int eventsPassed = 0;
   int eventsFailed = 0;
+  int eventsTrigger = 0;
   // BEGIN EVENT LOOP
   int nentries = npolTree->GetEntries();
   for(int i = 0; i < nentries; i++) {
@@ -645,6 +637,7 @@ int main(int argc, char *argv[]) {
 
     // BEGIN STEPS LOOP
     std::vector<NpolStep *>::iterator s_it;
+	bool tripFlag = false;
     for(s_it = steps->begin(); s_it != steps->end(); s_it++) {
       NpolStep *aStep = *s_it;
 		
@@ -661,6 +654,13 @@ int main(int argc, char *argv[]) {
 		(detEvents[aStep->volume])->gPosZ = aStep->gPosZ;
 		(detEvents[aStep->volume])->lPosZ = aStep->lPosZ;
 		(detEvents[aStep->volume])->time = aStep->time;
+
+		if(tripFlag == false){// A counter for number of events that fire at least one Analyzer in some section
+		  if(detectorType(aStep->volume) == analyzer){
+			eventsTrigger++;
+			tripFlag = true;
+		  }
+		}
       }
     } // END STEPS LOOP
 	
@@ -753,11 +753,12 @@ int main(int argc, char *argv[]) {
   h_sectionEfficiency3->Scale(1.0); 
   h_sectionEfficiency4->Scale(1.0); 
   
-  TVectorD runStatistics(4);
+  TVectorD runStatistics(5);
   runStatistics[0] = totalEvents;
   runStatistics[1] = eventInteraction;
   runStatistics[2] = eventsPassed;
   runStatistics[3] = eventsFailed;
+  runStatistics[4] = eventsTrigger;
   runStatistics.Write();
   h_dEoverE_TopHigh->Write();
   h_dEoverE_BotHigh->Write();
