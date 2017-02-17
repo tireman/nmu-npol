@@ -87,6 +87,6 @@
 /control/execute macros/particleFluxData/4.4GeV/npolEnergy_neutron.dat
 
 ###### Commands below are independent of GPS ######
-/run/printProgress 100
-/run/beamOn 500
+/run/printProgress 10000
+/run/beamOn 1000000
 
