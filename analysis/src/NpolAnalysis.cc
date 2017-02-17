@@ -90,9 +90,9 @@ int sectionNumber(const std::string &volName) {
       else if(pvNum <= 5 && pvNum >= 0) {return 1;}  // section 2
       else {return -1;}
     case 2: // Top E array 2
+	case 6: // Bottom E array 2
     case 4: // Top dE array 2
-    case 6: // Bottom E array 2
-    case 8: // Bottom dE array 2
+	case 8: // Bottom dE array 2
       pvNum = GetPlacementNumber(volName);
       if(pvNum <= 13 && pvNum >= 7) {return 2;}  // section 3
       else if(pvNum <= 6 && pvNum >= 0) {return 3;}  // section 4
@@ -288,18 +288,19 @@ int getSectionOfInterest(const std::map<std::string,NpolDetectorEvent *> *detEve
 		  break;
 		default: break;
 		}
-      }
-    }
+	  }
+	}
+    
     
     // Mod: Tireman (2017-January-18) to test if multiscattering counts are playing havoc on efficiences
     // If one of this section's analyzers took a hit, then any section after this fails requirement 2.
     // Note: Here we check if SOI has been set and then set Multiscatter = true; remove this check to allow multiscatter
     if(analyzerFlag) {
-      if(sectionOfInterest != -1) multiscatter = true;
+      //if(sectionOfInterest != -1) multiscatter = true;  // Turn this off by commenting out this line
       sectionOfInterest = -1;
-    }
-    if((analyzerFlag && topEArrayFlag && topdEArrayFlag && !taggerFlag) != (analyzerFlag && botEArrayFlag && botdEArrayFlag && !taggerFlag)) {
-	  sectionOfInterest = section; // If this section passes requirement 1, then it may be the section of interest
+	  //}
+    //if((analyzerFlag && topEArrayFlag && topdEArrayFlag && !taggerFlag) || (analyzerFlag && botEArrayFlag && botdEArrayFlag && !taggerFlag)) {  
+	sectionOfInterest = section; // If this section passes requirement 1, then it may be the section of interest
     }
     
     //  Code inserted for future "checks" of the E-array and dE-array if necessary
@@ -309,12 +310,13 @@ int getSectionOfInterest(const std::map<std::string,NpolDetectorEvent *> *detEve
   // Reject events with hits in multiple sections of interest
   // Reject events with more than 40 detectors with hits above 1 MeV
   // Otherwise return the ID'd section of interest
+  int totalDetHit = countA + countTE + countBE + countV + countTdE + countBdE;
   if(multiscatter) {  
     sectionOfInterest = -1;
     //std::cout << "Multi-hit: Event rejected!" << std::endl;
     return sectionOfInterest;
-  } else if((countA + countTE + countBE + countV + countTdE + countBdE) >= 20) { 
-    std::cout << "Event Rejected! Total number of detectors with 40 keV or greater: " << (countA + countTE + countBE + countV + countTdE + countBdE) << std::endl;
+  } else if(totalDetHit >= 80) { 
+    std::cout << "Event Rejected! Total number of detectors with 40 keV or greater: " << totalDetHit << std::endl;
     sectionOfInterest = -1;
     return sectionOfInterest;
   } else {
@@ -686,8 +688,8 @@ int main(int argc, char *argv[]) {
 			eDepArrayTotal[detector] += e_it->second->totEnergyDep;
 		  }
 		}
-      }
-	  
+	  }
+		
       PolarimeterDetector EArrayOfInterest = getEArrayOfInterest(&eDepArrayTotal,sectionOfInterest);
       PolarimeterDetector dEArrayOfInterest;	  
 	  
@@ -737,8 +739,6 @@ int main(int argc, char *argv[]) {
       } else eventsFailed++;
     } else eventsFailed++;
 	
-    if(sectionOfInterest != -1) eventsPassed ++;
-	
     // Clear out the map for the next event
     eDepArrayTotal.clear();
     for(e_it = detEvents.begin(); e_it != detEvents.end(); e_it++)
@@ -748,6 +748,8 @@ int main(int argc, char *argv[]) {
   
   std::cout << eventsPassed << " events passed requirements.  "
 			<< eventsFailed << " failed." << std::endl;
+  //double temp = (((double)eventsPassed)*100)/(double)totalEvents;
+  std::cout << (((double)eventsPassed)*100)/(double)totalEvents << " % of total events passed cuts." << std::endl; 
   h_sectionEfficiency1->Scale(1.0); 
   h_sectionEfficiency2->Scale(1.0); 
   h_sectionEfficiency3->Scale(1.0); 

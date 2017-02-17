@@ -151,7 +151,7 @@ void NpolShieldHut::Place(G4LogicalVolume *motherLV) {
   G4double VertOffSet = 0.3424*m, PosBack = 11.8739*m;
   G4double PosRoof = 9.1239*m, OffSetRoof = 3.7776*m;
 
-  PlaceCylindrical(LeadCurtainLV, motherLV, "LeadCurtain", PosLead,-NpolAng, 0);
+  //PlaceCylindrical(LeadCurtainLV, motherLV, "LeadCurtain", PosLead,-NpolAng, 0);
   PlaceCylindrical(NPOLTaggerLV, motherLV, "NPOLTagger", PosTagger, -NpolAng, 0);  
   PlaceCylindrical(HutFrontWallLV, motherLV, "HutFrontWall", PosFront,-NpolAng,-VertOffSet);
   PlaceCylindrical(HutBackWallLV, motherLV, "HutBackWall", PosBack,-NpolAng,-VertOffSet);
