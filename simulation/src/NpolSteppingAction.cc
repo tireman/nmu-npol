@@ -43,8 +43,7 @@ void NpolSteppingAction::UserSteppingAction(const G4Step *aStep) {
   G4VPhysicalVolume *postStepVolume = postStepPoint->GetPhysicalVolume();
   G4String volName = preStepVolume->GetName();
  
-  // Kill tracks that reach certian volumes and won't produce background in 
-  // the polarimeter
+  // Kill/stop tracks that will just waste precious CPU time
   if(volName == "Cap" || postStepVolume == NULL ||
      volName == "HallShellRoof" ||volName == "HallShellFloor" || volName == "HallShellWall"
      || volName == "HutBackWall" || volName == "HutSideWall" || volName == "HutRoof" || volName == "HutFrontWall"){
