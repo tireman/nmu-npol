@@ -33,6 +33,13 @@ public:
   virtual void Place(G4LogicalVolume *motherLV);
   void ConstructSHMSTagger();
   void ConstructHBender();
+
+  static G4double ShmsAng;
+  static G4double PosHB;
+  static G4double PosTagger;
+  static G4double thicknessTagger;
+  static G4double horizontalAcceptance;
+  static G4double verticalAcceptance;
   
 private:
   //G4LogicalVolume *HBenderLV;

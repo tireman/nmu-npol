@@ -24,6 +24,13 @@
 #include "NpolMaterials.hh"
 #include "NpolHBender.hh"
 
+G4double NpolHBender::ShmsAng = 36.53*deg; // Angle at 4.4 GeV/c 36.53*deg; at 11 GeV/c 16.79; 
+G4double NpolHBender::PosHB = 1.76*m;   // Position of HB center from target
+G4double NpolHBender::PosTagger = 1.195*m; // just in front of HB opening
+G4double NpolHBender::thicknessTagger = 0.10*cm; // thickness of SHMS tagger
+G4double NpolHBender::horizontalAcceptance = 0.048*rad; // SHMS horizontal acceptance (full)
+G4double NpolHBender::verticalAcceptance = 0.080*rad; // SHMS veritical acceptance (full)
+
 NpolHBender::NpolHBender() {
   ConstructHBender();
   ConstructSHMSTagger();
@@ -32,9 +39,8 @@ NpolHBender::NpolHBender() {
 NpolHBender::~NpolHBender() {}
 
 void NpolHBender::ConstructSHMSTagger(){
-  G4double xlen = 0.1588*m; G4double ylen = 0.2075*m; G4double zlen = 0.010*cm;
   
-  G4Box *SHMSTagger = new G4Box("SHMSTagger",xlen/2,ylen/2,zlen/2);
+  G4Box *SHMSTagger = new G4Box("SHMSTagger", PosTagger*tan(horizontalAcceptance/2),PosTagger*tan(verticalAcceptance/2),thicknessTagger/2);
   SHMSTaggerLV = 
 	new G4LogicalVolume(SHMSTagger,NpolMaterials::GetInstance()->GetMaterial("HardVacuum"),"SHMSTaggerLV",0,0,0);
   G4VisAttributes *TaggerVisAtt = new G4VisAttributes(G4Colour(0.2, 0.2, 0.2));
@@ -65,8 +71,6 @@ G4String NpolHBender::GetName() {
 }
 
 void NpolHBender::Place(G4LogicalVolume *motherLV) {
-  G4double ShmsAng = 36.53*deg; // Angle at 4.4 GeV/c 36.53*deg; at 11 GeV/c 16.79; 
-  G4double PosHB = 1.76*m, PosTagger = 1.195*m;
   
   PlaceCylindrical(HBBoreLogicLV, motherLV, "HBBore", PosHB, ShmsAng, 0);
   //PlaceCylindrical(HBCoilLogicLV, motherLV, "HBCoil", PosHB, ShmsAng, 0);
