@@ -41,7 +41,7 @@ G4double NpolPolarimeter::NDetStandardLength = 100.0*cm;
 G4double NpolPolarimeter::EArrayVertOffset = 0.90*m;
 G4double NpolPolarimeter::dEArrayVertOffset = 0.42*m; // orig was 0.32*m
 G4double NpolPolarimeter::EArrayHoriOffset = 0.602*m; // computed offset 0.601*m
-G4double NpolPolarimeter::dEArrayHoriOffset = 0.4288*m; // computed offset is 0.569*m
+G4double NpolPolarimeter::dEArrayHoriOffset = 0.4288*m; // offset is 0.569*m for angle dEs
 G4double NpolPolarimeter::Array1zPos = -1.10*m;
 G4double NpolPolarimeter::Array2zPos = +0.300*m;
 G4double NpolPolarimeter::EarrayRotAngle = 45.0*deg;
@@ -49,7 +49,7 @@ G4double NpolPolarimeter::FrontDetSpacing = 0.65*m;
 G4double NpolPolarimeter::FrontDetOffset = 1.70*m;
 G4double NpolPolarimeter::FrontVetoOffset = 1.77*m;
 G4double NpolPolarimeter::BackTaggerzPos = 1.80*m;
-G4double NpolPolarimeter::NpolAng = 28.0*deg; //28.0*deg;
+G4double NpolPolarimeter::NpolAng = 28.0*deg; // 28.0*deg; nominal
 
 NpolPolarimeter::NpolPolarimeter() {
   G4VSolid *PolarimeterBox = new G4Box("PolarimeterBox",1.30*m,1.45*m,1.85*m);
