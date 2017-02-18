@@ -34,12 +34,10 @@
 
 # the beam energy 
 /gps/ene/type Mono
-/gps/ene/mono 11000. MeV
+/gps/ene/mono 4400. MeV
 
 #
 # Commands below are independent of gps
 #
-/vis/scene/endOfEventAction accumulate 100
 /run/printProgress 10000
-
 /run/beamOn 5000000

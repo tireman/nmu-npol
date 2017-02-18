@@ -6,7 +6,7 @@
 /vis/open OGLI 600x600-0+0
 #/vis/viewer/set/background 0.25 0.50 0.45
 #/vis/viewer/set/background 1.0 .90 0.90
-/vis/viewer/set/background 0.20 0.40 0.40
+/vis/viewer/set/background 0.40 0.60 0.60
 #
 # Disable auto refresh and quieten vis messages whilst scene and
 # trajectories are established:
@@ -31,7 +31,7 @@
 /vis/scene/add/hits
 #
 # To superimpose all of the events from a given run:
-/vis/scene/endOfEventAction accumulate 100
+/vis/scene/endOfEventAction accumulate 1000
 #
 # Decorations
 # Name
