@@ -23,10 +23,10 @@
 #include "NpolMaterials.hh"
 #include "NpolParticleFluxTagger.hh"
 
-G4double NpolParticleFluxTagger::vertAngle = 4.927*deg;  // 1 degree more than gap height //0.085992 rad
-G4double NpolParticleFluxTagger::horAngle =  10.385*deg; // 2 degree more than gap width // 0.18125 rad
-G4double NpolParticleFluxTagger::taggerPos = 1.500*m; 
-G4double NpolParticleFluxTagger::NpolAng = 28.0*deg; //nominal NPOL location 28.0*deg;
+G4double NpolParticleFluxTagger::vertAngle = 0.600*rad; // 300 mrad more than enough
+G4double NpolParticleFluxTagger::horAngle = 0.850*rad;  // 450 mrad more than enough
+G4double NpolParticleFluxTagger::taggerPos = 1.500*m;   // tagger position from target
+G4double NpolParticleFluxTagger::NpolAng = 28.0*deg;    // nominal NPOL location 28.0*deg;
 
 NpolParticleFluxTagger::NpolParticleFluxTagger() {
   ConstructParticleTagger();
@@ -38,16 +38,14 @@ G4String NpolParticleFluxTagger::GetName() {
   return G4String("Particle Flux Tagger");
 }
 
-// Construct a thin air box so we can tag particles before entering the first magnet.  
-// Place it just a millimeter off the front steel wall
-// Vertical and horizontal angles are calculated by taking the Dipole 1 specs and the distance
-// to the front face of the magnet, then add 1 degree to that result so the solid angle of the
-// target tagger will encompass more than just the opening.
+// Construct a thin vacuum box so we can tag particles before entering the first magnet.  
+// Place it just a few millimeters off the front steel wall
+// Tagger height/width larger than opening just to make sure we encompass possibilities
+// In analysis, will cut down via acceptance cuts
 void NpolParticleFluxTagger::ConstructParticleTagger(){  
 
-  //G4double xlen = 2*taggerPos*tan(horAngle); G4double ylen = 2*taggerPos*tan(vertAngle);
+  G4double xlen = 2*taggerPos*tan(horAngle/2); G4double ylen = 2*taggerPos*tan(vertAngle/2);
   G4double zlen = 0.10*cm;
-  G4double xlen = 70.0*cm; G4double ylen = 30.0*cm;
 
   G4Box *ParticleTagger = new G4Box("ParticleTagger",xlen/2,ylen/2,zlen/2);
   ParticleTaggerLV = 
