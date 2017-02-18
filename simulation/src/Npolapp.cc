@@ -62,7 +62,7 @@ int main(int argc,char **argv) {
 
 	// RunManager construction
 #ifdef G4MULTITHREADED
-	G4RunManager *runManager = new G4RunManager;
+	G4RunManager *runManager = new G4RunManager;  // MT mode doesn't work yet
 	//G4MTRunManager *runManager = new G4MTRunManager;
 	//runManager->SetNumberOfThreads(5);
 #else
@@ -77,7 +77,7 @@ int main(int argc,char **argv) {
 
 	// mandatory user initialization classes
 	runManager->SetUserInitialization(new NpolDetectorConstruction);
-	//runManager->SetUserInitialization(new NpolPhysicsList);
+	//runManager->SetUserInitialization(new NpolPhysicsList);  // A test list
 	runManager->SetUserInitialization(new QGSP_BERT_HP); 
 	// Use _HP version for full runs and non-_HP version for tests
 	runManager->SetUserInitialization(new NpolActionInitialization);
