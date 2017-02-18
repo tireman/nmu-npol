@@ -31,6 +31,7 @@ public:
   static G4double vertAngle, horAngle;
   static G4double PosFront, PosLead, PosTagger;
   static G4double leadThickness;
+  static G4double vertOffSet;
   
   void ConstructHutSideWall();
   void ConstructHutFrontWall();
