@@ -5,7 +5,7 @@
 //* the Geant4 Collaboration.  It is provided  under  the terms  and *
 //* conditions of the Geant4 Software License,  included in the file *
 //* LICENSE and available at  http://cern.ch/geant4/license .  These *
-//* include a list of copyright holders.     		      	*
+//* include a list of copyright holders.     		      	         *
 //******************************************************************
 
 // %% NpolShieldHut.cc %%
@@ -27,7 +27,7 @@
 
 G4double NpolShieldHut::NpolAng = 28.0*deg;
 G4double NpolShieldHut::vertAngle = 0.1000*rad; // 0.06716*rad;  // vertical acceptance angle
-G4double NpolShieldHut::horAngle = 0.1200*rad; // 0.14226*rad;   // horizontal acceptance angle
+G4double NpolShieldHut::horAngle = 0.1600*rad; // 0.14226*rad;   // horizontal acceptance angle
 G4double NpolShieldHut::PosFront = 6.3739*m;  // position of front wall (center)
 G4double NpolShieldHut::PosLead = PosFront - 0.535*m;  // position of lead curtain (center)
 G4double NpolShieldHut::PosTagger = PosFront + 0.465*m;  // position of NPOL tagger (center)
