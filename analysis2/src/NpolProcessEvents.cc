@@ -41,8 +41,8 @@ TString OutputDir = "";
 TString InputDir = "";
 
 int main(int argc, char *argv[]) {
-  //TString analysisDir = getenv("NPOLLIB_DIR");
-  //gSystem->Load(analysisDir + "/" + "libNpolClasses.so"); 
+  TString analysisDir = getenv("NPOLLIB_DIR");
+  gSystem->Load(analysisDir + "/" + "libNpolClasses.so"); 
   
   // Set up the TTrees and their branch addresses
   TChain *npolTree = new TChain("T");
@@ -51,7 +51,7 @@ int main(int argc, char *argv[]) {
   Double_t NpolAng = 0.488692; // radians (28 degrees) NPOL angle from beamline
   Double_t targetTaggerPos = 150.0;  // Position of target tagger (cm)
   Double_t npolTaggerPos = 637.86;  // Position of NPOL Tagger (cm)
-  Double_t theta = 0.120; //0.13812; // NPOL horizontal angular accecptance (radians)
+  Double_t theta = 0.160; //0.13812; // NPOL horizontal angular accecptance (radians)
   Double_t phi = 0.100; // using the Dipole 1 limit // 0.08466; // NPOL vertical angular acceptance (radians)
   
   // ******* Tagger acceptance computations.  ALL SIZES ARE FULL WIDTH/HEIGHT ******** //
@@ -60,16 +60,16 @@ int main(int argc, char *argv[]) {
   // This may be a different acceptance for both NPOL and Target Taggers
 
   // This version uses the fixed angular acceptance for the sizing of the collimator
-  //Double_t targetW = 2*targetTaggerPos*TMath::Tan(theta/2);  // width of target tagger (cm)
-  //Double_t targetH = 2*targetTaggerPos*TMath::Tan(phi/2);   // height of target tagger (cm)
-  //Double_t npolW = 2*npolTaggerPos*TMath::Tan(theta/2);  // width of npol tagger (cm)
-  //Double_t npolH = 2*npolTaggerPos*TMath::Tan(phi/2);  // height of npol tagger (cm)
-
-  // This version allows for fixing the size manually
-  Double_t targetW = 56.0;  // width of target tagger (cm)
-  Double_t targetH = 21.0;  // height of target tagger (cm)
+  Double_t targetW = 2*targetTaggerPos*TMath::Tan(theta/2);  // width of target tagger (cm)
+  Double_t targetH = 2*targetTaggerPos*TMath::Tan(phi/2);   // height of target tagger (cm)
   Double_t npolW = 2*npolTaggerPos*TMath::Tan(theta/2);  // width of npol tagger (cm)
   Double_t npolH = 2*npolTaggerPos*TMath::Tan(phi/2);  // height of npol tagger (cm)
+
+  // This version allows for fixing the size manually
+  //Double_t targetW = 56.0;  // width of target tagger (cm)
+  //Double_t targetH = 21.0;  // height of target tagger (cm)
+  //Double_t npolW = 2*npolTaggerPos*TMath::Tan(theta/2);  // width of npol tagger (cm)
+  //Double_t npolH = 2*npolTaggerPos*TMath::Tan(phi/2);  // height of npol tagger (cm)
 
   Double_t targetAlpha = targetW/(4*targetTaggerPos);  // Constant needed for solid angle
   Double_t npolAlpha = npolW/(4*npolTaggerPos);  // Constant needed for solid angle
