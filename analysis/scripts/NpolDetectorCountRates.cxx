@@ -54,14 +54,11 @@ void NpolDetectorCountRates() {
 
   // Retrieve the object with the total number of electrons on target and calculate 
   // effective electron time on target per micro amp of beam
-
   TVectorD *v = (TVectorD*)inFile->Get("TVectorT<double>");
   Double_t totalElectrons = ((*v))[0];
   Double_t electronTime = totalElectrons/(6.242e12); //6.242e12 e-/s at 1 microAmp
-  //Double_t fluxscaling = 1/(totalElectrons*1.602e-13*(98*60));
   std::cout << "Electron beam time at 1 micro-amp is " << electronTime << " s " << std::endl;
   std::cout << "Total electrons on target: " << totalElectrons/1e6 << " Million" << std::endl;
-
 
   int pvNum = 1, avNum = 1, imprNum = 1;
   Int_t Nx = 16, Ny = 2, nThresh = 10, fillStyle = 1001;
@@ -73,23 +70,33 @@ void NpolDetectorCountRates() {
   std::ofstream txtOut;
   txtOut.open(OutputDir + "/Output/NpolDetectorCountRates" + Lead + "cm.out");
 
-  TCanvas *C1[22]; TCanvas *C2[22];
-  for(int l = 0; l < 22; l++){
-	char tempName[12], tempName2[12];
-	sprintf(tempName,"canvas%i",l);
-	sprintf(tempName2,"graph%i",l);
-	C1[l]= new TCanvas(tempName,"Energy Plots at Polarimeter Angle 28.0 Deg, E = 4.4 GeV",1200,900);
-	C2[l]= new TCanvas(tempName2,"Count Rate vs. Threshold plots",1200,900);
-  }
+  //***************************  Main portion of code ***************************************
+  // The main job of this code is to take in a file containing all the energy histograms of
+  // the CGEN polarimeter and generate 2 canvas plots for each assembly volume/imprint group.
+  // The first canvas is just formatted energy depositied plots.  The second canvas is a set
+  // of graphs plotting raw count rates versus threshold setting.  These graphs have been 
+  // scaled to 1 micro-amp of electron beam on target for convenience.  All canvases are 
+  // saved to a ROOT file and the threshold values are saved to text file as well.
+  //
+  // Three loops are needed. Loop over 'n' is for all the assembly volume/imprint combos.
+  // There are currently 22 of them.  Loop over 'i' and 'j' fill the canvases with the 
+  // individual plots.  
+  //*****************************************************************************************
 
+  TCanvas *C1[22], *C2[22];
   TPad *pad1[22][7][2]; TPad *pad2[22][7][2];
-  char histoName[60];
+  char histoName[60], tempName[9], tempName2[8];
   for(int n = 0; n < 22; n++){	
 	pvNum = 0;
 	GetCanvasParameters(n);
 	if(PVnumMax == 13){ Nx = 7; } else { Nx = PVnumMax/2; }
+	sprintf(tempName,"canvas%i",n);
+	sprintf(tempName2,"graph%i",n);
+	C1[n]= new TCanvas(tempName,"Energy Plots at Polarimeter Angle 28.0 Deg, E = 4.4 GeV",1200,900);
+	C2[n]= new TCanvas(tempName2,"Count Rate vs. Threshold plots",1200,900);
 	CanvasPartition(C1[n],Nx,Ny,lMargin,rMargin,bMargin,tMargin,vSpacing,hSpacing);
 	CanvasPartition(C2[n],Nx,Ny,lMargin,rMargin,bMargin,tMargin,vSpacing,hSpacing);
+
 	for(int i = 0; i < Nx; i++){
 	  for(int j = 0; j < Ny; j++){
 		sprintf(histoName,"av_%i_impr_%i_%sLV_pv_%i",AVnum,imprNum,FancyName.c_str(),pvNum);
@@ -110,6 +117,7 @@ void NpolDetectorCountRates() {
 		Float_t xFactor = pad1[n][0][0]->GetAbsWNDC()/pad1[n][i][j]->GetAbsWNDC();
 		Float_t yFactor = pad1[n][0][0]->GetAbsHNDC()/pad1[n][i][j]->GetAbsHNDC();
 
+		// Get the histogram and begin preparing it and placing on the TPad
 		TH1F *hFrame = (TH1F*) inFile->Get(histoName);
 		hFrame->SetStats(false); 
 		hFrame->SetFillColor(kBlue);
@@ -158,10 +166,10 @@ void NpolDetectorCountRates() {
 		// TICKS X Axis
 		hFrame->GetXaxis()->SetTickLength(yFactor*0.06/xFactor);
 		
-		// Count up events in Front layer of taggers above Threshold
+		// This loop computes the thresholds and prints them to the screen.
+		// This is needed for the second canvas
 		int nBins = hFrame->GetNbinsX();
 		double binWidth = hFrame->GetXaxis()->GetBinWidth(10);
-		
 		for(int k = 0; k < nThresh; k++){
 		  double Threshold = Thresholds[k];
 		  CTagger[i][j] = hFrame->Integral((Threshold/binWidth),nBins);    
@@ -183,13 +191,16 @@ void NpolDetectorCountRates() {
 		pad2[n][i][j]->SetLogy();
 		pad2[n][i][j]->cd();
 		txtOut << RealName << ": AV Number " << AVnum << "  PV Number " << pvNum << std::endl;
+
+		// THis creates the x,y vectors for TGraph and writes the data to a text file
 		for(int k = 0; k < nThresh; k++){
 		  x[k] = Thresholds[k];
 		  y[k] = CountRates[k][i][j]/electronTime/(1e6);
 		  txtOut << Thresholds[k] << "      " << 80*CountRates[k][i][j]/electronTime/(1e6) << std::endl;
 		}
+
+		//  Generate the graph and format it ... somewhat nicely
 		TGraph *gr = new TGraph(nThresh,x,y); 
-     // Set Good Graph Title
 		char gtitle[90];
 		sprintf(gtitle,"#splitline{Count Rate VS. Threshold}{%s %i, Layer %i}",RealName.c_str(),pvNum+1, imprNum);
 		gr->SetTitle(gtitle);   
@@ -220,10 +231,12 @@ void NpolDetectorCountRates() {
 		gr->Draw("APC");
 		
 		// Cycle the Physical Volume number and check if you are at the end of a row.
+		// If so, increase imprint number by 1 and break the loop otherwise continue
 		pvNum++;
 		if(pvNum == PVnumMax) { imprNum++; break; }
 	  }
 	}
+	// Check imprNum against max allowed; cycle to next detector if greater than max
 	if(imprNum > ImprNumMax) { imprNum = 1; continue; }
   }
   
@@ -417,6 +430,9 @@ void RetrieveENVvariables() {
   }
 }
 
+// This method returns a set of values (av, pvMax imprintMax, names) for each 'n'
+// value that is cycled through in the main program.  It's a poor man's decoder
+// to be honest.
 void GetCanvasParameters(int n){
   ImprNumMax = 2;
   if(n == 0 || n == 1 || n == 2 || n == 3){
@@ -452,8 +468,7 @@ void GetCanvasParameters(int n){
 	FancyName = "FrontVeto";
 	RealName = "Front Veto";
   } else if(n == 20 || n == 21){
-	AVnum = 13;
-	PVnumMax = 16;
+	AVnum = 13; PVnumMax = 16;
 	FancyName = "BackTag";
 	RealName = "Back Tagger";
   }
