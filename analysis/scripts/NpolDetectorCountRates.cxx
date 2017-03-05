@@ -240,13 +240,11 @@ void NpolDetectorCountRates() {
 	if(imprNum > ImprNumMax) { imprNum = 1; continue; }
   }
   
-  //*************** End new Code Looper *********************
-
-  txtOut.close();
-  for(int n = 0; n < 22; n++){
-	C1[n]->Write();
-	C2[n]->Write();
+  for(int i = 0; i < 22; i++){
+	C1[i]->Write();
+	C2[i]->Write();
   }
+  txtOut.close();
   outFile->Close(); 
   //inFile->Close();
 
