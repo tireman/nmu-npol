@@ -36,7 +36,7 @@ TString FormOutputFile(TString OutputDir);
 void RetrieveENVvariables();
 void GetCanvasParameters(int n);
 
-int PVnumMax = 0, AVnum = 1, ImprNumMax = 2;
+int PVnumMax = 0, AVnum = 1, ImprNumMax = 2, layerNum = 1;
 TString BaseName = "";  TString JobNum = "";  TString Lead = ""; TString Energy = ""; 
 TString Bfield = ""; TString OutputDir = ""; TString InputDir = "";
 std::string FancyName = ""; std::string RealName = "";
@@ -55,14 +55,14 @@ void NpolDetectorCountRates() {
   // Retrieve the object with the total number of electrons on target and calculate 
   // effective electron time on target per micro amp of beam
   TVectorD *v = (TVectorD*)inFile->Get("TVectorT<double>");
-  Double_t totalElectrons = ((*v))[0];
+  Double_t totalElectrons = 10e10; //((*v))[0];
   Double_t electronTime = totalElectrons/(6.242e12); //6.242e12 e-/s at 1 microAmp
   std::cout << "Electron beam time at 1 micro-amp is " << electronTime << " s " << std::endl;
   std::cout << "Total electrons on target: " << totalElectrons/1e6 << " Million" << std::endl;
 
   int pvNum = 1, avNum = 1, imprNum = 1;
   Int_t Nx = 16, Ny = 2, nThresh = 10, fillStyle = 1001;
-  Float_t lMargin = 0.10, rMargin = 0.05, bMargin = 0.10, tMargin = 0.05;
+  Float_t lMargin = 0.05, rMargin = 0.05, bMargin = 0.10, tMargin = 0.05;
   Float_t vSpacing = 0.0; Float_t hSpacing = 0.0;
   double CTagger[Nx][Ny];
   double Thresholds[10]={0.5,1.0,1.5,2.0,2.5,3.0,3.5,4.0,4.5,5.0};
@@ -85,15 +85,15 @@ void NpolDetectorCountRates() {
 
   TCanvas *C1[22], *C2[22];
   TPad *pad1[22][7][2]; TPad *pad2[22][7][2];
-  char histoName[60], tempName[9], tempName2[8];
+  char histoName[60], tempName[9], tempName2[8]; 
   for(int n = 0; n < 22; n++){	
 	pvNum = 0;
 	GetCanvasParameters(n);
 	if(PVnumMax == 13){ Nx = 7; } else { Nx = PVnumMax/2; }
 	sprintf(tempName,"canvas%i",n);
 	sprintf(tempName2,"graph%i",n);
-	C1[n]= new TCanvas(tempName,"Energy Plots at Polarimeter Angle 28.0 Deg, E = 4.4 GeV",1200,900);
-	C2[n]= new TCanvas(tempName2,"Count Rate vs. Threshold plots",1200,900);
+	C1[n]= new TCanvas(tempName,"Energy Plots at Polarimeter Angle 28.0 Deg, E = 4.4 GeV",1500,900);
+	C2[n]= new TCanvas(tempName2,"Count Rate vs. Threshold plots",1500,900);
 	CanvasPartition(C1[n],Nx,Ny,lMargin,rMargin,bMargin,tMargin,vSpacing,hSpacing);
 	CanvasPartition(C2[n],Nx,Ny,lMargin,rMargin,bMargin,tMargin,vSpacing,hSpacing);
 
@@ -129,7 +129,7 @@ void NpolDetectorCountRates() {
 		imprNum = GetImprNumber(histoName);
 		pvNum = GetPlacementNumber(histoName);
 		char htitle[80];
-		sprintf(htitle,"#splitline{Energy Deposited}{%s %i, Layer %i}",RealName.c_str(),pvNum+1, imprNum);
+		sprintf(htitle,"#splitline{Energy Deposited}{%s %i, Layer %i}",RealName.c_str(),pvNum+1, layerNum);
 		hFrame->SetTitle(htitle);     
 		// y axis range
 		double FirstBinHeight= hFrame->GetBinContent(hFrame->GetMaximumBin());
@@ -174,10 +174,10 @@ void NpolDetectorCountRates() {
 		  double Threshold = Thresholds[k];
 		  CTagger[i][j] = hFrame->Integral((Threshold/binWidth),nBins);    
 		  CountRates[k][i][j] = CTagger[i][j];
-		  cout << "First Veto layer, detector " << pvNum << " counts/s for 1 microAmp of Beam " 
-			   << CTagger[i][j]/electronTime/(1e6) << " MHz" << endl;
-		  cout << "First Veto layer, detector " << pvNum << " counts/s for 80 microAmp of Beam " 
-			   << 80*CTagger[i][j]/electronTime/(1e6) << " MHz" << endl;    
+		  cout << RealName << ", detector # " << pvNum << " counts/s for 1 microAmp of Beam " 
+			   << CTagger[i][j]/electronTime/(1e3) << " kHz" << endl;
+		  cout << RealName << ", detector # " << pvNum << " counts/s for 80 microAmp of Beam " 
+			   << 80*CTagger[i][j]/electronTime/(1e3) << " kHz" << endl;    
 		  cout << " " << endl;
 		}
 		
@@ -193,20 +193,25 @@ void NpolDetectorCountRates() {
 		txtOut << RealName << ": AV Number " << AVnum << "  PV Number " << pvNum << std::endl;
 
 		// THis creates the x,y vectors for TGraph and writes the data to a text file
+		double largestY = 0.0, smallestY = 10.0;
 		for(int k = 0; k < nThresh; k++){
 		  x[k] = Thresholds[k];
-		  y[k] = CountRates[k][i][j]/electronTime/(1e6);
-		  txtOut << Thresholds[k] << "      " << 80*CountRates[k][i][j]/electronTime/(1e6) << std::endl;
+		  y[k] = CountRates[k][i][j]/electronTime/(1e3);
+		  if(y[k] > largestY) largestY = y[k];
+		  if(y[k] < smallestY) smallestY = y[k];
+		  txtOut << Thresholds[k] << "      " << 
+			80*CountRates[k][i][j]/electronTime/(1e3) << std::endl;
 		}
 
 		//  Generate the graph and format it ... somewhat nicely
 		TGraph *gr = new TGraph(nThresh,x,y); 
 		char gtitle[90];
-		sprintf(gtitle,"#splitline{Count Rate VS. Threshold}{%s %i, Layer %i}",RealName.c_str(),pvNum+1, imprNum);
+		sprintf(gtitle,"#splitline{Count Rate VS. Threshold}{%s %i, Layer %i}",
+				RealName.c_str(),pvNum+1, layerNum);
 		gr->SetTitle(gtitle);   
 		
 		// Clean up Y axis
-		gr->GetYaxis()->SetTitle("Count Rate at 1 #muA Beam (MHz)");   
+		gr->GetYaxis()->SetTitle("Count Rate at 1 #muA Beam (kHz)");   
 		gr->GetYaxis()->SetLabelFont(43);
 		gr->GetYaxis()->SetLabelSize(16);
 		gr->GetYaxis()->SetLabelOffset(0.02);
@@ -214,7 +219,8 @@ void NpolDetectorCountRates() {
 		gr->GetYaxis()->SetTitleSize(16);
 		gr->GetYaxis()->SetTitleOffset(5);
 		gr->GetYaxis()->CenterTitle(); 
-		gr->GetYaxis()->SetRangeUser(0.000,1.1*y[0]);
+		gr->SetMinimum(0.8*smallestY);
+		gr->SetMaximum(2*largestY);
 		
 		// Clean up X axis
 		gr->GetXaxis()->SetTitle("Threshold Energy (MeV)");
@@ -270,23 +276,23 @@ void CanvasPartition(TCanvas *C,const Int_t Nx,const Int_t Ny,
    for (Int_t i=0;i<Nx;i++) {
 
       if (i==0) {
-         hposl = 0.0;
+         hposl = 0.03;
          hposr = lMargin + hStep;
          hfactor = hposr-hposl;
          hmarl = lMargin / hfactor;
-         hmarr = 0.0;
+         hmarr = 0.05;
       } else if (i == Nx-1) {
          hposl = hposr + hSpacing;
          hposr = hposl + hStep + rMargin;
          hfactor = hposr-hposl;
-         hmarl = 0.0;
+         hmarl = 0.20;
          hmarr = rMargin / (hposr-hposl);
       } else {
          hposl = hposr + hSpacing;
          hposr = hposl + hStep;
          hfactor = hposr-hposl;
-         hmarl = 0.0;
-         hmarr = 0.0;
+         hmarl = 0.20;
+         hmarr = 0.05;
       }
 
       for (Int_t j=0;j<Ny;j++) {
@@ -321,8 +327,8 @@ void CanvasPartition(TCanvas *C,const Int_t Nx,const Int_t Ny,
          pad->SetLeftMargin(hmarl);
          pad->SetRightMargin(hmarr);
          pad->SetBottomMargin(vmard);
-	 pad->SetTopMargin(vmaru);
-
+		 pad->SetTopMargin(vmaru);
+	 
          pad->SetFrameBorderMode(0);
          pad->SetBorderMode(0);
          pad->SetBorderSize(0);
@@ -436,39 +442,41 @@ void GetCanvasParameters(int n){
   if(n == 0 || n == 1 || n == 2 || n == 3){
 	if(n == 0 || n == 1){ AVnum = 1; PVnumMax = 13; }
 	if(n == 2 || n == 3){ AVnum = 2; PVnumMax = 14; }
-	FancyName = "TopDet";
-	RealName = "Top Detector";
+	FancyName = "TopDet"; RealName = "Top Detector";
+	layerNum = 1;
   } else if(n == 6 || n == 7 || n == 8 || n == 9){
 	if(n == 6 || n == 7){ AVnum = 5; PVnumMax = 13; }
 	if(n == 8 || n == 9){ AVnum = 6; PVnumMax = 14; }
-	FancyName = "BottomDet";
-	RealName = "Bottom Detector";
+	FancyName = "BottomDet"; RealName = "Bottom Detector";
+	layerNum = 1;
   } else if(n == 4 || n == 5){
 	ImprNumMax = 1;
 	if(n == 4){ AVnum = 3; PVnumMax = 13; }
 	if(n == 5){ AVnum = 4; PVnumMax = 14; }
-	FancyName = "TopVeto";
-	RealName = "Top Veto";
+	FancyName = "TopVeto"; RealName = "Top Veto";
+	layerNum = 1;
   } else if(n == 10 || n ==11){
 	ImprNumMax = 1;
 	if(n == 10){ AVnum = 7; PVnumMax = 13; }
 	if(n == 11){ AVnum = 8; PVnumMax = 14; }
-	FancyName = "BottomVeto";
-	RealName = "Bottom Veto";
+	FancyName = "BottomVeto"; RealName = "Bottom Veto";
+	layerNum = 1;
   } else if(n == 12 || n == 13 || n == 14 || n == 15){
-	if(n == 12 || n == 13){ AVnum = 9; PVnumMax = 6;}
-	if(n == 14 || n == 15){ AVnum = 10; PVnumMax = 8; }
-	FancyName = "FrontDet";
-	RealName = "Front Detector";
+	if(n == 12){ AVnum = 9; PVnumMax = 6; layerNum = 1;}
+	if(n == 13){ AVnum = 9; PVnumMax = 6; layerNum = 2;}
+	if(n == 14){ AVnum = 10; PVnumMax = 8; layerNum = 3;}
+	if(n == 15){ AVnum = 10; PVnumMax = 8; layerNum = 4;}
+	FancyName = "FrontDet"; RealName = "Front Detector";
   } else if(n == 16 || n == 17 || n == 18 || n == 19){
-	if(n == 16 || n == 17){ AVnum = 11; PVnumMax = 6; }
-	if(n == 18 || n == 19){ AVnum = 12; PVnumMax = 8; }
-	FancyName = "FrontVeto";
-	RealName = "Front Veto";
+	if(n == 16){ AVnum = 11; PVnumMax = 6; layerNum = 1; }
+	if(n == 17){ AVnum = 11; PVnumMax = 6; layerNum = 2; }
+	if(n == 18){ AVnum = 12; PVnumMax = 8; layerNum = 3; }
+	if(n == 19){ AVnum = 12; PVnumMax = 8; layerNum = 4; }
+	FancyName = "FrontVeto"; RealName = "Front Veto";
   } else if(n == 20 || n == 21){
-	AVnum = 13; PVnumMax = 16;
-	FancyName = "BackTag";
-	RealName = "Back Tagger";
+	if(n == 20){ AVnum = 13; PVnumMax = 16; layerNum = 1; }
+	if(n == 21){ AVnum = 13; PVnumMax = 16; layerNum = 2; }
+	FancyName = "BackTag"; RealName = "Back Tagger";
   }
   return;
 }
