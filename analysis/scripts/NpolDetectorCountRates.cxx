@@ -237,14 +237,13 @@ void NpolDetectorCountRates() {
 	  }
 	}
 	// Check imprNum against max allowed; cycle to next detector if greater than max
-	if(imprNum > ImprNumMax) { 
-	  imprNum = 1; 
-	  C1[n]->Write();
-	  C2[n]->Write();
-	  continue; 
-	}
+	if(imprNum > ImprNumMax) { imprNum = 1; continue; }
   }
   
+  for(int i = 0; i < 22; i++){
+	C1[i]->Write();
+	C2[i]->Write();
+  }
   txtOut.close();
   outFile->Close(); 
   //inFile->Close();
