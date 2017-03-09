@@ -19,6 +19,7 @@ class NpolTagger : public TObject {
 public:
 
   int trackId;
+  int parentId;
   double gPosX;
   double gPosY;
   double gPosZ;
