@@ -18,10 +18,10 @@
 #include <TVectorD.h>
 #include <TString.h>
 
-#include "NpolVertex.hh"
-#include "NpolTagger.hh"
-#include "NpolStatistics.hh"
-#include "NpolStep.hh"
+#include "../../npollib/include/NpolVertex.hh"
+#include "../../npollib/include/NpolTagger.hh"
+#include "../../npollib/include/NpolStatistics.hh"
+#include "../../npollib/include/NpolStep.hh"
 
 void RetrieveENVvariables();
 TString FormInputFile(TString InputDir);
@@ -198,8 +198,8 @@ int main(int argc, char *argv[]) {
   delta_TOF->GetXaxis()->SetTitle("Analyzer to Top/Bottom Array Time-of-Flight (ns)");
 
   // Solid angle calculation! 
-  Double_t targetSolidAngle = 8*(TMath::ATan(targetH/targetW)-TMath::ASin(targetH/TMath::Sqrt((1+TMath::Power(targetAlpha,2))*(TMath::Power(targetH,2)+TMath::Power(targetW,2)))));
-  Double_t npolSolidAngle = 8*(TMath::ATan(npolH/npolW)-TMath::ASin(npolH/TMath::Sqrt((1+TMath::Power(npolAlpha,2))*(TMath::Power(npolH,2)+TMath::Power(npolW,2)))));
+  //Double_t targetSolidAngle = 8*(TMath::ATan(targetH/targetW)-TMath::ASin(targetH/TMath::Sqrt((1+TMath::Power(targetAlpha,2))*(TMath::Power(targetH,2)+TMath::Power(targetW,2)))));
+  //Double_t npolSolidAngle = 8*(TMath::ATan(npolH/npolW)-TMath::ASin(npolH/TMath::Sqrt((1+TMath::Power(npolAlpha,2))*(TMath::Power(npolH,2)+TMath::Power(npolW,2)))));
   
   // loop over all entries (one per event)
   Int_t nentries = npolTree->GetEntries();
@@ -208,26 +208,27 @@ int main(int argc, char *argv[]) {
     npolTree->GetEntry(i);
 	PrintEventNumber(nentries,i);
 
-	std::set<int> npolTrackIDs;
-	
-	// ***** tHIS SECTION IS USED TO SELECT PARTICULAR EVENTS FROM THE TRACKS VECTOR ***** //
+	// ***** THIS SECTION IS USED TO SELECT PARTICULAR EVENTS FROM THE TRACKS VECTOR ***** //
 	// loop over all vertex entries to find particles created in
 	// the lead curtain or front wall of shield hut
-	/*std::set<int> vertexTrackIDs;
-	std::vector<NpolVertex *>::iterator v_it;
+	std::set<int> vertexTrackIDs;
+	std::set<int> npolTrackIDs;
+
+	/*std::vector<NpolVertex *>::iterator v_it;
 	for(v_it = vertexEntry->begin(); v_it != vertexEntry->end(); v_it++){
 	  NpolVertex *aVertex = *v_it;
 	  if(aVertex == NULL) continue;
-	  std::string volumeName = aVertex->volume;
-	  std::string processName = aVertex->process;
-	  Int_t PID = aVertex->parentId;
+	  //std::string volumeName = aVertex->volume;
+	  //std::string processName = aVertex->process;
+	  Int_t PDGcode = aVertex->particleId;
+	  //Int_t PID = aVertex->parentId;
 	  //if(volumeName == "TargetFluid" && processName == "electronNuclear") 
 	  //std::cout << "Process name is: " << processName << std::endl;
 	  //if((volumeName == "TargetFluid") && (processName == "electronNuclear") && (PID == 1)){
-	  if(PID == 0){
+	  if(!(PDGcode == 2112 || PDGcode == 22)){
 		vertexTrackIDs.insert(aVertex->trackId);
 	  }
-	  } */
+	  }*/
 	
     // loop over all tagged particles (min. one step in NPOL tagger volume)
 	Double_t npolxMax = npolW/2; // acceptance limit
@@ -239,7 +240,7 @@ int main(int argc, char *argv[]) {
 	  std::string particleName = npolTagged->particle;
       if(npolParticleKE.find(particleName) == npolParticleKE.end())
 		continue;
-	  Double_t fluxscaling = 1;
+	  Double_t fluxscaling = 1;	
 	  //if(vertexTrackIDs.find(npolTagged->trackId) != vertexTrackIDs.end()){
 	  if((abs(npolTagged->lPosX) <= npolxMax) && (abs(npolTagged->lPosY) <= npolyMax)){
 		(npolParticleKE[particleName])->
@@ -259,12 +260,11 @@ int main(int argc, char *argv[]) {
 		if(theta > TMath::Pi()/2) continue;
 		(npolTheta[particleName])->Fill(theta);
 		(npolPhi[particleName])->Fill(phi);
-		
-		}
+	  }
 	  npolTrackIDs.insert(npolTagged->trackId);
 	  //}
 	}
-	
+
     // loop over all tagged particles (min. one step in target tagger volume)
 	Double_t targetxMax = targetW/2; // acceptance limit 
 	Double_t targetyMax = targetH/2; // acceptance limit
@@ -295,7 +295,7 @@ int main(int argc, char *argv[]) {
 		if(theta > TMath::Pi()/2) continue;
 		(targetTheta[particleName])->Fill(theta);
 		(targetPhi[particleName])->Fill(phi);
-	  
+		
 		// Here the correlated histograms are to be filled
 		if(npolTrackIDs.find(targetTagged->trackId) 
 		   != npolTrackIDs.end()){  
@@ -305,90 +305,94 @@ int main(int argc, char *argv[]) {
 		  (correlatePOS[particleName])->
 			Fill(targetTagged->lPosX,targetTagged->lPosY);
 		}
-		}
-		//}
+	  }
+	  //}
 	}
-	npolTrackIDs.clear();
-  	//vertexTrackIDs.clear();
-
+ 
     // This section is designed to file up the histograms for hits in
     // the Scintillator detectors
     std::map<std::string, double> eDep;
     std::map<std::string, double> hitTime;
-
+	
     // loop over vector elements (one per vertex)
     
-    int avNum, imprNum, pvNum;
+    int avNum, imprNum, pvNum; 
+	int stepCount = 0;
     std::vector<NpolStep *>::iterator s_it;
     for(s_it = anStep->begin(); s_it != anStep->end(); s_it++){
       NpolStep *aStep = *s_it;
       double Ethreshold;
-      
-      if(aStep == NULL) continue;
-      
-      if(eDep.find(aStep->volume) == eDep.end())
-		eDep[aStep->volume] = 0;
-      eDep[aStep->volume] += aStep->eDep;
   
-      avNum = GetAVNumber(aStep->volume);
-      switch(avNum){
-      case 1: case 2: case 5: case 6:
-		Ethreshold = 1.0;
-		break;
-      case 3: case 4: case 7: case 8: case 13:
-		Ethreshold = 1.0;
-		break;
-      case 9: case 10:
-		Ethreshold = 1.0;
-		break;
-      default:
-		break;
-      }
-      
-      if(avNum != 0){
-		if(hitTime.find(aStep->volume) == hitTime.end() 
-		   && eDep[aStep->volume] >= Ethreshold)
-		  hitTime[aStep->volume] = aStep->time;
-      }
-    }
+      if(aStep == NULL) continue;
+	  //if(npolTrackIDs.find(aStep->trackId) != npolTrackIDs.end()) {
+	  
+	  if(eDep.find(aStep->volume) == eDep.end())
+		eDep[aStep->volume] = 0;
+	  eDep[aStep->volume] += aStep->eDep;
 
-    double t2 = 0.0, t1 = 0.0, dTOF = 0.0;
-    std::map<std::string,double>::iterator itt;
-	
-    for(itt = hitTime.begin(); itt != hitTime.end(); itt++){
-      avNum = GetAVNumber(itt->first);
-      if((avNum == 1 || avNum == 2 || avNum == 5 || avNum == 6) 
-		 && t2 == 0.0)
-		t2 = itt->second;
-      if((avNum == 9 || avNum == 10) && t1 == 0.0)
-		t1 = itt->second;
-    }
-    dTOF = (t2-t1);
-    if(dTOF != 0.0) delta_TOF->Fill(dTOF);   
-
-    std::map<std::string,double>::iterator it;
-    for(it = eDep.begin(); it != eDep.end(); it++) {
-      if(histograms.find(it->first) == histograms.end()) {
-		avNum = GetAVNumber(it->first);
-		if((avNum == 1 || avNum == 2 || avNum == 5 || avNum == 6 || 
-			avNum == 9 || avNum == 10)){
-		  histograms[it->first] = 
-			new TH1F((it->first).c_str(),(it->first).c_str(),1000,0,200);
-		}else if((avNum == 3 || avNum == 4 || avNum == 7 || avNum == 8 || 
-				  avNum == 11 || avNum == 12 || avNum == 13)){
-		  histograms[it->first] = 
-			new TH1F((it->first).c_str(),(it->first).c_str(),200,0,20);
-		}else if(avNum == 0){
-		  histograms[it->first] = 
-			new TH1F((it->first).c_str(),(it->first).c_str(),1000,0,200);
+		avNum = GetAVNumber(aStep->volume);
+		switch(avNum){
+		case 1: case 2: case 5: case 6:
+		  Ethreshold = 1.0;
+		  break;
+		case 3: case 4: case 7: case 8: case 13:
+		  Ethreshold = 1.0;
+		  break;
+		case 9: case 10:
+		  Ethreshold = 1.0;
+		  break;
+		default:
+		  break;
 		}
-      }
-      if(it->second != 0.0) (histograms[it->first])->Fill(it->second);
-    } 
-    eDep.clear();	
+	
+		if(avNum != 0) {
+		  if(hitTime.find(aStep->volume) == hitTime.end() 
+			 && eDep[aStep->volume] >= Ethreshold)
+			hitTime[aStep->volume] = aStep->time;
+		}
+		
+		double t2 = 0.0, t1 = 0.0, dTOF = 0.0;
+		std::map<std::string,double>::iterator itt;
+		
+		for(itt = hitTime.begin(); itt != hitTime.end(); itt++){
+		  avNum = GetAVNumber(itt->first);
+		  if((avNum == 1 || avNum == 2 || avNum == 5 || avNum == 6) 
+			 && t2 == 0.0)
+			t2 = itt->second;
+		  if((avNum == 9 || avNum == 10) && t1 == 0.0)
+			t1 = itt->second;
+		}
+		dTOF = (t2-t1);
+		if(dTOF != 0.0) delta_TOF->Fill(dTOF);   
+		
+		std::map<std::string,double>::iterator it;
+		for(it = eDep.begin(); it != eDep.end(); it++) {
+		  if(histograms.find(it->first) == histograms.end()) {
+			avNum = GetAVNumber(it->first);
+			if((avNum == 1 || avNum == 2 || avNum == 5 || avNum == 6 || 
+				avNum == 9 || avNum == 10)){
+			  histograms[it->first] = 
+				new TH1F((it->first).c_str(),(it->first).c_str(),1000,0,200);
+			}else if((avNum == 3 || avNum == 4 || avNum == 7 || avNum == 8 || 
+					  avNum == 11 || avNum == 12 || avNum == 13)){
+			  histograms[it->first] = 
+				new TH1F((it->first).c_str(),(it->first).c_str(),200,0,20);
+			}else if(avNum == 0){
+			  histograms[it->first] = 
+				new TH1F((it->first).c_str(),(it->first).c_str(),1000,0,200);
+			}
+		  }
+		  if(it->second != 0.0) (histograms[it->first])->Fill(it->second);
+		}
+		//}
+	}
+ 
+	eDep.clear();	
 	hitTime.clear();
+	npolTrackIDs.clear();
+	vertexTrackIDs.clear();
   }
-
+  
   /* // Write it all out to the ROOT file.*/
   TVectorD totalElectrons(2);
   totalElectrons[0] = TotalElectrons;
@@ -589,3 +593,7 @@ void RetrieveENVvariables() {
   }
 }
 
+	  //Int_t PDGcode = npolTagged->particleId;
+	  //TString partName = npolTagged->particle;
+	  //if(!(PDGcode == 2112 || PDGcode == 22)){
+	  //if((partName == "neutron" || partName == "gamma")){
