@@ -45,8 +45,8 @@ void NpolSteppingAction::UserSteppingAction(const G4Step *aStep) {
  
   // Kill/stop tracks that will just waste precious CPU time
   if(volName == "Cap" || postStepVolume == NULL ||
-     volName == "HallShellRoof" ||volName == "HallShellFloor" || volName == "HallShellWall"
-     || volName == "HutBackWall" || volName == "HutSideWall" || volName == "HutRoof" || volName == "HutFrontWall"){
+     volName == "HallShellRoof" ||volName == "HallShellFloor" || volName == "HallShellWall"){
+	//     || volName == "HutBackWall" || volName == "HutSideWall" || volName == "HutRoof" || volName == "HutFrontWall"){
  	analysisMan->TrackKilled(aTrack->GetTrackID());
 	aTrack->SetTrackStatus(fStopAndKill);
   }

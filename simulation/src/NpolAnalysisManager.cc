@@ -177,7 +177,7 @@ void NpolAnalysisManager::RecordTrack(const G4Track *aTrack) {
 void NpolAnalysisManager::RecordStep(const G4Step *aStep) {
 	G4Track *aTrack = aStep->GetTrack();
 	G4StepPoint *preStepPoint = aStep->GetPreStepPoint();
-	G4String volName = preStepPoint->GetPhysicalVolume()->GetName();
+	std::string volName = preStepPoint->GetPhysicalVolume()->GetName();
 	G4ThreeVector worldPosition = preStepPoint->GetPosition();
 	G4ThreeVector localPosition = preStepPoint->GetTouchableHandle()->GetHistory()
 	  ->GetTopTransform().TransformPoint(worldPosition);
