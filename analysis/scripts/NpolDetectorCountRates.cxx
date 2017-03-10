@@ -193,14 +193,16 @@ void NpolDetectorCountRates() {
 		txtOut << RealName << ": AV Number " << AVnum << "  PV Number " << pvNum << std::endl;
 
 		// THis creates the x,y vectors for TGraph and writes the data to a text file
-		double largestY = 0.0, smallestY = 10.0;
+		double largestY = 0.0, smallestY = 100000.0;
 		for(int k = 0; k < nThresh; k++){
 		  x[k] = Thresholds[k];
 		  y[k] = CountRates[k][i][j]/electronTime/(1e3);
 		  if(y[k] > largestY) largestY = y[k];
 		  if(y[k] < smallestY) smallestY = y[k];
 		  txtOut << Thresholds[k] << "      " << 
-			80*CountRates[k][i][j]/electronTime/(1e3) << std::endl;
+			80*CountRates[k][i][j]/(1e3) << " Counts" << std::endl;
+		  txtOut << Thresholds[k] << "      " << 
+			80*CountRates[k][i][j]/electronTime/(1e3) << " kHz" <<std::endl;
 		}
 
 		//  Generate the graph and format it ... somewhat nicely
@@ -209,7 +211,7 @@ void NpolDetectorCountRates() {
 		sprintf(gtitle,"#splitline{Count Rate VS. Threshold}{%s %i, Layer %i}",
 				RealName.c_str(),pvNum+1, layerNum);
 		gr->SetTitle(gtitle);   
-		
+
 		// Clean up Y axis
 		gr->GetYaxis()->SetTitle("Count Rate at 1 #muA Beam (kHz)");   
 		gr->GetYaxis()->SetLabelFont(43);
@@ -219,9 +221,11 @@ void NpolDetectorCountRates() {
 		gr->GetYaxis()->SetTitleSize(16);
 		gr->GetYaxis()->SetTitleOffset(5);
 		gr->GetYaxis()->CenterTitle(); 
-		gr->SetMinimum(0.8*smallestY);
+		gr->SetMinimum(0.6*smallestY);
 		gr->SetMaximum(2*largestY);
-		
+		//gr->Fit("expo","FQ");
+		//gr->SetLineColor(4);
+		//gr->GetFunction("expo")->SetLineColor(4);
 		// Clean up X axis
 		gr->GetXaxis()->SetTitle("Threshold Energy (MeV)");
 		gr->GetXaxis()->SetLabelFont(43);
