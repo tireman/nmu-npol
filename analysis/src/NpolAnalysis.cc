@@ -32,7 +32,7 @@
 #define EDEP_THRESHOLD 1.0 /*MeV*/
 #define LOW_THRESHOLD 0.040 /*MeV This threshold is a per detector low value in SOI selection */
 #define LAYER_NUM 4        /* number of analyzer layers; not general; only good for 4 and 6 layers */
-
+	double azAngle = 0.0;
 enum PolarimeterDetector {
   analyzer = 0,
   tagger,
@@ -445,7 +445,8 @@ bool CheckAngleRequirement(std::ofstream &txtOut, NpolVertex *incNeutronVert, st
   GetPoI(analyzerPt,&analyzerTime,section,analyzer,detEvents);
   GetPoI(EarrayPt,&EarrayTime,section,EArrayOfInterest,detEvents);
 
-  double azAngle = getAzimuthAngle(txtOut,targetPt[0],targetPt[1], targetPt[2],
+  //double 
+	azAngle = getAzimuthAngle(txtOut,targetPt[0],targetPt[1], targetPt[2],
 								   analyzerPt[0],analyzerPt[1],analyzerPt[2],
 								   EarrayPt[0],EarrayPt[1],EarrayPt[2]);
 
@@ -549,6 +550,10 @@ int main(int argc, char *argv[]) {
   npolTree->SetBranchAddress("tracks",&verts);
   statsTree->SetBranchAddress("stats",&stats);
   TFile *outFile = new TFile(outFilename,"RECREATE");
+
+  //********************************* Define your Histograms Here *******************************
+  TH1F *h_recoilAngle = new TH1F("recoil_angle","Proton Recoil Angle", 100, 0.0, 90.0); 
+
   TH2F *h_dEoverE_TopHigh = new TH2F("dEoverE_Top", "dE over E for top array - HIGHEST PV ONLY", 400,0,150,400,0,20);
   TH2F *h_dEoverE_BotHigh = new TH2F("dEoverE_Bot", "dE over E for bottom array - HIGHEST PV ONLY", 400,0,150,400,0,20);
   TH2F *h_dEoverEtop = new TH2F("dEoverEtop", "dE over E for top array", 400,0,150,400,0,20);
@@ -716,7 +721,8 @@ int main(int argc, char *argv[]) {
 		    //OutputTracks(verts,txtOut,eventCounter,&eDepArrayTotal,sectionOfInterest);
 			h_sectionEfficiency4->Fill(sectionOfInterest+1); //FILL
 			fillEvent1DHisto(h_sectionEfficiency4_Elastic, h_sectionEfficiency4_Inelastic, elasticFlag, sectionOfInterest+1);
-			h_dTOF->Fill(dTOF);//FILL
+			h_dTOF->Fill(dTOF); //FILL
+			h_recoilAngle->Fill(azAngle); // Fill the proton recoil angle histo
 			fillEvent1DHisto(h_dTOF_Elastic, h_dTOF_Inelastic, elasticFlag, dTOF);
 			sectionEffLocalCoordinates(h_sectionEfficiencyLocalPositions[sectionOfInterest],&detEvents,sectionOfInterest,analyzer);
 			sectionEffLocalCoordinates(h_sectionEfficiencyLocalPositions_Elastic[sectionOfInterest],&detEvents,sectionOfInterest,analyzer);
@@ -787,6 +793,7 @@ int main(int argc, char *argv[]) {
 	(h_sectionEfficiencyLocalPositions_Elastic[i])->Write();
   }
   h_dTOF_Elastic->Write();
+  h_recoilAngle->Write();
   //write inelastic only
   h_dEoverE_TopHigh_Inelastic->Write();
   h_dEoverE_BotHigh_Inelastic->Write();
