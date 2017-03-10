@@ -30,7 +30,7 @@ public:
   double momZ;
   double time;
   double eDep;
-  int  particleId;
+  int particleId;
   std::string volume;
 
   inline NpolStep() {};
