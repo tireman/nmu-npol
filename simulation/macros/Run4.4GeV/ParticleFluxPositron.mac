@@ -6,8 +6,8 @@
 # for changing of the user particle source within the macro.  The user 
 # must supply the particle type and file(s) which contains the biasing data 
 #
-# Thiscan be run in batch, without graphic with >> ./Npolapp marco/ParticleFlux.mac
-# or interactively: Idle> /control/execute PartilceFlux.mac
+# Thiscan be run in batch, without graphic with >> ./Npolapp marco/ParticleFluxPositron.mac
+# or interactively: Idle> /control/execute PartilceFluxPositron.mac
 
 /run/initialize
 /run/verbose 0

@@ -6,8 +6,8 @@
 # for changing of the user particle source within the macro.  The user 
 # must supply the particle type and file(s) which contains the biasing data 
 #
-# Thiscan be run in batch, without graphic with >> ./Npolapp marco/ParticleFlux.mac
-# or interactively: Idle> /control/execute PartilceFlux.mac
+# Thiscan be run in batch, without graphic with >> ./Npolapp marco/ParticleFluxPion-.mac
+# or interactively: Idle> /control/execute PartilceFluxPion-.mac
 
 /run/initialize
 /run/verbose 0
@@ -52,12 +52,12 @@
 
 ###### Biasing the (x,y) distribution ######
 /gps/hist/type biasx
-/control/execute macros/particleFluxData/4.4GeV/targetX_pi-.dat
-#/control/execute macros/particleFluxData/4.4GeV/npolX_pi-.dat
+/control/execute macros/particleFluxData/11GeV/targetX_pi-.dat
+#/control/execute macros/particleFluxData/11GeV/npolX_pi-.dat
 
 /gps/hist/type biasy
-/control/execute macros/particleFluxData/4.4GeV/targetY_pi-.dat
-#/control/execute macros/particleFluxData/4.4GeV/npolY_pi-.dat
+/control/execute macros/particleFluxData/11GeV/targetY_pi-.dat
+#/control/execute macros/particleFluxData/11GeV/npolY_pi-.dat
 
 ###### Angular distribution biasing ######
 /gps/ang/type iso						# isotropic source
@@ -68,20 +68,20 @@
 
 ###### Biasing theta ######
 /gps/hist/type biast					# bias theta
-/control/execute macros/particleFluxData/4.4GeV/targetTheta_pi-.dat
-#/control/execute macros/particleFluxData/4.4GeV/npolTheta_pi-.dat
+/control/execute macros/particleFluxData/11GeV/targetTheta_pi-.dat
+#/control/execute macros/particleFluxData/11GeV/npolTheta_pi-.dat
 
 ###### Biasing phi ######
 /gps/hist/type biasp					# bias phi
-/control/execute macros/particleFluxData/4.4GeV/targetPhi_pi-.dat
-#/control/execute macros/particleFluxData/4.4GeV/npolPhi_pi-.dat	
+/control/execute macros/particleFluxData/11GeV/targetPhi_pi-.dat
+#/control/execute macros/particleFluxData/11GeV/npolPhi_pi-.dat	
 
 ###### Loads the energy distribution from user supplied data. ######
 /gps/ene/type User
 /gps/hist/type energy
-/control/execute macros/particleFluxData/4.4GeV/targetEnergy_pi-.dat
-#/control/execute macros/particleFluxData/4.4GeV/npolEnergy_pi-.dat
+/control/execute macros/particleFluxData/11GeV/targetEnergy_pi-.dat
+#/control/execute macros/particleFluxData/11GeV/npolEnergy_pi-.dat
 
 ###### Commands below are independent of GPS ######
 /run/printProgress 10000
-/run/beamOn 2044
+/run/beamOn 3418
