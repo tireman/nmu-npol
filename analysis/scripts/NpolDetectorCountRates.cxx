@@ -68,7 +68,7 @@ void NpolDetectorCountRates() {
   double Thresholds[10]={0.5,1.0,1.5,2.0,2.5,3.0,3.5,4.0,4.5,5.0};
   double CountRates [nThresh][Nx][Ny];
   std::ofstream txtOut;
-  txtOut.open(OutputDir + "/Output/NpolDetectorCountRates" + Lead + "cm.out");
+  txtOut.open(OutputDir + "/Output/NpolDetectorCountRates" + Energy + "GeV_" + Lead + "cm.out");
 
   //***************************  Main portion of code ***************************************
   // The main job of this code is to take in a file containing all the energy histograms of
@@ -380,7 +380,7 @@ TString FormInputFile(TString InputDir){
 
 TString FormOutputFile(TString OutputDir){
   
-  TString fileName =  OutputDir + "/Plots/" + BaseName + "_FrontVetoRates.root";
+  TString fileName =  OutputDir + "/Plots/" + BaseName + "_NpolRates.root";
   
   return fileName;
 }
