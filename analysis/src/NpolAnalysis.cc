@@ -255,7 +255,8 @@ bool checkdEarrayHits(const std::map<std::string,NpolDetectorEvent *> *detEvents
 // Return the frontmost polarimeter section that passes requirements 1 and 2.
 // If -1 is returned, then no section passed requirements 1 and 2.
 int getSectionOfInterest(const std::map<std::string,NpolDetectorEvent *> *detEvents) {
-  int sectionOfInterest = -1; int countTdE=0; int countTE=0; int countBdE=0; int countBE =0; int countA = 0; int countV = 0;
+  int sectionOfInterest = -1; int countTdE=0; int countTE=0; 
+  int countBdE=0; int countBE =0; int countA = 0; int countV = 0;
   bool multiscatter = false;
   for(int section = (LAYER_NUM - 1); section >= 0; section--) {
     std::map<std::string,NpolDetectorEvent *>::const_iterator it;
@@ -315,7 +316,7 @@ int getSectionOfInterest(const std::map<std::string,NpolDetectorEvent *> *detEve
     sectionOfInterest = -1;
     //std::cout << "Multi-hit: Event rejected!" << std::endl;
     return sectionOfInterest;
-  } else if(totalDetHit >= 80) { 
+  } else if(totalDetHit >= 40) { 
     std::cout << "Event Rejected! Total number of detectors with 40 keV or greater: " << totalDetHit << std::endl;
     sectionOfInterest = -1;
     return sectionOfInterest;
@@ -429,6 +430,32 @@ void GetPoI(double *ret, double *time, const int section, const PolarimeterDetec
   *time /= totEdepSoFar;
 }
 
+void GetPoI2(double *ret, double *time, const int section, const PolarimeterDetector type, const std::map<std::string,NpolDetectorEvent *> *detEvents) {
+  std::map<std::string,NpolDetectorEvent *>::const_iterator it;
+
+  ret[0] = 0.0;
+  ret[1] = 0.0;
+  ret[2] = 0.0;
+  double totEdepSoFar = 0.0;
+  for(it = detEvents->begin(); it != detEvents->end(); it++) {
+    if((sectionNumber(it->first) == section || sectionNumber(it->first) == (section + 1) || sectionNumber(it->first) == (section + 2)) && detectorType(it->first) == type) {
+      if(it->second->thresholdExceeded) {
+		ret[0] += (it->second->totEnergyDep)*(it->second->gPosX);
+		ret[1] += (it->second->totEnergyDep)*(it->second->gPosY);
+		ret[2] += (it->second->totEnergyDep)*(it->second->gPosZ);
+		*time += (it->second->totEnergyDep)*(it->second->time);
+		totEdepSoFar += it->second->totEnergyDep;
+      }
+    }
+  }
+
+  // Compute the weighted average
+  ret[0] /= totEdepSoFar;
+  ret[1] /= totEdepSoFar;
+  ret[2] /= totEdepSoFar;
+  *time /= totEdepSoFar;
+}
+
 // Check requirement 6
 // Optionally return delta time-of-flight between the analyzer and E-array
 bool CheckAngleRequirement(std::ofstream &txtOut, NpolVertex *incNeutronVert, std::map<std::string,NpolDetectorEvent *> *detEvents, const int section, const PolarimeterDetector EArrayOfInterest, double *dTOF = NULL) {
@@ -443,7 +470,7 @@ bool CheckAngleRequirement(std::ofstream &txtOut, NpolVertex *incNeutronVert, st
   targetPt[2] = incNeutronVert->posZ;
 
   GetPoI(analyzerPt,&analyzerTime,section,analyzer,detEvents);
-  GetPoI(EarrayPt,&EarrayTime,section,EArrayOfInterest,detEvents);
+  GetPoI2(EarrayPt,&EarrayTime,section,EArrayOfInterest,detEvents);
 
   //double 
 	azAngle = getAzimuthAngle(txtOut,targetPt[0],targetPt[1], targetPt[2],
@@ -686,10 +713,17 @@ int main(int argc, char *argv[]) {
       h_sectionEfficiency1->Fill(sectionOfInterest+1); // Fill
 	  fillEvent1DHisto(h_sectionEfficiency1_Elastic, h_sectionEfficiency1_Inelastic, elasticFlag, sectionOfInterest+1);
       for(e_it = detEvents.begin(); e_it != detEvents.end(); e_it++) {
+		
+		PolarimeterDetector detector2 = detectorType(e_it->first);
+		if(detector2 == topEArray || detector2 == topdEArray || 
+		   detector2 == botEArray || detector2 == botdEArray){
+		  eDepArrayTotal[detector2] += e_it->second->totEnergyDep;
+		}
+		// Changed this on 12-March-2017 to test theory on the Recoil Proton Angle "question"
 		if(sectionNumber(e_it->first) == sectionOfInterest) {
 		  PolarimeterDetector detector = detectorType(e_it->first);
-		  if(detector == analyzer || detector == tagger || detector == topEArray 
-			 || detector == topdEArray || detector == botEArray || detector == botdEArray) {
+		  if(detector == analyzer || detector == tagger){
+			//|| detector == topEArray || detector == topdEArray || detector == botEArray || detector == botdEArray){
 			eDepArrayTotal[detector] += e_it->second->totEnergyDep;
 		  }
 		}
