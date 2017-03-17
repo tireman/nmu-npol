@@ -28,7 +28,7 @@
 G4double NpolShieldHut::NpolAng = 28.0*deg;
 G4double NpolShieldHut::vertAngle = 0.1200*rad; // 0.100 rad nominal 0.120 rad for 10in gap// vertical acceptance angle
 G4double NpolShieldHut::horAngle = 0.200*rad;  // 0.160 rad nomial 0.200 rad for 10in gap horizontal acceptance angle
-G4double NpolShieldHut::PosFront = (7.0-2)*m*cos(NpolAng);//6.3739*m-2*m;  // position of front wall (center)
+G4double NpolShieldHut::PosFront = (7.0)*m*cos(NpolAng);//6.3739*m-2*m;  // position of front wall (center)
 G4double NpolShieldHut::PosLead = PosFront - 0.535*m;  // position of lead curtain (center)
 G4double NpolShieldHut::PosTagger = PosFront + 0.465*m;  // position of NPOL tagger (center)
 G4double NpolShieldHut::leadThickness = 15.0*cm;  // thickness of the lead curtain

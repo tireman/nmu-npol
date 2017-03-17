@@ -33,7 +33,7 @@
 #include "NpolDetectorFactory.hh"
 #include "NpolDetectorConstruction.hh"
 
-G4double NpolPolarimeter::NpolBoxPos = 8.7*m;
+G4double NpolPolarimeter::NpolBoxPos = 8.7*m;  // Proposal had 6.7m to center, redo had 8.7m to center
 G4double NpolPolarimeter::NDetThickness = 10.0*cm;
 G4double NpolPolarimeter::NVetoThickness = 1.00*cm;
 G4double NpolPolarimeter::NDetHeight = 10.0*cm;
