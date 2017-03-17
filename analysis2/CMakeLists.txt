@@ -15,7 +15,6 @@ message("    -> ROOT Include directory is: ${ROOT_INCLUDE_DIR}")
 message("    -> ROOT Library Directory is: ${ROOT_LIBRARY_DIR}")
 include_directories(${ROOT_INCLUDE_DIR})
 
-file(COPY ${PROJECT_SOURCE_DIR}/scripts DESTINATION ${CMAKE_CURRENT_BINARY_DIR})
 file(MAKE_DIRECTORY ${PROJECT_BINARY_DIR}/output)
 
 add_executable(NpolProcessEvents ${sources})
