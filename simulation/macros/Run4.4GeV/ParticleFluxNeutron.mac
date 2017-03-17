@@ -1,0 +1,92 @@
+# $Id: ParticleFlux.mac,v0.5 For running with or without visualization
+# on the NMU Npolapp simulation 7/21/2016 with particle distributions 
+# from the electron on target simulations 
+# 
+# This macro feeds commands to the primary event generator and allows 
+# for changing of the user particle source within the macro.  The user 
+# must supply the particle type and file(s) which contains the biasing data 
+#
+# This can be run in batch, without graphic, with >> ./Npolapp marco/ParticleFlux.mac
+# or interactively: Idle> /control/execute PartilceFlux.mac
+
+/run/initialize
+/run/verbose 0
+
+/control/verbose 0
+#/event/verbose 0
+/gps/verbose 0
+
+/material/verbose 0
+/cuts/verbose 0
+/process/verbose 0
+
+/tracking/verbose 0
+/tracking/storeTrajectory 1
+
+# Particle type  !!! Must be chosen by the user !!!!
+/gps/particle neutron
+
+################################################################
+# Particle source:  The particle source will generally be a plane
+# with dimensions specificed by the user.  The current version 
+# rotates the plane to 28 degrees right of beam line to line up with
+# the polarimeter.  
+
+# Choose wisely here!  You must choose the file to load for the particle 
+# distribution(s). There are two taggers to choose from depending on 
+# if you are just tossing particles at the polarimeter from the NPOL
+# tagger (close to the polarimeter) or thorugh the entire NPOL, Magnet, 
+# shield house stack.
+######################################################################
+
+##### Shape, position, and rotation of source ######
+/gps/pos/type Plane
+/gps/pos/shape Rectangle
+
+/gps/pos/centre -70.421 0. 132.442 cm  # target tagger
+/gps/pos/halfx 13.535 cm   		    # target tagger
+/gps/pos/halfy 9.010 cm			    # target tagger
+
+#/gps/pos/centre -321.067 0. 603.839 cm  # NPOL tagger
+#/gps/pos/halfx 43.32 cm   		        # NPOL tagger
+#/gps/pos/halfy 36.92 cm			    # NPOL tagger
+
+/gps/pos/rot1 0.882947 0 0.46947        # Rotate the source
+/gps/pos/rot2 0. 1. 0.                  # default
+
+###### Biasing the (x,y) distribution ######
+/gps/hist/type biasx
+/control/execute macros/particleFluxData/4.4GeV/targetX_neutron.dat
+#/control/execute macros/particleFluxData/4.4GeV/npolX_neutron.dat
+
+/gps/hist/type biasy
+/control/execute macros/particleFluxData/4.4GeV/targetY_neutron.dat
+#/control/execute macros/particleFluxData/4.4GeV/npolY_neutron.dat
+
+###### Angular distribution biasing ######
+/gps/ang/type iso						# isotropic source
+/gps/ang/rot1 -0.882947 0. -0.46947 		# rotate the momentum direction
+/gps/ang/rot2 0. 1. 0. 	  				# only in one plane
+/gps/ang/user_coor 1				# lock user coordinates in
+/gps/ang/surfnorm 0						# compute with reference to surface
+
+###### Biasing theta ######
+/gps/hist/type biast					# bias theta
+/control/execute macros/particleFluxData/4.4GeV/targetTheta_neutron.dat
+#/control/execute macros/particleFluxData/4.4GeV/npolTheta_neutron.dat
+
+###### Biasing phi ######
+/gps/hist/type biasp					# bias phi
+/control/execute macros/particleFluxData/4.4GeV/targetPhi_neutron.dat
+#/control/execute macros/particleFluxData/4.4GeV/npolPhi_neutron.dat	
+
+###### Loads the energy distribution from user supplied data. ######
+/gps/ene/type User
+/gps/hist/type energy
+/control/execute macros/particleFluxData/4.4GeV/targetEnergy_neutron.dat
+#/control/execute macros/particleFluxData/4.4GeV/npolEnergy_neutron.dat
+
+###### Commands below are independent of GPS ######
+/run/printProgress 10000
+/run/beamOn 35982
+
