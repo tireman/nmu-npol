@@ -50,7 +50,7 @@ int main(int argc, char *argv[]) {
 
   Double_t NpolAng = 0.488692; // radians (28 degrees) NPOL angle from beamline
   Double_t targetTaggerPos = 150.0;  // Position of target tagger (cm)
-  Double_t npolTaggerPos = 637.86;  // Position of NPOL Tagger (cm)
+  Double_t npolTaggerPos = 687.97;  // Position of NPOL Tagger (cm)
   Double_t theta = 0.160; // NPOL horizontal angular accecptance (radians)
   Double_t phi = 0.100; // NPOL vertical angular acceptance (radians)
   
@@ -66,16 +66,16 @@ int main(int argc, char *argv[]) {
   //Double_t npolH = 2*npolTaggerPos*TMath::Tan(phi/2);  // height of npol tagger (cm)
 
   // This version allows for fixing the size manually
-  Double_t targetW = 27.07;  // width of target tagger (cm)
-  Double_t targetH = 18.02;  // height of target tagger (cm)
+  Double_t targetW = 60.00;  // width of target tagger (cm) Dipole 1 opening 56.0 cm
+  Double_t targetH = 25.00;  // height of target tagger (cm) Dipole 1 opeing 20.955 cm
   Double_t npolW = 2*npolTaggerPos*TMath::Tan(theta/2);  // width of npol tagger (cm)
   Double_t npolH = 2*npolTaggerPos*TMath::Tan(phi/2);  // height of npol tagger (cm)
 
-  Double_t targetAlpha = targetW/(4*targetTaggerPos);  // Constant needed for solid angle
-  Double_t npolAlpha = npolW/(4*npolTaggerPos);  // Constant needed for solid angle
+  //Double_t targetAlpha = targetW/(4*targetTaggerPos);  // Constant needed for solid angle
+  //Double_t npolAlpha = npolW/(4*npolTaggerPos);  // Constant needed for solid angle
   
-  npolTree->SetCacheSize(50000000);
-  statsTree->SetCacheSize(50000000);
+  //npolTree->SetCacheSize(50000000);
+  //statsTree->SetCacheSize(50000000);
   
   RetrieveENVvariables();
 
@@ -238,8 +238,10 @@ int main(int argc, char *argv[]) {
       NpolTagger *npolTagged = *n_it;
       if(npolTagged == NULL)  continue;
 	  std::string particleName = npolTagged->particle;
-      if(npolParticleKE.find(particleName) == npolParticleKE.end())
-		continue;
+	  if(npolParticleKE.find(particleName) == npolParticleKE.end()) continue;  // 1 of 9 particles we want?
+	  //int pType = npolTagged->particleId;
+	  //if((pType == 2112 || pType == 22)) continue;  // Reject if charged(use !) reject if not charged (remove !)
+	  
 	  Double_t fluxscaling = 1;	
 	  //if(vertexTrackIDs.find(npolTagged->trackId) != vertexTrackIDs.end()){
 	  if((abs(npolTagged->lPosX) <= npolxMax) && (abs(npolTagged->lPosY) <= npolyMax)){
