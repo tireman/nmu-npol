@@ -12,6 +12,7 @@
 #include <TBranch.h>
 #include <TH1.h>
 #include <TH2.h>
+#include <TH3.h>
 #include <TSystem.h>
 #include <TROOT.h>
 #include <TObject.h>
@@ -50,7 +51,7 @@ int main(int argc, char *argv[]) {
 
   Double_t NpolAng = 0.488692; // radians (28 degrees) NPOL angle from beamline
   Double_t targetTaggerPos = 150.0;  // Position of target tagger (cm)
-  Double_t npolTaggerPos = 687.97;  // Position of NPOL Tagger (cm)
+  Double_t npolTaggerPos = 681.50;  // Position of NPOL Tagger (cm)687.97
   Double_t theta = 0.160; // NPOL horizontal angular accecptance (radians)
   Double_t phi = 0.100; // NPOL vertical angular acceptance (radians)
   
@@ -139,6 +140,7 @@ int main(int argc, char *argv[]) {
   std::map<std::string,TH1F *> targetPhi;
   std::map<std::string,TH1F *> npolTheta;
   std::map<std::string,TH1F *> npolPhi;
+  std::map<std::string,TH3F *> particleOrigin;
 
   // Allocate Theta, Phi, KE and Position Histograms
   std::map<std::string,std::string>::iterator it;
@@ -166,6 +168,12 @@ int main(int argc, char *argv[]) {
     std::string npolXYHistoTitle = it->second + " XY Position in NPOL Tagger";
     std::string correlateXYHistoName = "Correlated_targetXY_" + it->first;
     std::string correlateXYTitle = it->second + " XY position in Target Tagger Correlated to NPOL Tagger";
+
+	std::string origin3DHistoTitle = it->second + " 3D position of Vertex in System from NPOL Tagger hit";
+	std::string origin3DHistoName = "Origin3D_Position_" + it->first;
+
+	particleOrigin[it->first] = 
+	  new TH3F(origin3DHistoName.c_str(), origin3DHistoTitle.c_str(),200,-100.,+700.,200,-700., +100.,200,-300., +300.);
 
     targetParticleKE[it->first] = 
 	  new TH1F(targetHistoName.c_str(), targetHistoTitle.c_str(),nbins,bins);
@@ -197,6 +205,9 @@ int main(int argc, char *argv[]) {
   delta_TOF->GetYaxis()->SetTitle("Events");
   delta_TOF->GetXaxis()->SetTitle("Analyzer to Top/Bottom Array Time-of-Flight (ns)");
 
+
+  // ****************  Done with Hisotgram allocation ***********************
+
   // Solid angle calculation! 
   //Double_t targetSolidAngle = 8*(TMath::ATan(targetH/targetW)-TMath::ASin(targetH/TMath::Sqrt((1+TMath::Power(targetAlpha,2))*(TMath::Power(targetH,2)+TMath::Power(targetW,2)))));
   //Double_t npolSolidAngle = 8*(TMath::ATan(npolH/npolW)-TMath::ASin(npolH/TMath::Sqrt((1+TMath::Power(npolAlpha,2))*(TMath::Power(npolH,2)+TMath::Power(npolW,2)))));
@@ -208,27 +219,8 @@ int main(int argc, char *argv[]) {
     npolTree->GetEntry(i);
 	PrintEventNumber(nentries,i);
 
-	// ***** THIS SECTION IS USED TO SELECT PARTICULAR EVENTS FROM THE TRACKS VECTOR ***** //
-	// loop over all vertex entries to find particles created in
-	// the lead curtain or front wall of shield hut
 	std::set<int> vertexTrackIDs;
 	std::set<int> npolTrackIDs;
-
-	/*std::vector<NpolVertex *>::iterator v_it;
-	for(v_it = vertexEntry->begin(); v_it != vertexEntry->end(); v_it++){
-	  NpolVertex *aVertex = *v_it;
-	  if(aVertex == NULL) continue;
-	  //std::string volumeName = aVertex->volume;
-	  //std::string processName = aVertex->process;
-	  Int_t PDGcode = aVertex->particleId;
-	  //Int_t PID = aVertex->parentId;
-	  //if(volumeName == "TargetFluid" && processName == "electronNuclear") 
-	  //std::cout << "Process name is: " << processName << std::endl;
-	  //if((volumeName == "TargetFluid") && (processName == "electronNuclear") && (PID == 1)){
-	  if(!(PDGcode == 2112 || PDGcode == 22)){
-		vertexTrackIDs.insert(aVertex->trackId);
-	  }
-	  }*/
 	
     // loop over all tagged particles (min. one step in NPOL tagger volume)
 	Double_t npolxMax = npolW/2; // acceptance limit
@@ -266,6 +258,20 @@ int main(int argc, char *argv[]) {
 	  npolTrackIDs.insert(npolTagged->trackId);
 	  //}
 	}
+
+	// ************ Fill the 3D plot ***********************
+	std::vector<NpolVertex *>::iterator v_it;
+	for(v_it = vertexEntry->begin(); v_it != vertexEntry->end(); v_it++){
+	  NpolVertex *aVertex = *v_it;
+	  if(aVertex == NULL) continue;
+	  
+	  if(npolTrackIDs.find(aVertex->trackId) != npolTrackIDs.end()){ 
+		std::string particleName = aVertex->particle;
+		(particleOrigin[particleName])->Fill(aVertex->posZ,aVertex->
+							 posX,aVertex->posY);
+	  }
+	}
+
 
     // loop over all tagged particles (min. one step in target tagger volume)
 	Double_t targetxMax = targetW/2; // acceptance limit 
@@ -306,7 +312,9 @@ int main(int argc, char *argv[]) {
 			Fill(targetTagged->energy,fluxscaling);
 		  (correlatePOS[particleName])->
 			Fill(targetTagged->lPosX,targetTagged->lPosY);
+		 
 		}
+	  
 	  }
 	  //}
 	}
@@ -326,7 +334,6 @@ int main(int argc, char *argv[]) {
       double Ethreshold;
   
       if(aStep == NULL) continue;
-	  //if(npolTrackIDs.find(aStep->trackId) != npolTrackIDs.end()) {
 	  
 	  if(eDep.find(aStep->volume) == eDep.end())
 		eDep[aStep->volume] = 0;
@@ -386,7 +393,6 @@ int main(int argc, char *argv[]) {
 		  }
 		  if(it->second != 0.0) (histograms[it->first])->Fill(it->second);
 		}
-		//}
 	}
  
 	eDep.clear();	
@@ -453,6 +459,11 @@ int main(int argc, char *argv[]) {
   std::map<std::string,TH1F *>::iterator it12;
   for(it12 = npolPhi.begin(); it12 != npolPhi.end(); it12++){
 	it12->second->Write();
+  }
+
+  std::map<std::string,TH3F *>::iterator it13;
+  for(it13 = particleOrigin.begin(); it13 != particleOrigin.end(); it13++){
+	it13->second->Write();
   }
 
   delta_TOF->Write();
