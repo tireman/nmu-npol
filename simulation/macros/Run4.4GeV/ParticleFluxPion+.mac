@@ -40,8 +40,8 @@
 /gps/pos/shape Rectangle
 
 /gps/pos/centre -70.421 0. 132.442 cm  # target tagger
-/gps/pos/halfx 13.535 cm   		    # target tagger
-/gps/pos/halfy 9.010 cm			    # target tagger
+/gps/pos/halfx 30.0 cm   		    # target tagger
+/gps/pos/halfy 12.5 cm			    # target tagger
 
 #/gps/pos/centre -321.067 0. 603.839 cm  # NPOL tagger
 #/gps/pos/halfx 43.32 cm   		        # NPOL tagger
@@ -84,4 +84,4 @@
 
 ###### Commands below are independent of GPS ######
 /run/printProgress 10000
-/run/beamOn 2110
+/run/beamOn 6520
