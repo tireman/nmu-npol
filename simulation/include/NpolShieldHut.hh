@@ -30,7 +30,7 @@ public:
   static G4double NpolAng, AngSide;
   static G4double vertAngle, horAngle;
   static G4double PosFront, PosLead, PosTagger;
-  static G4double leadThickness, wallThickness;
+  static G4double leadThickness, wallThickness, sideWallLength, wallHeight;
   static G4double vertOffSet;
   static G4double PosSide; 
   static G4double PosBack;
