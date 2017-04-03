@@ -47,17 +47,13 @@ public:
   virtual void Place(G4LogicalVolume *motherLV);
   virtual void ConstructSDandField();
 
-  static G4double yokeLength;
-  static G4double gapWidth;
-  static G4double gapHeight;
-  static G4double gapLength;
-  static G4double fieldClampHeight;
-  static G4double fieldClampWidth;
-  static G4double fieldClampThick;
-  static G4double fieldClampInheight;
-  static G4double fieldClampInwidth;
+  static G4double yokeLength, gapWidth, gapHeight, gapLength;
+  static G4double PosD2;
+  static G4double fieldClampHeight, fieldClampWidth, fieldClampThick;
+  static G4double fieldClampInheight, fieldClampInwidth;
   static G4double dipole2FieldY;
   static G4double NpolAng;
+  static G4double FM;
 
 private: 
   G4LogicalVolume *Dipole2YokeLV, *Dipole2CuBarLV, *Dipole2CuEndLV;
