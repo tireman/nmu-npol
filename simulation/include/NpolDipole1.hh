@@ -59,7 +59,7 @@ public:
   static G4double yokeGap;
   static G4double dipole1FieldY;
   static G4double NpolAng;
-
+  static G4double FM;
 private: 
   G4LogicalVolume *Dipole1YokeLV, *Dipole1CuBarLV, *Dipole1CuEndLV;
   G4LogicalVolume *FieldClamp1LV, *FieldClamp2LV, * Dipole1FieldLV;

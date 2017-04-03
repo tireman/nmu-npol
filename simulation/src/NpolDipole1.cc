@@ -38,13 +38,18 @@
 #include "NpolBeamlineDown.hh"
 #include "NpolDetectorConstruction.hh"
 
-G4double NpolDipole1::dipole1FieldY = 2*0.40984*tesla; // 1 B.dl = 0.40984*tesla so 4 * 1 B.dl = 1.639*tesla
+// Field multiplier; if 2 mags, use value corresponding to desired integrated
+// field strength; example: for 1 Tm use FM = 1.0 and for 4.3 Tm use FM = 4.3
+// If 1 mag, use 2.0 for integrated 1.0 Tm or 4.0 for 2.0 Tm (double FM for 
+// same effect) Note: In general, for 1 mag test use only Dipole 1
+G4double NpolDipole1::FM = 2.0; 
+G4double NpolDipole1::dipole1FieldY = FM*0.40984*tesla; 
 
 G4double NpolDipole1::NpolAng = 28.0*deg;
 G4double NpolDipole1::yokeLength = 1.22*m;
 G4double NpolDipole1::gapWidth = 0.56*m;
 G4double NpolDipole1::gapLength = 1.22*m;
-G4double NpolDipole1::gapHeight = 0.20955*m;  // using 8.25 inch(0.20955 m) gap or 10.0 inch(0.2540m)
+G4double NpolDipole1::gapHeight = 0.2604*m; //0.20955*m;  // using 8.25 inch(0.20955 m) gap or 10.25 inch(0.2604m) or 14.75 inch (0.37465m)
 G4double NpolDipole1::yokeGap = 0.1016*m + (gapHeight - 0.20955*m);  // adjust if at 10in gap
 G4double NpolDipole1::fieldClampHeight = 152.8*cm; 
 G4double NpolDipole1::fieldClampWidth = 235.0*cm;
