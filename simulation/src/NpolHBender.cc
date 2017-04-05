@@ -24,7 +24,7 @@
 #include "NpolMaterials.hh"
 #include "NpolHBender.hh"
 
-G4double NpolHBender::ShmsAng = 36.53*deg; // Angle at 4.4 GeV/c 36.53*deg; at 11 GeV/c 16.79; 
+G4double NpolHBender::ShmsAng = 16.79*deg; // Angle at 4.4 GeV/c 36.53*deg; at 11 GeV/c 16.79; 
 G4double NpolHBender::PosHB = 1.76*m;   // Position of HB center from target
 G4double NpolHBender::PosTagger = 1.195*m; // just in front of HB opening
 G4double NpolHBender::thicknessTagger = 0.10*cm; // thickness of SHMS tagger
