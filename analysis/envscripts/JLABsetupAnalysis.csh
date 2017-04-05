@@ -1,13 +1,13 @@
 #!/bin/tsch
 
 setenv Lead 15
-setenv Energy 11
+setenv Energy 4.4
 setenv Bfield 4
 
 setenv NPOLLIB_DIR $BUILD_DIR/../npollib
 setenv NPOLBASENAME electronBeam_Lead$Lead\cm_$Energy\GeV_$Bfield\Bdl
-setenv NPOLDIR /cache/hallc/cgen/simulation/tireman/Summer2016Run/FullGeometry/$Energy\GeV
-setenv NPOLWORKDIR /volatile/hallc/cgen/tireman/Summer2016Run/FullGeometry/$Energy\GeV/$Bfield\Bdl/SmallTargetTagger
+setenv NPOLDIR /volatile/hallc/cgen/tireman/FebRun2017/$Energy\GeV/$Bfield\Bdl
+setenv NPOLWORKDIR /volatile/hallc/cgen/tireman/FebRun2017/$Energy\GeV/$Bfield\Bdl
 
 setenv RawDataDir $NPOLDIR/root
 setenv OutputDir $NPOLWORKDIR/Output
