@@ -25,14 +25,24 @@
 #include "NpolMaterials.hh"
 #include "NpolShieldHut.hh"
 
+G4double NpolShieldHut::vertAngle = 0.1000*rad; // 0.100 rad nominal 0.120 rad for 10.25/14.75in gap// vertical acceptance angle
+G4double NpolShieldHut::horAngle = 0.160*rad;  // 0.160 rad nomial 0.200 rad for 10in gap horizontal acceptance angle // the max for 56cm wide gap is +/- 100 mrad
+
 G4double NpolShieldHut::NpolAng = 28.0*deg;
-G4double NpolShieldHut::vertAngle = 0.1000*rad; // 0.06716*rad;  // vertical acceptance angle
-G4double NpolShieldHut::horAngle = 0.1600*rad; // 0.14226*rad;   // horizontal acceptance angle
-G4double NpolShieldHut::PosFront = 6.3739*m;  // position of front wall (center)
-G4double NpolShieldHut::PosLead = PosFront - 0.535*m;  // position of lead curtain (center)
-G4double NpolShieldHut::PosTagger = PosFront + 0.465*m;  // position of NPOL tagger (center)
+G4double NpolShieldHut::AngSide = 14.0*deg;  // Angular offset for the side walls for positioning
 G4double NpolShieldHut::leadThickness = 15.0*cm;  // thickness of the lead curtain
+G4double NpolShieldHut::wallThickness = 0.900*m;  // Thickness of the concrete walls (nominal)
+G4double NpolShieldHut::wallHeight = 7.0*m; // Nominal height of the shield hut walls
 G4double NpolShieldHut::vertOffSet = 0.3424*m; // Vertical offset for target pivot
+G4double NpolShieldHut::PosFront = 6.35*m; // position of front wall (center)
+G4double NpolShieldHut::OffSetRoof = (wallHeight + wallThickness)/2-vertOffSet; // Roof offset
+G4double NpolShieldHut::PosLead = PosFront - (leadThickness + wallThickness)/2; // position of lead 
+G4double NpolShieldHut::PosTagger = PosFront + wallThickness/2 + 1.50*cm;  // position of NPOL tagger
+G4double NpolShieldHut::sideWallLength = 5.5*m - wallThickness; // length of side walls
+
+G4double NpolShieldHut::PosSide = PosFront + sideWallLength/2 + wallThickness*cos(NpolAng)-5*cm; 
+G4double NpolShieldHut::PosBack = PosFront + sideWallLength + wallThickness;
+G4double NpolShieldHut::PosRoof = PosFront  + 0.5*(sideWallLength + wallThickness); 
 
 NpolShieldHut::NpolShieldHut() {
   ConstructHutFrontWall();
@@ -85,7 +95,7 @@ void NpolShieldHut::ConstructNPOLTagger(){
 void NpolShieldHut::ConstructHutFrontWall() {
   // constants for sizing and positioning
   // front wall sizes
-  G4double xlen = 4.8768*m, ylen = 7.3152*m, zlen = 0.900*m;
+  G4double xlen = 4.8768*m, ylen = wallHeight, zlen = wallThickness;
   // collimator sizing
   G4double xlen1 = 2*(PosFront-zlen/2)*tan(horAngle/2), xlen2 = 2*(PosFront+zlen/2)*tan(horAngle/2);
   G4double ylen1 = 2*(PosFront-zlen/2)*tan(vertAngle/2), ylen2 = 2*(PosFront+zlen/2)*tan(vertAngle/2);
@@ -113,7 +123,7 @@ void NpolShieldHut::ConstructHutFrontWall() {
 // will simplfy to a 3 foot deep wall that is 16 feet wide and 24 feet high
 void NpolShieldHut::ConstructHutBackWall() {
   // Back wall sizes
-  G4double xlen = 4.8768*m, ylen = 7.3152*m, zlen = 0.900*m;
+  G4double xlen = 4.8768*m, ylen = wallHeight, zlen = wallThickness;
   
   G4Box *HutBackWall = new G4Box("HutBackWall",xlen/2, ylen/2, zlen/2);
   HutBackWallLV = new G4LogicalVolume(HutBackWall,
@@ -125,7 +135,7 @@ void NpolShieldHut::ConstructHutBackWall() {
 // Construct the side walls (one construct, two placements) for the shield 
 // hut out of concrete.
 void NpolShieldHut::ConstructHutSideWall() {
-  G4double xlen = 0.9144*m, ylen = 7.3152*m, zlen = 5.50*m-xlen-0.0050*m;
+  G4double xlen = wallThickness, ylen = wallHeight, zlen = sideWallLength;
   
   G4Box *HutSideWall = new G4Box("HutSideWall",xlen/2, ylen/2, zlen/2);
   HutSideWallLV = new G4LogicalVolume(HutSideWall,
@@ -140,7 +150,7 @@ void NpolShieldHut::ConstructHutSideWall() {
 
 void NpolShieldHut::ConstructHutRoof() {
   
-  G4double xlen = 4.8768*m, ylen = 0.9144*m, zlen = 6.25*m;
+  G4double xlen = 4.8768*m, ylen = wallThickness, zlen = 6.25*m;
   G4Box *HutRoof = new G4Box("HutRoof", xlen/2, ylen/2, zlen/2);
   HutRoofLV = new G4LogicalVolume(HutRoof,NpolMaterials::GetInstance()->GetMaterial("Concrete"), "HutRoofLV",0,0,0);
   G4VisAttributes *RoofVisAtt= new G4VisAttributes(G4Colour(1.0,1.0,1.0));
@@ -148,16 +158,12 @@ void NpolShieldHut::ConstructHutRoof() {
 }
 
 void NpolShieldHut::Place(G4LogicalVolume *motherLV) {
-  
-  G4double PosSide = 9.4025*m, AngSide = 14.0*deg;
-  G4double PosBack = 11.8739*m;
-  G4double PosRoof = 9.1239*m, OffSetRoof = 3.7776*m;
-
+ 
   PlaceCylindrical(LeadCurtainLV, motherLV, "LeadCurtain", PosLead,-NpolAng, 0);
   PlaceCylindrical(NPOLTaggerLV, motherLV, "NPOLTagger", PosTagger, -NpolAng, 0);  
   PlaceCylindrical(HutFrontWallLV, motherLV, "HutFrontWall", PosFront,-NpolAng,-vertOffSet);
   PlaceCylindrical(HutBackWallLV, motherLV, "HutBackWall", PosBack,-NpolAng,-vertOffSet);
-  PlaceRectangular(HutSideWallLV, motherLV, "HutSideWall", -PosSide*sin(AngSide+NpolAng),-vertOffSet, PosSide*cos(AngSide+NpolAng), 0*deg, -NpolAng, 0*deg);
-  PlaceRectangular(HutSideWallLV, motherLV, "HutSideWall", -PosSide*sin(AngSide),-vertOffSet, PosSide*cos(AngSide), 0*deg, -NpolAng, 0);
+  PlaceRectangular(HutSideWallLV, motherLV, "HutSideWall", -PosSide*sin(NpolAng+AngSide),-vertOffSet, PosSide*cos(NpolAng+AngSide), 0*deg, -NpolAng, 0*deg);
+  PlaceRectangular(HutSideWallLV, motherLV, "HutSideWall", -PosSide*sin(NpolAng-AngSide),-vertOffSet, PosSide*cos(NpolAng-AngSide), 0*deg, -NpolAng, 0);
   PlaceCylindrical(HutRoofLV, motherLV, "HutRoof", PosRoof, -NpolAng, OffSetRoof);
 }

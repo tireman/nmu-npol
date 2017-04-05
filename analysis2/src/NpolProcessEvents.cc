@@ -12,16 +12,17 @@
 #include <TBranch.h>
 #include <TH1.h>
 #include <TH2.h>
+#include <TH3.h>
 #include <TSystem.h>
 #include <TROOT.h>
 #include <TObject.h>
 #include <TVectorD.h>
 #include <TString.h>
 
-#include "NpolVertex.hh"
-#include "NpolTagger.hh"
-#include "NpolStatistics.hh"
-#include "NpolStep.hh"
+#include "../../npollib/include/NpolVertex.hh"
+#include "../../npollib/include/NpolTagger.hh"
+#include "../../npollib/include/NpolStatistics.hh"
+#include "../../npollib/include/NpolStep.hh"
 
 void RetrieveENVvariables();
 TString FormInputFile(TString InputDir);
@@ -41,8 +42,8 @@ TString OutputDir = "";
 TString InputDir = "";
 
 int main(int argc, char *argv[]) {
-  //TString analysisDir = getenv("NPOLLIB_DIR");
-  //gSystem->Load(analysisDir + "/" + "libNpolClasses.so"); 
+  TString analysisDir = getenv("NPOLLIB_DIR");
+  gSystem->Load(analysisDir + "/" + "libNpolClasses.so"); 
   
   // Set up the TTrees and their branch addresses
   TChain *npolTree = new TChain("T");
@@ -50,9 +51,9 @@ int main(int argc, char *argv[]) {
 
   Double_t NpolAng = 0.488692; // radians (28 degrees) NPOL angle from beamline
   Double_t targetTaggerPos = 150.0;  // Position of target tagger (cm)
-  Double_t npolTaggerPos = 637.86;  // Position of NPOL Tagger (cm)
-  Double_t theta = 0.120; //0.13812; // NPOL horizontal angular accecptance (radians)
-  Double_t phi = 0.100; // using the Dipole 1 limit // 0.08466; // NPOL vertical angular acceptance (radians)
+  Double_t npolTaggerPos = 681.50;  // Position of NPOL Tagger (cm)687.97
+  Double_t theta = 0.160; // NPOL horizontal angular accecptance (radians)
+  Double_t phi = 0.100; // NPOL vertical angular acceptance (radians)
   
   // ******* Tagger acceptance computations.  ALL SIZES ARE FULL WIDTH/HEIGHT ******** //
   // Compute or Manually set the size of the histograms and cuts for filling histograms (X,Y) position
@@ -66,16 +67,16 @@ int main(int argc, char *argv[]) {
   //Double_t npolH = 2*npolTaggerPos*TMath::Tan(phi/2);  // height of npol tagger (cm)
 
   // This version allows for fixing the size manually
-  Double_t targetW = 56.0;  // width of target tagger (cm)
-  Double_t targetH = 21.0;  // height of target tagger (cm)
+  Double_t targetW = 60.00;  // width of target tagger (cm) Dipole 1 opening 56.0 cm
+  Double_t targetH = 25.00;  // height of target tagger (cm) Dipole 1 opeing 20.955 cm
   Double_t npolW = 2*npolTaggerPos*TMath::Tan(theta/2);  // width of npol tagger (cm)
   Double_t npolH = 2*npolTaggerPos*TMath::Tan(phi/2);  // height of npol tagger (cm)
 
-  Double_t targetAlpha = targetW/(4*targetTaggerPos);  // Constant needed for solid angle
-  Double_t npolAlpha = npolW/(4*npolTaggerPos);  // Constant needed for solid angle
+  //Double_t targetAlpha = targetW/(4*targetTaggerPos);  // Constant needed for solid angle
+  //Double_t npolAlpha = npolW/(4*npolTaggerPos);  // Constant needed for solid angle
   
-  npolTree->SetCacheSize(500000000);
-  statsTree->SetCacheSize(500000000);
+  //npolTree->SetCacheSize(50000000);
+  //statsTree->SetCacheSize(50000000);
   
   RetrieveENVvariables();
 
@@ -139,6 +140,7 @@ int main(int argc, char *argv[]) {
   std::map<std::string,TH1F *> targetPhi;
   std::map<std::string,TH1F *> npolTheta;
   std::map<std::string,TH1F *> npolPhi;
+  std::map<std::string,TH3F *> particleOrigin;
 
   // Allocate Theta, Phi, KE and Position Histograms
   std::map<std::string,std::string>::iterator it;
@@ -166,6 +168,12 @@ int main(int argc, char *argv[]) {
     std::string npolXYHistoTitle = it->second + " XY Position in NPOL Tagger";
     std::string correlateXYHistoName = "Correlated_targetXY_" + it->first;
     std::string correlateXYTitle = it->second + " XY position in Target Tagger Correlated to NPOL Tagger";
+
+	std::string origin3DHistoTitle = it->second + " 3D position of Vertex in System from NPOL Tagger hit";
+	std::string origin3DHistoName = "Origin3D_Position_" + it->first;
+
+	particleOrigin[it->first] = 
+	  new TH3F(origin3DHistoName.c_str(), origin3DHistoTitle.c_str(),200,-100.,+700.,200,-700., +100.,200,-300., +300.);
 
     targetParticleKE[it->first] = 
 	  new TH1F(targetHistoName.c_str(), targetHistoTitle.c_str(),nbins,bins);
@@ -197,9 +205,12 @@ int main(int argc, char *argv[]) {
   delta_TOF->GetYaxis()->SetTitle("Events");
   delta_TOF->GetXaxis()->SetTitle("Analyzer to Top/Bottom Array Time-of-Flight (ns)");
 
+
+  // ****************  Done with Hisotgram allocation ***********************
+
   // Solid angle calculation! 
-  Double_t targetSolidAngle = 8*(TMath::ATan(targetH/targetW)-TMath::ASin(targetH/TMath::Sqrt((1+TMath::Power(targetAlpha,2))*(TMath::Power(targetH,2)+TMath::Power(targetW,2)))));
-  Double_t npolSolidAngle = 8*(TMath::ATan(npolH/npolW)-TMath::ASin(npolH/TMath::Sqrt((1+TMath::Power(npolAlpha,2))*(TMath::Power(npolH,2)+TMath::Power(npolW,2)))));
+  //Double_t targetSolidAngle = 8*(TMath::ATan(targetH/targetW)-TMath::ASin(targetH/TMath::Sqrt((1+TMath::Power(targetAlpha,2))*(TMath::Power(targetH,2)+TMath::Power(targetW,2)))));
+  //Double_t npolSolidAngle = 8*(TMath::ATan(npolH/npolW)-TMath::ASin(npolH/TMath::Sqrt((1+TMath::Power(npolAlpha,2))*(TMath::Power(npolH,2)+TMath::Power(npolW,2)))));
   
   // loop over all entries (one per event)
   Int_t nentries = npolTree->GetEntries();
@@ -208,26 +219,8 @@ int main(int argc, char *argv[]) {
     npolTree->GetEntry(i);
 	PrintEventNumber(nentries,i);
 
+	std::set<int> vertexTrackIDs;
 	std::set<int> npolTrackIDs;
-	
-	// ***** tHIS SECTION IS USED TO SELECT PARTICULAR EVENTS FROM THE TRACKS VECTOR ***** //
-	// loop over all vertex entries to find particles created in
-	// the lead curtain or front wall of shield hut
-	/*std::set<int> vertexTrackIDs;
-	std::vector<NpolVertex *>::iterator v_it;
-	for(v_it = vertexEntry->begin(); v_it != vertexEntry->end(); v_it++){
-	  NpolVertex *aVertex = *v_it;
-	  if(aVertex == NULL) continue;
-	  std::string volumeName = aVertex->volume;
-	  std::string processName = aVertex->process;
-	  Int_t PID = aVertex->parentId;
-	  //if(volumeName == "TargetFluid" && processName == "electronNuclear") 
-	  //std::cout << "Process name is: " << processName << std::endl;
-	  //if((volumeName == "TargetFluid") && (processName == "electronNuclear") && (PID == 1)){
-	  if(PID == 0){
-		vertexTrackIDs.insert(aVertex->trackId);
-	  }
-	  } */
 	
     // loop over all tagged particles (min. one step in NPOL tagger volume)
 	Double_t npolxMax = npolW/2; // acceptance limit
@@ -237,9 +230,11 @@ int main(int argc, char *argv[]) {
       NpolTagger *npolTagged = *n_it;
       if(npolTagged == NULL)  continue;
 	  std::string particleName = npolTagged->particle;
-      if(npolParticleKE.find(particleName) == npolParticleKE.end())
-		continue;
-	  Double_t fluxscaling = 1;
+	  if(npolParticleKE.find(particleName) == npolParticleKE.end()) continue;  // 1 of 9 particles we want?
+	  //int pType = npolTagged->particleId;
+	  //if((pType == 2112 || pType == 22)) continue;  // Reject if charged(use !) reject if not charged (remove !)
+	  
+	  Double_t fluxscaling = 1;	
 	  //if(vertexTrackIDs.find(npolTagged->trackId) != vertexTrackIDs.end()){
 	  if((abs(npolTagged->lPosX) <= npolxMax) && (abs(npolTagged->lPosY) <= npolyMax)){
 		(npolParticleKE[particleName])->
@@ -259,12 +254,25 @@ int main(int argc, char *argv[]) {
 		if(theta > TMath::Pi()/2) continue;
 		(npolTheta[particleName])->Fill(theta);
 		(npolPhi[particleName])->Fill(phi);
-		
-		}
+	  }
 	  npolTrackIDs.insert(npolTagged->trackId);
 	  //}
 	}
-	
+
+	// ************ Fill the 3D plot ***********************
+	std::vector<NpolVertex *>::iterator v_it;
+	for(v_it = vertexEntry->begin(); v_it != vertexEntry->end(); v_it++){
+	  NpolVertex *aVertex = *v_it;
+	  if(aVertex == NULL) continue;
+	  
+	  if(npolTrackIDs.find(aVertex->trackId) != npolTrackIDs.end()){ 
+		std::string particleName = aVertex->particle;
+		(particleOrigin[particleName])->Fill(aVertex->posZ,aVertex->
+							 posX,aVertex->posY);
+	  }
+	}
+
+
     // loop over all tagged particles (min. one step in target tagger volume)
 	Double_t targetxMax = targetW/2; // acceptance limit 
 	Double_t targetyMax = targetH/2; // acceptance limit
@@ -295,7 +303,7 @@ int main(int argc, char *argv[]) {
 		if(theta > TMath::Pi()/2) continue;
 		(targetTheta[particleName])->Fill(theta);
 		(targetPhi[particleName])->Fill(phi);
-	  
+		
 		// Here the correlated histograms are to be filled
 		if(npolTrackIDs.find(targetTagged->trackId) 
 		   != npolTrackIDs.end()){  
@@ -304,91 +312,95 @@ int main(int argc, char *argv[]) {
 			Fill(targetTagged->energy,fluxscaling);
 		  (correlatePOS[particleName])->
 			Fill(targetTagged->lPosX,targetTagged->lPosY);
+		 
 		}
-		}
-		//}
+	  
+	  }
+	  //}
 	}
-	npolTrackIDs.clear();
-  	//vertexTrackIDs.clear();
-
+ 
     // This section is designed to file up the histograms for hits in
     // the Scintillator detectors
     std::map<std::string, double> eDep;
     std::map<std::string, double> hitTime;
-
+	
     // loop over vector elements (one per vertex)
     
-    int avNum, imprNum, pvNum;
+    int avNum, imprNum, pvNum; 
+	int stepCount = 0;
     std::vector<NpolStep *>::iterator s_it;
     for(s_it = anStep->begin(); s_it != anStep->end(); s_it++){
       NpolStep *aStep = *s_it;
       double Ethreshold;
-      
-      if(aStep == NULL) continue;
-      
-      if(eDep.find(aStep->volume) == eDep.end())
-		eDep[aStep->volume] = 0;
-      eDep[aStep->volume] += aStep->eDep;
   
-      avNum = GetAVNumber(aStep->volume);
-      switch(avNum){
-      case 1: case 2: case 5: case 6:
-		Ethreshold = 1.0;
-		break;
-      case 3: case 4: case 7: case 8: case 13:
-		Ethreshold = 1.0;
-		break;
-      case 9: case 10:
-		Ethreshold = 1.0;
-		break;
-      default:
-		break;
-      }
-      
-      if(avNum != 0){
-		if(hitTime.find(aStep->volume) == hitTime.end() 
-		   && eDep[aStep->volume] >= Ethreshold)
-		  hitTime[aStep->volume] = aStep->time;
-      }
-    }
+      if(aStep == NULL) continue;
+	  
+	  if(eDep.find(aStep->volume) == eDep.end())
+		eDep[aStep->volume] = 0;
+	  eDep[aStep->volume] += aStep->eDep;
 
-    double t2 = 0.0, t1 = 0.0, dTOF = 0.0;
-    std::map<std::string,double>::iterator itt;
-	
-    for(itt = hitTime.begin(); itt != hitTime.end(); itt++){
-      avNum = GetAVNumber(itt->first);
-      if((avNum == 1 || avNum == 2 || avNum == 5 || avNum == 6) 
-		 && t2 == 0.0)
-		t2 = itt->second;
-      if((avNum == 9 || avNum == 10) && t1 == 0.0)
-		t1 = itt->second;
-    }
-    dTOF = (t2-t1);
-    if(dTOF != 0.0) delta_TOF->Fill(dTOF);   
-
-    std::map<std::string,double>::iterator it;
-    for(it = eDep.begin(); it != eDep.end(); it++) {
-      if(histograms.find(it->first) == histograms.end()) {
-		avNum = GetAVNumber(it->first);
-		if((avNum == 1 || avNum == 2 || avNum == 5 || avNum == 6 || 
-			avNum == 9 || avNum == 10)){
-		  histograms[it->first] = 
-			new TH1F((it->first).c_str(),(it->first).c_str(),1000,0,200);
-		}else if((avNum == 3 || avNum == 4 || avNum == 7 || avNum == 8 || 
-				  avNum == 11 || avNum == 12 || avNum == 13)){
-		  histograms[it->first] = 
-			new TH1F((it->first).c_str(),(it->first).c_str(),200,0,20);
-		}else if(avNum == 0){
-		  histograms[it->first] = 
-			new TH1F((it->first).c_str(),(it->first).c_str(),1000,0,200);
+		avNum = GetAVNumber(aStep->volume);
+		switch(avNum){
+		case 1: case 2: case 5: case 6:
+		  Ethreshold = 1.0;
+		  break;
+		case 3: case 4: case 7: case 8: case 13:
+		  Ethreshold = 1.0;
+		  break;
+		case 9: case 10:
+		  Ethreshold = 1.0;
+		  break;
+		default:
+		  break;
 		}
-      }
-      if(it->second != 0.0) (histograms[it->first])->Fill(it->second);
-    } 
-    eDep.clear();	
+	
+		if(avNum != 0) {
+		  if(hitTime.find(aStep->volume) == hitTime.end() 
+			 && eDep[aStep->volume] >= Ethreshold)
+			hitTime[aStep->volume] = aStep->time;
+		}
+		
+		double t2 = 0.0, t1 = 0.0, dTOF = 0.0;
+		std::map<std::string,double>::iterator itt;
+		
+		for(itt = hitTime.begin(); itt != hitTime.end(); itt++){
+		  avNum = GetAVNumber(itt->first);
+		  if((avNum == 1 || avNum == 2 || avNum == 5 || avNum == 6) 
+			 && t2 == 0.0)
+			t2 = itt->second;
+		  if((avNum == 9 || avNum == 10) && t1 == 0.0)
+			t1 = itt->second;
+		}
+		dTOF = (t2-t1);
+		if(dTOF != 0.0) delta_TOF->Fill(dTOF);   
+		
+		std::map<std::string,double>::iterator it;
+		for(it = eDep.begin(); it != eDep.end(); it++) {
+		  if(histograms.find(it->first) == histograms.end()) {
+			avNum = GetAVNumber(it->first);
+			if((avNum == 1 || avNum == 2 || avNum == 5 || avNum == 6 || 
+				avNum == 9 || avNum == 10)){
+			  histograms[it->first] = 
+				new TH1F((it->first).c_str(),(it->first).c_str(),1000,0,200);
+			}else if((avNum == 3 || avNum == 4 || avNum == 7 || avNum == 8 || 
+					  avNum == 11 || avNum == 12 || avNum == 13)){
+			  histograms[it->first] = 
+				new TH1F((it->first).c_str(),(it->first).c_str(),200,0,20);
+			}else if(avNum == 0){
+			  histograms[it->first] = 
+				new TH1F((it->first).c_str(),(it->first).c_str(),1000,0,200);
+			}
+		  }
+		  if(it->second != 0.0) (histograms[it->first])->Fill(it->second);
+		}
+	}
+ 
+	eDep.clear();	
 	hitTime.clear();
+	npolTrackIDs.clear();
+	vertexTrackIDs.clear();
   }
-
+  
   /* // Write it all out to the ROOT file.*/
   TVectorD totalElectrons(2);
   totalElectrons[0] = TotalElectrons;
@@ -447,6 +459,11 @@ int main(int argc, char *argv[]) {
   std::map<std::string,TH1F *>::iterator it12;
   for(it12 = npolPhi.begin(); it12 != npolPhi.end(); it12++){
 	it12->second->Write();
+  }
+
+  std::map<std::string,TH3F *>::iterator it13;
+  for(it13 = particleOrigin.begin(); it13 != particleOrigin.end(); it13++){
+	it13->second->Write();
   }
 
   delta_TOF->Write();
@@ -589,3 +606,7 @@ void RetrieveENVvariables() {
   }
 }
 
+	  //Int_t PDGcode = npolTagged->particleId;
+	  //TString partName = npolTagged->particle;
+	  //if(!(PDGcode == 2112 || PDGcode == 22)){
+	  //if((partName == "neutron" || partName == "gamma")){

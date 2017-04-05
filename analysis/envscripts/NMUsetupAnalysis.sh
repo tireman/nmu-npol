@@ -3,13 +3,14 @@
 export Lead=15
 export Energy=4.4
 export Bfield=4
-export BUILD_DIR=/home/tireman/simulation/jlab/npol/nmu-npol/build/simulation
-export NPOLLIB_DIR=/home/tireman/simulation/jlab/npol/nmu-npol/build/npollib
-export NPOLBASENAME=sourceNeutron_Lead$Lead\cm_$Energy\GeV_$Bfield\Bdl
+export PType=Gamma
+export BUILD_DIR=/home/tireman/simulation/jlab/nmu-npol/build/simulation
+export NPOLLIB_DIR=/home/tireman/simulation/jlab/nmu-npol/build/npollib
+export NPOLBASENAME=source$PType\_Lead$Lead\cm_$Energy\GeV_$Bfield\Bdl 
 
-export NPOLDIR=/data2/cgen/JlabSimData/December2016/NpolTaggerSource/4.4GeV/4Bdl/Lead15cm/Neutron
-
-export NPOLWORKDIR=/data2/cgen/JlabSimData/December2016/NpolTaggerSource/4.4GeV/4Bdl/Lead15cm/Neutron
+export NPOLDIR=/home/tireman/data1/TargetTaggerSource/$Energy\GeV/$Bfield\Bdl
+export NPOLWORKDIR=/home/tireman/data1/TargetTaggerSource/$Energy\GeV/$Bfield\Bdl 
+#/NeutralParticles
 
 export OutputDir=$NPOLDIR/Output
 export InputDir=$NPOLDIR/root

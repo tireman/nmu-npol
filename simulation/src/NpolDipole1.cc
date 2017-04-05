@@ -38,14 +38,19 @@
 #include "NpolBeamlineDown.hh"
 #include "NpolDetectorConstruction.hh"
 
-G4double NpolDipole1::dipole1FieldY = 4*0.40984*tesla; // 1 B.dl = 0.40984*tesla so 4 * 1 B.dl = 1.639*tesla
+// Field multiplier; if 2 mags, use value corresponding to desired integrated
+// field strength; example: for 1 Tm use FM = 1.0 and for 4.3 Tm use FM = 4.3
+// If 1 mag, use 2.0 for integrated 1.0 Tm or 4.0 for 2.0 Tm (double FM for 
+// same effect) Note: In general, for 1 mag test use only Dipole 1
+G4double NpolDipole1::FM = 2.0; 
+G4double NpolDipole1::dipole1FieldY = FM*0.40984*tesla; 
 
 G4double NpolDipole1::NpolAng = 28.0*deg;
 G4double NpolDipole1::yokeLength = 1.22*m;
 G4double NpolDipole1::gapWidth = 0.56*m;
 G4double NpolDipole1::gapLength = 1.22*m;
-G4double NpolDipole1::gapHeight = 0.20965*m;  // using 8.25 inch gap, Charybdis can do 10.25 inch as well
-G4double NpolDipole1::yokeGap = 0.1016*m;
+G4double NpolDipole1::gapHeight = 0.2604*m; //0.20955*m;  // using 8.25 inch(0.20955 m) gap or 10.25 inch(0.2604m) or 14.75 inch (0.37465m)
+G4double NpolDipole1::yokeGap = 0.1016*m + (gapHeight - 0.20955*m);  // adjust if at 10in gap
 G4double NpolDipole1::fieldClampHeight = 152.8*cm; 
 G4double NpolDipole1::fieldClampWidth = 235.0*cm;
 G4double NpolDipole1::fieldClampThick = 5.08*cm ;
@@ -187,25 +192,26 @@ void NpolDipole1::ConstructDipole1Field(){
 }
 
 void NpolDipole1::Place(G4LogicalVolume *motherLV) {
-  G4double PosD1 = 2.5096*m, BarOffSet = 0.47*m;
+  G4double PosD1 = 2.5096*m, BarOffSet = 0.47*m, BarVertOffset = 0.125*m + (gapHeight - 0.20955*m)/2;
+  G4double GapOffset = 0.0508*m + (gapHeight - 0.20955*m)/2;
   G4double EndOffSet = +0.735*m, ClampOffSet = 0.9398*m;
    
   // Place 4 of the Copper bars in the magnet
   PlaceRectangular(Dipole1CuBarLV, motherLV, "Dipole1CuBar", (BarOffSet*cos(NpolAng)-PosD1*sin(NpolAng)), 
-				   +0.150*m, (BarOffSet*sin(NpolAng)+PosD1*cos(NpolAng)), 0*deg, -NpolAng, 0.0); 
+				   +BarVertOffset, (BarOffSet*sin(NpolAng)+PosD1*cos(NpolAng)), 0*deg, -NpolAng, 0.0); 
   PlaceRectangular(Dipole1CuBarLV, motherLV, "Dipole1CuBar", (BarOffSet*cos(NpolAng)-PosD1*sin(NpolAng)), 
-				   -0.125*m, (BarOffSet*sin(NpolAng)+PosD1*cos(NpolAng)), 0*deg, -NpolAng, 0.0); 
+				   -BarVertOffset, (BarOffSet*sin(NpolAng)+PosD1*cos(NpolAng)), 0*deg, -NpolAng, 0.0); 
   PlaceRectangular(Dipole1CuBarLV, motherLV, "Dipole1CuBar", (-BarOffSet*cos(NpolAng)-PosD1*sin(NpolAng)), 
-				   +0.125*m, (-BarOffSet*sin(NpolAng)+PosD1*cos(NpolAng)), 0*deg, -NpolAng, 0.0); 
+				   +BarVertOffset, (-BarOffSet*sin(NpolAng)+PosD1*cos(NpolAng)), 0*deg, -NpolAng, 0.0); 
   PlaceRectangular(Dipole1CuBarLV, motherLV, "Dipole1CuBar", (-BarOffSet*cos(NpolAng)-PosD1*sin(NpolAng)), 
-				   -0.125*m, (-BarOffSet*sin(NpolAng)+PosD1*cos(NpolAng)), 0*deg, -NpolAng, 0.0); 
+				   -BarVertOffset, (-BarOffSet*sin(NpolAng)+PosD1*cos(NpolAng)), 0*deg, -NpolAng, 0.0); 
   
   // Place 4 copies of the extruded copper ends for the coil packs
-  PlaceCylindrical(Dipole1CuEndLV, motherLV, "Dipole1CuEnd", (PosD1-EndOffSet), -NpolAng, +5.08*cm);
-  PlaceCylindrical(Dipole1CuEndLV, motherLV, "Dipole1CuEnd", (PosD1+EndOffSet), -NpolAng, +5.08*cm);
-  PlaceRectangular(Dipole1CuEndLV, motherLV, "Dipole1CuEnd", (-(PosD1-EndOffSet)*sin(NpolAng)), -5.08*cm, 
+  PlaceCylindrical(Dipole1CuEndLV, motherLV, "Dipole1CuEnd", (PosD1-EndOffSet), -NpolAng, +GapOffset);
+  PlaceCylindrical(Dipole1CuEndLV, motherLV, "Dipole1CuEnd", (PosD1+EndOffSet), -NpolAng, +GapOffset);
+  PlaceRectangular(Dipole1CuEndLV, motherLV, "Dipole1CuEnd", (-(PosD1-EndOffSet)*sin(NpolAng)), -GapOffset, 
 				   ((PosD1-EndOffSet)*cos(NpolAng)), 0.0*deg, NpolAng, 180.*deg);
-  PlaceRectangular(Dipole1CuEndLV, motherLV, "Dipole1CuEnd", (-(PosD1+EndOffSet)*sin(NpolAng)), -5.08*cm, 
+  PlaceRectangular(Dipole1CuEndLV, motherLV, "Dipole1CuEnd", (-(PosD1+EndOffSet)*sin(NpolAng)), -GapOffset, 
 				   ((PosD1+EndOffSet)*cos(NpolAng)), 0.0*deg, NpolAng, 180.*deg);
   
   // Place 2 copies of the Charybdis field clamps

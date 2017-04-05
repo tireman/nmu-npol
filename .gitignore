@@ -1,3 +1,4 @@
+*.cmake
 *.old
 *.root
 *.d
@@ -9,5 +10,8 @@
 *.pcm
 \#*\#
 dict.*
+CMakeCache.txt
+Makefile*
 
 build/
+CMakeFiles/

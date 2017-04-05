@@ -40,9 +40,8 @@ void ExtractParticleDistributions() {
   TString InputFile = FormInputFile(InputDir);
   TFile *inFile = TFile::Open(InputFile);
   
-  // Algorthm to load the histograms and generate the *.dat files from the 
+  // Algorithm to load the histograms and generate the *.dat files from the 
   // histogram data.
-  //std::string leadName = "NpolFlux";
   Int_t Nx = 3;  Int_t Ny = 3; Int_t Nk = 8;
   for(int k = 0; k < Nk; k++){
 	for(int i = 0; i < Nx; i++){
@@ -60,7 +59,7 @@ void ExtractParticleDistributions() {
 		  if(k == 3) fileName = "targetPhi_" + histoNames[i][j] + ".dat";
 		  if(k == 4) fileName = "npolTheta_" + histoNames[i][j] + ".dat";
 		  if(k == 5) fileName = "npolPhi_" + histoNames[i][j] + ".dat";
-		  txtOut.open(OutputDir + "/" + fileName);
+		  txtOut.open(OutputDir + "/Output/" + fileName);
 		  txtOut << "/gps/hist/point " << "0.0 " << " 0.0" << std::endl;
 		  Double_t totalCounts = hFrame->Integral();
 		  Double_t binOut = 0.0;
@@ -89,7 +88,7 @@ void ExtractParticleDistributions() {
 			if(l == 1 && k == 6) fileName = "npolY_" + histoNames[i][j] + ".dat";
 			if(l == 0 && k == 7) fileName = "targetX_" + histoNames[i][j] + ".dat";
 			if(l == 1 && k == 7) fileName = "targetY_" + histoNames[i][j] + ".dat";
-			txtOut.open(OutputDir + "/" + fileName);
+			txtOut.open(OutputDir + "/Output/" + fileName);
 			txtOut << "/gps/hist/point " << "0.0 " << " 0.0" << std::endl;
 			Int_t NbinsX = hFrame->GetNbinsX()-2;
 			Int_t NbinsY = hFrame->GetNbinsY()-2;
@@ -127,7 +126,7 @@ TString FormInputFile(TString InputDir){
 
 TString FormOutputFile(TString OutputDir){
   
-  TString fileName =  OutputDir + "/" + BaseName + "_Fig21-23.root";
+  TString fileName =  OutputDir + "/Output/" + BaseName + "_Fig21-23.root";
   
   return fileName;
 }
@@ -170,8 +169,8 @@ void RetrieveENVvariables() {
      return; // Return error if not found
   }
   
-  if(getenv("OutputDir")){
-	OutputDir = getenv("OutputDir");
+  if(getenv("WorkOutputDir")){
+	OutputDir = getenv("WorkOutputDir");
   }else{
 	std::cout << "Output Directory environmental varilable not set" << std::endl;
 	return;

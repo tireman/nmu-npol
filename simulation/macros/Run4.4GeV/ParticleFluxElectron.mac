@@ -6,8 +6,8 @@
 # for changing of the user particle source within the macro.  The user 
 # must supply the particle type and file(s) which contains the biasing data 
 #
-# Thiscan be run in batch, without graphic with >> ./Npolapp marco/ParticleFlux.mac
-# or interactively: Idle> /control/execute PartilceFlux.mac
+# Thiscan be run in batch, without graphic with >> ./Npolapp marco/ParticleFluxElectron.mac
+# or interactively: Idle> /control/execute PartilceFluxElectron.mac
 
 /run/initialize
 /run/verbose 0
@@ -20,7 +20,7 @@
 /tracking/storeTrajectory 1
 
 # Particle type  !!! Must be chosen by the user !!!!
-/gps/particle proton
+/gps/particle e-
 
 ################################################################
 # Particle source:  The particle source will generally be a plane
@@ -40,8 +40,8 @@
 /gps/pos/shape Rectangle
 
 /gps/pos/centre -70.421 0. 132.442 cm  # target tagger
-/gps/pos/halfx 28.00 cm   		    # target tagger
-/gps/pos/halfy 10.5 cm			    # target tagger
+/gps/pos/halfx 30.0 cm   		    # target tagger
+/gps/pos/halfy 12.5 cm			    # target tagger
 
 #/gps/pos/centre -321.067 0. 603.839 cm  # NPOL tagger
 #/gps/pos/halfx 43.32 cm   		        # NPOL tagger
@@ -52,12 +52,12 @@
 
 ###### Biasing the (x,y) distribution ######
 /gps/hist/type biasx
-/control/execute macros/particleFluxData/4.4GeV/targetX_proton.dat
-#/control/execute macros/particleFluxData/4.4GeV/npolX_proton.dat
+/control/execute macros/particleFluxData/4.4GeV/targetX_e-.dat
+#/control/execute macros/particleFluxData/4.4GeV/npolX_e-.dat
 
 /gps/hist/type biasy
-/control/execute macros/particleFluxData/4.4GeV/targetY_proton.dat
-#/control/execute macros/particleFluxData/4.4GeV/npolY_proton.dat
+/control/execute macros/particleFluxData/4.4GeV/targetY_e-.dat
+#/control/execute macros/particleFluxData/4.4GeV/npolY_e-.dat
 
 ###### Angular distribution biasing ######
 /gps/ang/type iso						# isotropic source
@@ -68,22 +68,20 @@
 
 ###### Biasing theta ######
 /gps/hist/type biast					# bias theta
-/control/execute macros/particleFluxData/4.4GeV/targetTheta_proton.dat
-#/control/execute macros/particleFluxData/4.4GeV/npolTheta_proton.dat
+/control/execute macros/particleFluxData/4.4GeV/targetTheta_e-.dat
+#/control/execute macros/particleFluxData/4.4GeV/npolTheta_e-.dat
 
 ###### Biasing phi ######
 /gps/hist/type biasp					# bias phi
-/control/execute macros/particleFluxData/4.4GeV/targetPhi_proton.dat
-#/control/execute macros/particleFluxData/4.4GeV/npolPhi_proton.dat	
+/control/execute macros/particleFluxData/4.4GeV/targetPhi_e-.dat
+#/control/execute macros/particleFluxData/4.4GeV/npolPhi_e-.dat	
 
 ###### Loads the energy distribution from user supplied data. ######
 /gps/ene/type User
 /gps/hist/type energy
-/control/execute macros/particleFluxData/4.4GeV/targetEnergy_proton.dat
-#/control/execute macros/particleFluxData/4.4GeV/npolEnergy_proton.dat
+/control/execute macros/particleFluxData/4.4GeV/targetEnergy_e-.dat
+#/control/execute macros/particleFluxData/4.4GeV/npolEnergy_e-.dat
 
 ###### Commands below are independent of GPS ######
-/vis/scene/endOfEventAction accumulate 100
 /run/printProgress 10000
-
-/run/beamOn 18326
+/run/beamOn 29571945

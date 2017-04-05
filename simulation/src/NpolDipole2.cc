@@ -34,13 +34,19 @@
 #include "NpolMaterials.hh"
 #include "NpolDipole2.hh"
 
-G4double NpolDipole2::dipole2FieldY = 4*0.40984*tesla; // 1 B.dl = 0.40984*tesla and 4 * 1 B.dl = 1.639*tesla
+// Field multiplier; if 2 mags, use value corresponding to desired integrated
+// field strength; example: for 1 Tm use FM = 1.0 and for 4.3 Tm use FM = 4.3
+// If 1 mag, use 2.0 for integrated 1.0 Tm or 4.0 for 2.0 Tm (double FM for 
+// same effect) Note: Generally we won't use Dipole 2 by itself
+G4double NpolDipole2::FM = 4.3; 
+G4double NpolDipole2::dipole2FieldY = FM*0.40984*tesla; 
 
 G4double NpolDipole2::NpolAng = 28.0*deg;
 G4double NpolDipole2::yokeLength = 0.6096*m;
 G4double NpolDipole2::gapWidth = 1.22*m;
 G4double NpolDipole2::gapLength = 1.22*m;
 G4double NpolDipole2::gapHeight = 0.4699*m;
+G4double NpolDipole2::PosD2 = 4.60*m;
 G4double NpolDipole2::fieldClampHeight = 279.4*cm;
 G4double NpolDipole2::fieldClampWidth = 370.0*cm;
 G4double NpolDipole2::fieldClampThick = 5.08*cm;
@@ -149,19 +155,15 @@ void NpolDipole2::ConstructDipole2Field(){
 }
 
 void NpolDipole2::Place(G4LogicalVolume *motherLV) {
-  G4double PosD2 = 4.6866*m, BarOffSet = +0.7730*m;
+  G4double BarOffSet = +0.7730*m;
   G4double VertOffSet = 0.231/2*m, EndOffSet = +0.8235*m;
   G4double ClampOffSet = 1.05*m;
   
   // Place 4 copes of the Copper bars in the magnet
-  PlaceRectangular(Dipole2CuBarLV, motherLV, "Dipole2CuBar", (BarOffSet*cos(NpolAng)-PosD2*sin(NpolAng)), 
-				   VertOffSet, (BarOffSet*sin(NpolAng)+PosD2*cos(NpolAng)), 0*deg, -NpolAng, 0.0); 
-  PlaceRectangular(Dipole2CuBarLV, motherLV, "Dipole2CuBar", (-BarOffSet*cos(NpolAng)-PosD2*sin(NpolAng)), 
-				   VertOffSet, (-BarOffSet*sin(NpolAng)+PosD2*cos(NpolAng)), 0*deg, -NpolAng, 0.0);
-  PlaceRectangular(Dipole2CuBarLV, motherLV, "Dipole2CuBar", (BarOffSet*cos(NpolAng)-PosD2*sin(NpolAng)), 
-				   -VertOffSet, (BarOffSet*sin(NpolAng)+PosD2*cos(NpolAng)), 0*deg, -NpolAng, 0.0); 
-  PlaceRectangular(Dipole2CuBarLV, motherLV, "Dipole2CuBar", (-BarOffSet*cos(NpolAng)-PosD2*sin(NpolAng)), 
-				   -VertOffSet, (-BarOffSet*sin(NpolAng)+PosD2*cos(NpolAng)), 0*deg, -NpolAng, 0.0);
+  PlaceRectangular(Dipole2CuBarLV, motherLV, "Dipole2CuBar", (BarOffSet*cos(NpolAng)-PosD2*sin(NpolAng)), VertOffSet, (BarOffSet*sin(NpolAng)+PosD2*cos(NpolAng)), 0*deg, -NpolAng, 0.0); 
+  PlaceRectangular(Dipole2CuBarLV, motherLV, "Dipole2CuBar", (-BarOffSet*cos(NpolAng)-PosD2*sin(NpolAng)), VertOffSet, (-BarOffSet*sin(NpolAng)+PosD2*cos(NpolAng)), 0*deg, -NpolAng, 0.0);
+  PlaceRectangular(Dipole2CuBarLV, motherLV, "Dipole2CuBar", (BarOffSet*cos(NpolAng)-PosD2*sin(NpolAng)), -VertOffSet, (BarOffSet*sin(NpolAng)+PosD2*cos(NpolAng)), 0*deg, -NpolAng, 0.0); 
+  PlaceRectangular(Dipole2CuBarLV, motherLV, "Dipole2CuBar", (-BarOffSet*cos(NpolAng)-PosD2*sin(NpolAng)),-VertOffSet, (-BarOffSet*sin(NpolAng)+PosD2*cos(NpolAng)), 0*deg, -NpolAng, 0.0);
   
   // Place 4 copies of the extruded copper ends for the coil packs
   PlaceCylindrical(Dipole2CuEndLV, motherLV, "Dipole2CuEnd", (PosD2-EndOffSet), -NpolAng, 0.0*m);

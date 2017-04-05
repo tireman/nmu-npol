@@ -1,5 +1,7 @@
 #!/bin/bash
 
+source /home/tireman/simulation/jlab/nmu-npol/build/simulation/scripts/NMUPhysics/NMUsetuprun.sh
+
 if [ $# -eq 0 ]
 then
 	START=1
@@ -24,6 +26,6 @@ do
     fi
 
 	echo "Starting up Job Number $i."
-    $BUILD_DIR/Npolapp $BUILD_DIR/macros/ParticleFlux.mac 1>$NPOLDIR/${NPOLBASENAME}_$i.out 2>$NPOLDIR/${NPOLBASENAME}_$i.err &
-    sleep 5s
+    $BUILD_DIR/Npolapp $BUILD_DIR/macros/ParticleFlux$PType.mac 1>$NPOLDIR/dumpFiles/${NPOLBASENAME}_$i.out 2>$NPOLDIR/dumpFiles/${NPOLBASENAME}_$i.err &
+    sleep 2s
 done

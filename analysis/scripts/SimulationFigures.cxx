@@ -61,12 +61,12 @@ void SimulationFigures() {
   TFile *outFile = new TFile(OutputFile,"RECREATE");
   
   TVectorD *v = (TVectorD*)inFile->Get("TVectorT<double>");
-  Double_t totalElectrons = 10*3.49967e10; //((*v))[0];
+  Double_t totalElectrons = 10e10;// ((*v))[0];
   Double_t electronTime = totalElectrons/(6.242e12); //6.242e12 e-/s at 1 microAmp
   
   // Tagger sizes
-  Double_t theta = 138.12e-3; //369.08e-3; // Target Tagger // 138.12e-3; // horizontal angular accecptance (radians)
-  Double_t phi = 67.16e-3; //139.77e-3; // Target Tagger // 67.16e-3;  // using the Dipole 1 limit // 0.08466; // vertical angular acceptance (radians)
+  Double_t theta = 160.0e-3;  // Target Tagger // 138.12e-3; // horizontal angular accecptance (radians)
+  Double_t phi = 100.0e-3; // Target Tagger // 67.16e-3;  // using the Dipole 1 limit // 0.08466; // vertical angular acceptance (radians)
   Double_t targetD = 150.0;  // Position of target tagger (cm)
   Double_t targetW = 2*targetD*TMath::Tan(theta/2);  // height of target tagger (cm)
   Double_t targetL = 2*targetD*TMath::Tan(phi/2);   // width of target tagger (cm)

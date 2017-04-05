@@ -21,7 +21,7 @@
 #include "NpolTagger.hh"
 #include "NpolStatistics.hh"
 
-#define OUTFILE_VERSION 20160504 // Determined by YYYYMMDD
+#define OUTFILE_VERSION 20170309 // Determined by YYYYMMDD
 
 NpolAnalysisManager *NpolAnalysisManager::pInstance = NULL;
 
@@ -177,7 +177,7 @@ void NpolAnalysisManager::RecordTrack(const G4Track *aTrack) {
 void NpolAnalysisManager::RecordStep(const G4Step *aStep) {
 	G4Track *aTrack = aStep->GetTrack();
 	G4StepPoint *preStepPoint = aStep->GetPreStepPoint();
-	G4String volName = preStepPoint->GetPhysicalVolume()->GetName();
+	std::string volName = preStepPoint->GetPhysicalVolume()->GetName();
 	G4ThreeVector worldPosition = preStepPoint->GetPosition();
 	G4ThreeVector localPosition = preStepPoint->GetTouchableHandle()->GetHistory()
 	  ->GetTopTransform().TransformPoint(worldPosition);
@@ -186,6 +186,7 @@ void NpolAnalysisManager::RecordStep(const G4Step *aStep) {
     	NpolStep *npolStep = new NpolStep();
 		
 		npolStep->trackId = aTrack->GetTrackID();
+		npolStep->parentId = aTrack->GetParentID();
 		npolStep->gPosX = worldPosition.x()/cm;
 		npolStep->gPosY = worldPosition.y()/cm;
 		npolStep->gPosZ = worldPosition.z()/cm;
@@ -197,6 +198,7 @@ void NpolAnalysisManager::RecordStep(const G4Step *aStep) {
 		npolStep->momZ = (aTrack->GetMomentum()).z()/cm;
 		npolStep->time = aTrack->GetGlobalTime()/ns;
 		npolStep->eDep = (aStep->GetTotalEnergyDeposit())/MeV;
+		npolStep->particleId = aTrack->GetDefinition()->GetPDGEncoding();
 		npolStep->volume = volName;
 		steps->push_back(npolStep);
 	}
@@ -210,6 +212,7 @@ void NpolAnalysisManager::RecordStep(const G4Step *aStep) {
 		NpolTagger *taggedParticle = new NpolTagger();
 
 		taggedParticle->trackId = aTrack->GetTrackID();
+		taggedParticle->parentId = aTrack->GetParentID();
 		taggedParticle->gPosX = worldPosition.x()/cm;
 		taggedParticle->gPosY = worldPosition.y()/cm;
 		taggedParticle->gPosZ = worldPosition.z()/cm;

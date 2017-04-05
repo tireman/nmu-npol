@@ -32,7 +32,7 @@
 #define EDEP_THRESHOLD 1.0 /*MeV*/
 #define LOW_THRESHOLD 0.040 /*MeV This threshold is a per detector low value in SOI selection */
 #define LAYER_NUM 4        /* number of analyzer layers; not general; only good for 4 and 6 layers */
-
+	double azAngle = 0.0;
 enum PolarimeterDetector {
   analyzer = 0,
   tagger,
@@ -255,7 +255,8 @@ bool checkdEarrayHits(const std::map<std::string,NpolDetectorEvent *> *detEvents
 // Return the frontmost polarimeter section that passes requirements 1 and 2.
 // If -1 is returned, then no section passed requirements 1 and 2.
 int getSectionOfInterest(const std::map<std::string,NpolDetectorEvent *> *detEvents) {
-  int sectionOfInterest = -1; int countTdE=0; int countTE=0; int countBdE=0; int countBE =0; int countA = 0; int countV = 0;
+  int sectionOfInterest = -1; int countTdE=0; int countTE=0; 
+  int countBdE=0; int countBE =0; int countA = 0; int countV = 0;
   bool multiscatter = false;
   for(int section = (LAYER_NUM - 1); section >= 0; section--) {
     std::map<std::string,NpolDetectorEvent *>::const_iterator it;
@@ -315,7 +316,7 @@ int getSectionOfInterest(const std::map<std::string,NpolDetectorEvent *> *detEve
     sectionOfInterest = -1;
     //std::cout << "Multi-hit: Event rejected!" << std::endl;
     return sectionOfInterest;
-  } else if(totalDetHit >= 80) { 
+  } else if(totalDetHit >= 40) { 
     std::cout << "Event Rejected! Total number of detectors with 40 keV or greater: " << totalDetHit << std::endl;
     sectionOfInterest = -1;
     return sectionOfInterest;
@@ -429,6 +430,32 @@ void GetPoI(double *ret, double *time, const int section, const PolarimeterDetec
   *time /= totEdepSoFar;
 }
 
+void GetPoI2(double *ret, double *time, const int section, const PolarimeterDetector type, const std::map<std::string,NpolDetectorEvent *> *detEvents) {
+  std::map<std::string,NpolDetectorEvent *>::const_iterator it;
+
+  ret[0] = 0.0;
+  ret[1] = 0.0;
+  ret[2] = 0.0;
+  double totEdepSoFar = 0.0;
+  for(it = detEvents->begin(); it != detEvents->end(); it++) {
+    if((sectionNumber(it->first) == section || sectionNumber(it->first) == (section + 1) || sectionNumber(it->first) == (section + 2)) && detectorType(it->first) == type) {
+      if(it->second->thresholdExceeded) {
+		ret[0] += (it->second->totEnergyDep)*(it->second->gPosX);
+		ret[1] += (it->second->totEnergyDep)*(it->second->gPosY);
+		ret[2] += (it->second->totEnergyDep)*(it->second->gPosZ);
+		*time += (it->second->totEnergyDep)*(it->second->time);
+		totEdepSoFar += it->second->totEnergyDep;
+      }
+    }
+  }
+
+  // Compute the weighted average
+  ret[0] /= totEdepSoFar;
+  ret[1] /= totEdepSoFar;
+  ret[2] /= totEdepSoFar;
+  *time /= totEdepSoFar;
+}
+
 // Check requirement 6
 // Optionally return delta time-of-flight between the analyzer and E-array
 bool CheckAngleRequirement(std::ofstream &txtOut, NpolVertex *incNeutronVert, std::map<std::string,NpolDetectorEvent *> *detEvents, const int section, const PolarimeterDetector EArrayOfInterest, double *dTOF = NULL) {
@@ -443,9 +470,10 @@ bool CheckAngleRequirement(std::ofstream &txtOut, NpolVertex *incNeutronVert, st
   targetPt[2] = incNeutronVert->posZ;
 
   GetPoI(analyzerPt,&analyzerTime,section,analyzer,detEvents);
-  GetPoI(EarrayPt,&EarrayTime,section,EArrayOfInterest,detEvents);
+  GetPoI2(EarrayPt,&EarrayTime,section,EArrayOfInterest,detEvents);
 
-  double azAngle = getAzimuthAngle(txtOut,targetPt[0],targetPt[1], targetPt[2],
+  //double 
+	azAngle = getAzimuthAngle(txtOut,targetPt[0],targetPt[1], targetPt[2],
 								   analyzerPt[0],analyzerPt[1],analyzerPt[2],
 								   EarrayPt[0],EarrayPt[1],EarrayPt[2]);
 
@@ -549,6 +577,10 @@ int main(int argc, char *argv[]) {
   npolTree->SetBranchAddress("tracks",&verts);
   statsTree->SetBranchAddress("stats",&stats);
   TFile *outFile = new TFile(outFilename,"RECREATE");
+
+  //********************************* Define your Histograms Here *******************************
+  TH1F *h_recoilAngle = new TH1F("recoil_angle","Proton Recoil Angle", 100, 0.0, 90.0); 
+
   TH2F *h_dEoverE_TopHigh = new TH2F("dEoverE_Top", "dE over E for top array - HIGHEST PV ONLY", 400,0,150,400,0,20);
   TH2F *h_dEoverE_BotHigh = new TH2F("dEoverE_Bot", "dE over E for bottom array - HIGHEST PV ONLY", 400,0,150,400,0,20);
   TH2F *h_dEoverEtop = new TH2F("dEoverEtop", "dE over E for top array", 400,0,150,400,0,20);
@@ -681,10 +713,17 @@ int main(int argc, char *argv[]) {
       h_sectionEfficiency1->Fill(sectionOfInterest+1); // Fill
 	  fillEvent1DHisto(h_sectionEfficiency1_Elastic, h_sectionEfficiency1_Inelastic, elasticFlag, sectionOfInterest+1);
       for(e_it = detEvents.begin(); e_it != detEvents.end(); e_it++) {
+		
+		PolarimeterDetector detector2 = detectorType(e_it->first);
+		if(detector2 == topEArray || detector2 == topdEArray || 
+		   detector2 == botEArray || detector2 == botdEArray){
+		  eDepArrayTotal[detector2] += e_it->second->totEnergyDep;
+		}
+		// Changed this on 12-March-2017 to test theory on the Recoil Proton Angle "question"
 		if(sectionNumber(e_it->first) == sectionOfInterest) {
 		  PolarimeterDetector detector = detectorType(e_it->first);
-		  if(detector == analyzer || detector == tagger || detector == topEArray 
-			 || detector == topdEArray || detector == botEArray || detector == botdEArray) {
+		  if(detector == analyzer || detector == tagger){
+			//|| detector == topEArray || detector == topdEArray || detector == botEArray || detector == botdEArray){
 			eDepArrayTotal[detector] += e_it->second->totEnergyDep;
 		  }
 		}
@@ -716,7 +755,8 @@ int main(int argc, char *argv[]) {
 		    //OutputTracks(verts,txtOut,eventCounter,&eDepArrayTotal,sectionOfInterest);
 			h_sectionEfficiency4->Fill(sectionOfInterest+1); //FILL
 			fillEvent1DHisto(h_sectionEfficiency4_Elastic, h_sectionEfficiency4_Inelastic, elasticFlag, sectionOfInterest+1);
-			h_dTOF->Fill(dTOF);//FILL
+			h_dTOF->Fill(dTOF); //FILL
+			h_recoilAngle->Fill(azAngle); // Fill the proton recoil angle histo
 			fillEvent1DHisto(h_dTOF_Elastic, h_dTOF_Inelastic, elasticFlag, dTOF);
 			sectionEffLocalCoordinates(h_sectionEfficiencyLocalPositions[sectionOfInterest],&detEvents,sectionOfInterest,analyzer);
 			sectionEffLocalCoordinates(h_sectionEfficiencyLocalPositions_Elastic[sectionOfInterest],&detEvents,sectionOfInterest,analyzer);
@@ -787,6 +827,7 @@ int main(int argc, char *argv[]) {
 	(h_sectionEfficiencyLocalPositions_Elastic[i])->Write();
   }
   h_dTOF_Elastic->Write();
+  h_recoilAngle->Write();
   //write inelastic only
   h_dEoverE_TopHigh_Inelastic->Write();
   h_dEoverE_BotHigh_Inelastic->Write();
