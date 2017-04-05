@@ -68,7 +68,7 @@
   	<position name="pHBCoilBottomCut" unit="cm" x="0" y="-(fHBCoilWidth+fHBCoilBoxTopCutY/2)" z="0" />
   
   
-  	<rotation name="identity" unit="cm" x="0" y="0" z="0"/>
+  	<rotation name="identity" unit="deg" x="0" y="0" z="0"/>
 	<rotation name="rHBRot" unit="deg" x="0" y="fBoreRot" z="0"/>
 	<rotation name="rHBCoilLeftRot" unit="deg" x="0" y="-3.0" z="0"/>
 	<rotation name="rHBCoilRightRot" unit="deg" x="0" y="-7.0" z="0"/>
