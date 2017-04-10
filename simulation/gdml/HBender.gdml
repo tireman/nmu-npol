@@ -67,11 +67,10 @@
 	<position name="pHBCoilTopCut" unit="cm" x="0" y="fHBCoilWidth+fHBCoilBoxTopCutY/2" z="0" />
   	<position name="pHBCoilBottomCut" unit="cm" x="0" y="-(fHBCoilWidth+fHBCoilBoxTopCutY/2)" z="0" />
   
-  
-  	<rotation name="identity" unit="deg" x="0" y="0" z="0"/>
-	<rotation name="rHBRot" unit="deg" x="0" y="fBoreRot" z="0"/>
-	<rotation name="rHBCoilLeftRot" unit="deg" x="0" y="-3.0" z="0"/>
-	<rotation name="rHBCoilRightRot" unit="deg" x="0" y="-7.0" z="0"/>
+ 	<rotation name="identity" unit="deg" x="0" y="0" z="0" />
+	<rotation name="rHBRot" unit="deg" x="0" y="fBoreRot" z="0" />
+	<rotation name="rHBCoilLeftRot" unit="deg" x="0" y="-3.0" z="0" />
+	<rotation name="rHBCoilRightRot" unit="deg" x="0" y="-7.0" z="0" />
 
 </define>
 
@@ -113,81 +112,81 @@
 	<arb8 lunit="cm" name="HBenderBox" dz="fHBCoilBoxZ/2+15" 
 		v1x="+62.0" v1y="+64.0" 
 		v2x="+62.0" v2y="-64.0"
-             	v3x="-14.0" v3y="-64.0" 
+        v3x="-14.0" v3y="-64.0" 
 		v4x="-14.0" v4y="+64.0" 
 		v5x="+62.0" v5y="+64.0" 
 		v6x="+62.0" v6y="-64.0"
-             	v7x="-24.0" v7y="-64.0" 
+        v7x="-24.0" v7y="-64.0" 
 		v8x="-24.0" v8y="+64.0"/>
 
 	<arb8 lunit="cm" name="hbBore" dz="(fHBBoreZ/2)" 
 		v1x="fHBBoreXfn" v1y="-fHBBoreY/2" 
 		v2x="fHBBoreXfn" v2y="fHBBoreY/2"
-             	v3x="fHBBoreXfp" v3y="fHBBoreY/2" 
+        v3x="fHBBoreXfp" v3y="fHBBoreY/2" 
 		v4x="fHBBoreXfp" v4y="-fHBBoreY/2" 
 		v5x="fHBBoreXbn" v5y="-fHBBoreY/2" 
 		v6x="fHBBoreXbn" v6y="fHBBoreY/2"
-             	v7x="fHBBoreXbp" v7y="fHBBoreY/2" 
+        v7x="fHBBoreXbp" v7y="fHBBoreY/2" 
 		v8x="fHBBoreXbp" v8y="-fHBBoreY/2"/>
 	
 	<arb8 lunit="cm" name="hbYork" dz="fHBYorkZ/2" 
 		v1x="fHBYorkXfn" v1y="-fHBYorkY/2" 
 		v2x="fHBYorkXfn" v2y="fHBYorkY/2"
-             	v3x="fHBYorkXfp" v3y="fHBYorkY/2" 
+        v3x="fHBYorkXfp" v3y="fHBYorkY/2" 
 		v4x="fHBYorkXfp" v4y="-fHBYorkY/2" 
 		v5x="fHBYorkXbn" v5y="-fHBYorkY/2" 
 		v6x="fHBYorkXbn" v6y="fHBYorkY/2"
-             	v7x="fHBYorkXbp" v7y="fHBYorkY/2" 
+        v7x="fHBYorkXbp" v7y="fHBYorkY/2" 
 		v8x="fHBYorkXbp" v8y="-fHBYorkY/2"/>
 
 	<arb8 lunit="cm" name="hbCoilBox" dz="fHBCoilBoxZ/2" 
 		v1x="fHBCoilBoxXfn" v1y="-fHBCoilBoxY/2" 
 		v2x="fHBCoilBoxXfn" v2y="fHBCoilBoxY/2"
-             	v3x="fHBCoilBoxXfp" v3y="fHBCoilBoxY/2" 
+        v3x="fHBCoilBoxXfp" v3y="fHBCoilBoxY/2" 
 		v4x="fHBCoilBoxXfp" v4y="-fHBCoilBoxY/2" 
 		v5x="fHBCoilBoxXbn" v5y="-fHBCoilBoxY/2" 
 		v6x="fHBCoilBoxXbn" v6y="fHBCoilBoxY/2"
-             	v7x="fHBCoilBoxXbp" v7y="fHBCoilBoxY/2" 
+        v7x="fHBCoilBoxXbp" v7y="fHBCoilBoxY/2" 
 		v8x="fHBCoilBoxXbp" v8y="-fHBCoilBoxY/2"/>
 
 	<arb8 lunit="cm" name="hbCoilBoxCut" dz="fHBCoilBoxCutZ/2" 
 		v1x="fHBCoilBoxCutXfn" v1y="-fHBCoilBoxCutY/2" 
 		v2x="fHBCoilBoxCutXfn" v2y="fHBCoilBoxCutY/2"
-             	v3x="fHBCoilBoxCutXfp" v3y="fHBCoilBoxCutY/2" 
+        v3x="fHBCoilBoxCutXfp" v3y="fHBCoilBoxCutY/2" 
 		v4x="fHBCoilBoxCutXfp" v4y="-fHBCoilBoxCutY/2" 
 		v5x="fHBCoilBoxCutXbn" v5y="-fHBCoilBoxCutY/2" 
 		v6x="fHBCoilBoxCutXbn" v6y="fHBCoilBoxCutY/2"
-             	v7x="fHBCoilBoxCutXbp" v7y="fHBCoilBoxCutY/2" 
+        v7x="fHBCoilBoxCutXbp" v7y="fHBCoilBoxCutY/2" 
 		v8x="fHBCoilBoxCutXbp" v8y="-fHBCoilBoxCutY/2"/>
 
 	<arb8 lunit="cm" name="hbCoilBoxTopCut" dz="fHBCoilBoxTopCutZ/2" 
 		v1x="fHBCoilBoxTopCutXfn" v1y="-fHBCoilBoxTopCutY/2" 
 		v2x="fHBCoilBoxTopCutXfn" v2y="fHBCoilBoxTopCutY/2"
-             	v3x="fHBCoilBoxTopCutXfp" v3y="fHBCoilBoxTopCutY/2" 
+        v3x="fHBCoilBoxTopCutXfp" v3y="fHBCoilBoxTopCutY/2" 
 		v4x="fHBCoilBoxTopCutXfp" v4y="-fHBCoilBoxTopCutY/2" 
 		v5x="fHBCoilBoxTopCutXbn" v5y="-fHBCoilBoxTopCutY/2" 
 		v6x="fHBCoilBoxTopCutXbn" v6y="fHBCoilBoxTopCutY/2"
-             	v7x="fHBCoilBoxTopCutXbp" v7y="fHBCoilBoxTopCutY/2" 
+        v7x="fHBCoilBoxTopCutXbp" v7y="fHBCoilBoxTopCutY/2" 
 		v8x="fHBCoilBoxTopCutXbp" v8y="-fHBCoilBoxTopCutY/2"/>
 
 	<arb8 lunit="cm" name="hbCryoBoxFull" dz="fHBCryoBoxZ/2" 
 		v1x="fHBCryoBoxXfn" v1y="-fHBCryoBoxY/2" 
 		v2x="fHBCryoBoxXfn" v2y="fHBCryoBoxY/2"
-             	v3x="fHBCryoBoxXfp" v3y="fHBCryoBoxY/2" 
+        v3x="fHBCryoBoxXfp" v3y="fHBCryoBoxY/2" 
 		v4x="fHBCryoBoxXfp" v4y="-fHBCryoBoxY/2" 
 		v5x="fHBCryoBoxXbn" v5y="-fHBCryoBoxY/2" 
 		v6x="fHBCryoBoxXbn" v6y="fHBCryoBoxY/2"
-             	v7x="fHBCryoBoxXbp" v7y="fHBCryoBoxY/2" 
+        v7x="fHBCryoBoxXbp" v7y="fHBCryoBoxY/2" 
 		v8x="fHBCryoBoxXbp" v8y="-fHBCryoBoxY/2"/>
 
 	<arb8 lunit="cm" name="hbCryoBoxCut" dz="(-2+fHBCryoBoxZ)/2" 
 		v1x="0.5+fHBCoilBoxXfn" v1y="-(-2+fHBCryoBoxY)/2" 
 		v2x="0.5+fHBCoilBoxXfn" v2y="(-2+fHBCryoBoxY)/2"
-             	v3x="-1+fHBCryoBoxXfp" v3y="(-2+fHBCryoBoxY)/2" 
+        v3x="-1+fHBCryoBoxXfp" v3y="(-2+fHBCryoBoxY)/2" 
 		v4x="-1+fHBCryoBoxXfp" v4y="-(-2+fHBCryoBoxY)/2" 
 		v5x="1+fHBCryoBoxXbn" v5y="-(-2+fHBCryoBoxY)/2" 
 		v6x="1+fHBCryoBoxXbn" v6y="(-2+fHBCryoBoxY)/2"
-             	v7x="-1+fHBCryoBoxXbp" v7y="(-2+fHBCryoBoxY)/2" 
+        v7x="-1+fHBCryoBoxXbp" v7y="(-2+fHBCryoBoxY)/2" 
 		v8x="-1+fHBCryoBoxXbp" v8y="-(-2+fHBCryoBoxY)/2"/>
 
 	<subtraction name="hbCoilsCutMiddle">
@@ -237,27 +236,27 @@
 <structure>
 
   <volume name="HBBoreLogic">
-      <materialref ref="BVacuum"/>
-      <solidref ref="hbBore"/>
-    </volume>
-    
-    <volume name="HBCoilLogic">
-      <materialref ref="Copper"/>
-      <solidref ref="hbCoils"/>
-      <auxiliary auxtype="SensDet" auxvalue="HBCoil"/>
-    </volume>
-    
-    <volume name="HBYorkLogic">
-      <materialref ref="SSteel"/>
-      <solidref ref="HBYorkSolid"/>
-     </volume>
-    
-     <volume name="HBCryoBoxLogic">
-      <materialref ref="SSteel"/>
-      <solidref ref="hbCryoMinusBore"/>
-       <auxiliary auxtype="SensDet" auxvalue="HBCryoBox"/>
-    </volume>
-
+    <materialref ref="BVacuum"/>
+    <solidref ref="hbBore"/>
+  </volume>
+  
+  <volume name="HBCoilLogic">
+    <materialref ref="Copper"/>
+    <solidref ref="hbCoils"/>
+    <auxiliary auxtype="SensDet" auxvalue="HBCoil"/>
+  </volume>
+  
+  <volume name="HBYorkLogic">
+    <materialref ref="SSteel"/>
+    <solidref ref="HBYorkSolid"/>
+  </volume>
+  
+  <volume name="HBCryoBoxLogic">
+    <materialref ref="SSteel"/>
+    <solidref ref="hbCryoMinusBore"/>
+    <auxiliary auxtype="SensDet" auxvalue="HBCryoBox"/>
+  </volume>
+  
 
   <volume name="HBenderPV">
     <materialref ref="Air"/>
