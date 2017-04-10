@@ -24,7 +24,7 @@
 #include "NpolMaterials.hh"
 #include "NpolHBender.hh"
 
-G4double NpolHBender::ShmsAng = 16.79*deg; // Angle at 4.4 GeV/c 36.53*deg; at 11 GeV/c 16.79; 
+G4double NpolHBender::ShmsAng = 36.53*deg; // Angle at 4.4 GeV/c 36.53*deg; at 11 GeV/c 16.79; 
 G4double NpolHBender::PosHB = 1.76*m;   // Position of HB center from target
 G4double NpolHBender::PosTagger = 1.195*m; // just in front of HB opening
 G4double NpolHBender::thicknessTagger = 0.10*cm; // thickness of SHMS tagger
@@ -58,6 +58,7 @@ void NpolHBender::ConstructHBender(){
   HBBoreLogicLV = parser.GetVolume("HBBoreLogic");
   //HBCoilLogicLV = parser.GetVolume("HBCoilLogic");
   HBYorkLogicLV = parser.GetVolume("HBYorkLogic");
+  HBenderLV = parser.GetVolume("HBenderPV");
   
   G4VisAttributes *VisAtt= new G4VisAttributes(G4Colour(1.0,0.0,1.0));
   HBCryoBoxLV->SetVisAttributes(VisAtt);
@@ -72,10 +73,11 @@ G4String NpolHBender::GetName() {
 
 void NpolHBender::Place(G4LogicalVolume *motherLV) {
   
-  PlaceCylindrical(HBBoreLogicLV, motherLV, "HBBore", PosHB, ShmsAng, 0);
-  //PlaceCylindrical(HBCoilLogicLV, motherLV, "HBCoil", PosHB, ShmsAng, 0);
-  PlaceCylindrical(HBYorkLogicLV, motherLV, "HBYork", PosHB, ShmsAng, 0);
-  PlaceCylindrical(HBCryoBoxLV, motherLV, "HBCyro", PosHB, ShmsAng, 0);
+  PlaceCylindrical(HBenderLV, motherLV, "HBender", PosHB, ShmsAng, 0);
+  //PlaceCylindrical(HBBoreLogicLV, motherLV, "HBBore", PosHB, ShmsAng, 0);
+  ////PlaceCylindrical(HBCoilLogicLV, motherLV, "HBCoil", PosHB, ShmsAng, 0);
+  //PlaceCylindrical(HBYorkLogicLV, motherLV, "HBYork", PosHB, ShmsAng, 0);
+  //PlaceCylindrical(HBCryoBoxLV, motherLV, "HBCyro", PosHB, ShmsAng, 0);
   PlaceRectangular(SHMSTaggerLV,motherLV, "SHMSTagger", (PosTagger+4.0*cm)*sin(ShmsAng),0.0, (PosTagger-4.0*cm)*cos(ShmsAng), 0.0, ShmsAng, 0.0);
 } 
 
