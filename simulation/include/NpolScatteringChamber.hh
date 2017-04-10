@@ -35,7 +35,7 @@ public:
 
   static G4double insideRadius;
   static G4double insideHeight;
-  static G4double wallThickness;
+  static G4double wallWidth;
   static G4double holeRadius;
   static G4double WindowThickness;
   static G4double shmsWindowAngle;
