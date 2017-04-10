@@ -42,7 +42,7 @@ public:
   static G4double verticalAcceptance;
   
 private:
-  //G4LogicalVolume *HBenderLV;
+  G4LogicalVolume *HBenderLV;
   G4LogicalVolume *SHMSTaggerLV;
   G4LogicalVolume *HBCryoBoxLV;
   G4LogicalVolume *HBBoreLogicLV;
