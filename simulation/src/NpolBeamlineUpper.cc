@@ -70,7 +70,7 @@ void NpolBeamlineUpper::ConstructBeamlineUpperInner() {
 
 void NpolBeamlineUpper::Place(G4LogicalVolume *motherLV) {
   
-  PlaceCylindrical(BeamlineUpperLV, motherLV, "BeamLineUpper", -upperLen/2 - NpolScatteringChamber::insideRadius - NpolScatteringChamber::wallThickness ,0,0);
+  PlaceCylindrical(BeamlineUpperLV, motherLV, "BeamLineUpper", -upperLen/2 - NpolScatteringChamber::insideRadius - NpolScatteringChamber::wallWidth ,0,0);
   PlaceCylindrical(BeamlineUpperInnerLV, BeamlineUpperLV, "BeamLineUpperInner",
      0,0,0);
 }
@@ -81,6 +81,6 @@ G4double NpolBeamlineUpper::calculateUpperBeamLineLen() {
   G4double z0 = NpolHallShell::zPlacementOffset;
   G4double r = NpolHallShell::insideRadius;
   
-  return abs((z0 - sqrt(r*r - x0*x0))) - NpolScatteringChamber::insideRadius - NpolScatteringChamber::wallThickness;
+  return abs((z0 - sqrt(r*r - x0*x0))) - NpolScatteringChamber::insideRadius - NpolScatteringChamber::wallWidth;
 }
 

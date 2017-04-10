@@ -307,13 +307,13 @@ void NpolBeamlineDown::ConstructSecA3Inner(){
 
 void NpolBeamlineDown::Place(G4LogicalVolume *motherLV) {
   
-  PlaceCylindrical(SectionALV, motherLV, "SectionA", SecA1zLen/2 + NpolScatteringChamber::insideRadius + NpolScatteringChamber::wallThickness, 0, 0);
-  PlaceCylindrical(SecA1InLV, motherLV, "SecA1In", SecA1zLen/2 + NpolScatteringChamber::insideRadius + NpolScatteringChamber::wallThickness, 0, 0);
-  PlaceCylindrical(SecA2InLV, motherLV, "SecA2In", SecA2zLen/2 + SecA1zLen + NpolScatteringChamber::insideRadius + NpolScatteringChamber::wallThickness, 0, 0);
-  PlaceCylindrical(SecA3InLV, motherLV, "SecA3In", 0.2*cm + SecA3zLen/2 + SecA2zLen + SecA1zLen + NpolScatteringChamber::insideRadius + NpolScatteringChamber::wallThickness, 0, 0);
-  PlaceCylindrical(BeamlineDownLV, motherLV, "BeamLineDown", -2.1*cm + SecA1zLen + 2*NpolScatteringChamber::insideRadius + 2*NpolScatteringChamber::wallThickness + NpolHallShell::zPlacementOffset,0,0);
+  PlaceCylindrical(SectionALV, motherLV, "SectionA", SecA1zLen/2 + NpolScatteringChamber::insideRadius + NpolScatteringChamber::wallWidth, 0, 0);
+  PlaceCylindrical(SecA1InLV, motherLV, "SecA1In", SecA1zLen/2 + NpolScatteringChamber::insideRadius + NpolScatteringChamber::wallWidth, 0, 0);
+  PlaceCylindrical(SecA2InLV, motherLV, "SecA2In", SecA2zLen/2 + SecA1zLen + NpolScatteringChamber::insideRadius + NpolScatteringChamber::wallWidth, 0, 0);
+  PlaceCylindrical(SecA3InLV, motherLV, "SecA3In", 0.2*cm + SecA3zLen/2 + SecA2zLen + SecA1zLen + NpolScatteringChamber::insideRadius + NpolScatteringChamber::wallWidth, 0, 0);
+  PlaceCylindrical(BeamlineDownLV, motherLV, "BeamLineDown", -2.1*cm + SecA1zLen + 2*NpolScatteringChamber::insideRadius + 2*NpolScatteringChamber::wallWidth + NpolHallShell::zPlacementOffset,0,0);
   PlaceCylindrical(BeamlineDownInnerLV,BeamlineDownLV,"BeamLineDownInner", 0,0,0);
-  PlaceCylindrical(CapLV,motherLV,"Cap", -1.8*cm + downLen + SecA1zLen + 2*NpolScatteringChamber::insideRadius + 2*NpolScatteringChamber::wallThickness + NpolHallShell::zPlacementOffset, 0, 0);
+  PlaceCylindrical(CapLV,motherLV,"Cap", -1.8*cm + downLen + SecA1zLen + 2*NpolScatteringChamber::insideRadius + 2*NpolScatteringChamber::wallWidth + NpolHallShell::zPlacementOffset, 0, 0);
 }
 
 G4double NpolBeamlineDown::calculateDownBeamLineLen() {
@@ -322,6 +322,6 @@ G4double NpolBeamlineDown::calculateDownBeamLineLen() {
   G4double z0 = NpolHallShell::zPlacementOffset;
   G4double r = NpolHallShell::insideRadius;
   
-  return abs((z0 - sqrt(r*r - x0*x0))) + NpolScatteringChamber::insideRadius + NpolScatteringChamber::wallThickness + NpolHallShell::zPlacementOffset - NpolHallShell::creteThick/2;
+  return abs((z0 - sqrt(r*r - x0*x0))) + NpolScatteringChamber::insideRadius + NpolScatteringChamber::wallWidth + NpolHallShell::zPlacementOffset - NpolHallShell::creteThick/2;
 }
 
