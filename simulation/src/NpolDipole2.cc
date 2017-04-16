@@ -38,20 +38,20 @@
 // field strength; example: for 1 Tm use FM = 1.0 and for 4.3 Tm use FM = 4.3
 // If 1 mag, use 2.0 for integrated 1.0 Tm or 4.0 for 2.0 Tm (double FM for 
 // same effect) Note: Generally we won't use Dipole 2 by itself
-G4double NpolDipole2::FM = 4.3; 
+G4double NpolDipole2::FM = 1.0; 
 G4double NpolDipole2::dipole2FieldY = FM*0.40984*tesla; 
 
 G4double NpolDipole2::NpolAng = 28.0*deg;
-G4double NpolDipole2::yokeLength = 0.6096*m;
-G4double NpolDipole2::gapWidth = 1.22*m;
-G4double NpolDipole2::gapLength = 1.22*m;
-G4double NpolDipole2::gapHeight = 0.4699*m;
+G4double NpolDipole2::yokeLength = 48.0*2.54*cm; // 1.22*m;
+G4double NpolDipole2::gapWidth = 48.0*2.54*cm; //1.22*m;
+G4double NpolDipole2::gapLength = 48.0*2.54*cm; //1.22*m;
+G4double NpolDipole2::gapHeight = 18.5*2.54*cm; //0.4699*m;
 G4double NpolDipole2::PosD2 = 4.60*m;
-G4double NpolDipole2::fieldClampHeight = 279.4*cm;
-G4double NpolDipole2::fieldClampWidth = 355.0*cm;
-G4double NpolDipole2::fieldClampThick = 5.08*cm;
-G4double NpolDipole2::fieldClampInheight = 46.99*cm;
-G4double NpolDipole2::fieldClampInwidth = 121.92*cm;
+G4double NpolDipole2::fieldClampHeight = 91.5*2.54*cm;
+G4double NpolDipole2::fieldClampWidth = 146.5*2.54*cm;
+G4double NpolDipole2::fieldClampThick = 2.0*2.54*cm;
+G4double NpolDipole2::fieldClampInheight = 20.0*2.54*cm;
+G4double NpolDipole2::fieldClampInwidth = 50.0*2.54*cm;
 
 NpolDipole2::NpolDipole2() {
   ConstructDipole2Yoke();
@@ -70,18 +70,19 @@ G4String NpolDipole2::GetName() {
 // Construct the yokes using the extruded class
 void NpolDipole2::ConstructDipole2Yoke() {
   
+  G4double inch = 2.54*cm;
   std::vector<G4TwoVector> polygon(8); // define the polygon to be extruded
-  polygon[0] = G4TwoVector(-1.8669*m, 0.0*m);
-  polygon[1] = G4TwoVector(-1.8669*m, 1.3970*m);
-  polygon[2] = G4TwoVector(+1.8669*m, 1.3970*m);
-  polygon[3] = G4TwoVector(+1.8669*m, 0.0*m);
-  polygon[4] = G4TwoVector(+0.9335*m, 0.0*m);
-  polygon[5] = G4TwoVector(+0.9335*m, 0.23495*m);
-  polygon[6] = G4TwoVector(-0.9335*m, 0.23495*m);
-  polygon[7] = G4TwoVector(-0.9335*m, 0.0*m);
+  polygon[0] = G4TwoVector(-73.25*inch, 0.0*m);
+  polygon[1] = G4TwoVector(-73.25*inch, 45.75*inch);
+  polygon[2] = G4TwoVector(+73.25*inch, 45.75*inch);
+  polygon[3] = G4TwoVector(+73.25*inch, 0.0*m);
+  polygon[4] = G4TwoVector(+36.6*inch, 0.0*m);
+  polygon[5] = G4TwoVector(+36.6*inch, +9.25*inch);
+  polygon[6] = G4TwoVector(-36.6*inch, +9.25*inch);
+  polygon[7] = G4TwoVector(-36.6*inch, 0.0*m);
   
   G4ExtrudedSolid *Dipole2Yoke = 
-	new G4ExtrudedSolid("Dipole2Yoke",polygon, yokeLength, G4TwoVector(0, 0), 1.0, G4TwoVector(0, 0), 1.0);
+	new G4ExtrudedSolid("Dipole2Yoke",polygon, yokeLength/2, G4TwoVector(0, 0), 1.0, G4TwoVector(0, 0), 1.0);
   Dipole2YokeLV = 
 	new G4LogicalVolume(Dipole2Yoke, NpolMaterials::GetInstance()->GetMaterial("Fe"),"Dipole2YokeLV",0,0,0);
   
@@ -91,11 +92,11 @@ void NpolDipole2::ConstructDipole2Yoke() {
 }
 
 void NpolDipole2::ConstructDipole2CuBar(){
-  
+  G4double inch = 2.54*cm;
   // Define the horizontal pieces of the Dipole 2 coil packs which
   // are made of Cu. Wish I could imagine a way to do this as an extruded
   // solid ... hmmm.  The Dipole 2 will need to place 4 of these.
-  G4double xlen = 0.320*m, ylen = 0.231*m, zlen = 1.416*m;
+  G4double xlen = 12.6*inch, ylen = 9.1*inch, zlen = 55.75*inch;
   
   G4Box *Dipole2CuBar = new G4Box("Dipole2CuBar", xlen/2, ylen/2, zlen/2);
   Dipole2CuBarLV = new G4LogicalVolume(Dipole2CuBar, 
@@ -108,16 +109,16 @@ void NpolDipole2::ConstructDipole2CuEnd(){
   // Define the end pieces of the Dipole 2 coil packs which
   // are made of Cu. Wish I could imagine a way to do this differently.
   // The Dipole 2 will need to place 4 of these.
-  
+  G4double inch = 2.54*cm;
   std::vector<G4TwoVector> polygon(8); // define the polygon to be extruded
-  polygon[0] = G4TwoVector(-0.933*m, +0.0*m);
-  polygon[1] = G4TwoVector(-0.933*m, +0.81275*m);
-  polygon[2] = G4TwoVector(+0.933*m, +0.81275*m);
-  polygon[3] = G4TwoVector(+0.933*m, +0.0*m);
-  polygon[4] = G4TwoVector(+0.613*m, +0.0*m);
-  polygon[5] = G4TwoVector(+0.613*m, +0.41275*m);
-  polygon[6] = G4TwoVector(-0.613*m, +0.41275*m);
-  polygon[7] = G4TwoVector(-0.613*m, +0.0*m);
+  polygon[0] = G4TwoVector(-36.75*inch, +0.0*m);
+  polygon[1] = G4TwoVector(-36.75*inch, +32.0*inch);
+  polygon[2] = G4TwoVector(+36.75*inch, +32.0*inch);
+  polygon[3] = G4TwoVector(+36.75*inch, +0.0*m);
+  polygon[4] = G4TwoVector(+24.0*inch, +0.0*m);
+  polygon[5] = G4TwoVector(+24.0*inch, +19.4*inch);
+  polygon[6] = G4TwoVector(-24.0*inch, +19.4*inch);
+  polygon[7] = G4TwoVector(-24.0*inch, +0.0*m);
   
   G4ExtrudedSolid *Dipole2CuEnd = 
 	new G4ExtrudedSolid("Dipole2CuEnd", polygon, 0.231*m/2, G4TwoVector(0, 0), 1.0, G4TwoVector(0, 0), 1.0);
@@ -155,9 +156,10 @@ void NpolDipole2::ConstructDipole2Field(){
 }
 
 void NpolDipole2::Place(G4LogicalVolume *motherLV) {
-  G4double BarOffSet = +0.7730*m;
-  G4double VertOffSet = 0.231/2*m, EndOffSet = +0.8235*m;
-  G4double ClampOffSet = 1.05*m;
+  G4double inch = 2.54*cm;
+  G4double BarOffSet = +(24.0 + 12.6/2)*inch;
+  G4double VertOffSet = 9.25/2*inch, EndOffSet = +(9.1+55.75)/2*inch;
+  G4double ClampOffSet = +9.1*inch + (55.75)/2*inch + 2.0*inch;
   
   // Place 4 copes of the Copper bars in the magnet
   PlaceRectangular(Dipole2CuBarLV, motherLV, "Dipole2CuBar", (BarOffSet*cos(NpolAng)-PosD2*sin(NpolAng)), VertOffSet, (BarOffSet*sin(NpolAng)+PosD2*cos(NpolAng)), 0*deg, -NpolAng, 0.0); 
@@ -174,8 +176,8 @@ void NpolDipole2::Place(G4LogicalVolume *motherLV) {
 				   ((PosD2+EndOffSet)*cos(NpolAng)), 0.0*deg, NpolAng, 180.*deg);
 
   // Place 2 copies of the field clamps for BNL 48D48
-    PlaceCylindrical(FieldClampLV, motherLV, "FieldClamp", (PosD2-ClampOffSet), -NpolAng, 0.0*m);
-    PlaceCylindrical(FieldClampLV, motherLV, "FieldClamp", (PosD2+ClampOffSet), -NpolAng, 0.0*m);
+  PlaceCylindrical(FieldClampLV, motherLV, "FieldClamp", (PosD2-ClampOffSet), -NpolAng, 0.0*m);
+  PlaceCylindrical(FieldClampLV, motherLV, "FieldClamp", (PosD2+ClampOffSet), -NpolAng, 0.0*m);
 
   // Place the two copies of the yokes with 2nd one flipped over
   PlaceCylindrical(Dipole2YokeLV, motherLV, "Dipole2", PosD2,-NpolAng,+0.0*cm);
