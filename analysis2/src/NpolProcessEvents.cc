@@ -51,7 +51,7 @@ int main(int argc, char *argv[]) {
 
   Double_t NpolAng = 0.488692; // radians (28 degrees) NPOL angle from beamline
   Double_t targetTaggerPos = 150.0;  // Position of target tagger (cm)
-  Double_t npolTaggerPos = 681.50;  // Position of NPOL Tagger (cm)687.97
+  Double_t npolTaggerPos = 681.50;  // Position of NPOL Tagger (cm) 681.50
   Double_t theta = 0.160; // NPOL horizontal angular accecptance (radians)
   Double_t phi = 0.100; // NPOL vertical angular acceptance (radians)
   
@@ -67,8 +67,8 @@ int main(int argc, char *argv[]) {
   //Double_t npolH = 2*npolTaggerPos*TMath::Tan(phi/2);  // height of npol tagger (cm)
 
   // This version allows for fixing the size manually
-  Double_t targetW = 60.00;  // width of target tagger (cm) Dipole 1 opening 56.0 cm
-  Double_t targetH = 25.00;  // height of target tagger (cm) Dipole 1 opeing 20.955 cm
+  Double_t targetW = 70.00;  // width of target tagger (cm) Dipole 1 opening 56.0 cm
+  Double_t targetH = 26.00;  // height of target tagger (cm) Dipole 1 opeing 20.955 cm
   Double_t npolW = 2*npolTaggerPos*TMath::Tan(theta/2);  // width of npol tagger (cm)
   Double_t npolH = 2*npolTaggerPos*TMath::Tan(phi/2);  // height of npol tagger (cm)
 
@@ -229,10 +229,14 @@ int main(int argc, char *argv[]) {
     for(n_it = npolEntry->begin(); n_it != npolEntry->end(); n_it++){
       NpolTagger *npolTagged = *n_it;
       if(npolTagged == NULL)  continue;
+
+	  // Is it 1 of 9 particles we want?
 	  std::string particleName = npolTagged->particle;
-	  if(npolParticleKE.find(particleName) == npolParticleKE.end()) continue;  // 1 of 9 particles we want?
+	  if(npolParticleKE.find(particleName) == npolParticleKE.end()) continue; 
+
+	  // Reject if charged(use !) reject if not charged (remove !)
 	  //int pType = npolTagged->particleId;
-	  //if((pType == 2112 || pType == 22)) continue;  // Reject if charged(use !) reject if not charged (remove !)
+	  //if(!(pType == 2112 || pType == 22)) continue;  
 	  
 	  Double_t fluxscaling = 1;	
 	  //if(vertexTrackIDs.find(npolTagged->trackId) != vertexTrackIDs.end()){
@@ -334,7 +338,17 @@ int main(int argc, char *argv[]) {
       double Ethreshold;
   
       if(aStep == NULL) continue;
-	  
+
+	  if((npolTrackIDs.find(aStep->trackId) != npolTrackIDs.end()) 
+		 || (npolTrackIDs.find(aStep->parentId) != npolTrackIDs.end())){
+
+		if(npolTrackIDs.find(aStep->parentId) != npolTrackIDs.end()){
+		  npolTrackIDs.insert(aStep->trackId);
+		}
+	  } else {
+		continue;
+	  }
+
 	  if(eDep.find(aStep->volume) == eDep.end())
 		eDep[aStep->volume] = 0;
 	  eDep[aStep->volume] += aStep->eDep;
@@ -606,7 +620,3 @@ void RetrieveENVvariables() {
   }
 }
 
-	  //Int_t PDGcode = npolTagged->particleId;
-	  //TString partName = npolTagged->particle;
-	  //if(!(PDGcode == 2112 || PDGcode == 22)){
-	  //if((partName == "neutron" || partName == "gamma")){

@@ -43,10 +43,8 @@ std::string FancyName = ""; std::string RealName = "";
 
 void NpolDetectorCountRates() {
 
-  Long_t TotalElectrons = 0, TotalEventsRecorded = 0; 
-
   RetrieveENVvariables();
-  
+  Long_t TotalElectrons = 0, TotalEventsRecorded = 0; 
   TString InputFile = FormInputFile(InputDir);
   TString OutputFile = FormOutputFile(OutputDir);
   TFile *inFile = TFile::Open(InputFile);
@@ -55,17 +53,16 @@ void NpolDetectorCountRates() {
   // Retrieve the object with the total number of electrons on target and calculate 
   // effective electron time on target per micro amp of beam
   TVectorD *v = (TVectorD*)inFile->Get("TVectorT<double>");
-  Double_t totalElectrons = 10e10; //((*v))[0];
+  Double_t totalElectrons = 1e11; //((*v))[0];
   Double_t electronTime = totalElectrons/(6.242e12); //6.242e12 e-/s at 1 microAmp
   std::cout << "Electron beam time at 1 micro-amp is " << electronTime << " s " << std::endl;
-  std::cout << "Total electrons on target: " << totalElectrons/1e6 << " Million" << std::endl;
+  std::cout << "Total electrons on target: " << totalElectrons/1e9 << " Billion" << std::endl;
 
   int pvNum = 1, avNum = 1, imprNum = 1;
   Int_t Nx = 16, Ny = 2, nThresh = 10, fillStyle = 1001;
   Float_t lMargin = 0.05, rMargin = 0.05, bMargin = 0.10, tMargin = 0.05;
   Float_t vSpacing = 0.0; Float_t hSpacing = 0.0;
   double CTagger[Nx][Ny];
-  double Thresholds[10]={0.5,1.0,1.5,2.0,2.5,3.0,3.5,4.0,4.5,5.0};
   double CountRates [nThresh][Nx][Ny];
   std::ofstream txtOut;
   txtOut.open(OutputDir + "/Output/NpolDetectorCountRates" + Energy + "GeV_" + Lead + "cm.out");
@@ -102,6 +99,24 @@ void NpolDetectorCountRates() {
 		sprintf(histoName,"av_%i_impr_%i_%sLV_pv_%i",AVnum,imprNum,FancyName.c_str(),pvNum);
 		std::cout << "Detector name = " << histoName << std::endl;
 
+		double Thresholds[10];
+		switch(AVnum){
+		case 1: case 2: case 5: case 6: case 9: case 10:
+		  Thresholds[0] = 1.0; Thresholds[1] = 2.0;
+		  for(int AB = 2; AB < 10; AB++){
+			Thresholds[AB] = Thresholds[AB-1] + 2.0;
+		  }
+		  break;
+		case 3: case 4: case 7: case 8: case 11: case 12: case 13:
+		  Thresholds[0] = 0.5;
+		  for(int AB = 1; AB < 10; AB++){
+			Thresholds[AB] = Thresholds[AB-1] + 0.5;
+		  }
+		  break;
+		default:
+		  break;
+		}
+		
 		// Process the histogram here
 		C1[n]->cd(0);
 		// Get the pads previosly created.
@@ -170,40 +185,41 @@ void NpolDetectorCountRates() {
 		// This is needed for the second canvas
 		int nBins = hFrame->GetNbinsX();
 		double binWidth = hFrame->GetXaxis()->GetBinWidth(10);
+		double largestY = 0.0, smallestY = 100000.0;
+		Double_t x[nThresh], y[nThresh];
+		txtOut << RealName << ": AV Number " << AVnum << " Imprint Number " << imprNum << 
+		  "  PV Number " << pvNum << std::endl;
 		for(int k = 0; k < nThresh; k++){
 		  double Threshold = Thresholds[k];
 		  CTagger[i][j] = hFrame->Integral((Threshold/binWidth),nBins);    
-		  CountRates[k][i][j] = CTagger[i][j];
+		  CountRates[k][i][j] = CTagger[i][j]/electronTime/(1e6);
+		  std::cout << "Threshold = " << Thresholds[k] << " MeV" << std::endl;
 		  cout << RealName << ", detector # " << pvNum << " counts/s for 1 microAmp of Beam " 
-			   << CTagger[i][j]/electronTime/(1e3) << " kHz" << endl;
+			   << CountRates[k][i][j] << " MHz" << endl;
 		  cout << RealName << ", detector # " << pvNum << " counts/s for 80 microAmp of Beam " 
-			   << 80*CTagger[i][j]/electronTime/(1e3) << " kHz" << endl;    
+			   << 80*CountRates[k][i][j] << " MHz" << endl;    
 		  cout << " " << endl;
+		  // THis creates the x,y vectors for TGraph and writes the data to a text file
+		  x[k] = Thresholds[k];
+		  y[k] = CountRates[k][i][j]; // scaled to 1 uA beam and 1 MHz
+		  if(y[k] > largestY) largestY = y[k];
+		  if(y[k] < smallestY) smallestY = y[k];
+
+		  // Output to text file for getting the numbers easier
+		  txtOut << Thresholds[k] << "      " << 
+			CTagger[i][j] << " Counts" << "      " << 
+			CountRates[k][i][j] << " MHz" <<std::endl;
 		}
-		
-		// Plot the threshold data!
-		Double_t x[nThresh], y[nThresh];
+		txtOut << std::endl;
+
+		// Plot the threshold data!	
 		C2[n]->cd(0);
 		char pname2[16];
 		sprintf(pname2,"pad_%i_%i",i,j);
 		pad2[n][i][j] = (TPad*) gROOT->FindObject(pname2);
 		pad2[n][i][j]->Draw();     
-		pad2[n][i][j]->SetLogy();
+		//pad2[n][i][j]->SetLogy();
 		pad2[n][i][j]->cd();
-		txtOut << RealName << ": AV Number " << AVnum << "  PV Number " << pvNum << std::endl;
-
-		// THis creates the x,y vectors for TGraph and writes the data to a text file
-		double largestY = 0.0, smallestY = 100000.0;
-		for(int k = 0; k < nThresh; k++){
-		  x[k] = Thresholds[k];
-		  y[k] = CountRates[k][i][j]/electronTime/(1e3);
-		  if(y[k] > largestY) largestY = y[k];
-		  if(y[k] < smallestY) smallestY = y[k];
-		  txtOut << Thresholds[k] << "      " << 
-			80*CountRates[k][i][j]/(1e3) << " Counts" << std::endl;
-		  txtOut << Thresholds[k] << "      " << 
-			80*CountRates[k][i][j]/electronTime/(1e3) << " kHz" <<std::endl;
-		}
 
 		//  Generate the graph and format it ... somewhat nicely
 		TGraph *gr = new TGraph(nThresh,x,y); 
@@ -213,7 +229,7 @@ void NpolDetectorCountRates() {
 		gr->SetTitle(gtitle);   
 
 		// Clean up Y axis
-		gr->GetYaxis()->SetTitle("Count Rate at 1 #muA Beam (kHz)");   
+		gr->GetYaxis()->SetTitle("Count Rate at 1 #muA Beam (MHz)");   
 		gr->GetYaxis()->SetLabelFont(43);
 		gr->GetYaxis()->SetLabelSize(16);
 		gr->GetYaxis()->SetLabelOffset(0.02);

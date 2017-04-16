@@ -61,16 +61,16 @@ void SimulationFigures() {
   TFile *outFile = new TFile(OutputFile,"RECREATE");
   
   TVectorD *v = (TVectorD*)inFile->Get("TVectorT<double>");
-  Double_t totalElectrons = 10e10;// ((*v))[0];
+  Double_t totalElectrons = 100e9; //((*v))[0];
   Double_t electronTime = totalElectrons/(6.242e12); //6.242e12 e-/s at 1 microAmp
   
   // Tagger sizes
   Double_t theta = 160.0e-3;  // Target Tagger // 138.12e-3; // horizontal angular accecptance (radians)
   Double_t phi = 100.0e-3; // Target Tagger // 67.16e-3;  // using the Dipole 1 limit // 0.08466; // vertical angular acceptance (radians)
   Double_t targetD = 150.0;  // Position of target tagger (cm)
-  Double_t targetW = 2*targetD*TMath::Tan(theta/2);  // height of target tagger (cm)
-  Double_t targetL = 2*targetD*TMath::Tan(phi/2);   // width of target tagger (cm)
-  Double_t npolD = 683.89;  // Position of Npol Tagger (cm)
+  Double_t targetW = 26.0; // 2*targetD*TMath::Tan(theta/2);  // height of target tagger (cm)
+  Double_t targetL = 70.0; // 2*targetD*TMath::Tan(phi/2);   // width of target tagger (cm)
+  Double_t npolD = 681.50;  // Position of Npol Tagger (cm)683.89
   Double_t npolW = 2*npolD*TMath::Tan(theta/2);  // height of npol tagger (cm)
   Double_t npolL = 2*npolD*TMath::Tan(phi/2);  // width of npol tagger (cm)
 
@@ -94,7 +94,7 @@ void SimulationFigures() {
    
   // Put out some statistics
   std::cout << "Electron beam time at 1 micro-amp is " << electronTime << " s " << std::endl;
-  std::cout << "Total electrons on target: " << totalElectrons/1e6 << " Million" << std::endl;
+  std::cout << "Total electrons on target: " << totalElectrons/1e9 << " Billion" << std::endl;
   
   // Plot the Npol Tagger Flux plots
   TCanvas *c1 = new TCanvas("c1","NPOL Tagger Flux vs. KE at Polarimeter Angle 28.0 Deg, E = 4.4 GeV",1000,900);

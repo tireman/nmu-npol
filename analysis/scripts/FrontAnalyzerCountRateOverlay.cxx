@@ -48,16 +48,18 @@ void FrontAnalyzerCountRateOverlay() {
   //RetrieveENVvariables();
   //TString InputFile = FormInputFile(InputDir);
   //TString OutputFile = FormOutputFile(OutputDir);
-  
-  TFile *inFile = TFile::Open("/data2/cgen/JlabSimData/Summer2016Run/TargetTaggerSource/4.4GeV/1Bdl/SmallTargetTagger/histos/sourceTotal_Lead15cm_4.4GeV_1Bdl_Histos.root");
-  TFile *inFile2 = TFile::Open("/data2/cgen/JlabSimData/Summer2016Run/TargetTaggerSource/4.4GeV/4Bdl/SmallTargetTagger/histos/sourceTotal_Lead15cm_4.4GeV_4Bdl_Histos.root");
-  TFile *outFile = new TFile("FrontAnalyzerComparison_4Bdl_1Bdl.root","RECREATE");
+  TString PType = "Neutral";
+  TString BaseDIR = "/home/tireman/data1/TargetTaggerSource/4.4GeV/ComparisonArea";
+
+  TFile *inFile = TFile::Open(BaseDIR + "/histos/sourceTotal_Lead15cm_4.4GeV_1Bdl_7m_" + PType + "_Histos.root");
+  TFile *inFile2 = TFile::Open(BaseDIR + "/histos/sourceTotal_Lead15cm_4.4GeV_4Bdl_7m_" + PType + "_Histos.root");
+  TFile *outFile = new TFile(BaseDIR + "/Output/FrontAnalyzerComparison_4Bdl_7m_1Bdl_7m_" + PType + ".root","RECREATE");
 
   // Retrieve the object with the total number of electrons on target and calculate 
   // effective electron time on target per micro amp of beam
 
   TVectorD *v = (TVectorD*)inFile->Get("TVectorT<double>");
-  Double_t totalElectrons = 3.49967e10; //((*v))[0];
+  Double_t totalElectrons = 100.e9; //((*v))[0];
   Double_t electronTime = totalElectrons/(6.242e12); //6.242e12 e-/s at 1 microAmp
   //Double_t fluxscaling = 1/(totalElectrons*1.602e-13*(98*60));
   std::cout << "Electron beam time at 1 micro-amp is " << electronTime << " s " << std::endl;
@@ -102,7 +104,6 @@ void FrontAnalyzerCountRateOverlay() {
      Float_t yFactor = pad[0][0]->GetAbsHNDC()/pad[i][j]->GetAbsHNDC();
 
      char hname[60];
-     //TString str = histoNames[i][j];
      sprintf(hname,"%s",histoNames[i][j].c_str());
      std::cout << "Name is: " << hname << std::endl;
 	 TH1F *hFrame = (TH1F*) inFile->Get(hname);
@@ -125,7 +126,7 @@ void FrontAnalyzerCountRateOverlay() {
      sprintf(htitle,"#splitline{Energy Deposited}{Front Analyzer %i, Layer %i}",pvNum+1, imprNum);
      hFrame->SetTitle(htitle);     
      // y axis range
-     hFrame->GetYaxis()->SetRangeUser(0.2,5e3);
+     hFrame->GetYaxis()->SetRangeUser(0.2,5e5);
      
      // Format for y axis
      hFrame->GetYaxis()->SetTitle("Events");
@@ -232,7 +233,7 @@ void FrontAnalyzerCountRateOverlay() {
 	 mg->GetYaxis()->SetTitleFont(43);
      mg->GetYaxis()->SetTitleSize(16);
      mg->GetYaxis()->SetTitleOffset(5); 
-	 mg->GetYaxis()->SetRangeUser(0.000,.505);
+	 mg->GetYaxis()->SetRangeUser(0.000,5.705);
 
 	 mg->GetXaxis()->SetTitle("Threshold Energy (MeV)"); 
 	 mg->GetXaxis()->CenterTitle();
@@ -287,7 +288,7 @@ void FrontAnalyzerCountRateOverlay() {
      mg2->GetYaxis()->SetTitleOffset(5);  
 	 mg2->GetYaxis()->SetLabelFont(43);
 	 mg2->GetYaxis()->SetLabelSize(16);
-	 mg2->GetYaxis()->SetRangeUser(1.15,3.75);
+	 mg2->GetYaxis()->SetRangeUser(1.15,10.75);
 
 	 mg2->GetXaxis()->SetTitle("Threshold Energy (MeV)"); 
 	 mg2->GetXaxis()->CenterTitle();
