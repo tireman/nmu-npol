@@ -46,7 +46,7 @@ public:
   virtual G4String GetName();
   virtual void Place(G4LogicalVolume *motherLV);
   virtual void ConstructSDandField();
-  
+ 
   static G4double yokeLength;
   static G4double gapWidth;
   static G4double gapHeight;
