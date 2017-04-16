@@ -3,7 +3,7 @@
 export Lead=15
 export Energy=4.4
 export Bfield=4
-export PType=Proton
+export PType=Gamma
 
 export BUILD_DIR=/home/tireman/simulation/jlab/nmu-npol/build/simulation
 export NPOLBASENAME=source$PType\_Lead$Lead\cm_$Energy\GeV_$Bfield\Bdl

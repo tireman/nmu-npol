@@ -26,6 +26,6 @@ do
     fi
 
 	echo "Starting up Job Number $i."
-    $BUILD_DIR/Npolapp $BUILD_DIR/macros/ParticleFlux$PType.mac 1>$NPOLDIR/dumpFiles/${NPOLBASENAME}_$i.out 2>$NPOLDIR/dumpFiles/${NPOLBASENAME}_$i.err &
-    sleep 2s
+    $BUILD_DIR/Npolapp $BUILD_DIR/macros/Run4.4GeV/ParticleFlux$PType.mac 1>$NPOLDIR/dumpFiles/${NPOLBASENAME}_$i.out 2>$NPOLDIR/dumpFiles/${NPOLBASENAME}_$i.err &
+    sleep 1s
 done
