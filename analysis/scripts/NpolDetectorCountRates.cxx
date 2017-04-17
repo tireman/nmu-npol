@@ -62,7 +62,7 @@ void NpolDetectorCountRates() {
   Int_t Nx = 16, Ny = 2, nThresh = 10, fillStyle = 1001;
   Float_t lMargin = 0.05, rMargin = 0.05, bMargin = 0.10, tMargin = 0.05;
   Float_t vSpacing = 0.0; Float_t hSpacing = 0.0;
-  double CTagger[Nx][Ny];
+  double DetCounts[Nx][Ny];
   double CountRates [nThresh][Nx][Ny];
   std::ofstream txtOut;
   txtOut.open(OutputDir + "/Output/NpolDetectorCountRates" + Energy + "GeV_" + Lead + "cm.out");
@@ -80,19 +80,23 @@ void NpolDetectorCountRates() {
   // individual plots.  
   //*****************************************************************************************
 
-  TCanvas *C1[22], *C2[22];
-  TPad *pad1[22][7][2]; TPad *pad2[22][7][2];
-  char histoName[60], tempName[9], tempName2[8]; 
+  TCanvas *C1[22], *C2[22], *C3[22];
+  TPad *pad1[22][7][2]; TPad *pad2[22][7][2]; TPad *pad3[22][7][2];
+  char histoName[60], tempName[9], tempName2[8], tempName3[9]; 
   for(int n = 0; n < 22; n++){	
 	pvNum = 0;
 	GetCanvasParameters(n);
 	if(PVnumMax == 13){ Nx = 7; } else { Nx = PVnumMax/2; }
 	sprintf(tempName,"canvas%i",n);
 	sprintf(tempName2,"graph%i",n);
+	sprintf(tempName3,"Counts%i",n);
 	C1[n]= new TCanvas(tempName,"Energy Plots at Polarimeter Angle 28.0 Deg, E = 4.4 GeV",1500,900);
 	C2[n]= new TCanvas(tempName2,"Count Rate vs. Threshold plots",1500,900);
+	C3[n]= new TCanvas(tempName3,"Counts vs. Threshold plots",1500,900);
+	
 	CanvasPartition(C1[n],Nx,Ny,lMargin,rMargin,bMargin,tMargin,vSpacing,hSpacing);
 	CanvasPartition(C2[n],Nx,Ny,lMargin,rMargin,bMargin,tMargin,vSpacing,hSpacing);
+	CanvasPartition(C3[n],Nx,Ny,lMargin,rMargin,bMargin,tMargin,vSpacing,hSpacing);
 
 	for(int i = 0; i < Nx; i++){
 	  for(int j = 0; j < Ny; j++){
@@ -186,28 +190,34 @@ void NpolDetectorCountRates() {
 		int nBins = hFrame->GetNbinsX();
 		double binWidth = hFrame->GetXaxis()->GetBinWidth(10);
 		double largestY = 0.0, smallestY = 100000.0;
-		Double_t x[nThresh], y[nThresh];
+		double largestY2 = 0.0, smallestY2 = 10000.0;
+		Double_t x[nThresh], y[nThresh], x2[nThresh], y2[nThresh];
 		txtOut << RealName << ": AV Number " << AVnum << " Imprint Number " << imprNum << 
 		  "  PV Number " << pvNum << std::endl;
 		for(int k = 0; k < nThresh; k++){
 		  double Threshold = Thresholds[k];
-		  CTagger[i][j] = hFrame->Integral((Threshold/binWidth),nBins);    
-		  CountRates[k][i][j] = CTagger[i][j]/electronTime/(1e6);
+		  DetCounts[i][j] = hFrame->Integral((Threshold/binWidth),nBins);    
+		  CountRates[k][i][j] = DetCounts[i][j]/electronTime/(1e6);
 		  std::cout << "Threshold = " << Thresholds[k] << " MeV" << std::endl;
 		  cout << RealName << ", detector # " << pvNum << " counts/s for 1 microAmp of Beam " 
 			   << CountRates[k][i][j] << " MHz" << endl;
 		  cout << RealName << ", detector # " << pvNum << " counts/s for 80 microAmp of Beam " 
 			   << 80*CountRates[k][i][j] << " MHz" << endl;    
 		  cout << " " << endl;
-		  // THis creates the x,y vectors for TGraph and writes the data to a text file
+		  // THis creates the x,y vectors for TGraph later on
 		  x[k] = Thresholds[k];
 		  y[k] = CountRates[k][i][j]; // scaled to 1 uA beam and 1 MHz
 		  if(y[k] > largestY) largestY = y[k];
 		  if(y[k] < smallestY) smallestY = y[k];
-
-		  // Output to text file for getting the numbers easier
+		  
+		  x2[k] = Thresholds[k];
+		  y2[k] = DetCounts[i][j]; // scaled to 1 uA beam and 1 MHz
+		  if(y2[k] > largestY2) largestY2 = y2[k];
+		  if(y2[k] < smallestY2) smallestY2 = y2[k];
+		  
+		  // Output to text file for getting the numbers 
 		  txtOut << Thresholds[k] << "      " << 
-			CTagger[i][j] << " Counts" << "      " << 
+			DetCounts[i][j] << " Counts" << "      " << 
 			CountRates[k][i][j] << " MHz" <<std::endl;
 		}
 		txtOut << std::endl;
@@ -256,6 +266,49 @@ void NpolDetectorCountRates() {
 		gr->SetMarkerStyle(21);
 		gr->Draw("APC");
 		
+		C3[n]->cd(0);
+		char pname3[16];
+		sprintf(pname3,"pad_%i_%i",i,j);
+		pad3[n][i][j] = (TPad*) gROOT->FindObject(pname3);
+		pad3[n][i][j]->Draw();     
+		//pad3[n][i][j]->SetLogy();
+		pad3[n][i][j]->cd();
+
+		//  Generate the graph and format it ... somewhat nicely
+		TGraph *gr2 = new TGraph(nThresh,x2,y2); 
+		//char gtitle[90];
+		sprintf(gtitle,"#splitline{Detector Counts VS. Threshold}{%s %i, Layer %i}",
+				RealName.c_str(),pvNum+1, layerNum);
+		gr2->SetTitle(gtitle);   
+
+		// Clean up Y axis
+		gr2->GetYaxis()->SetTitle("Total Counts at 1 #muA Beam (Counts)");   
+		gr2->GetYaxis()->SetLabelFont(43);
+		gr2->GetYaxis()->SetLabelSize(16);
+		gr2->GetYaxis()->SetLabelOffset(0.02);
+		gr2->GetYaxis()->SetTitleFont(43);
+		gr2->GetYaxis()->SetTitleSize(16);
+		gr2->GetYaxis()->SetTitleOffset(5);
+		gr2->GetYaxis()->CenterTitle(); 
+		gr2->SetMinimum(0.6*smallestY2);
+		gr2->SetMaximum(1.2*largestY2);
+		//gr2->Fit("expo","FQ");
+		//gr2->SetLineColor(4);
+		//gr2->GetFunction("expo")->SetLineColor(4);
+		// Clean up X axis
+		gr2->GetXaxis()->SetTitle("Threshold Energy (MeV)");
+		gr2->GetXaxis()->SetLabelFont(43);
+		gr2->GetXaxis()->SetLabelSize(16);
+		gr2->GetXaxis()->SetLabelOffset(0.02);
+		gr2->GetXaxis()->SetTitleFont(43);
+		gr2->GetXaxis()->SetTitleSize(16);
+		gr2->GetXaxis()->SetTitleOffset(3);
+		gr2->GetXaxis()->CenterTitle();
+		
+		// Go for the plot
+		gr2->SetMarkerStyle(21);
+		gr2->Draw("APC");
+
 		// Cycle the Physical Volume number and check if you are at the end of a row.
 		// If so, increase imprint number by 1 and break the loop otherwise continue
 		pvNum++;
@@ -269,6 +322,7 @@ void NpolDetectorCountRates() {
   for(int i = 0; i < 22; i++){
 	C1[i]->Write();
 	C2[i]->Write();
+	C3[i]->Write();
   }
   txtOut.close();
   outFile->Close(); 
