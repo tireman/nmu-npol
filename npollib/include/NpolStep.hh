@@ -18,7 +18,7 @@ class NpolStep : public TObject {
 
 public:
   int trackId;
-  int parentId;
+  int parentId; // Comment out for old electron data
   double gPosX;
   double gPosY;
   double gPosZ;
@@ -30,7 +30,7 @@ public:
   double momZ;
   double time;
   double eDep;
-  int particleId;
+  int particleId;  // comment out for old electron data
   std::string volume;
 
   inline NpolStep() {};
