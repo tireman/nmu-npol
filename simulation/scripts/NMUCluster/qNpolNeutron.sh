@@ -1,7 +1,7 @@
 #! /bin/bash
 #
 #$ -V
-#$ -t 1-1
+#$ -t 1-100
 #$ -cwd
 
 export Lead=15
@@ -60,17 +60,13 @@ then
 fi
 
 echo "Starting up Job Number $JOBNUMBER."
-$BUILD_DIR/simulation/Npolapp $BUILD_DIR/simulation/macros/ParticleFlux$PType.mac
+$BUILD_DIR/simulation/Npolapp $BUILD_DIR/simulation/macros/Run4.4GeV/ParticleFlux$PType.mac
 
 /share/apps/root/bin/hadd -f -k /scratch/root/$NPOLBASENAME\_$SGE_TASK_ID.root /scratch/root/$NPOLBASENAME\_$SGE_TASK_ID\_*.root
 
 rm /scratch/root/$NPOLBASENAME\_$SGE_TASK_ID\_*.root
 
-$BUILD_DIR/analysis/NpolAnalysis
 $BUILD_DIR/analysis2/NpolProcessEvents
-
-mv /scratch/histos/$NPOLBASENAME\_Histos_$SGE_TASK_ID.root /home/tireman/output/NpolTaggerBaised/4.4GeV/NeutronOnly/ArrayOption_1/NpolEvents/histos
-
-mv /scratch/histos/$NPOLBASENAME\_NpolEff_$SGE_TASK_ID.root /home/tireman/output/NpolTaggerBaised/4.4GeV/NeutronOnly/ArrayOption_1/NpolEff/histos
+mv /scratch/histos/*.root /home/tireman/output/TargetTaggerBiased/4.4GeV/4Bdl/LongRuns/histos
 
 rm /scratch/root/$NPOLBASENAME\_$SGE_TASK_ID.root

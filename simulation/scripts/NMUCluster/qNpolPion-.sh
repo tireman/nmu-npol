@@ -1,13 +1,14 @@
 #! /bin/bash
 #
 #$ -V
-#$ -t 1-10
+#$ -t 1-100
 #$ -cwd
 
 export Lead=15
 export Energy=4.4
 export Bfield=4
 export PType=Pion-
+
 
 export BUILD_DIR=/home/tireman/simulation/jlab/nmu-npol/build
 export NPOLLIB_DIR=$BUILD_DIR/npollib
@@ -60,13 +61,13 @@ then
 fi
 
 echo "Starting up Job Number $JOBNUMBER."
-$BUILD_DIR/simulation/Npolapp $BUILD_DIR/simulation/macros/ParticleFlux$PType.mac
+$BUILD_DIR/simulation/Npolapp $BUILD_DIR/simulation/macros/Run4.4GeV/ParticleFlux$PType.mac
 
 /share/apps/root/bin/hadd -f -k /scratch/root/$NPOLBASENAME\_$SGE_TASK_ID.root /scratch/root/$NPOLBASENAME\_$SGE_TASK_ID\_*.root
 
 rm /scratch/root/$NPOLBASENAME\_$SGE_TASK_ID\_*.root
 
-$BUILD_DIR/analysis/NpolAnalysis
 $BUILD_DIR/analysis2/NpolProcessEvents
+mv /scratch/histos/*.root /home/tireman/output/TargetTaggerBiased/4.4GeV/4Bdl/LongRuns/histos
 
 rm /scratch/root/$NPOLBASENAME\_$SGE_TASK_ID.root
