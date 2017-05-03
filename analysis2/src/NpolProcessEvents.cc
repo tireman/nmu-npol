@@ -75,6 +75,10 @@ int main(int argc, char *argv[]) {
   //Double_t targetAlpha = targetW/(4*targetTaggerPos);  // Constant needed for solid angle
   //Double_t npolAlpha = npolW/(4*npolTaggerPos);  // Constant needed for solid angle
   
+  // Solid angle calculation! 
+  //Double_t targetSolidAngle = 8*(TMath::ATan(targetH/targetW)-TMath::ASin(targetH/TMath::Sqrt((1+TMath::Power(targetAlpha,2))*(TMath::Power(targetH,2)+TMath::Power(targetW,2)))));
+  //Double_t npolSolidAngle = 8*(TMath::ATan(npolH/npolW)-TMath::ASin(npolH/TMath::Sqrt((1+TMath::Power(npolAlpha,2))*(TMath::Power(npolH,2)+TMath::Power(npolW,2)))));
+  
   //npolTree->SetCacheSize(50000000);
   //statsTree->SetCacheSize(50000000);
   
@@ -152,7 +156,7 @@ int main(int argc, char *argv[]) {
     std::string correlateHistoName = "Correlated_TargetFlux_" + it->first;
     std::string correlateHistoTitle = it->second + " Flux vs. KE Target Tagger Correlated to NPOL Tagger";
 
-	std::string targetThetaName = "targetTheta_" + it->first;
+   	std::string targetThetaName = "targetTheta_" + it->first;
 	std::string targetThetaTitle = it->second + " Particles vs. Theta Angle in Target Tagger";
 	std::string targetPhiName = "targetPhi_" + it->first;
 	std::string targetPhiTitle = it->second + " Particles vs. Phi Angle in Target Tagger";
@@ -207,44 +211,47 @@ int main(int argc, char *argv[]) {
 
 
   // ****************  Done with Hisotgram allocation ***********************
-
-  // Solid angle calculation! 
-  //Double_t targetSolidAngle = 8*(TMath::ATan(targetH/targetW)-TMath::ASin(targetH/TMath::Sqrt((1+TMath::Power(targetAlpha,2))*(TMath::Power(targetH,2)+TMath::Power(targetW,2)))));
-  //Double_t npolSolidAngle = 8*(TMath::ATan(npolH/npolW)-TMath::ASin(npolH/TMath::Sqrt((1+TMath::Power(npolAlpha,2))*(TMath::Power(npolH,2)+TMath::Power(npolW,2)))));
   
   // loop over all entries (one per event)
   Int_t nentries = npolTree->GetEntries();
-  //Int_t nentries = 100;
   for(int i = 0; i < nentries; i++) {
     npolTree->GetEntry(i);
 	PrintEventNumber(nentries,i);
 
-	std::set<int> vertexTrackIDs;
 	std::set<int> npolTrackIDs;
 	
     // loop over all tagged particles (min. one step in NPOL tagger volume)
 	Double_t npolxMax = npolW/2; // acceptance limit
 	Double_t npolyMax = npolH/2; // acceptance limit
-    std::vector<NpolTagger *>::iterator n_it;
+    std::vector<NpolTagger *>::iterator n_it;	
+	std::vector<NpolVertex *>::iterator v_it2;
     for(n_it = npolEntry->begin(); n_it != npolEntry->end(); n_it++){
       NpolTagger *npolTagged = *n_it;
       if(npolTagged == NULL)  continue;
 
 	  // Is it 1 of 9 particles we want?
 	  std::string particleName = npolTagged->particle;
-	  if(npolParticleKE.find(particleName) == npolParticleKE.end()) continue; 
-
+	  if(npolParticleKE.find(particleName) == npolParticleKE.end()) continue;
+ 
 	  // Reject if charged(use !) reject if not charged (remove !)
-	  //int pType = npolTagged->particleId;
-	  //if(!(pType == 2112 || pType == 22)) continue;  
+	  int pType = npolTagged->particleId;
+	  //if((pType == 2112 || pType == 22)) continue; 
 	  
+	  for(v_it2 = vertexEntry->begin(); v_it2 != vertexEntry->end(); v_it2++){
+		NpolVertex *aVertex = *v_it2;
+		if(aVertex == NULL) continue;
+		
+		if(aVertex->trackId == npolTagged->trackId){
+		  std::string volName = aVertex->volume;
+		  if((volName == "LeadCurtain" || volName == "HutFrontWall")) continue;
+		}
+	  }
+
+	  // Insert Track ID into a set so we can cut later
+	  npolTrackIDs.insert(npolTagged->trackId);
+
 	  Double_t fluxscaling = 1;	
-	  //if(vertexTrackIDs.find(npolTagged->trackId) != vertexTrackIDs.end()){
 	  if((abs(npolTagged->lPosX) <= npolxMax) && (abs(npolTagged->lPosY) <= npolyMax)){
-		(npolParticleKE[particleName])->
-		  Fill(npolTagged->energy,fluxscaling);
-		(npolParticlePOS[particleName])->
-		  Fill(npolTagged->lPosX,npolTagged->lPosY);
 		
 		// Calculating the theta and phi angles and saving to histograms
 		Double_t momx = npolTagged->momX*TMath::Cos(NpolAng) + npolTagged->momZ*TMath::Sin(NpolAng);
@@ -256,11 +263,13 @@ int main(int argc, char *argv[]) {
 		if(momy >= 0) phi = TMath::ACos(momx/(momTotal*TMath::Sin(theta)));
 		if(momy < 0) phi = 2*TMath::Pi()-TMath::ACos(momx/(momTotal*TMath::Sin(theta)));
 		if(theta > TMath::Pi()/2) continue;
+		(npolParticleKE[particleName])->
+		  Fill(npolTagged->energy,fluxscaling);
+		(npolParticlePOS[particleName])->
+		  Fill(npolTagged->lPosX,npolTagged->lPosY);
 		(npolTheta[particleName])->Fill(theta);
 		(npolPhi[particleName])->Fill(phi);
 	  }
-	  npolTrackIDs.insert(npolTagged->trackId);
-	  //}
 	}
 
 	// ************ Fill the 3D plot ***********************
@@ -284,17 +293,13 @@ int main(int argc, char *argv[]) {
     for(t_it = targetEntry->begin(); t_it != targetEntry->end(); t_it++){
       NpolTagger *targetTagged = *t_it;
       if(targetTagged == NULL) continue;  
-      std::string particleName = targetTagged->particle;
+      
+	  std::string particleName = targetTagged->particle;
       if(targetParticleKE.find(particleName) == targetParticleKE.end())
 		continue;
 	  Double_t fluxscaling = 1;
-	  //if(vertexTrackIDs.find(targetTagged->trackId) != vertexTrackIDs.end()){
 	  if((abs(targetTagged->lPosX) <= targetxMax) && (abs(targetTagged->lPosY) <= targetyMax)){
-		(targetParticleKE[particleName])->
-		  Fill(targetTagged->energy,fluxscaling);
-		(targetParticlePOS[particleName])->
-		  Fill(targetTagged->lPosX,targetTagged->lPosY);
-		
+			
 		// Calculating the theta and phi angles and saving to histograms
 		Double_t momx = targetTagged->momX*TMath::Cos(NpolAng) + targetTagged->momZ*TMath::Sin(NpolAng);
 		Double_t momy = targetTagged->momY;
@@ -305,6 +310,10 @@ int main(int argc, char *argv[]) {
 		if(momy >= 0) phi = TMath::ACos(momx/(momTotal*TMath::Sin(theta)));
 		if(momy < 0) phi = 2*TMath::Pi()-TMath::ACos(momx/(momTotal*TMath::Sin(theta)));
 		if(theta > TMath::Pi()/2) continue;
+		(targetParticleKE[particleName])->
+		  Fill(targetTagged->energy,fluxscaling);
+		(targetParticlePOS[particleName])->
+		  Fill(targetTagged->lPosX,targetTagged->lPosY);
 		(targetTheta[particleName])->Fill(theta);
 		(targetPhi[particleName])->Fill(phi);
 		
@@ -316,11 +325,8 @@ int main(int argc, char *argv[]) {
 			Fill(targetTagged->energy,fluxscaling);
 		  (correlatePOS[particleName])->
 			Fill(targetTagged->lPosX,targetTagged->lPosY);
-		 
 		}
-	  
 	  }
-	  //}
 	}
  
     // This section is designed to file up the histograms for hits in
@@ -330,8 +336,8 @@ int main(int argc, char *argv[]) {
 	
     // loop over vector elements (one per vertex)
     
-    int avNum, imprNum, pvNum; 
-	int stepCount = 0;
+    int avNum; //, imprNum, pvNum; 
+	//int stepCount = 0;
     std::vector<NpolStep *>::iterator s_it;
     for(s_it = anStep->begin(); s_it != anStep->end(); s_it++){
       NpolStep *aStep = *s_it;
@@ -342,9 +348,8 @@ int main(int argc, char *argv[]) {
 	  if((npolTrackIDs.find(aStep->trackId) != npolTrackIDs.end()) 
 		 || (npolTrackIDs.find(aStep->parentId) != npolTrackIDs.end())){
 
-		if(npolTrackIDs.find(aStep->parentId) != npolTrackIDs.end()){
-		  npolTrackIDs.insert(aStep->trackId);
-		}
+		npolTrackIDs.insert(aStep->trackId);
+		
 	  } else {
 		continue;
 	  }
@@ -412,7 +417,6 @@ int main(int argc, char *argv[]) {
 	eDep.clear();	
 	hitTime.clear();
 	npolTrackIDs.clear();
-	vertexTrackIDs.clear();
   }
   
   /* // Write it all out to the ROOT file.*/
@@ -420,6 +424,7 @@ int main(int argc, char *argv[]) {
   totalElectrons[0] = TotalElectrons;
   totalElectrons[1] = TotalEventsRecorded;
   totalElectrons.Write();
+
   std::map<std::string,TH1F *>::iterator it2;
   for(it2 = targetParticleKE.begin(); it2 != targetParticleKE.end(); it2++) {
     it2->second->Write();
