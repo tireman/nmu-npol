@@ -52,7 +52,7 @@ NpolDetectorConstruction::NpolDetectorConstruction() {
   //detectors.insert(new NpolBeamlineUpper);
   //detectors.insert(new NpolBeamlineDown);
   detectors.insert(new NpolDipole1);
-  detectors.insert(new NpolDipole2); // Comment out Dipole 2 for one Mag tests
+  //detectors.insert(new NpolDipole2); // Comment out Dipole 2 for one Mag tests
   detectors.insert(new NpolShieldHut);
   //detectors.insert(new NpolHBender);
   detectors.insert(new NpolParticleFluxTagger);

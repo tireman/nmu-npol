@@ -33,7 +33,7 @@
 #include "NpolDetectorFactory.hh"
 #include "NpolDetectorConstruction.hh"
 
-G4double NpolPolarimeter::NpolBoxPos = 8.7*m; //Subtract 2*m if 5m test
+G4double NpolPolarimeter::NpolBoxPos = 8.7*m-2.0*m; //Subtract 2*m if 5m test
 G4double NpolPolarimeter::NDetThickness = 10.0*cm;
 G4double NpolPolarimeter::NVetoThickness = 1.00*cm;
 G4double NpolPolarimeter::NDetHeight = 10.0*cm;

@@ -34,7 +34,7 @@ G4double NpolShieldHut::wallThickness = 0.900*m;  // Thickness of the concrete w
 G4double NpolShieldHut::wallHeight = 7.0*m; // Nominal height of the shield hut walls
 G4double NpolShieldHut::frontWallWidth = 4.8768*m;  // Width of the front and back walls
 G4double NpolShieldHut::vertOffSet = 0.3424*m; // Vertical offset for target pivot
-G4double NpolShieldHut::PosFront = 6.35*m; // position of front wall (center)
+G4double NpolShieldHut::PosFront = 6.35*m-2.0*m; // position of front wall (center)
 G4double NpolShieldHut::OffSetRoof = (wallHeight + wallThickness)/2-vertOffSet; // Roof offset
 G4double NpolShieldHut::PosLead = PosFront - (leadThickness + wallThickness)/2; // position of lead 
 G4double NpolShieldHut::PosTagger = PosFront + wallThickness/2 + 1.50*cm;  // position of NPOL tagger
@@ -163,7 +163,7 @@ void NpolShieldHut::Place(G4LogicalVolume *motherLV) {
   PlaceCylindrical(NPOLTaggerLV, motherLV, "NPOLTagger", PosTagger, -NpolAng, 0);  
   PlaceCylindrical(HutFrontWallLV, motherLV, "HutFrontWall", PosFront,-NpolAng,-vertOffSet);
   PlaceCylindrical(HutBackWallLV, motherLV, "HutBackWall", PosBack,-NpolAng,-vertOffSet);
-  PlaceRectangular(HutSideWallLV, motherLV, "HutSideWall", -PosSide*sin(NpolAng) - frontWallWidth/2*cos(NpolAng),-vertOffSet, PosSide*cos(NpolAng) - frontWallWidth/2*sin(NpolAng) , 0*deg, -NpolAng, 0*deg);
-  PlaceRectangular(HutSideWallLV, motherLV, "HutSideWall", -PosSide*sin(NpolAng) + frontWallWidth/2*cos(NpolAng),-vertOffSet, PosSide*cos(NpolAng)+ frontWallWidth/2*sin(NpolAng), 0*deg, -NpolAng, 0);
+  PlaceRectangular(HutSideWallLV, motherLV, "HutSideWall", -PosSide*sin(NpolAng) - frontWallWidth/2*cos(NpolAng),-vertOffSet, PosSide*cos(NpolAng) - frontWallWidth/2*sin(NpolAng) , 0*deg, -NpolAng, 0*deg); // right side wall
+  PlaceRectangular(HutSideWallLV, motherLV, "HutSideWall", -PosSide*sin(NpolAng) + frontWallWidth/2*cos(NpolAng),-vertOffSet, PosSide*cos(NpolAng)+ frontWallWidth/2*sin(NpolAng), 0*deg, -NpolAng, 0); // left side wall
   PlaceCylindrical(HutRoofLV, motherLV, "HutRoof", PosRoof, -NpolAng, OffSetRoof);
 }
