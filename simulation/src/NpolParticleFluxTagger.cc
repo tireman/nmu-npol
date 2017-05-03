@@ -44,7 +44,8 @@ G4String NpolParticleFluxTagger::GetName() {
 // In analysis, will cut down via acceptance cuts
 void NpolParticleFluxTagger::ConstructParticleTagger(){  
 
-  G4double xlen = 2*taggerPos*tan(horAngle/2); G4double ylen = 2*taggerPos*tan(vertAngle/2);
+  G4double xlen = 2*taggerPos*tan(horAngle/2); 
+  G4double ylen = 2*taggerPos*tan(vertAngle/2);
   G4double zlen = 0.10*cm;
 
   G4Box *ParticleTagger = new G4Box("ParticleTagger",xlen/2,ylen/2,zlen/2);
