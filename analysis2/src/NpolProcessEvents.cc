@@ -232,20 +232,23 @@ int main(int argc, char *argv[]) {
 	  // Is it 1 of 9 particles we want?
 	  std::string particleName = npolTagged->particle;
 	  if(npolParticleKE.find(particleName) == npolParticleKE.end()) continue;
- 
-	  // Reject if charged(use !) reject if not charged (remove !)
-	  int pType = npolTagged->particleId;
-	  //if((pType == 2112 || pType == 22)) continue; 
 	  
-	  for(v_it2 = vertexEntry->begin(); v_it2 != vertexEntry->end(); v_it2++){
+	  // ******* Cut out neutral, charged or keep all particles ******* //
+	  // Reject if charged(use !) reject if not charged (remove !) or comment out if you want all included
+	  int pType = npolTagged->particleId;
+	  if(!(pType == 2112 || pType == 22)) continue; 
+	  
+	  // ******** Cut out particles generated in a chosen volume ******* //
+	  /*for(v_it2 = vertexEntry->begin(); v_it2 != vertexEntry->end(); v_it2++){
 		NpolVertex *aVertex = *v_it2;
 		if(aVertex == NULL) continue;
 		
 		if(aVertex->trackId == npolTagged->trackId){
 		  std::string volName = aVertex->volume;
-		  if((volName == "LeadCurtain" || volName == "HutFrontWall")) continue;
+		  if((volName == "Dipole1" || volName == "Dipole2" || volName == "Dipole1CuBar" 
+			  || volName == "Dipole2CuBar")) continue;
 		}
-	  }
+		}*/
 
 	  // Insert Track ID into a set so we can cut later
 	  npolTrackIDs.insert(npolTagged->trackId);
