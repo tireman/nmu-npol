@@ -38,7 +38,7 @@
 // field strength; example: for 1 Tm use FM = 1.0 and for 4.3 Tm use FM = 4.3
 // If 1 mag, use 2.0 for integrated 1.0 Tm or 4.0 for 2.0 Tm (double FM for 
 // same effect) Note: Generally we won't use Dipole 2 by itself
-G4double NpolDipole2::FM = 1.0; 
+G4double NpolDipole2::FM = 4.3; 
 G4double NpolDipole2::dipole2FieldY = FM*0.40984*tesla; 
 
 G4double NpolDipole2::NpolAng = 28.0*deg;
