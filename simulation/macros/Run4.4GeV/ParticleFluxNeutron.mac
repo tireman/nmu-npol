@@ -88,5 +88,5 @@
 
 ###### Commands below are independent of GPS ######
 /run/printProgress 10000
-/run/beamOn 28627
+/run/beamOn 58157
 
