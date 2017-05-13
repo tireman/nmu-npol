@@ -220,7 +220,7 @@ TString FormInputFile(TString InputDir){
 
 TString FormOutputFile(TString OutputDir){
   
-  TString fileName =  OutputDir + "/" + BaseName + "_NpolEff.root";
+  TString fileName =  OutputDir + "/" + BaseName + "_Histos.root";
   
   return fileName;
 }

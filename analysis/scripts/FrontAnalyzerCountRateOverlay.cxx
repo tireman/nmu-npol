@@ -48,18 +48,26 @@ void FrontAnalyzerCountRateOverlay() {
   //RetrieveENVvariables();
   //TString InputFile = FormInputFile(InputDir);
   //TString OutputFile = FormOutputFile(OutputDir);
-  TString PType = "Neutral";
-  TString BaseDIR = "/home/tireman/data1/TargetTaggerSource/4.4GeV/ComparisonArea";
 
-  TFile *inFile = TFile::Open(BaseDIR + "/histos/sourceTotal_Lead15cm_4.4GeV_1Bdl_7m_" + PType + "_Histos.root");
-  TFile *inFile2 = TFile::Open(BaseDIR + "/histos/sourceTotal_Lead15cm_4.4GeV_4Bdl_7m_" + PType + "_Histos.root");
-  TFile *outFile = new TFile(BaseDIR + "/Output/FrontAnalyzerComparison_4Bdl_7m_1Bdl_7m_" + PType + ".root","RECREATE");
+  Double_t y1min = 0; Double_t y1max = 0;
+  Double_t y2min = 0.0001; Double_t y2max = .705;
+  Double_t y3min = 0.90; Double_t y3max = 1.05;
+ 
+  TString PType1 = "Neutral";
+  TString PType2 = "Neutral";
+  TString CutType1 = "AllVolumes_";  // put '_' after any Non-NULL strings
+  TString CutType2 = "CutDipoleSurface_";
+  TString BaseDIR = "/home/tireman/data1/TargetTaggerSource/4.4GeV/4Bdl/ComparisonStuff";
+
+  TFile *inFile = TFile::Open(BaseDIR + "/histos/sourceTotal_Lead15cm_4.4GeV_4Bdl_" + CutType1 + PType1+"_Histos.root");
+  TFile *inFile2 = TFile::Open(BaseDIR + "/histos/sourceTotal_Lead15cm_4.4GeV_4Bdl_" + CutType2 + PType2+"_Histos.root");
+  TFile *outFile = new TFile(BaseDIR + "/Plots/FrontAnalyzerComparison_" + CutType1 + "4Bdl_7m_" + PType1 + "_" + CutType2 + "_4Bdl_7m_" + PType2 + ".root","RECREATE");
 
   // Retrieve the object with the total number of electrons on target and calculate 
   // effective electron time on target per micro amp of beam
 
   TVectorD *v = (TVectorD*)inFile->Get("TVectorT<double>");
-  Double_t totalElectrons = 100.e9; //((*v))[0];
+  Double_t totalElectrons = 10*19.995e9; //((*v))[0];
   Double_t electronTime = totalElectrons/(6.242e12); //6.242e12 e-/s at 1 microAmp
   //Double_t fluxscaling = 1/(totalElectrons*1.602e-13*(98*60));
   std::cout << "Electron beam time at 1 micro-amp is " << electronTime << " s " << std::endl;
@@ -160,8 +168,8 @@ void FrontAnalyzerCountRateOverlay() {
      hFrame->GetXaxis()->SetTickLength(yFactor*0.06/xFactor);
      
 	 TLegend *legend2 = new TLegend(0.7,0.7,0.9,0.8);
-	 legend2->AddEntry(hFrame, "1 Tm Field","lp");
-	 legend2->AddEntry(hFrame2, "4 Tm Field","lp");
+	 legend2->AddEntry(hFrame, PType1 + " Particles","lp");
+	 legend2->AddEntry(hFrame2, PType2 + " Particles","lp");
 	 legend2->Draw();
 
      // Count up events in Front layer of taggers above Threshold
@@ -176,13 +184,13 @@ void FrontAnalyzerCountRateOverlay() {
        CTagger[i][j] = hFrame->Integral((Threshold/binWidth),nBins);
 	   CTagger2[i][j] = hFrame2->Integral((Threshold/binWidth),nBins);
 
-       CountRates[k][i][j] = CTagger[i][j];
-	   CountRates2[k][i][j] = CTagger2[i][j];
+       CountRates[k][i][j] = CTagger[i][j]/electronTime/(1e6);
+	   CountRates2[k][i][j] = CTagger2[i][j]/electronTime/(1e6);
        
 	   cout << "First Analyzer layer, detector " << pvNum << " counts/s for 1 microAmp of Beam " 
-	    << CTagger[i][j]/electronTime/(1e6) << " MHz" << endl;
+	    << CountRates[k][i][j] << " kHz" << endl;
        cout << "First Analyzer layer, detector " << pvNum << " counts/s for 80 microAmp of Beam " 
-	    << 80*CTagger[i][j]/electronTime/(1e6) << " MHz" << endl;    
+	    << 80*CountRates[k][i][j]<< " kHz" << endl;    
        cout << " " << endl;
      }
 
@@ -191,18 +199,18 @@ void FrontAnalyzerCountRateOverlay() {
      char pname2[16];
      sprintf(pname2,"pad_%i_%i",i,j);
      pad1[i][j] = (TPad*) gROOT->FindObject(pname2);
-     pad1[i][j]->Draw();
+     pad1[i][j]->Draw(); 
+	 pad1[i][j]->SetLogy();
      pad1[i][j]->cd();
      for(int k = 0; k < nThresh; k++){
        x[k] = Thresholds[k];
-       y[k] = CountRates[k][i][j]/electronTime/(1e6);
+       y[k] = CountRates[k][i][j];
 	   x2[k] = Thresholds[k];
-       y2[k] = CountRates2[k][i][j]/electronTime/(1e6);
+       y2[k] = CountRates2[k][i][j];
 	   ratiox[k] = Thresholds[k];
-	   ratioy[k] = y[k]/y2[k];
+	   ratioy[k] = y2[k]/y[k];
      }
 	 
-
      TGraph *gr = new TGraph(nThresh,x,y); 
 	 TGraph *gr2 = new TGraph(nThresh,x2,y2);
      // Set Good Graph Title
@@ -216,6 +224,13 @@ void FrontAnalyzerCountRateOverlay() {
      //gr->Draw("APC");
 
 	 TMultiGraph *mg = new TMultiGraph();
+	 /*TF1 *myFunc = new TF1("myFunc", "[0]+[1]*x+[2]*x^2+[3]*x^3+[4]*x^4",0.5,16);
+	 myFunc->SetParameter(0,10);
+	 myFunc->SetParameter(1,-0.25);
+	 myFunc->SetParameter(2,0.5);
+	 myFunc->SetParameter(3,-0.05);
+	 myFunc->SetParameter(4,0.1);
+	 //myFunc->SetParameter(5,-0.0005);*/
 	 gr->Fit("expo","FQ");
 	 gr->SetLineColor(4);
 	 gr->GetFunction("expo")->SetLineColor(4);
@@ -227,13 +242,13 @@ void FrontAnalyzerCountRateOverlay() {
 	 mg->Draw("a");
 
 	 mg->SetTitle(htitle);
-	 mg->GetYaxis()->SetTitle("Count Rate at 1 #muA Beam (MHz)");
+	 mg->GetYaxis()->SetTitle("Count Rate at 1 #muA Beam (kHz)");
 	 mg->GetYaxis()->CenterTitle();
 	 mg->GetYaxis()->SetLabelOffset(0.02);    
 	 mg->GetYaxis()->SetTitleFont(43);
      mg->GetYaxis()->SetTitleSize(16);
      mg->GetYaxis()->SetTitleOffset(5); 
-	 mg->GetYaxis()->SetRangeUser(0.000,5.705);
+	 mg->GetYaxis()->SetRangeUser(y2min,y2max);
 
 	 mg->GetXaxis()->SetTitle("Threshold Energy (MeV)"); 
 	 mg->GetXaxis()->CenterTitle();
@@ -245,8 +260,8 @@ void FrontAnalyzerCountRateOverlay() {
 	 mg->GetXaxis()->SetLabelSize(16);
 
 	 TLegend *legend = new TLegend(0.7,0.7,0.9,0.8);
-	 legend->AddEntry(gr, "1 Tm Field","lp");
-	 legend->AddEntry(gr2, "4 Tm Field","lp");
+	 legend->AddEntry(gr, PType1 + " Particles","lp");
+	 legend->AddEntry(gr2, PType2 + " Particles","lp");
 	 legend->Draw();
 
 	 pad1[i][j]->Modified();
@@ -280,7 +295,7 @@ void FrontAnalyzerCountRateOverlay() {
 	 mg2->Draw("a");
 
 	 mg2->SetTitle(htitle);
-	 mg2->GetYaxis()->SetTitle("Ratio of 1 Tm Field to 4 Tm Field Count Rate");
+	 mg2->GetYaxis()->SetTitle("Ratio of " + PType2 + " to " + PType1 + " Particle Count Rate");
 	 mg2->GetYaxis()->CenterTitle();
 	 mg2->GetYaxis()->SetLabelOffset(0.02);    
 	 mg2->GetYaxis()->SetTitleFont(43);
@@ -288,7 +303,8 @@ void FrontAnalyzerCountRateOverlay() {
      mg2->GetYaxis()->SetTitleOffset(5);  
 	 mg2->GetYaxis()->SetLabelFont(43);
 	 mg2->GetYaxis()->SetLabelSize(16);
-	 mg2->GetYaxis()->SetRangeUser(1.15,10.75);
+	 //mg2->GetYaxis()->SetRangeUser(0.04,0.75);
+	 mg2->GetYaxis()->SetRangeUser(y3min,y3max);
 
 	 mg2->GetXaxis()->SetTitle("Threshold Energy (MeV)"); 
 	 mg2->GetXaxis()->CenterTitle();

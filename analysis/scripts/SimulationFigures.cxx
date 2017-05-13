@@ -61,7 +61,7 @@ void SimulationFigures() {
   TFile *outFile = new TFile(OutputFile,"RECREATE");
   
   TVectorD *v = (TVectorD*)inFile->Get("TVectorT<double>");
-  Double_t totalElectrons = 100e9; //((*v))[0];
+  Double_t totalElectrons = 10*19.995e9; //((*v))[0];//100e9; //((*v))[0];
   Double_t electronTime = totalElectrons/(6.242e12); //6.242e12 e-/s at 1 microAmp
   
   // Tagger sizes

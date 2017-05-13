@@ -53,7 +53,7 @@ void NpolDetectorCountRates() {
   // Retrieve the object with the total number of electrons on target and calculate 
   // effective electron time on target per micro amp of beam
   TVectorD *v = (TVectorD*)inFile->Get("TVectorT<double>");
-  Double_t totalElectrons = 1e11; //((*v))[0];
+  Double_t totalElectrons = 10*19.995e9; //((*v))[0]; //1e11; //((*v))[0];
   Double_t electronTime = totalElectrons/(6.242e12); //6.242e12 e-/s at 1 microAmp
   std::cout << "Electron beam time at 1 micro-amp is " << electronTime << " s " << std::endl;
   std::cout << "Total electrons on target: " << totalElectrons/1e9 << " Billion" << std::endl;
@@ -138,6 +138,10 @@ void NpolDetectorCountRates() {
 
 		// Get the histogram and begin preparing it and placing on the TPad
 		TH1F *hFrame = (TH1F*) inFile->Get(histoName);
+		if(hFrame == NULL){
+		  std::cout << "Histogram is Empty" << std::endl;
+		  txtOut << "Histogram is Empty" << std::endl;
+		  continue;}
 		hFrame->SetStats(false); 
 		hFrame->SetFillColor(kBlue);
 		hFrame->SetTitleFont(16);
@@ -197,12 +201,12 @@ void NpolDetectorCountRates() {
 		for(int k = 0; k < nThresh; k++){
 		  double Threshold = Thresholds[k];
 		  DetCounts[i][j] = hFrame->Integral((Threshold/binWidth),nBins);    
-		  CountRates[k][i][j] = DetCounts[i][j]/electronTime/(1e6);
+		  CountRates[k][i][j] = DetCounts[i][j]/electronTime/(1e3);
 		  std::cout << "Threshold = " << Thresholds[k] << " MeV" << std::endl;
 		  cout << RealName << ", detector # " << pvNum << " counts/s for 1 microAmp of Beam " 
-			   << CountRates[k][i][j] << " MHz" << endl;
+			   << CountRates[k][i][j] << " kHz" << endl;
 		  cout << RealName << ", detector # " << pvNum << " counts/s for 80 microAmp of Beam " 
-			   << 80*CountRates[k][i][j] << " MHz" << endl;    
+			   << 80*CountRates[k][i][j] << " kHz" << endl;    
 		  cout << " " << endl;
 		  // THis creates the x,y vectors for TGraph later on
 		  x[k] = Thresholds[k];
@@ -218,7 +222,7 @@ void NpolDetectorCountRates() {
 		  // Output to text file for getting the numbers 
 		  txtOut << Thresholds[k] << "      " << 
 			DetCounts[i][j] << " Counts" << "      " << 
-			CountRates[k][i][j] << " MHz" <<std::endl;
+			CountRates[k][i][j] << " kHz" <<std::endl;
 		}
 		txtOut << std::endl;
 
@@ -228,7 +232,7 @@ void NpolDetectorCountRates() {
 		sprintf(pname2,"pad_%i_%i",i,j);
 		pad2[n][i][j] = (TPad*) gROOT->FindObject(pname2);
 		pad2[n][i][j]->Draw();     
-		//pad2[n][i][j]->SetLogy();
+		pad2[n][i][j]->SetLogy();
 		pad2[n][i][j]->cd();
 
 		//  Generate the graph and format it ... somewhat nicely
@@ -239,7 +243,7 @@ void NpolDetectorCountRates() {
 		gr->SetTitle(gtitle);   
 
 		// Clean up Y axis
-		gr->GetYaxis()->SetTitle("Count Rate at 1 #muA Beam (MHz)");   
+		gr->GetYaxis()->SetTitle("Count Rate at 1 #muA Beam (kHz)");   
 		gr->GetYaxis()->SetLabelFont(43);
 		gr->GetYaxis()->SetLabelSize(16);
 		gr->GetYaxis()->SetLabelOffset(0.02);
@@ -271,7 +275,7 @@ void NpolDetectorCountRates() {
 		sprintf(pname3,"pad_%i_%i",i,j);
 		pad3[n][i][j] = (TPad*) gROOT->FindObject(pname3);
 		pad3[n][i][j]->Draw();     
-		//pad3[n][i][j]->SetLogy();
+		pad3[n][i][j]->SetLogy();
 		pad3[n][i][j]->cd();
 
 		//  Generate the graph and format it ... somewhat nicely
@@ -291,7 +295,7 @@ void NpolDetectorCountRates() {
 		gr2->GetYaxis()->SetTitleOffset(5);
 		gr2->GetYaxis()->CenterTitle(); 
 		gr2->SetMinimum(0.6*smallestY2);
-		gr2->SetMaximum(1.2*largestY2);
+		gr2->SetMaximum(2*largestY2);
 		//gr2->Fit("expo","FQ");
 		//gr2->SetLineColor(4);
 		//gr2->GetFunction("expo")->SetLineColor(4);
