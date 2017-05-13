@@ -51,7 +51,7 @@ int main(int argc, char *argv[]) {
 
   Double_t NpolAng = 0.488692; // radians (28 degrees) NPOL angle from beamline
   Double_t targetTaggerPos = 150.0;  // Position of target tagger (cm)
-  Double_t npolTaggerPos = 681.50;  // Position of NPOL Tagger (cm) 681.50
+  Double_t npolTaggerPos = 681.50;  // Position of NPOL Tagger (cm) 681.50 for 7 meter
   Double_t theta = 0.160; // NPOL horizontal angular accecptance (radians)
   Double_t phi = 0.100; // NPOL vertical angular acceptance (radians)
   
@@ -71,16 +71,6 @@ int main(int argc, char *argv[]) {
   Double_t targetH = 26.00;  // height of target tagger (cm) Dipole 1 opeing 20.955 cm
   Double_t npolW = 2*npolTaggerPos*TMath::Tan(theta/2);  // width of npol tagger (cm)
   Double_t npolH = 2*npolTaggerPos*TMath::Tan(phi/2);  // height of npol tagger (cm)
-
-  //Double_t targetAlpha = targetW/(4*targetTaggerPos);  // Constant needed for solid angle
-  //Double_t npolAlpha = npolW/(4*npolTaggerPos);  // Constant needed for solid angle
-  
-  // Solid angle calculation! 
-  //Double_t targetSolidAngle = 8*(TMath::ATan(targetH/targetW)-TMath::ASin(targetH/TMath::Sqrt((1+TMath::Power(targetAlpha,2))*(TMath::Power(targetH,2)+TMath::Power(targetW,2)))));
-  //Double_t npolSolidAngle = 8*(TMath::ATan(npolH/npolW)-TMath::ASin(npolH/TMath::Sqrt((1+TMath::Power(npolAlpha,2))*(TMath::Power(npolH,2)+TMath::Power(npolW,2)))));
-  
-  //npolTree->SetCacheSize(50000000);
-  //statsTree->SetCacheSize(50000000);
   
   RetrieveENVvariables();
 
@@ -211,48 +201,52 @@ int main(int argc, char *argv[]) {
 
 
   // ****************  Done with Hisotgram allocation ***********************
-  
+  std::set<int> npolTrackIDs;
+  std::set<int> vertexTrackIDs;
   // loop over all entries (one per event)
   Int_t nentries = npolTree->GetEntries();
   for(int i = 0; i < nentries; i++) {
     npolTree->GetEntry(i);
 	PrintEventNumber(nentries,i);
-
-	std::set<int> npolTrackIDs;
+	
+	// ****** This section fills a std::set with the trackIDs of particles ****
+	// ****** generated in the specified volume(s).  This 'set' is then    ****
+	// ****** used to cut events later.
+	std::vector<NpolVertex *>::iterator v_it2;
+	for(v_it2 = vertexEntry->begin(); v_it2 != vertexEntry->end(); v_it2++){
+	  NpolVertex *aVertex = *v_it2;
+	  if(aVertex == NULL) continue;
+	  
+	  std::string volName = aVertex->volume;
+	  if(!(volName == "LeadCurtain")) vertexTrackIDs.insert(aVertex->trackId);
+	   
+	  }
 	
     // loop over all tagged particles (min. one step in NPOL tagger volume)
 	Double_t npolxMax = npolW/2; // acceptance limit
 	Double_t npolyMax = npolH/2; // acceptance limit
     std::vector<NpolTagger *>::iterator n_it;	
-	std::vector<NpolVertex *>::iterator v_it2;
     for(n_it = npolEntry->begin(); n_it != npolEntry->end(); n_it++){
       NpolTagger *npolTagged = *n_it;
       if(npolTagged == NULL)  continue;
-
+	  
 	  // Is it 1 of 9 particles we want?
 	  std::string particleName = npolTagged->particle;
 	  if(npolParticleKE.find(particleName) == npolParticleKE.end()) continue;
 	  
 	  // ******* Cut out neutral, charged or keep all particles ******* //
-	  // Reject if charged(use !) reject if not charged (remove !) or comment out if you want all included
-	  int pType = npolTagged->particleId;
-	  if(!(pType == 2112 || pType == 22)) continue; 
+	  // Reject if charged(use !) reject if not charged (remove !) 
+	  //or comment out if you want all included
+	  //int pType = npolTagged->particleId;
+	  //if((pType == 2112 || pType == 22)) continue; 
+
+	  //******** Cut out particles generated in a chosen volume ******* //
+	  if(vertexTrackIDs.find(npolTagged->trackId) != vertexTrackIDs.end()) continue;
 	  
-	  // ******** Cut out particles generated in a chosen volume ******* //
-	  /*for(v_it2 = vertexEntry->begin(); v_it2 != vertexEntry->end(); v_it2++){
-		NpolVertex *aVertex = *v_it2;
-		if(aVertex == NULL) continue;
-		
-		if(aVertex->trackId == npolTagged->trackId){
-		  std::string volName = aVertex->volume;
-		  if((volName == "Dipole1" || volName == "Dipole2" || volName == "Dipole1CuBar" 
-			  || volName == "Dipole2CuBar")) continue;
-		}
-		}*/
-
 	  // Insert Track ID into a set so we can cut later
-	  npolTrackIDs.insert(npolTagged->trackId);
-
+	  if(npolTrackIDs.find(npolTagged->trackId) == npolTrackIDs.end())
+		npolTrackIDs.insert(npolTagged->trackId);
+	  		
 	  Double_t fluxscaling = 1;	
 	  if((abs(npolTagged->lPosX) <= npolxMax) && (abs(npolTagged->lPosY) <= npolyMax)){
 		
@@ -274,7 +268,7 @@ int main(int argc, char *argv[]) {
 		(npolPhi[particleName])->Fill(phi);
 	  }
 	}
-
+	
 	// ************ Fill the 3D plot ***********************
 	std::vector<NpolVertex *>::iterator v_it;
 	for(v_it = vertexEntry->begin(); v_it != vertexEntry->end(); v_it++){
@@ -284,11 +278,11 @@ int main(int argc, char *argv[]) {
 	  if(npolTrackIDs.find(aVertex->trackId) != npolTrackIDs.end()){ 
 		std::string particleName = aVertex->particle;
 		(particleOrigin[particleName])->Fill(aVertex->posZ,aVertex->
-							 posX,aVertex->posY);
+											 posX,aVertex->posY);
 	  }
 	}
-
-
+	
+	
     // loop over all tagged particles (min. one step in target tagger volume)
 	Double_t targetxMax = targetW/2; // acceptance limit 
 	Double_t targetyMax = targetH/2; // acceptance limit
@@ -302,7 +296,7 @@ int main(int argc, char *argv[]) {
 		continue;
 	  Double_t fluxscaling = 1;
 	  if((abs(targetTagged->lPosX) <= targetxMax) && (abs(targetTagged->lPosY) <= targetyMax)){
-			
+		
 		// Calculating the theta and phi angles and saving to histograms
 		Double_t momx = targetTagged->momX*TMath::Cos(NpolAng) + targetTagged->momZ*TMath::Sin(NpolAng);
 		Double_t momy = targetTagged->momY;
@@ -331,95 +325,94 @@ int main(int argc, char *argv[]) {
 		}
 	  }
 	}
- 
+	
     // This section is designed to file up the histograms for hits in
     // the Scintillator detectors
-    std::map<std::string, double> eDep;
-    std::map<std::string, double> hitTime;
+	std::map<std::string, double> eDep;
+	std::map<std::string, double> hitTime;
 	
-    // loop over vector elements (one per vertex)
-    
-    int avNum; //, imprNum, pvNum; 
+	int avNum; //, imprNum, pvNum; 
 	//int stepCount = 0;
     std::vector<NpolStep *>::iterator s_it;
     for(s_it = anStep->begin(); s_it != anStep->end(); s_it++){
       NpolStep *aStep = *s_it;
       double Ethreshold;
-  
+	  
       if(aStep == NULL) continue;
-
+	  
 	  if((npolTrackIDs.find(aStep->trackId) != npolTrackIDs.end()) 
 		 || (npolTrackIDs.find(aStep->parentId) != npolTrackIDs.end())){
-
+		
 		npolTrackIDs.insert(aStep->trackId);
 		
 	  } else {
+		std::cout << "Rejected Step!" << std::endl;
 		continue;
 	  }
-
+	  
 	  if(eDep.find(aStep->volume) == eDep.end())
 		eDep[aStep->volume] = 0;
 	  eDep[aStep->volume] += aStep->eDep;
-
-		avNum = GetAVNumber(aStep->volume);
-		switch(avNum){
-		case 1: case 2: case 5: case 6:
-		  Ethreshold = 1.0;
-		  break;
-		case 3: case 4: case 7: case 8: case 13:
-		  Ethreshold = 1.0;
-		  break;
-		case 9: case 10:
-		  Ethreshold = 1.0;
-		  break;
-		default:
-		  break;
-		}
-	
-		if(avNum != 0) {
-		  if(hitTime.find(aStep->volume) == hitTime.end() 
-			 && eDep[aStep->volume] >= Ethreshold)
-			hitTime[aStep->volume] = aStep->time;
-		}
-		
-		double t2 = 0.0, t1 = 0.0, dTOF = 0.0;
-		std::map<std::string,double>::iterator itt;
-		
-		for(itt = hitTime.begin(); itt != hitTime.end(); itt++){
-		  avNum = GetAVNumber(itt->first);
-		  if((avNum == 1 || avNum == 2 || avNum == 5 || avNum == 6) 
-			 && t2 == 0.0)
-			t2 = itt->second;
-		  if((avNum == 9 || avNum == 10) && t1 == 0.0)
-			t1 = itt->second;
-		}
-		dTOF = (t2-t1);
-		if(dTOF != 0.0) delta_TOF->Fill(dTOF);   
-		
-		std::map<std::string,double>::iterator it;
-		for(it = eDep.begin(); it != eDep.end(); it++) {
-		  if(histograms.find(it->first) == histograms.end()) {
-			avNum = GetAVNumber(it->first);
-			if((avNum == 1 || avNum == 2 || avNum == 5 || avNum == 6 || 
-				avNum == 9 || avNum == 10)){
-			  histograms[it->first] = 
-				new TH1F((it->first).c_str(),(it->first).c_str(),1000,0,200);
-			}else if((avNum == 3 || avNum == 4 || avNum == 7 || avNum == 8 || 
-					  avNum == 11 || avNum == 12 || avNum == 13)){
-			  histograms[it->first] = 
-				new TH1F((it->first).c_str(),(it->first).c_str(),200,0,20);
-			}else if(avNum == 0){
-			  histograms[it->first] = 
-				new TH1F((it->first).c_str(),(it->first).c_str(),1000,0,200);
-			}
+	  
+	  avNum = GetAVNumber(aStep->volume);
+	  switch(avNum){
+	  case 1: case 2: case 5: case 6:
+		Ethreshold = 1.0;
+		break;
+	  case 3: case 4: case 7: case 8: case 13:
+		Ethreshold = 1.0;
+		break;
+	  case 9: case 10:
+		Ethreshold = 1.0;
+		break;
+	  default:
+		break;
+	  }
+	  
+	  if(avNum != 0) {
+		if(hitTime.find(aStep->volume) == hitTime.end() 
+		   && eDep[aStep->volume] >= Ethreshold)
+		  hitTime[aStep->volume] = aStep->time;
+	  }
+	  
+	  double t2 = 0.0, t1 = 0.0, dTOF = 0.0;
+	  std::map<std::string,double>::iterator itt;
+	  
+	  for(itt = hitTime.begin(); itt != hitTime.end(); itt++){
+		avNum = GetAVNumber(itt->first);
+		if((avNum == 1 || avNum == 2 || avNum == 5 || avNum == 6) 
+		   && t2 == 0.0)
+		  t2 = itt->second;
+		if((avNum == 9 || avNum == 10) && t1 == 0.0)
+		  t1 = itt->second;
+	  }
+	  dTOF = (t2-t1);
+	  if(dTOF != 0.0) delta_TOF->Fill(dTOF);   
+	  
+	  std::map<std::string,double>::iterator it;
+	  for(it = eDep.begin(); it != eDep.end(); it++) {
+		if(histograms.find(it->first) == histograms.end()) {
+		  avNum = GetAVNumber(it->first);
+		  if((avNum == 1 || avNum == 2 || avNum == 5 || avNum == 6 || 
+			  avNum == 9 || avNum == 10)){
+			histograms[it->first] = 
+			  new TH1F((it->first).c_str(),(it->first).c_str(),1000,0,200);
+		  }else if((avNum == 3 || avNum == 4 || avNum == 7 || avNum == 8 || 
+					avNum == 11 || avNum == 12 || avNum == 13)){
+			histograms[it->first] = 
+			  new TH1F((it->first).c_str(),(it->first).c_str(),200,0,20);
+		  }else if(avNum == 0){
+			histograms[it->first] = 
+			  new TH1F((it->first).c_str(),(it->first).c_str(),1000,0,200);
 		  }
-		  if(it->second != 0.0) (histograms[it->first])->Fill(it->second);
 		}
+		if(it->second != 0.0) (histograms[it->first])->Fill(it->second);
+	  }
+	  eDep.clear();	  // Clear the maps BEFORE cycling the steps loop
+	  hitTime.clear();  // This MUST be done before the next } - brace
 	}
- 
-	eDep.clear();	
-	hitTime.clear();
-	npolTrackIDs.clear();
+	npolTrackIDs.clear(); // clear the sets before cycling the event loop
+	vertexTrackIDs.clear(); 
   }
   
   /* // Write it all out to the ROOT file.*/
@@ -628,3 +621,16 @@ void RetrieveENVvariables() {
   }
 }
 
+//if((volName == "LeadCurtain"))
+//if((volName == "HutFrontWall")) 
+//if((volName == "Dipole1" || volName == "Dipole2" || volName == "Dipole1CuBar" || volName == "Dipole2CuBar"))
+
+//Double_t targetAlpha = targetW/(4*targetTaggerPos);  // Constant needed for solid angle
+//Double_t npolAlpha = npolW/(4*npolTaggerPos);  // Constant needed for solid angle
+
+// Solid angle calculation! 
+//Double_t targetSolidAngle = 8*(TMath::ATan(targetH/targetW)-TMath::ASin(targetH/TMath::Sqrt((1+TMath::Power(targetAlpha,2))*(TMath::Power(targetH,2)+TMath::Power(targetW,2)))));
+//Double_t npolSolidAngle = 8*(TMath::ATan(npolH/npolW)-TMath::ASin(npolH/TMath::Sqrt((1+TMath::Power(npolAlpha,2))*(TMath::Power(npolH,2)+TMath::Power(npolW,2)))));
+
+//npolTree->SetCacheSize(50000000);
+//statsTree->SetCacheSize(50000000);
