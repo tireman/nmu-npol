@@ -50,18 +50,18 @@ void FrontAnalyzerCountRateOverlay() {
   //TString OutputFile = FormOutputFile(OutputDir);
 
   Double_t y1min = 0; Double_t y1max = 0;
-  Double_t y2min = 0.0001; Double_t y2max = .705;
-  Double_t y3min = 0.90; Double_t y3max = 1.05;
+  Double_t y2min = 0.0005; Double_t y2max = 1.705;
+  Double_t y3min = 0.75; Double_t y3max = 2.25;
  
-  TString PType1 = "Neutral";
-  TString PType2 = "Neutral";
+  TString PType1 = "Charged";
+  TString PType2 = "Charged";
   TString CutType1 = "AllVolumes_";  // put '_' after any Non-NULL strings
-  TString CutType2 = "CutDipoleSurface_";
+  TString CutType2 = "AllVolumes_";
   TString BaseDIR = "/home/tireman/data1/TargetTaggerSource/4.4GeV/4Bdl/ComparisonStuff";
 
-  TFile *inFile = TFile::Open(BaseDIR + "/histos/sourceTotal_Lead15cm_4.4GeV_4Bdl_" + CutType1 + PType1+"_Histos.root");
-  TFile *inFile2 = TFile::Open(BaseDIR + "/histos/sourceTotal_Lead15cm_4.4GeV_4Bdl_" + CutType2 + PType2+"_Histos.root");
-  TFile *outFile = new TFile(BaseDIR + "/Plots/FrontAnalyzerComparison_" + CutType1 + "4Bdl_7m_" + PType1 + "_" + CutType2 + "_4Bdl_7m_" + PType2 + ".root","RECREATE");
+  TFile *inFile = TFile::Open(BaseDIR + "/histos/sourceTotal_Lead15cm_4.4GeV_1Bdl_7m_" + CutType1 + PType1+"_Histos.root");
+  TFile *inFile2 = TFile::Open(BaseDIR + "/histos/sourceTotal_Lead15cm_4.4GeV_1Bdl_5m_" + CutType2 + PType2+"_Histos.root");
+  TFile *outFile = new TFile(BaseDIR + "/Plots/FrontAnalyzerComparison_" + CutType1 + "1Bdl_7m_" + PType1 + "_" + CutType2 + "_1Bdl_5m_" + PType2 + ".root","RECREATE");
 
   // Retrieve the object with the total number of electrons on target and calculate 
   // effective electron time on target per micro amp of beam
@@ -168,8 +168,8 @@ void FrontAnalyzerCountRateOverlay() {
      hFrame->GetXaxis()->SetTickLength(yFactor*0.06/xFactor);
      
 	 TLegend *legend2 = new TLegend(0.7,0.7,0.9,0.8);
-	 legend2->AddEntry(hFrame, PType1 + " Particles","lp");
-	 legend2->AddEntry(hFrame2, PType2 + " Particles","lp");
+	 legend2->AddEntry(hFrame, PType1 + " Particles, 4.3 T m ","lp");
+	 legend2->AddEntry(hFrame2, PType2 + " Particles, 1.0 T m ","lp");
 	 legend2->Draw();
 
      // Count up events in Front layer of taggers above Threshold
@@ -260,8 +260,8 @@ void FrontAnalyzerCountRateOverlay() {
 	 mg->GetXaxis()->SetLabelSize(16);
 
 	 TLegend *legend = new TLegend(0.7,0.7,0.9,0.8);
-	 legend->AddEntry(gr, PType1 + " Particles","lp");
-	 legend->AddEntry(gr2, PType2 + " Particles","lp");
+	 legend->AddEntry(gr, PType1 + " Particles, 4.3 T m ","lp");
+	 legend->AddEntry(gr2, PType2 + " Particles, 1.0 T m ","lp");
 	 legend->Draw();
 
 	 pad1[i][j]->Modified();
