@@ -3,13 +3,12 @@
 export Lead=15
 export Energy=4.4
 export Bfield=1
-#export PType=Electron
 
 export BUILD_DIR=/home/tireman/simulation/jlab/nmu-npol/build/simulation
 export NPOLBASENAME=source$PType\_Lead$Lead\cm_$Energy\GeV_$Bfield\Bdl
 export NPOLEVENTSPERFILE=100000
-export NPOLDIR=/home/tireman/data1/TargetTaggerSource/$Energy\GeV/$Bfield\Bdl
-export NPOLWORKDIR=/home/tireman/data1/TargetTaggerSource/$Energy\GeV/$Bfield\Bdl
+export NPOLDIR=/home2/tireman-h2/data1/TargetTaggerSource/$Energy\GeV/$Bfield\Bdl/6mSameAcceptance
+export NPOLWORKDIR=/home2/tireman-h2/data1/TargetTaggerSource/$Energy\GeV/$Bfield\Bdl/6mSameAcceptance
 
 export RawDataDir=$NPOLDIR/root
 export HistoOutputDir=$NPOLDIR/histos

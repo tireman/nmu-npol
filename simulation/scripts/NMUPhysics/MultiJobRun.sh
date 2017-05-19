@@ -1,7 +1,5 @@
 #!/bin/bash
 
-#source /home/tireman/simulation/jlab/nmu-npol/build/simulation/scripts/NMUPhysics/NMUsetuprun.sh
-
 ./scripts/NMUPhysics/NMUjobsubmitPion+.sh 1 10 &
 ./scripts/NMUPhysics/NMUjobsubmitPion-.sh 1 10 &
 
