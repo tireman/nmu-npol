@@ -212,7 +212,7 @@ int main(int argc, char *argv[]) {
 	// ****** This section fills a std::set with the trackIDs of particles ****
 	// ****** generated in the specified volume(s).  This 'set' is then    ****
 	// ****** used to cut events later.
-	std::vector<NpolVertex *>::iterator v_it2;
+	/*std::vector<NpolVertex *>::iterator v_it2;
 	for(v_it2 = vertexEntry->begin(); v_it2 != vertexEntry->end(); v_it2++){
 	  NpolVertex *aVertex = *v_it2;
 	  if(aVertex == NULL) continue;
@@ -220,7 +220,7 @@ int main(int argc, char *argv[]) {
 	  std::string volName = aVertex->volume;
 	  if(!(volName == "LeadCurtain")) vertexTrackIDs.insert(aVertex->trackId);
 	   
-	  }
+	  }*/
 	
     // loop over all tagged particles (min. one step in NPOL tagger volume)
 	Double_t npolxMax = npolW/2; // acceptance limit
@@ -237,8 +237,8 @@ int main(int argc, char *argv[]) {
 	  // ******* Cut out neutral, charged or keep all particles ******* //
 	  // Reject if charged(use !) reject if not charged (remove !) 
 	  //or comment out if you want all included
-	  //int pType = npolTagged->particleId;
-	  //if((pType == 2112 || pType == 22)) continue; 
+	  int pType = npolTagged->particleId;
+	  if((pType == 2112 || pType == 22)) continue; 
 
 	  //******** Cut out particles generated in a chosen volume ******* //
 	  if(vertexTrackIDs.find(npolTagged->trackId) != vertexTrackIDs.end()) continue;
