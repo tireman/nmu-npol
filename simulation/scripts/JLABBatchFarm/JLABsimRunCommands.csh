@@ -1,7 +1,7 @@
 #!/bin/tsch
 
 setenv BUILD_DIR /home/tireman/simulation/e11_12_009/background/nmu-npol/build/simulation
-source $BUILD_DIR/../../simulation/scripts/JLABBatchFarm/JLABsetupRun.csh
+source $BUILD_DIR/scripts/JLABBatchFarm/JLABsetupRun.csh
 
 setenv JOBNUMBER $1
 
@@ -28,9 +28,7 @@ hadd -f -k $NPOLDIR/root/$NPOLBASENAME\_$1.root $NPOLDIR/root/$NPOLBASENAME\_$1\
 rm $NPOLDIR/root/$NPOLBASENAME\_$1\_*.root
 
 source $BUILD_DIR/../../analysis/envscripts/JLABsetupAnalysis.csh
-#$BUILD_DIR/../analysis/NpolAnalysis
+
 $BUILD_DIR/../analysis2/NpolProcessEvents
 
-#root -b -q $BUILD_DIR/../../analysis/scripts/ProcessElectrons.cxx+
-
-#rm $NPOLDIR/root/$NPOLBASENAME\_$1.root
+rm $NPOLDIR/root/$NPOLBASENAME\_$1.root

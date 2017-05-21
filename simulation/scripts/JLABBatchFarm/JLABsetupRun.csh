@@ -6,8 +6,8 @@ setenv Bfield 4
 
 setenv NPOLLIB_DIR $BUILD_DIR/../npollib
 setenv NPOLBASENAME electronBeam_Lead$Lead\cm_$Energy\GeV_$Bfield\Bdl
-setenv NPOLDIR /volatile/hallc/cgen/tireman/FebRun2017/$Energy\GeV/$Bfield\Bdl
-setenv NPOLWORKDIR /volatile/hallc/cgen/tireman/FebRun2017/$Energy\GeV/$Bfield\Bdl
+setenv NPOLDIR /volatile/hallc/cgen/tireman/AprilRun2017/$Energy\GeV/$Bfield\Bdl
+setenv NPOLWORKDIR /volatile/hallc/cgen/tireman/AprilRun2017/$Energy\GeV/$Bfield\Bdl
 setenv NPOLEVENTSPERFILE 100000
 
 setenv RawDataDir $NPOLDIR/root

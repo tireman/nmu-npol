@@ -5,9 +5,10 @@ setenv Energy 4.4
 setenv Bfield 4
 
 setenv NPOLLIB_DIR $BUILD_DIR/../npollib
-setenv NPOLBASENAME electronBeam_Lead$Lead\cm_$Energy\GeV_$Bfield\Bdl
-setenv NPOLDIR /volatile/hallc/cgen/tireman/FebRun2017/$Energy\GeV/$Bfield\Bdl
-setenv NPOLWORKDIR /volatile/hallc/cgen/tireman/FebRun2017/$Energy\GeV/$Bfield\Bdl
+setenv NPOLBASENAME source$pType\_Lead$Lead\cm_$Energy\GeV_$Bfield\Bdl 
+#electronBeam_Lead$Lead\cm_$Energy\GeV_$Bfield\Bdl
+setenv NPOLDIR /volatile/hallc/cgen/tireman/TargetTaggerRuns/Lead$Lead\cm/$Energy\GeV/$Bfield\Bdl/Location_1
+setenv NPOLWORKDIR /volatile/hallc/cgen/tireman/TargetTaggerRuns/Lead$Lead\cm/$Energy\GeV/$Bfield\Bdl/Location_1
 
 setenv RawDataDir $NPOLDIR/root
 setenv OutputDir $NPOLWORKDIR/Output

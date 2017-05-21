@@ -18,7 +18,6 @@ end
 foreach j (`seq $1 1 $2`)
 
   jsub jsubfile_$j
-  sleep 1s
   rm jsubfile_$j
 
 end
