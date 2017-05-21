@@ -24,6 +24,11 @@
 #include "../../npollib/include/NpolStatistics.hh"
 #include "../../npollib/include/NpolStep.hh"
 
+#include "NpolVertex.hh"
+#include "NpolTagger.hh"
+#include "NpolStatistics.hh"
+#include "NpolStep.hh"
+
 void RetrieveENVvariables();
 TString FormInputFile(TString InputDir);
 TString FormOutputFile(TString OutputDir);
@@ -40,11 +45,12 @@ TString Energy = "";
 TString Bfield = "";
 TString OutputDir = "";
 TString InputDir = "";
+TString CType = "";
 
 int main(int argc, char *argv[]) {
   TString analysisDir = getenv("NPOLLIB_DIR");
-  gSystem->Load(analysisDir + "/" + "libNpolClasses.so"); 
-  
+  //gSystem->Load(analysisDir + "/" + "libNpolClasses.so"); 
+  gSystem->Load("libNpolClasses.so");
   // Set up the TTrees and their branch addresses
   TChain *npolTree = new TChain("T");
   TChain *statsTree = new TChain("T2");
@@ -146,15 +152,15 @@ int main(int argc, char *argv[]) {
     std::string correlateHistoName = "Correlated_TargetFlux_" + it->first;
     std::string correlateHistoTitle = it->second + " Flux vs. KE Target Tagger Correlated to NPOL Tagger";
 
-   	std::string targetThetaName = "targetTheta_" + it->first;
-	std::string targetThetaTitle = it->second + " Particles vs. Theta Angle in Target Tagger";
-	std::string targetPhiName = "targetPhi_" + it->first;
-	std::string targetPhiTitle = it->second + " Particles vs. Phi Angle in Target Tagger";
+    std::string targetThetaName = "targetTheta_" + it->first;
+    std::string targetThetaTitle = it->second + " Particles vs. Theta Angle in Target Tagger";
+    std::string targetPhiName = "targetPhi_" + it->first;
+    std::string targetPhiTitle = it->second + " Particles vs. Phi Angle in Target Tagger";
 
-	std::string npolThetaName = "npolTheta_" + it->first;
-	std::string npolThetaTitle = it->second + " Particles vs. Theta Angle in Npol Tagger";
-	std::string npolPhiName = "npolPhi_" + it->first;
-	std::string npolPhiTitle = it->second + " Particles vs. Phi Angle in Npol Tagger";
+    std::string npolThetaName = "npolTheta_" + it->first;
+    std::string npolThetaTitle = it->second + " Particles vs. Theta Angle in Npol Tagger";
+    std::string npolPhiName = "npolPhi_" + it->first;
+    std::string npolPhiTitle = it->second + " Particles vs. Phi Angle in Npol Tagger";
 
     std::string targetXYHistoName = "targetXY_" + it->first;
     std::string npolXYHistoName = "npolXY_" + it->first;
@@ -163,34 +169,34 @@ int main(int argc, char *argv[]) {
     std::string correlateXYHistoName = "Correlated_targetXY_" + it->first;
     std::string correlateXYTitle = it->second + " XY position in Target Tagger Correlated to NPOL Tagger";
 
-	std::string origin3DHistoTitle = it->second + " 3D position of Vertex in System from NPOL Tagger hit";
-	std::string origin3DHistoName = "Origin3D_Position_" + it->first;
+    std::string origin3DHistoTitle = it->second + " 3D position of Vertex in System from NPOL Tagger hit";
+    std::string origin3DHistoName = "Origin3D_Position_" + it->first;
 
-	particleOrigin[it->first] = 
-	  new TH3F(origin3DHistoName.c_str(), origin3DHistoTitle.c_str(),200,-100.,+700.,200,-700., +100.,200,-300., +300.);
+    particleOrigin[it->first] = 
+      new TH3F(origin3DHistoName.c_str(), origin3DHistoTitle.c_str(),200,-100.,+700.,200,-700., +100.,200,-300., +300.);
 
     targetParticleKE[it->first] = 
-	  new TH1F(targetHistoName.c_str(), targetHistoTitle.c_str(),nbins,bins);
+      new TH1F(targetHistoName.c_str(), targetHistoTitle.c_str(),nbins,bins);
     targetParticlePOS[it->first] = 
-	  new TH2F(targetXYHistoName.c_str(),targetXYHistoTitle.c_str()
-			   ,400,-targetW/2,targetW/2,400,-targetH/2,targetH/2);
+      new TH2F(targetXYHistoName.c_str(),targetXYHistoTitle.c_str()
+               ,400,-targetW/2,targetW/2,400,-targetH/2,targetH/2);
 
     npolParticleKE[it->first] = 
-	  new TH1F(npolHistoName.c_str(), npolHistoTitle.c_str(),nbins,bins);
+      new TH1F(npolHistoName.c_str(), npolHistoTitle.c_str(),nbins,bins);
     npolParticlePOS[it->first] = 
-	  new TH2F(npolXYHistoName.c_str(),npolXYHistoTitle.c_str()
-			   ,400,-npolW/2,npolW/2, 400, -npolH/2,npolH/2);
+      new TH2F(npolXYHistoName.c_str(),npolXYHistoTitle.c_str()
+               ,400,-npolW/2,npolW/2, 400, -npolH/2,npolH/2);
 
     correlateKE[it->first] = 
-	  new TH1F(correlateHistoName.c_str(), correlateHistoTitle.c_str(),nbins,bins);
+      new TH1F(correlateHistoName.c_str(), correlateHistoTitle.c_str(),nbins,bins);
     correlatePOS[it->first] = 
-	  new TH2F(correlateXYHistoName.c_str(),correlateXYTitle.c_str()
-			   ,400,-npolW/2,npolW/2,400,-npolH/2,npolH/2); 
+      new TH2F(correlateXYHistoName.c_str(),correlateXYTitle.c_str()
+               ,400,-npolW/2,npolW/2,400,-npolH/2,npolH/2); 
 
-	targetTheta[it->first] = new TH1F(targetThetaName.c_str(),targetThetaTitle.c_str(),300,0.0,TMath::Pi());
-	targetPhi[it->first] = new TH1F(targetPhiName.c_str(),targetPhiTitle.c_str(),600,0.0,2*TMath::Pi());
-	npolTheta[it->first] = new TH1F(npolThetaName.c_str(),npolThetaTitle.c_str(),300,0.0,TMath::Pi());
-	npolPhi[it->first] = new TH1F(npolPhiName.c_str(),npolPhiTitle.c_str(),600,0.0,2*TMath::Pi());
+    targetTheta[it->first] = new TH1F(targetThetaName.c_str(),targetThetaTitle.c_str(),300,0.0,TMath::Pi());
+    targetPhi[it->first] = new TH1F(targetPhiName.c_str(),targetPhiTitle.c_str(),600,0.0,2*TMath::Pi());
+    npolTheta[it->first] = new TH1F(npolThetaName.c_str(),npolThetaTitle.c_str(),300,0.0,TMath::Pi());
+    npolPhi[it->first] = new TH1F(npolPhiName.c_str(),npolPhiTitle.c_str(),600,0.0,2*TMath::Pi());
   }  
 
   // Allocate the dTOF histogram
@@ -207,38 +213,48 @@ int main(int argc, char *argv[]) {
   Int_t nentries = npolTree->GetEntries();
   for(int i = 0; i < nentries; i++) {
     npolTree->GetEntry(i);
-	PrintEventNumber(nentries,i);
-	
-	// ****** This section fills a std::set with the trackIDs of particles ****
-	// ****** generated in the specified volume(s).  This 'set' is then    ****
-	// ****** used to cut events later.
-	/*std::vector<NpolVertex *>::iterator v_it2;
-	for(v_it2 = vertexEntry->begin(); v_it2 != vertexEntry->end(); v_it2++){
-	  NpolVertex *aVertex = *v_it2;
-	  if(aVertex == NULL) continue;
-	  
-	  std::string volName = aVertex->volume;
-	  if(!(volName == "LeadCurtain")) vertexTrackIDs.insert(aVertex->trackId);
-	   
-	  }*/
-	
+    PrintEventNumber(nentries,i);
+    
+    // ****** This section fills a std::set with the trackIDs of particles ****
+    // ****** generated in the specified volume(s).  This 'set' is then    ****
+    // ****** used to cut events later.
+    /*std::vector<NpolVertex *>::iterator v_it2;
+    for(v_it2 = vertexEntry->begin(); v_it2 != vertexEntry->end(); v_it2++){
+      NpolVertex *aVertex = *v_it2;
+      if(aVertex == NULL) continue;
+      
+      std::string volName = aVertex->volume;
+      if(!(volName == "LeadCurtain")) vertexTrackIDs.insert(aVertex->trackId);
+       
+      }*/
+    
     // loop over all tagged particles (min. one step in NPOL tagger volume)
-	Double_t npolxMax = npolW/2; // acceptance limit
-	Double_t npolyMax = npolH/2; // acceptance limit
-    std::vector<NpolTagger *>::iterator n_it;	
+    Double_t npolxMax = npolW/2; // acceptance limit
+    Double_t npolyMax = npolH/2; // acceptance limit
+    std::vector<NpolTagger *>::iterator n_it;   
     for(n_it = npolEntry->begin(); n_it != npolEntry->end(); n_it++){
       NpolTagger *npolTagged = *n_it;
       if(npolTagged == NULL)  continue;
-	  
-	  // Is it 1 of 9 particles we want?
-	  std::string particleName = npolTagged->particle;
-	  if(npolParticleKE.find(particleName) == npolParticleKE.end()) continue;
-	  
-	  // ******* Cut out neutral, charged or keep all particles ******* //
-	  // Reject if charged(use !) reject if not charged (remove !) 
-	  //or comment out if you want all included
-	  int pType = npolTagged->particleId;
-	  if((pType == 2112 || pType == 22)) continue; 
+      
+      // Is it 1 of 9 particles we want?
+      std::string particleName = npolTagged->particle;
+      if(npolParticleKE.find(particleName) == npolParticleKE.end()) continue;
+      std::cout << "Got to this point 2!" << std::endl;
+
+      // ******* Cut out neutral, charged or keep all particles ******* //
+      // Reject if charged(use !) reject if not charged (remove !) 
+      //or comment out if you want all included
+      int pType = npolTagged->particleId;
+      if(CType == "Neutral"){
+		std::cout << "Neutral!" << std::endl;
+        if(!(pType == 2112 || pType == 22)) continue; 
+	  }else if(CType == "Charged"){
+		std::cout << "Charged!" << std::endl;
+		if((pType == 2112 || pType == 22)) continue;
+	  }else if(CType == "All"){
+		std::cout << "All!" << std::endl;
+		// all all
+	  }
 
 	  //******** Cut out particles generated in a chosen volume ******* //
 	  if(vertexTrackIDs.find(npolTagged->trackId) != vertexTrackIDs.end()) continue;
@@ -290,13 +306,14 @@ int main(int argc, char *argv[]) {
     for(t_it = targetEntry->begin(); t_it != targetEntry->end(); t_it++){
       NpolTagger *targetTagged = *t_it;
       if(targetTagged == NULL) continue;  
-      
+       
 	  std::string particleName = targetTagged->particle;
       if(targetParticleKE.find(particleName) == targetParticleKE.end())
 		continue;
+std::cout << "Got to this point 3!" << std::endl;
 	  Double_t fluxscaling = 1;
 	  if((abs(targetTagged->lPosX) <= targetxMax) && (abs(targetTagged->lPosY) <= targetyMax)){
-		
+		std::cout << "Got to this point 4!" << std::endl;
 		// Calculating the theta and phi angles and saving to histograms
 		Double_t momx = targetTagged->momX*TMath::Cos(NpolAng) + targetTagged->momZ*TMath::Sin(NpolAng);
 		Double_t momy = targetTagged->momY;
@@ -346,7 +363,7 @@ int main(int argc, char *argv[]) {
 		npolTrackIDs.insert(aStep->trackId);
 		
 	  } else {
-		std::cout << "Rejected Step!" << std::endl;
+		//d::cout << "Rejected Step!" << std::endl;
 		continue;
 	  }
 	  
@@ -563,15 +580,21 @@ TString FormInputFile(TString InputDir){
 
 TString FormOutputFile(TString OutputDir){
   
-  TString fileName =  OutputDir + "/" + BaseName + "_Histos_" + JobNum + ".root";
+  TString fileName =  OutputDir + "/" + BaseName + "_Histos_" + CType + "_" + JobNum + ".root";
   
   return fileName;
 }
 
 void RetrieveENVvariables() {
 
- if(getenv("JOBNUMBER")){
-    JobNum = getenv("JOBNUMBER");
+  if(getenv("CHARGE_TYPE")){
+	CType = getenv("CHARGE_TYPE");
+  }else{
+	CType = "All";
+  }
+
+  if(getenv("JOBNUMBER")){
+	JobNum = getenv("JOBNUMBER");
   }else{
     JobNum = "99999"; // default job number is 99999
   }
