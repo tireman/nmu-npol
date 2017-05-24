@@ -3,7 +3,7 @@ cmake_minimum_required(VERSION 2.8 FATAL_ERROR)
 project (NpolProcessEvents)
 message("Configuring project NpolProcessEvents.")
 
-set(CMAKE_CXX_FLAGS "-D_GLIBCXX_USE_CXX11_ABI=0 -Wall -std=c++11")
+set(CMAKE_CXX_FLAGS "-Wall -std=c++11")
 
 include_directories(${PROJECT_SOURCE_DIR}/include)
 #include_directories(../npollib/include)
