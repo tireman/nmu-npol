@@ -46,6 +46,7 @@ G4double NpolDipole1::FM = 4.3;
 G4double NpolDipole1::dipole1FieldY = FM*0.40984*tesla; 
 
 G4double NpolDipole1::NpolAng = 28.0*deg;
+G4double NpolDipole1::PosD1 = 2.5096*m;
 G4double NpolDipole1::yokeLength = 48.0*2.54*cm; // inches to cm
 G4double NpolDipole1::gapWidth = 22.0*2.54*cm; // inches to cm
 G4double NpolDipole1::gapLength = 48.0*2.54*cm; // inches to cm
@@ -195,7 +196,7 @@ void NpolDipole1::ConstructDipole1Field(){
 void NpolDipole1::Place(G4LogicalVolume *motherLV) {
 
   G4double inch = 2.54*cm;
-  G4double PosD1 = 2.5096*m, BarOffSet = 18.5*inch;
+  G4double BarOffSet = 18.5*inch;
   G4double BarVertOffset = yokeGap/2 + 3.5*inch;
   G4double GapOffset = yokeGap/2;
   G4double EndOffSet = +29.0*inch, ClampOffSet = 37.0*inch;

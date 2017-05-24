@@ -36,6 +36,7 @@
 #include "NpolDipole1.hh"
 #include "NpolDipole2.hh"
 #include "NpolShieldHut.hh"
+#include "NpolLeadCurtain.hh"
 #include "NpolHBender.hh"
 #include "NpolBDump.hh"
 #include "NpolParticleFluxTagger.hh"
@@ -48,7 +49,7 @@ NpolDetectorConstruction::NpolDetectorConstruction() {
   detectors.insert(new NpolPolarimeter());
   //detectors.insert(new NpolPolarimeter6Layer()); // invoke this when studying 6 layers
   //detectors.insert(new NpolScatteringChamber);
-  detectors.insert(new NpolHallShell);
+  //detectors.insert(new NpolHallShell);
   //detectors.insert(new NpolBeamlineUpper);
   //detectors.insert(new NpolBeamlineDown);
   detectors.insert(new NpolDipole1);
@@ -56,6 +57,7 @@ NpolDetectorConstruction::NpolDetectorConstruction() {
   detectors.insert(new NpolShieldHut);
   //detectors.insert(new NpolHBender);
   detectors.insert(new NpolParticleFluxTagger);
+  detectors.insert(new NpolLeadCurtain);
   //detectors.insert(new NpolBDump);
 }
 

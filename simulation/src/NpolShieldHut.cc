@@ -25,18 +25,15 @@
 #include "NpolMaterials.hh"
 #include "NpolShieldHut.hh"
 
+G4double NpolShieldHut::PosFront = 6.35*m; //-2.0*m; // position of front wall (center)
 G4double NpolShieldHut::vertAngle = 0.1000*rad; // 0.100 rad nominal 0.120 rad for 10.25/14.75in gap// vertical acceptance angle
 G4double NpolShieldHut::horAngle = 0.160*rad;  // 0.160 rad nomial 0.200 rad for 10in gap horizontal acceptance angle // the max for 56cm wide gap is +/- 100 mrad
-
 G4double NpolShieldHut::NpolAng = 28.0*deg; // Polarimeter central angle
-G4double NpolShieldHut::leadThickness = 15.0*cm;  // thickness of the lead curtain
 G4double NpolShieldHut::wallThickness = 0.900*m;  // Thickness of the concrete walls (nominal)
 G4double NpolShieldHut::wallHeight = 7.0*m; // Nominal height of the shield hut walls
 G4double NpolShieldHut::frontWallWidth = 4.8768*m;  // Width of the front and back walls
 G4double NpolShieldHut::vertOffSet = 0.3424*m; // Vertical offset for target pivot
-G4double NpolShieldHut::PosFront = 6.35*m; //-2.0*m; // position of front wall (center)
 G4double NpolShieldHut::OffSetRoof = (wallHeight + wallThickness)/2-vertOffSet; // Roof offset
-G4double NpolShieldHut::PosLead = PosFront - (leadThickness + wallThickness)/2; // position of lead 
 G4double NpolShieldHut::PosTagger = PosFront + wallThickness/2 + 1.50*cm;  // position of NPOL tagger
 G4double NpolShieldHut::sideWallLength = 5.50*m - wallThickness; // length of side walls
 
@@ -50,27 +47,12 @@ NpolShieldHut::NpolShieldHut() {
   ConstructHutSideWall();
   ConstructHutRoof();
   ConstructNPOLTagger();
-  ConstructLeadCurtain();
 }
 
 NpolShieldHut::~NpolShieldHut() {}
 
 G4String NpolShieldHut::GetName() {
   return G4String("Shield Hut");
-}
-
-// Construct a lead shield for in front of the polarimeter
-void NpolShieldHut::ConstructLeadCurtain(){
-
-  // Make lead curtain 5*cm wider/taller than the collimator
-  G4double xlen = 2*(PosLead)*tan(horAngle/2) + 5.0*cm;
-  G4double ylen = 2*(PosLead)*tan(vertAngle/2) + 5.0*cm; 
-
-  G4Box *LeadCurtain = new G4Box("LeadCurtain",xlen/2,ylen/2,leadThickness/2);
-  LeadCurtainLV = 
-	new G4LogicalVolume(LeadCurtain,NpolMaterials::GetInstance()->GetMaterial("Pb"),"LeadCurtainLV",0,0,0);
-  G4VisAttributes *LeadCurtainVisAtt = new G4VisAttributes(G4Colour(1.0, 0.7, 0.2));
-  LeadCurtainLV->SetVisAttributes(LeadCurtainVisAtt);
 }
 
 // Construct a thin vacuum box so we can tag particles passing through the collimator.  
@@ -159,7 +141,6 @@ void NpolShieldHut::ConstructHutRoof() {
 
 void NpolShieldHut::Place(G4LogicalVolume *motherLV) {
  
-  PlaceCylindrical(LeadCurtainLV, motherLV, "LeadCurtain", PosLead,-NpolAng, 0);
   PlaceCylindrical(NPOLTaggerLV, motherLV, "NPOLTagger", PosTagger, -NpolAng, 0);  
   PlaceCylindrical(HutFrontWallLV, motherLV, "HutFrontWall", PosFront,-NpolAng,-vertOffSet);
   PlaceCylindrical(HutBackWallLV, motherLV, "HutBackWall", PosBack,-NpolAng,-vertOffSet);
