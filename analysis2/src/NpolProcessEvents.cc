@@ -24,10 +24,10 @@
 #include "../../npollib/include/NpolStatistics.hh"
 #include "../../npollib/include/NpolStep.hh"
 
-#include "NpolVertex.hh"
-#include "NpolTagger.hh"
-#include "NpolStatistics.hh"
-#include "NpolStep.hh"
+//#include "NpolVertex.hh"
+//#include "NpolTagger.hh"
+//#include "NpolStatistics.hh"
+//#include "NpolStep.hh"
 
 void RetrieveENVvariables();
 TString FormInputFile(TString InputDir);
@@ -49,8 +49,8 @@ TString CType = "";
 
 int main(int argc, char *argv[]) {
   TString analysisDir = getenv("NPOLLIB_DIR");
-  //gSystem->Load(analysisDir + "/" + "libNpolClasses.so"); 
-  gSystem->Load("libNpolClasses.so");
+  gSystem->Load(analysisDir + "/" + "libNpolClasses.so"); 
+  //gSystem->Load("libNpolClasses.so");
   // Set up the TTrees and their branch addresses
   TChain *npolTree = new TChain("T");
   TChain *statsTree = new TChain("T2");
@@ -235,26 +235,24 @@ int main(int argc, char *argv[]) {
     for(n_it = npolEntry->begin(); n_it != npolEntry->end(); n_it++){
       NpolTagger *npolTagged = *n_it;
       if(npolTagged == NULL)  continue;
-      
+ 
       // Is it 1 of 9 particles we want?
       std::string particleName = npolTagged->particle;
-      if(npolParticleKE.find(particleName) == npolParticleKE.end()) continue;
-      std::cout << "Got to this point 2!" << std::endl;
-
+	  if(npolParticleKE.find(particleName) == npolParticleKE.end()) continue;
+ 
       // ******* Cut out neutral, charged or keep all particles ******* //
       // Reject if charged(use !) reject if not charged (remove !) 
       //or comment out if you want all included
       int pType = npolTagged->particleId;
+	  bool kPart = false;
       if(CType == "Neutral"){
-		std::cout << "Neutral!" << std::endl;
-        if(!(pType == 2112 || pType == 22)) continue; 
+		if(!(pType == 2112 || pType == 22)) kPart = true; //continue; 
 	  }else if(CType == "Charged"){
-		std::cout << "Charged!" << std::endl;
-		if((pType == 2112 || pType == 22)) continue;
+		if((pType == 2112 || pType == 22)) kPart = true; // continue;
 	  }else if(CType == "All"){
-		std::cout << "All!" << std::endl;
 		// all all
 	  }
+	  if(kPart) continue;
 
 	  //******** Cut out particles generated in a chosen volume ******* //
 	  if(vertexTrackIDs.find(npolTagged->trackId) != vertexTrackIDs.end()) continue;
@@ -310,10 +308,10 @@ int main(int argc, char *argv[]) {
 	  std::string particleName = targetTagged->particle;
       if(targetParticleKE.find(particleName) == targetParticleKE.end())
 		continue;
-std::cout << "Got to this point 3!" << std::endl;
+
 	  Double_t fluxscaling = 1;
 	  if((abs(targetTagged->lPosX) <= targetxMax) && (abs(targetTagged->lPosY) <= targetyMax)){
-		std::cout << "Got to this point 4!" << std::endl;
+
 		// Calculating the theta and phi angles and saving to histograms
 		Double_t momx = targetTagged->momX*TMath::Cos(NpolAng) + targetTagged->momZ*TMath::Sin(NpolAng);
 		Double_t momy = targetTagged->momY;
@@ -363,7 +361,6 @@ std::cout << "Got to this point 3!" << std::endl;
 		npolTrackIDs.insert(aStep->trackId);
 		
 	  } else {
-		//d::cout << "Rejected Step!" << std::endl;
 		continue;
 	  }
 	  
