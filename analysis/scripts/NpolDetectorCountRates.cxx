@@ -53,7 +53,7 @@ void NpolDetectorCountRates() {
   // Retrieve the object with the total number of electrons on target and calculate 
   // effective electron time on target per micro amp of beam
   TVectorD *v = (TVectorD*)inFile->Get("TVectorT<double>");
-  Double_t totalElectrons = 10*19.995e9; //((*v))[0]; //1e11; //((*v))[0];
+  Double_t totalElectrons = 100*19.995e9; //((*v))[0]; //1e11; //((*v))[0];
   Double_t electronTime = totalElectrons/(6.242e12); //6.242e12 e-/s at 1 microAmp
   std::cout << "Electron beam time at 1 micro-amp is " << electronTime << " s " << std::endl;
   std::cout << "Total electrons on target: " << totalElectrons/1e9 << " Billion" << std::endl;
@@ -64,9 +64,10 @@ void NpolDetectorCountRates() {
   Float_t vSpacing = 0.0; Float_t hSpacing = 0.0;
   double DetCounts[Nx][Ny];
   double CountRates [nThresh][Nx][Ny];
-  std::ofstream txtOut;
+  std::ofstream txtOut, thresh1MeV, thresh10MeV;
   txtOut.open(OutputDir + "/Output/NpolDetectorCountRates" + Energy + "GeV_" + Lead + "cm.out");
-
+  thresh1MeV.open(OutputDir + "/Output/Threshold1MeVCountRates" + Energy + "GeV_" + Lead + "cm.out");
+  thresh10MeV.open(OutputDir + "/Output/Threshold10MeVCountRates" + Energy + "GeV_" + Lead + "cm.out");
   //***************************  Main portion of code ***************************************
   // The main job of this code is to take in a file containing all the energy histograms of
   // the CGEN polarimeter and generate 2 canvas plots for each assembly volume/imprint group.
@@ -97,6 +98,9 @@ void NpolDetectorCountRates() {
 	CanvasPartition(C1[n],Nx,Ny,lMargin,rMargin,bMargin,tMargin,vSpacing,hSpacing);
 	CanvasPartition(C2[n],Nx,Ny,lMargin,rMargin,bMargin,tMargin,vSpacing,hSpacing);
 	CanvasPartition(C3[n],Nx,Ny,lMargin,rMargin,bMargin,tMargin,vSpacing,hSpacing);
+
+	thresh1MeV << RealName << ": AV Number " << AVnum << " Imprint Number " << imprNum << std::endl;
+	thresh10MeV << RealName << ": AV Number " << AVnum << " Imprint Number " << imprNum <<  std::endl;
 
 	for(int i = 0; i < Nx; i++){
 	  for(int j = 0; j < Ny; j++){
@@ -223,6 +227,16 @@ void NpolDetectorCountRates() {
 		  txtOut << Thresholds[k] << "      " << 
 			DetCounts[i][j] << " Counts" << "      " << 
 			CountRates[k][i][j] << " kHz" <<std::endl;
+
+		  if(Thresholds[k] == 1){
+			thresh1MeV << pvNum << "      " << Thresholds[k] << "      " << 
+			DetCounts[i][j] << " Counts" << "      " << 
+			CountRates[k][i][j] << " kHz" <<std::endl;
+		  } else if(Thresholds[k] == 10){
+			thresh10MeV << pvNum  << "      " << Thresholds[k] << "      " << 
+			DetCounts[i][j] << " Counts" << "      " << 
+			CountRates[k][i][j] << " kHz" <<std::endl;
+		  }
 		}
 		txtOut << std::endl;
 
@@ -329,6 +343,8 @@ void NpolDetectorCountRates() {
 	C3[i]->Write();
   }
   txtOut.close();
+  thresh1MeV.close();
+  thresh10MeV.close();
   outFile->Close(); 
   //inFile->Close();
 
