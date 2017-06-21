@@ -3,13 +3,11 @@
 setenv BUILD_DIR /home/tireman/simulation/e11_12_009/background/nmu-npol-tagger/build/simulation
 setenv pType $2
 source $BUILD_DIR/../../analysis/envscripts/JLABsetupAnalysis.csh
-#source $BUILD_DIR/scripts/JLABBatchFarm/JLABsetupRun.csh
 
 setenv JOBNUMBER $1
 
 cp -R $BUILD_DIR/gdml .
 cp -R $BUILD_DIR/macros .
-#cp -R $BUILD_DIR/../../simulation/include .
 cp -R $BUILD_DIR/../../npollib/include/*.hh .
 cp $BUILD_DIR/../npollib/libNpolClasses.so .
 cp $BUILD_DIR/../../simulation/include/*.hh .

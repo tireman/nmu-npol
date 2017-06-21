@@ -18,4 +18,6 @@ source /site/12gev_phys/production.csh 2.0
 echo "Starting up Job Number $1."	
 
 $BUILD_DIR/Npolapp $BUILD_DIR/macros/Run4.4GeV/ParticleFlux$pType\.mac  
+source $BUILD_DIR/scripts/JLABBatchFarm/JLABAnalysisRunCommands.csh $1 $2
+
 

@@ -1,13 +1,13 @@
 #!/bin/tsch
 
-setenv Lead 0
+setenv Lead 5
 setenv Energy 4.4
 setenv Bfield 4
 
 setenv NPOLLIB_DIR $BUILD_DIR/../npollib
 setenv NPOLBASENAME source$pType\_Lead$Lead\cm_$Energy\GeV_$Bfield\Bdl
-setenv NPOLDIR /volatile/hallc/cgen/tireman/TargetTaggerRuns/Lead$Lead\cm/$Energy\GeV/$Bfield\Bdl/Location_1
-setenv NPOLWORKDIR /volatile/hallc/cgen/tireman/TargetTaggerRuns/Lead$Lead\cm/$Energy\GeV/$Bfield\Bdl/Location_1
+setenv NPOLDIR /volatile/hallc/cgen/tireman/TargetTaggerRuns/retest/Lead$Lead\cm/$Energy\GeV/$Bfield\Bdl/Location_2
+setenv NPOLWORKDIR /volatile/hallc/cgen/tireman/TargetTaggerRuns/retest/Lead$Lead\cm/$Energy\GeV/$Bfield\Bdl/Location_2
 setenv NPOLEVENTSPERFILE 100000
 
 setenv RawDataDir $NPOLDIR/root
