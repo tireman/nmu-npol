@@ -25,10 +25,11 @@
 #include "NpolMaterials.hh"
 #include "NpolLeadCurtain.hh"
 #include "NpolDipole1.hh"
+#include "NpolDipole2.hh"
 #include "NpolShieldHut.hh"
 
-G4double NpolLeadCurtain::leadThickness = 15.0*cm;  // thickness of the lead curtain
-G4double NpolLeadCurtain::PosLead = NpolDipole1::PosD1 + NpolDipole1::gapLength/2 + leadThickness/2 + 40*cm; // position of lead 
+G4double NpolLeadCurtain::leadThickness = 5.0*cm;  // thickness of the lead curtain
+G4double NpolLeadCurtain::PosLead = NpolDipole1::PosD1 + NpolDipole1::gapLength/2 + leadThickness/2 + 40.5*cm; // position of lead (add 2 cm for location 1)
 
 NpolLeadCurtain::NpolLeadCurtain() {
    ConstructLeadCurtain();

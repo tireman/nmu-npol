@@ -113,6 +113,8 @@ int main(int argc,char **argv) {
 #endif
 	delete runManager;
 
+	std::quick_exit(0);
+
 	return 0;
 }
 
