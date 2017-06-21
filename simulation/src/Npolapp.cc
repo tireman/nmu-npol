@@ -40,7 +40,7 @@
 int main(int argc,char **argv) {
 
 	// Choose the Random engine
-	//
+	
 	G4Random::setTheEngine(new CLHEP::RanecuEngine);
 	//set random seed with system time
 	//
