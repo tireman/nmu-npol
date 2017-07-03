@@ -29,7 +29,7 @@
 #include "NpolShieldHut.hh"
 
 G4double NpolLeadCurtain::leadThickness = 5.0*cm;  // thickness of the lead curtain
-G4double NpolLeadCurtain::PosLead = NpolDipole1::PosD1 + NpolDipole1::gapLength/2 + leadThickness/2 + 40.5*cm; // position of lead (add 2 cm for location 1)
+G4double NpolLeadCurtain::PosLead = NpolDipole1::PosD1 + NpolDipole1::gapLength/2 - leadThickness/2 + 55.25*cm; // offset of lead (58.25 cm for location 1, 55.25 cm for Location 2 )
 
 NpolLeadCurtain::NpolLeadCurtain() {
    ConstructLeadCurtain();
@@ -45,8 +45,8 @@ G4String NpolLeadCurtain::GetName() {
 void NpolLeadCurtain::ConstructLeadCurtain(){
 
   // Make lead curtain 5*cm wider/taller than what is necessary
-  G4double xlen = 2*(PosLead)*tan(NpolShieldHut::horAngle/2) + 5.0*cm;
-  G4double ylen = 2*(PosLead)*tan(NpolShieldHut::vertAngle/2) + 5.0*cm; 
+  G4double xlen = 120*cm; //2*(PosLead)*tan(NpolShieldHut::horAngle/2) + 5.0*cm;
+  G4double ylen = 90*cm; //2*(PosLead)*tan(NpolShieldHut::vertAngle/2) + 5.0*cm; 
 
   G4Box *LeadCurtain = new G4Box("LeadCurtain",xlen/2,ylen/2,leadThickness/2);
   LeadCurtainLV = new G4LogicalVolume(LeadCurtain,NpolMaterials::GetInstance()->GetMaterial("Pb"),"LeadCurtainLV",0,0,0);

@@ -1,6 +1,6 @@
 cmake_minimum_required(VERSION 2.8 FATAL_ERROR)
 
-project(nmu-npol-tagger)
+project(nmu-npol)
 
 add_subdirectory(npollib)
 
