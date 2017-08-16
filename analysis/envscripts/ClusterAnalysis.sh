@@ -9,7 +9,7 @@ export NPOLLIB_DIR=/home/tireman/simulation/jlab/npol/nmu-npol/build/npollib
 export NPOLBASENAME=source$pType\_Lead$Lead\cm_$Energy\GeV_$Bfield\Bdl
 
 export NPOLDIR=/home/tireman/output/TargetTaggerBiased/4.4GeV/4Bdl/LongRuns
-export NPOLWORKDIR=/home/tireman/output/TargetTaggerBiased/4.4GeV/4Bdl/LongRuns/Location_2/Lead$Lead\cm/ChargedParticles
+export NPOLWORKDIR=/home/tireman/output/TargetTaggerBiased/$Energy\GeV/$Bfield\Bdl/LongRuns/QEneutron/test1/Lead$Lead\cm/Location_2
 
 export OutputDir=$NPOLDIR/Output
 export InputDir=$NPOLDIR/root

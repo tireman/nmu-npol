@@ -27,9 +27,11 @@
 #include "NpolDipole1.hh"
 #include "NpolDipole2.hh"
 #include "NpolShieldHut.hh"
+#include "NpolParticleFluxTagger.hh"
 
-G4double NpolLeadCurtain::leadThickness = 5.0*cm;  // thickness of the lead curtain
-G4double NpolLeadCurtain::PosLead = NpolDipole1::PosD1 + NpolDipole1::gapLength/2 - leadThickness/2 + 55.25*cm; // offset of lead (58.25 cm for location 1, 55.25 cm for Location 2 )
+G4double NpolLeadCurtain::leadThickness = 15.0*cm;  // thickness of the lead curtain
+//G4double NpolLeadCurtain::PosLead = NpolParticleFluxTagger::taggerPos - leadThickness/2 + 18.50*cm; // Move D1 back 15*cm to fit lead shield
+G4double NpolLeadCurtain::PosLead = NpolDipole2::PosD2 - NpolDipole2::gapLength/2 + leadThickness/2 - 58.25*cm; // offset of lead (58.25 cm for location 1, 55.25 cm for Location 2 )
 
 NpolLeadCurtain::NpolLeadCurtain() {
    ConstructLeadCurtain();

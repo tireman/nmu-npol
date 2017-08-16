@@ -46,7 +46,7 @@ G4double NpolDipole1::FM = 4.3;
 G4double NpolDipole1::dipole1FieldY = FM*0.40984*tesla; 
 
 G4double NpolDipole1::NpolAng = 28.0*deg;
-G4double NpolDipole1::PosD1 = 2.5096*m;
+G4double NpolDipole1::PosD1 = 2.5096*m; // + 0.15*m; // add in 15 cm of space with particle tagger to fit lead curtain
 G4double NpolDipole1::yokeLength = 48.0*2.54*cm; // inches to cm
 G4double NpolDipole1::gapWidth = 22.0*2.54*cm; // inches to cm
 G4double NpolDipole1::gapLength = 48.0*2.54*cm; // inches to cm
