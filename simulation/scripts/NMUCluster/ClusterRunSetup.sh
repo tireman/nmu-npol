@@ -1,11 +1,11 @@
 #!/bin/bash
 
-export Lead=5
+export Lead=15
 export Energy=4.4
 export Bfield=4
 export NPOLLIB_DIR=$BUILD_DIR/npollib
 export NPOLBASENAME=source$PType\_Lead$Lead\cm_$Energy\GeV_$Bfield\Bdl
-export NPOLEVENTSPERFILE=100000
+export NPOLEVENTSPERFILE=10000
 export NPOLDIR=/scratch
 export NPOLWORKDIR=/scratch
 export OutputDir=$NPOLDIR/Output
@@ -15,7 +15,7 @@ export WorkInputDir=$NPOLWORKDIR
 export RawDataDir=$NPOLDIR/root
 export HistoOutputDir=$NPOLWORKDIR/histos
 export HistoInputDir=$NPOLWORKDIR/histos
-export COPYTODIR=/home/tireman/output/TargetTaggerBiased/4.4GeV/4Bdl/LongRuns/Location_1/Lead$Lead\cm
+export COPYTODIR=/home/tireman/output/TargetTaggerBiased/$Energy\GeV/$Bfield\Bdl/LongRuns/QEneutron/test1/Lead$Lead\cm/Location_2
 
 if [ ! -e $NPOLDIR ]
 then
