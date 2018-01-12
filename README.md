@@ -171,24 +171,32 @@ installed.
 	it was found to be easier to maintian if separate folders of each were kept.  The uses of these 
 	three sets of scripts will be covered next.  Remember, user beware!
 
-    1.A. You can run in batch mode on a local machine by modifying the appropriate macro file. 
-	You could also modify the NMUsetuprun.sh script to match your plans, however, the simulation
-	will default to a local output directory and file name if this is not done.
-	Then run by: 
+    1.A. You can run in batch mode on a local machine by modifying the appropriate macro file in the
+	simluation/scripts/NMUPhysics directory. You could also modify the NMUsetuprun.sh script to match 
+	your plans, however, the simulation will default to a local output directory and file name if this 
+	is not done.
+	
+	Then run the simualtion by: 
   ```
-    % cd build/simulation				# if not already in this directory
-    % source script/NMUsetuprun.sh    	# sets up output dir and name (optional); 
-      	     			     		  	# change as needed
-    % ./Npolapp macros/ElectronBeam.mac	# choose your macro file from above or create your own
+    % cd build/simulation							# if not already in this directory
+    % source script/NMUPhysics/NMUsetuprun.sh    	# sets up output dir and name (optional); 
+      	     			     		  				# change as needed
+    % ./Npolapp macros/ElectronBeam.mac				# choose your macro file from above or create your own
   ```
-	If you want to run a set of runs on a muticore machine, use the script 
-	NMUjobsubmit.sh.  From the build directory:
+	If you want to run a set of runs on a muticore machine, use the script NMUjobsubmit.sh. or one 
+	of its particle specific brothers. 
+
+	From the build directory:
   ```
-    % cd build/simulation				# if not already in this directory
-    % ./scripts/NMUjobsubmit.sh i j 	# 'i' is the first job number and 
-      				  	 		  		# 'j' is the number of jobs you want to run
-										# jobs will be put in the background
+    % cd build/simulation							# if not already in this directory
+    % ./scripts/NMUPhysics/NMUjobsubmit.sh i j 		# 'i' is the first job number and 'j' is the number of jobs 
+      				  	 		  		   	 		# to run; jobs will be put in the background; each is its 
+													# own instance of Npolapp.
   ```
+	If you you wish to run one or more of the particle specific scripts such as NMUjobsubmitElectron.sh 
+	then you can take advantage of script MultiJobRun.sh.  This script calls 
+	./scripts/NMUPhysics/NMUjobsubmit*ParticleType*.sh i j as many times as the user wants.  This works
+	well on very high thread count machinces such as the NMU 28 core(56 thread) server.
 
 	#### NOTES on NMUjobsubmit.sh script #### 
 	Jobs will be placed in the background and run to completion if you use the job submission
@@ -196,8 +204,18 @@ installed.
 	If you use i=11 and j = 6 then 6 jobs will start (j=6) with the first JOBNUMBER set to 11 
 	and the last will be 16.
 
-    1.B. If on the JLAB farm, one can run as above in interactive mode just 
-    	 remember to source the production.csh script on the Jlab farm system
+	1.B. Running on the NMU Math/CS cluster is done by submitting a script to the Son of Grid Engine (SGE)
+
+  ```
+	From the build/simulation directory:
+	% cd build/simulation							# if not already in this directory	
+	% qsub scripts/NMUCluster/qNpolElectron.sh		# This will submit the qNpolElectron.sh script to the SGE
+	  	   											# scheduler.  You must modify this scripts as necessary
+													# to get directory and file names correct.
+  ```
+
+    1.C. If on the JLAB farm, one can run as above in interactive mode just 
+     remember to source the production.csh script on the Jlab farm system
 	 before attempting to compile and run.  Remember to run only tests on the JLAB interactive
 	 farm.  Play nice in the sandbox.
 
@@ -209,12 +227,16 @@ installed.
 	 as necessary. Then, to submit a number of jobs to the farm nodes
 	 do the following:
   ```
-    % cd build/simulation/scripts	# do this after you have completed a build
-    % ./JLABjobscript.csh i j
+    % cd build/simulation/scripts					# do this after you have completed a build
+    % ./JLABsimSubmit.csh i j						# Submit the simulation job.  'i' is the first
+	  					  							# run number and 'j' is the final run number.
+	% ./JLABanalysisSubmit.csh i j 					# This submits analysis jobs to the batch farm
   ```
 
-	This script will generate the jobsub file, submit the job, pause
-	for 1 seconds (take a breath), and then generate the next one and 
+	There is another more generic JLABjobscript.csh which was the original JLAB run submission script.  Recently, 
+	I updated the code to allow the run script to only call the simulation or the analysis.
+
+	This script will generate the jobsub file, submit the job, and then generate the next one and 
 	submit until all have been submitted between i and j where i is the 
 	first job number and j is the last job number with i < j.  Note that
 	these job numbers are used in the ROOT file identification so you 
