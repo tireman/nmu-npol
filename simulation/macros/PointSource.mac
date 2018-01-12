@@ -1,11 +1,14 @@
 # $Id: npol.mac,v1.1 For running with or without visualization
 # on the nmu-Npol simulation 6/24/2016 $
 # 
-# This macro feeds commands to the primary event generator and allows 
-# for changing of beam parameters within the macro. 
+# This macro feeds commands to the primary event generator and to create
+# a point source for testing geometry.  It currently is setup to generate
+# a cone of uniformly distributed particles around a line from the target
+# (i.e. center of geometry) toward the center of the front array of 
+# NPOL analyzers.
 #
 # can be run in batch, without graphic
-# or interactively: Idle> /control/execute ElectronBeam.mac
+# or interactively: Idle> /control/execute PointSource.mac
 
 #/vis/viewer/set/viewpointThetaPhi -45 180 deg
 #/vis/viewer/zoom 1.5

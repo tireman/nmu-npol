@@ -1,3 +1,15 @@
+# Update: 12-January-2017
+
+No significant changes.  There was some clean up of the constructor files for the magnets and a geometry error in the generation of Dipole 1 was found a fixed.  Openings and positions are better determined by a few parameters. Magnetic fields are now changed with a simple change at the top of the each constructor.
+
+The system was modified to allow for the lead curtain to be placed in three locations: in from of D1, between D1 and D2, and between D2 and the front shield wall.  The size of the lead curtain is now constant since the lead sheets come in standard sizes.  
+
+The collimator was better computed using information from Andrei. 
+
+Particle generation was expanded by adding more macros under which to run the simulation.  This allows for looping through runs of particles and scaling the number of events generated. We can now use the Generalized Particle Source in a script loop to generate a set of superimposed plots which are constructed by added up the events from individual particle types that are ran in their own runs. 
+
+-- Will Tireman
+
 # Update: 27-July-2016
 
 Several updates and changes.  Analysis now has a file manager to take care of file names and separate if rom the analysis manager.  The field clamps for the dipole magnets have been opened up a bit more to reduce interference with the particles from the target. 
@@ -6,15 +18,19 @@ The new setup splits the simulation and analysis sections up.  The cleanBuild sc
 
 Major change: The particle gun was replaced with a generalized particle source.  This allows for the particle generator to be changed in a Macro file rather than in the primary particle generator class.  This has also led us to be able to bias particle distributions from analysis of electron-scattering data. See README.md file for more details.
 
+-- Will Tireman
+
 # Update: 3-Dec-2015
 
-A philosophy error was made with the energy.  The scheme didn't work to find the total energy deposited in a volume.  A change was made to save any event to the ROOT file that has at least 1 step in the polarimeter.  Also, step information such as volume, energy deposit in the volume, and the global time are stored in a new branch vector.  We can now sum up the total energy in each volume and determine the time at which detector fired.  This vector is sorted in time from smallest to largest before the vector is saved.  
+A philosophy error was made with the energy.  The scheme didn't work to find the total energy deposited in a volume.  A change was made to save any event to the ROOT file that has at least 1 step in the polarimeter.  Also, step information such as volume, energy deposit in the volume, and the global time are stored in a new branch vector.  We can now sum up the total energy in each volume and determine the time at which detector fired.  This vector is sorted in time from earliest to latest in timee before the vector is saved.  
 
 # Update: 26-Oct-2015
 
 Clean up of the NpolShieldHut.cc file was performed.  A better positioning of the shield hut so a proper 10 cm of lead curtain could be placed right at the entrance to the shield hut.  The collimator had to be changed to account for the change in position of the shield hut to fully illuminate the front array.  All done by visual inspection.  No hard numbers are available from C-GEN so best guess was employed. Polarimeter Tagger volume was moved to be as close to the exit from the collimator as possible and resized to be only as large as necessary.
 
 Checked the Scattering chamber to make sure the windows are large enough.  The basic check seemed to be okay, however, when specifics on the size of the chamber are available the file should be updated.
+
+-- Will Tireman
 
 # Update: 20-Oct-2015
 
@@ -27,6 +43,8 @@ SHMS tagger has been added.  A thin air volume was placed right in front of the 
 A new tree was added to track "statistics"  Since events that don't deposit any energy in the polarimeter are NOT recorded, it is necessary to check just how many are saved and how many are not for total calculations.  This is done in a new Tree which is only saved at the end of the run.  Other values can be added later that are run specific. There is also a version number added that should be changed when the NpolAnalysisManager undergoes changes that effect simulation output files.
 
 The ROOT files:  The ROOT files now contain Two trees.  The first Tree is saved at every "good" event with all the vertices and has three branches.  The second tree is only saved at the end of the run and contains run specific information or statistics.
+
+-- Will Tireman
 
 # Update: 10-3-2015
 
@@ -45,7 +63,7 @@ Several Changes to the analysis section and steppingacton along with file naming
    
    5.b. For JLAB there is the default option like NMU to just launch the program with ./Npolapp npol.mac from the build directory and it will output the default name in the default folder.  You can also run the JLABsetuprun.csh script manually as well after making appropriate changes.  You will have to set the JOBNUMBER env variable manually if you want something other than the default value.  If you wish to submit to the farm system, you will need to run JLABjobscript.csh.  The action is "./JLABjobscript.csh 1 4".  Here, like the NMU one, the 1 and 4 are the first and last job you want to run for the JOBNUMBER env variable.  This script generates the jobfile (e.g. jobfile_1) which is needed for the 'jsub' command on the ifarm.  This file calls the JLABsimRunCommands.csh script which sets up the env variables using the JLABsetuprun.csh script, calls in the other stuff and then runs the program on the farm node.
 
-Whew!  That is a lot just to push jobs to a series of machines. 
+Whew!  That is a lot just to push jobs to a series of machines. -- Will Tireman
  
 ------------------------------------------------------------------------------
 # Update: 9-2-2015
@@ -58,6 +76,8 @@ Several changes to the analysis section.
 3. Added an end cap to the end of the downstream beam line in NpolBeamlineDown.  This cap is thin and a vacuum.  Using steppingAction class, we kill all tracks that get to this point.  This cleans up the tracks from portions that were not going to effect the background in the neutron detectors.
 
 4. Added a NpolAnalysisMessenger class in attempt to generate a macro command 'setFileName' which would allow for setting the file name of the TFile from the Macro.  This didn't work but it is close ... needs checked.
+
+-- Will Tireman
 
 -------------------------------------------------------------------------------
 
