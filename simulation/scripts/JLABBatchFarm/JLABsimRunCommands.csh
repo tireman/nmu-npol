@@ -1,6 +1,6 @@
 #!/bin/tsch
 
-setenv BUILD_DIR /home/tireman/simulation/e11_12_009/background/nmu-npol-tagger/build/simulation
+setenv BUILD_DIR /home/tireman/simulation/e11_12_009/background/nmu-npol/build/simulation
 setenv pType $2
 source $BUILD_DIR/scripts/JLABBatchFarm/JLABsetupRun.csh
 

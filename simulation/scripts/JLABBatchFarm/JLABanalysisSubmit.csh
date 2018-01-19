@@ -11,7 +11,7 @@ MAIL: tireman@jlab.org
 TIME: 60
 MEMORY: 1350 MB
 COMMAND : source JLABAnalysisRunCommands.csh $i $3
-OTHER_FILES : /u/home/tireman/simulation/e11_12_009/background/nmu-npol-tagger/build/simulation/scripts/JLABBatchFarm/JLABAnalysisRunCommands.csh
+OTHER_FILES : /u/home/tireman/simulation/e11_12_009/background/nmu-npol/build/simulation/scripts/JLABBatchFarm/JLABAnalysisRunCommands.csh
 EOF1
 end
 

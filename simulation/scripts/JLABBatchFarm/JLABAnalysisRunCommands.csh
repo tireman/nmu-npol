@@ -1,6 +1,6 @@
 #!/bin/tsch
 
-setenv BUILD_DIR /home/tireman/simulation/e11_12_009/background/nmu-npol-tagger/build/simulation
+setenv BUILD_DIR /home/tireman/simulation/e11_12_009/background/nmu-npol/build/simulation
 setenv pType $2
 source $BUILD_DIR/../../analysis/envscripts/JLABsetupAnalysis.csh
 
@@ -16,11 +16,16 @@ source /site/12gev_phys/production.csh 2.0
 
 echo "Starting up Job Number $1."	
 
-hadd -fk $NPOLDIR/root/$NPOLBASENAME\_$1.root $NPOLDIR/root/$NPOLBASENAME\_$1\_*.root
+# These 2 lines combine multi-files together to one file and remove the original
+hadd -f -k $NPOLDIR/root/$NPOLBASENAME\_$1.root $NPOLDIR/root/$NPOLBASENAME\_$1\_*.root
 rm $NPOLDIR/root/$NPOLBASENAME\_$1\_*.root
 
 if ( -e $NPOLDIR/root/$NPOLBASENAME\_$1.root ) then
 
+	# This runs the NPOL efficiency code
+	$BUILD_DIR/../analysis/NpolAnalysis
+
+	# The next 3 run the NPOL Process events code for neutral/charged particles types
 	setenv CHARGE_TYPE All
 	setenv HistoOutputDir $NPOLWORKDIR/$CHARGE_TYPE\Particles/histos
 	$BUILD_DIR/../analysis2/NpolProcessEvents
@@ -33,7 +38,8 @@ if ( -e $NPOLDIR/root/$NPOLBASENAME\_$1.root ) then
 	setenv HistoOutputDir $NPOLWORKDIR/$CHARGE_TYPE\Particles/histos
 	$BUILD_DIR/../analysis2/NpolProcessEvents
 
-	rm $NPOLDIR/root/$NPOLBASENAME\_$1.root
+	# Uncomment this line if you DO NOT want to keep the raw ROOT file after run #
+	#rm $NPOLDIR/root/$NPOLBASENAME\_$1.root  
 	
 endif 
 
