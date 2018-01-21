@@ -1,4 +1,4 @@
-1//********************************************************************
+//********************************************************************
 //* License and Disclaimer: From GEANT Collaboration                 *
 //*                                                                  *
 //* The  Geant4 software  is  copyright of the Copyright Holders  of *
