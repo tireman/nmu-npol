@@ -1,10 +1,12 @@
 *.cmake
+*.make
 *.old
 *.root
 *.d
 *.o
 *.so
 *~
+*_tmp
 *.swp
 *.swo
 *.pcm
