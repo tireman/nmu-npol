@@ -1,4 +1,4 @@
-//********************************************************************
+1//********************************************************************
 //* License and Disclaimer: From GEANT Collaboration                 *
 //*                                                                  *
 //* The  Geant4 software  is  copyright of the Copyright Holders  of *
@@ -44,7 +44,7 @@ void NpolSteppingAction::UserSteppingAction(const G4Step *aStep) {
   G4String volName = preStepVolume->GetName();
  
   // Kill/stop tracks that will just waste precious CPU time
-  if(volName == "Cap" || postStepVolume == NULL ||
+  if(volName == "Cap" || postStepVolume == NULL || 
      //volName == "HallShellRoof" ||volName == "HallShellFloor" || volName == "HallShellWall"){
 	 volName == "HutBackWall" || volName == "HutSideWall" || volName == "HutRoof"){
     //|| volName == "HutFrontWall"){ 
