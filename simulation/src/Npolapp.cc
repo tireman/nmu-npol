@@ -113,7 +113,7 @@ int main(int argc,char **argv) {
 #endif
 	delete runManager;
 
-	std::quick_exit(0);
+	std::quick_exit(0);  // don't ask
 
 	return 0;
 }
