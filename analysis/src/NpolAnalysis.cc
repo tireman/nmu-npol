@@ -1,6 +1,8 @@
 /* Npol Analysis Script is designed to analyze the neutron flux on the NPOL 
    polarimeter being designed by the CGEN 
    collaboration at Jefferson National Laboratory. (2016)
+   Revisions: Spring 2017 by Will Tireman and Ashley Adzima (added some histograms)
+   Revisions: January 2017 by Will Tireman (Fixed eff. calculation, cleaned up code)
 */
 
 #include <iostream>
@@ -33,11 +35,11 @@
 
 //********************** Definition of methods which come after the Main() code *********************//
 
-#define EDEP_THRESHOLD 1.0 /*MeV*/
+#define EDEP_THRESHOLD 1.0  /*MeV*/
 #define LOW_THRESHOLD 0.040 /*MeV This threshold is a per detector low value in SOI selection */
-#define LAYER_NUM 4        /* number of analyzer layers; not general; only good for 4 and 6 layers */
-#define angleLow 45.3 /*degrees*/
-#define angleHigh 81.6 /*degrees*/
+#define LAYER_NUM 4         /* number of analyzer layers; not general; only good for 4 and 6 layers */
+#define angleLow 45.3       /*degrees: low angle recoil proton cut*/
+#define angleHigh 81.6      /*degrees; high angle recoil proton cut*/
 
 enum PolarimeterDetector {
   analyzer = 0,
