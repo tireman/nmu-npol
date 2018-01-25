@@ -36,7 +36,9 @@
 #define EDEP_THRESHOLD 1.0 /*MeV*/
 #define LOW_THRESHOLD 0.040 /*MeV This threshold is a per detector low value in SOI selection */
 #define LAYER_NUM 4        /* number of analyzer layers; not general; only good for 4 and 6 layers */
-	double azAngle = 0.0;
+#define angleLow 45.3 /*degrees*/
+#define angleHigh 81.6 /*degrees*/
+
 enum PolarimeterDetector {
   analyzer = 0,
   tagger,
@@ -79,7 +81,7 @@ void GetPoI(double *ret, double *time, const int section, const PolarimeterDetec
 			const std::map<std::string,NpolDetectorEvent *> *detEvents); 
 void GetPoI2(double *ret, double *time, const int section, const PolarimeterDetector type, 
 			 const std::map<std::string,NpolDetectorEvent *> *detEvents);
-bool CheckAngleRequirement(std::ofstream &txtOut, NpolVertex *incNeutronVert, std::map<std::string,
+double ReturnAngle(std::ofstream &txtOut, NpolVertex *incNeutronVert, std::map<std::string,
 						   NpolDetectorEvent *> *detEvents, const int section, const PolarimeterDetector EArrayOfInterest, double *dTOF ); 
 void OutputTracks(const std::vector<NpolVertex *> *verticies, std::ofstream &txtOut, int eventNo, 
 				  const std::map<PolarimeterDetector,double> *eDepArrayTotal, int sectionOfInterest);
@@ -117,7 +119,7 @@ int main(int argc, char *argv[]) {
   
   //********************************* Define your Histograms Here *******************************
   TH1F *h_recoilAngle = new TH1F("recoil_angle","Proton Recoil Angle", 100, 0.0, 90.0); 
-
+  TH1F *h_recoilAngle_Raw = new TH1F("recoil_angle_raw","Proton Recoil Angle Before Angle Cut", 100, 0.0, 90.0);
   TH2F *h_dEoverE_TopHigh = new TH2F("dEoverE_Top", "dE over E for top array - HIGHEST PV ONLY", 400,0,150,400,0,20);
   TH2F *h_dEoverE_BotHigh = new TH2F("dEoverE_Bot", "dE over E for bottom array - HIGHEST PV ONLY", 400,0,150,400,0,20);
   TH2F *h_dEoverEtop = new TH2F("dEoverEtop", "dE over E for top array", 400,0,150,400,0,20);
@@ -179,13 +181,15 @@ int main(int argc, char *argv[]) {
       if(!(detEvents[aStep->volume])->thresholdExceeded && (detEvents[aStep->volume])->totEnergyDep >= EDEP_THRESHOLD) {
 		(detEvents[aStep->volume])->thresholdExceeded = true;
 		(detEvents[aStep->volume])->lPosX = aStep->lPosX;
+		(detEvents[aStep->volume])->lPosY = aStep->lPosY;
+		(detEvents[aStep->volume])->lPosZ = aStep->lPosZ;
 		(detEvents[aStep->volume])->gPosX = aStep->gPosX;
 		(detEvents[aStep->volume])->gPosY = aStep->gPosY;
 		(detEvents[aStep->volume])->gPosZ = aStep->gPosZ;
-		(detEvents[aStep->volume])->lPosZ = aStep->lPosZ;
 		(detEvents[aStep->volume])->time = aStep->time;
 
 		// A counter for number of events that fire at least one Analyzer in some section
+		// This also sets a flag so we don't count more than once if more than one layer passes this requirement
 		if(tripFlag == false){
 		  if(detectorType(aStep->volume) == analyzer){
 			eventsTrigger++;
@@ -195,10 +199,15 @@ int main(int argc, char *argv[]) {
       }
     } // END STEPS LOOP
 	
+
+	// Here, get Section of Interest (SOI) and then begin checking further requirements using detEvents map
+	// of event data for the event.
     std::map<std::string,NpolDetectorEvent *>::iterator e_it;
     //double totalEnergyDep = getTotalEnergyDep(&detEvents);
-    int sectionOfInterest = getSectionOfInterest(&detEvents);
-    std::map<PolarimeterDetector, double> eDepArrayTotal;
+    int sectionOfInterest = getSectionOfInterest(&detEvents); // determine SOI
+
+	// Total energy map for each array; currently only does analyzer, analyzer taggers and top/bottom E and dE arrays
+    std::map<PolarimeterDetector, double> eDepArrayTotal;     
     eDepArrayTotal[analyzer] = 0.0;
     eDepArrayTotal[tagger] = 0.0;
     eDepArrayTotal[topEArray] = 0.0;
@@ -210,32 +219,36 @@ int main(int argc, char *argv[]) {
       eventInteraction++;
       h_sectionEfficiency1->Fill(sectionOfInterest+1); // Fill
 
+	  
+	  // Changed this on 12-March-2017 to test theory on the Recoil Proton Angle "question" by not requiring an
+	  // E or dE detector be in a particular "geometric section (vertical slice).
+	  // This allows E/dE detectors outside the "geometric" SOI to be counted as well.  It worked!
+	  // This part of the "tracking" needs some work ... lots of work.
       for(e_it = detEvents.begin(); e_it != detEvents.end(); e_it++) {		
 		PolarimeterDetector detector2 = detectorType(e_it->first);
 		if(detector2 == topEArray || detector2 == topdEArray || 
 		   detector2 == botEArray || detector2 == botdEArray){
 		  eDepArrayTotal[detector2] += e_it->second->totEnergyDep;
 		}
-		
-		// Changed this on 12-March-2017 to test theory on the Recoil Proton Angle "question"
-		// This allows E/dE detectors outside the "geometric" SOI to be counted as well.  It worked!
-		// This part of the "tracking" needs some work ... lots of work.
+				
 		if(sectionNumber(e_it->first) == sectionOfInterest) {
 		  PolarimeterDetector detector = detectorType(e_it->first);
 		  if(detector == analyzer || detector == tagger) {
-			//|| detector == topEArray || detector == topdEArray || detector == botEArray || detector == botdEArray){
+			//|| detector == topEArray || detector == topdEArray || detector == botEArray || detector == botdEArray){ // see note above
 			eDepArrayTotal[detector] += e_it->second->totEnergyDep;
 		  }
 		}
 	  }
-		
+	  
+	  // Get the EArray of Interest (EOI) based on Requirement 5 of a ratio of 20:1 between the top and bottom arrays
+	  // Not convinced this is the most prudent way to do it but it is quick to implement
       PolarimeterDetector EArrayOfInterest = getEArrayOfInterest(&eDepArrayTotal,sectionOfInterest);
       PolarimeterDetector dEArrayOfInterest;	  
 	  
       if(EArrayOfInterest == topEArray) {
 		dEArrayOfInterest = topdEArray;
       }
-      else {
+      else if(EArrayOfInterest == botEArray){
 		dEArrayOfInterest = botdEArray;
       }
 
@@ -247,14 +260,16 @@ int main(int argc, char *argv[]) {
 		double eDepTotal = eDepAnalyzer + eDepE + eDepdE;
 		double dTOF = -100.0;
 		double dEDepHighest = highestEDepPV(&detEvents, sectionOfInterest, dEArrayOfInterest);
-		double eDepHighest = highestEDepPV(&detEvents, sectionOfInterest, EArrayOfInterest);
+		double eDepHighest = highestEDepPV(&detEvents, sectionOfInterest, EArrayOfInterest); 
+		double azAngle = ReturnAngle(txtOut,verts->at(1),&detEvents,sectionOfInterest,EArrayOfInterest,&dTOF);
 		if(eDepAnalyzer >= 4.0 /*MeV*/ && eDepE >= 5.0 /*MeV */ && eDepTotal >= 50.0 /*MeV*/) { // Requirements 3 and 4
 		  h_sectionEfficiency3->Fill(sectionOfInterest+1); //FILL
-		  if(CheckAngleRequirement(txtOut,verts->at(1),&detEvents,sectionOfInterest,EArrayOfInterest,&dTOF)) {
+		  h_recoilAngle_Raw->Fill(azAngle);
+		  if (azAngle >= angleLow && azAngle <= angleHigh){
 		    //OutputTracks(verts,txtOut,eventCounter,&eDepArrayTotal,sectionOfInterest);
 			h_sectionEfficiency4->Fill(sectionOfInterest+1); //FILL
 			h_dTOF->Fill(dTOF); //FILL
-			h_recoilAngle->Fill(azAngle); // Fill the proton recoil angle histo
+			 h_recoilAngle->Fill(azAngle); // Fill the proton recoil angle histo
 			if(EArrayOfInterest == topEArray) {// this is where histo for top dE/E gets filled
 			  h_dEoverEtop->Fill(eDepE,eDepdE); //FILL
 			  h_dEoverE_TopHigh->Fill(eDepHighest, dEDepHighest); //FILL
@@ -264,7 +279,7 @@ int main(int argc, char *argv[]) {
 			}
 			
 			eventsPassed++;
-		  } else eventsFailed++;// TVector3 no longer works
+		  } else eventsFailed++;
 		} else eventsFailed++;
       } else eventsFailed++;
     } else eventsFailed++;
@@ -303,6 +318,7 @@ int main(int argc, char *argv[]) {
   h_sectionEfficiency4->Write();
   h_dTOF->Write();
   h_recoilAngle->Write();
+  h_recoilAngle_Raw->Write();
   outFile->Close();
   txtOut.close();
   return 0;
@@ -343,7 +359,8 @@ int GetPlacementNumber(const std::string &volName) {
 }
 
 
-// The NPOL polarimeter is divided into 4 or 6 sections.  This function takes a volume name and returns the section number that the detector belongs to, or -1 if the volume does not belong in the polarimeter.
+// The NPOL polarimeter is divided into 4 or 6 sections.  This function takes a volume name and returns 
+// the section number that the detector belongs to, or -1 if the volume does not belong in the polarimeter.
 int sectionNumber(const std::string &volName) {
   int avNum, imprNum, pvNum;
   if((avNum = GetAVNumber(volName)) == -1) return 0;
@@ -441,6 +458,13 @@ int sectionNumber(const std::string &volName) {
   }
 }
 
+// This method returns the NPOL detector "type" which is defined as the following:
+// analyzer = detector in 1 of the 4 vertically stacked arrays making up the analyzer sections
+// tagger = detector in the arrays in front of each analyzer section
+// topEArray = any detector in the top E-array detectors.  There are 2 imprints per section with 2 sections (4 total)
+// botEArray = any detector in the bottom E-array detectors.  There are 2 imprints per section with 2 sections (4 total)
+// topdEArray = any detector in the top dE-array detectors.  There are 2 imprints per section with 2 sections (4 total)
+// botdEArray = any detector in the bottom dE-array detectors.  There are 2 imprints per section with 2 sections (4 total)
 PolarimeterDetector detectorType(const std::string &volName) {
   int avNum = GetAVNumber(volName);
   if(LAYER_NUM == 4){
@@ -719,9 +743,9 @@ void OutputTracks(const std::vector<NpolVertex *> *verticies, std::ofstream &txt
   } // END VERTICES LOOP
 }
 
-// Check requirement 6
+// Return the Azimuth angle only.  Check is in main code.
 // Optionally return delta time-of-flight between the analyzer and E-array
-bool CheckAngleRequirement(std::ofstream &txtOut, NpolVertex *incNeutronVert, std::map<std::string,NpolDetectorEvent *> *detEvents, const int section, const PolarimeterDetector EArrayOfInterest, double *dTOF = NULL) {
+double ReturnAngle(std::ofstream &txtOut, NpolVertex *incNeutronVert, std::map<std::string,NpolDetectorEvent *> *detEvents, const int section, const PolarimeterDetector EArrayOfInterest, double *dTOF = NULL) {
   double targetPt[3];
   double analyzerPt[3];
   double EarrayPt[3];
@@ -735,8 +759,7 @@ bool CheckAngleRequirement(std::ofstream &txtOut, NpolVertex *incNeutronVert, st
   GetPoI(analyzerPt,&analyzerTime,section,analyzer,detEvents);
   GetPoI2(EarrayPt,&EarrayTime,section,EArrayOfInterest,detEvents);
 
-  //double 
-	azAngle = getAzimuthAngle(txtOut,targetPt[0],targetPt[1], targetPt[2],
+  double azAngle = getAzimuthAngle(txtOut,targetPt[0],targetPt[1], targetPt[2],
 								   analyzerPt[0],analyzerPt[1],analyzerPt[2],
 								   EarrayPt[0],EarrayPt[1],EarrayPt[2]);
 
@@ -750,8 +773,8 @@ bool CheckAngleRequirement(std::ofstream &txtOut, NpolVertex *incNeutronVert, st
 
   if(dTOF != NULL)
     *dTOF = EarrayTime - analyzerTime;
-  return (azAngle > 45.3 && azAngle < 81.6);
-  }
+  return azAngle;
+}
 
 TString FormInputFile(TString InputDir){
   
