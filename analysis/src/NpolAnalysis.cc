@@ -262,10 +262,11 @@ int main(int argc, char *argv[]) {
 		double dEDepHighest = highestEDepPV(&detEvents, sectionOfInterest, dEArrayOfInterest);
 		double eDepHighest = highestEDepPV(&detEvents, sectionOfInterest, EArrayOfInterest); 
 		double azAngle = ReturnAngle(txtOut,verts->at(1),&detEvents,sectionOfInterest,EArrayOfInterest,&dTOF);
+
 		if(eDepAnalyzer >= 4.0 /*MeV*/ && eDepE >= 5.0 /*MeV */ && eDepTotal >= 50.0 /*MeV*/) { // Requirements 3 and 4
 		  h_sectionEfficiency3->Fill(sectionOfInterest+1); //FILL
 		  h_recoilAngle_Raw->Fill(azAngle);
-		  if (azAngle >= angleLow && azAngle <= angleHigh){
+		  if (azAngle >= angleLow && azAngle <= angleHigh){  // checks Requirement 6 
 		    //OutputTracks(verts,txtOut,eventCounter,&eDepArrayTotal,sectionOfInterest);
 			h_sectionEfficiency4->Fill(sectionOfInterest+1); //FILL
 			h_dTOF->Fill(dTOF); //FILL
@@ -579,9 +580,9 @@ int getSectionOfInterest(const std::map<std::string,NpolDetectorEvent *> *detEve
   // Otherwise return the ID'd section of interest
   int totalDetHit = countA + countTE + countBE + countV + countTdE + countBdE;
   //if(multiscatter) {  
-  //sectionOfInterest = -1;
-  //std::cout << "Multi-hit: Event rejected!" << std::endl;
-  //return sectionOfInterest;
+  //	sectionOfInterest = -1;
+  //	std::cout << "Multi-hit: Event rejected!" << std::endl;
+  //	return sectionOfInterest;
   //} 
   if(totalDetHit >= 40) { 
 	std::cout << "Event Rejected! Total number of detectors with 40 keV or greater: " << totalDetHit << std::endl;
@@ -638,17 +639,6 @@ double getTotalEnergyDep(const std::map<std::string,NpolDetectorEvent *> *detEve
   return totEnergyDeposit;
 }
 
-void sectionEffLocalCoordinates(TH1F *h_sectionEfficiencyLocalPositions, const std::map<std::string,NpolDetectorEvent *> *detEvents, int sectionOfInterest, PolarimeterDetector detector) {
-
-
-  std::map<std::string,NpolDetectorEvent *>::const_iterator it;
-  for(it = detEvents->begin(); it != detEvents->end(); it++) {
-    if((sectionNumber(it->first) == sectionOfInterest) && (detectorType(it->first) == detector) && (it->second->thresholdExceeded)){
-      h_sectionEfficiencyLocalPositions->Fill(it->second->lPosZ);
-    }
-  }
-
-}
 
 // Return the azimuthal part of the scattering angle (in degrees) in the polarimeter given three points in global coordinates:
 // (p1x,p1y,p1z) - a point along the line of the incoming neutron's trajectory (the vertex in the target will do)
