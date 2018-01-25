@@ -25,9 +25,13 @@
 #include "TString.h"
 
 #include "NpolVertex.hh"
+#include "NpolTagger.hh"
 #include "NpolStep.hh"
 #include "NpolStatistics.hh"
 #include "NpolDetectorEvent.hh"
+
+
+//********************** Definition of methods which come after the Main() code *********************//
 
 #define EDEP_THRESHOLD 1.0 /*MeV*/
 #define LOW_THRESHOLD 0.040 /*MeV This threshold is a per detector low value in SOI selection */
@@ -44,8 +48,6 @@ enum PolarimeterDetector {
   unknown
 };
 
-// Definition of methods which come after the Main() code
-//
 TString BaseName = "";
 TString JobNum = "";
 TString Lead = ""; 
@@ -69,15 +71,21 @@ int getSectionOfInterest(const std::map<std::string,NpolDetectorEvent *> *detEve
 PolarimeterDetector getEArrayOfInterest(std::map<PolarimeterDetector, double> *eDepArrayTotal, int sectionOfInterest);
 double highestEDepPV(const std::map<std::string,NpolDetectorEvent *> *detEvents, int sectionOfInterest, PolarimeterDetector detectorOfInterest); 
 double getTotalEnergyDep(const std::map<std::string,NpolDetectorEvent *> *detEvents);
-void sectionEffLocalCoordinates(TH1F *h_sectionEfficiencyLocalPositions, const std::map<std::string,NpolDetectorEvent *> *detEvents, int sectionOfInterest, PolarimeterDetector detector);
-double getAzimuthAngle(std::ofstream &txtOut, const double p1x, const double p1y, const double p1z,const double p2x, const double p2y, const double p2z, const double p3x, const double p3y, const double p3z);
-void GetPoI(double *ret, double *time, const int section, const PolarimeterDetector type, const std::map<std::string,NpolDetectorEvent *> *detEvents); 
-void GetPoI2(double *ret, double *time, const int section, const PolarimeterDetector type, const std::map<std::string,NpolDetectorEvent *> *detEvents);
-bool CheckAngleRequirement(std::ofstream &txtOut, NpolVertex *incNeutronVert, std::map<std::string,NpolDetectorEvent *> *detEvents, const int section, const PolarimeterDetector EArrayOfInterest, double *dTOF ); 
-void OutputTracks(const std::vector<NpolVertex *> *verticies, std::ofstream &txtOut, int eventNo, const std::map<PolarimeterDetector,double> *eDepArrayTotal, int sectionOfInterest);
-void fillEvent1DHisto(TH1F* elastic, TH1F* inelastic, bool flag, double someInfo);
-void fillEvent2DHisto(TH2F* elastic, TH2F* inelastic, bool flag, double someInfo, double moreInfo);
+void sectionEffLocalCoordinates(TH1F *h_sectionEfficiencyLocalPositions, const std::map<std::string,NpolDetectorEvent *> *detEvents, 
+								int sectionOfInterest, PolarimeterDetector detector);
+double getAzimuthAngle(std::ofstream &txtOut, const double p1x, const double p1y, const double p1z,const double p2x, const double p2y, 
+					   const double p2z, const double p3x, const double p3y, const double p3z);
+void GetPoI(double *ret, double *time, const int section, const PolarimeterDetector type, 
+			const std::map<std::string,NpolDetectorEvent *> *detEvents); 
+void GetPoI2(double *ret, double *time, const int section, const PolarimeterDetector type, 
+			 const std::map<std::string,NpolDetectorEvent *> *detEvents);
+bool CheckAngleRequirement(std::ofstream &txtOut, NpolVertex *incNeutronVert, std::map<std::string,
+						   NpolDetectorEvent *> *detEvents, const int section, const PolarimeterDetector EArrayOfInterest, double *dTOF ); 
+void OutputTracks(const std::vector<NpolVertex *> *verticies, std::ofstream &txtOut, int eventNo, 
+				  const std::map<PolarimeterDetector,double> *eDepArrayTotal, int sectionOfInterest);
+//***************** End Definitions of Variables and Methods ***********************//
 
+//************************ Main Program Begins Here ********************************//
 
 int main(int argc, char *argv[]) {
   
@@ -100,9 +108,11 @@ int main(int argc, char *argv[]) {
 
   std::vector<NpolStep *> *steps = NULL;
   std::vector<NpolVertex *> *verts = NULL;
+  std::vector<NpolTagger *> *tagEvent = NULL;
   std::vector<NpolStatistics *> *stats = NULL;
   npolTree->SetBranchAddress("steps",&steps);
   npolTree->SetBranchAddress("tracks",&verts);
+  npolTree->SetBranchAddress("NPOLTagger",&tagEvent);
   statsTree->SetBranchAddress("stats",&stats);
   
   //********************************* Define your Histograms Here *******************************
@@ -117,65 +127,22 @@ int main(int argc, char *argv[]) {
   TH1F *h_sectionEfficiency3 = new TH1F("sectionEfficiency3","Polarimeter section efficiency after array energy total cuts",13,0.25,6.75);
   TH1F *h_sectionEfficiency4 = new TH1F("sectionEfficiency4","Polarimeter section efficiency after angle cut",13,0.25,6.75);
   TH1F *h_dTOF = new TH1F("dTOF","Delta time-of-flight",600,-30,120);
-  TH1F *h_sectionEfficiencyLocalPositions[LAYER_NUM]; 
-  for(int i = 0; i <= (LAYER_NUM-1); i++) {
-    std::string title = "Polarimeter Efficiency - Section ";
-    title = title + std::to_string(i + 1);
-    std::string name = "sectionEfficiencyLocalPosition";
-    name = name + std::to_string(i + 1);
-    h_sectionEfficiencyLocalPositions[i] = new TH1F(name.c_str(), title.c_str(),200, -5.0, 5.0);
-  }
-  //elastic ONLY histos
-  TH2F *h_dEoverE_TopHigh_Elastic = new TH2F("dEoverE_Top_Elastic", "dE over E for top array - HIGHEST PV ONLY(Elastic Events)", 200,0,150,200,0,20);
-  TH2F *h_dEoverE_BotHigh_Elastic = new TH2F("dEoverE_Bot_Elastic", "dE over E for bottom array - HIGHEST PV ONLY(Elastic Events)", 200,0,150,200,0,20);
-  TH2F *h_dEoverEtop_Elastic = new TH2F("dEoverEtop_Elastic", "dE over E for top array(Elastic Events)", 200,0,150,200,0,20);
-  TH2F *h_dEoverEbot_Elastic = new TH2F("dEoverEbot_Elastic", "dE over E for bottom array(Elastic Events)", 200,0,150,200,0,20);
-  TH1F *h_sectionEfficiency1_Elastic = new TH1F("sectionEfficiency1_Elastic","Polarimeter section efficiency before cuts (Elastic Events)",13,0.25,6.75);
-  TH1F *h_sectionEfficiency2_Elastic = new TH1F("sectionEfficiency2_Elastic","Polarimeter section efficiency after asymmetry cut (Elastic Events)",13,0.25,6.75);
-  TH1F *h_sectionEfficiency3_Elastic = new TH1F("sectionEfficiency3_Elastic","Polarimeter section efficiency after array energy total cuts (Elastic Events)",13,0.25,6.75);
-  TH1F *h_sectionEfficiency4_Elastic = new TH1F("sectionEfficiency4_Elastic","Polarimeter section efficiency after angle cut (Elastic Events)",13,0.25,6.75);
-  TH1F *h_dTOF_Elastic = new TH1F("dTOF_Elastic","Delta time-of-flight (Elastic Events)",600,-30,120);
-  TH1F *h_sectionEfficiencyLocalPositions_Elastic[LAYER_NUM]; 
-  for(int i = 0; i <= (LAYER_NUM-1); i++) {
-    std::string title = "Polarimeter Efficiency (Elastic Events)- Section ";
-    title = title + std::to_string(i + 1);
-    std::string name = "sectionEfficiencyLocalPosition_Elastic";
-    name = name + std::to_string(i + 1);
-    h_sectionEfficiencyLocalPositions_Elastic[i] = new TH1F(name.c_str(), title.c_str(),200, -2.5, 2.5);
-  }
 
-  //inelastic ONLY histos
-  TH2F *h_dEoverE_TopHigh_Inelastic = new TH2F("dEoverE_Top_Inelastic", "dE over E for top array - HIGHEST PV ONLY(Inelastic Events)", 200,0,150,200,0,20);
-  TH2F *h_dEoverE_BotHigh_Inelastic = new TH2F("dEoverE_Bot_Inelastic", "dE over E for bottom array - HIGHEST PV ONLY(Inelastic Events)", 200,0,150,200,0,20);
-  TH2F *h_dEoverEtop_Inelastic = new TH2F("dEoverEtop_Inelastic", "dE over E for top array(Inelastic Events)", 200,0,150,200,0,20);
-  TH2F *h_dEoverEbot_Inelastic = new TH2F("dEoverEbot_Inelastic", "dE over E for bottom array(Inelastic Events)", 200,0,150,200,0,20);
-  TH1F *h_sectionEfficiency1_Inelastic = new TH1F("sectionEfficiency1_Inelastic","Polarimeter section efficiency before cuts (Inelastic Events)",13,0.25,6.75);
-  TH1F *h_sectionEfficiency2_Inelastic = new TH1F("sectionEfficiency2_Inelastic","Polarimeter section efficiency after asymmetry cut (Inelastic Events)",13,0.25,6.75);
-  TH1F *h_sectionEfficiency3_Inelastic = new TH1F("sectionEfficiency3_Inelastic","Polarimeter section efficiency after array energy total cuts (Inelastic Events)",13,0.25,6.75);
-  TH1F *h_sectionEfficiency4_Inelastic = new TH1F("sectionEfficiency4_Inelastic","Polarimeter section efficiency after angle cut (Inelastic Events)",13,0.25,6.75);
-  TH1F *h_dTOF_Inelastic = new TH1F("dTOF_Inelastic","Delta time-of-flight (Inelastic Events)",600,-30,120);
-  TH1F *h_sectionEfficiencyLocalPositions_Inelastic[LAYER_NUM];
-  for(int i = 0; i <= (LAYER_NUM-1); i++) {
-    std::string title = "Polarimeter Efficiency(Inelastic Events)  - Section ";
-    title = title + std::to_string(i + 1);
-    std::string name = "sectionEfficiencyLocalPosition_Inelastic";
-    name = name + std::to_string(i + 1);
-    h_sectionEfficiencyLocalPositions_Inelastic[i] = new TH1F(name.c_str(), title.c_str(),200, -2.5, 2.5);
-  }
 	
   // BEGIN STATS LOOP
   int totalEvents = 0;
   int eventInteraction = 0;
-  for(int i = 0; i < statsTree->GetEntries(); i++) {
-    statsTree->GetEntry(i);
-    totalEvents += ((*stats)[0])->totalEvents;
-  }// END STATS LOOP
-  std::cout << totalEvents << " neutrons on polarimeter." << std::endl;
-	
   int eventCounter = 0;
   int eventsPassed = 0;
   int eventsFailed = 0;
   int eventsTrigger = 0;
+  int taggedEvents = 0;
+  for(int i = 0; i < statsTree->GetEntries(); i++) {
+    statsTree->GetEntry(i);
+    totalEvents += ((*stats)[0])->totalEvents;
+  }// END STATS LOOP
+  std::cout << totalEvents << " neutrons thrown at setup." << std::endl;
+	
   // BEGIN EVENT LOOP
   int nentries = npolTree->GetEntries();
   for(int i = 0; i < nentries; i++) {
@@ -184,19 +151,21 @@ int main(int argc, char *argv[]) {
       std::cout << "Processing event #" << eventCounter << std::endl;
     npolTree->GetEntry(i);
     std::map<std::string,NpolDetectorEvent *> detEvents;
-    // BEGIN VERTICES LOOP  run through two times with both only elastic and inelastic collisions - RENAME THE OUTPUT FILES EACH TIME! 
-    bool elasticFlag = false;
-    std::vector<NpolVertex *>::const_iterator v_it;
-    for(v_it = verts->begin(); v_it != verts->end(); v_it++) {
-      NpolVertex *aVertex = *v_it;
-      if(aVertex == NULL) continue;
-	  if(aVertex->parentId == 1 && aVertex->process == "hadElastic" && aVertex->particle == "proton") {
-		elasticFlag = true;
-		break;
-      }
-	} 
 
-    // BEGIN STEPS LOOP
+	// NpolTagger loop to count number neutrons with parentID = 0 which cross the Npol Tagger (24-Jan-2018)
+	// This is a "rough" counter for the total number of neutrons to enter the polarimeter which have 
+	// a chance to interact with an analyzer layer and thus need to be in the denominator for the efficiency 
+	// calculation.  This isn't the best since the NPOL tagger is a bit wider than the front layer of analyzers ANDdddd
+	// is about 5-7 cm in front of the first layer (just a 1-2 cm from the inside of front shield wall).
+	std::vector<NpolTagger *>::iterator t_it;
+	for(t_it = tagEvent->begin(); t_it != tagEvent->end(); t_it++) {
+	  NpolTagger *tagged = *t_it;
+	  if(tagged == NULL) continue;
+	  if((tagged->parentId == 0) && (tagged->particle == "neutron")) taggedEvents++;
+	}
+
+
+    // BEGIN STEPS LOOP: Fills the detEvent map with volumes and total energy, etc.
     std::vector<NpolStep *>::iterator s_it;
 	bool tripFlag = false;
     for(s_it = steps->begin(); s_it != steps->end(); s_it++) {
@@ -216,7 +185,8 @@ int main(int argc, char *argv[]) {
 		(detEvents[aStep->volume])->lPosZ = aStep->lPosZ;
 		(detEvents[aStep->volume])->time = aStep->time;
 
-		if(tripFlag == false){// A counter for number of events that fire at least one Analyzer in some section
+		// A counter for number of events that fire at least one Analyzer in some section
+		if(tripFlag == false){
 		  if(detectorType(aStep->volume) == analyzer){
 			eventsTrigger++;
 			tripFlag = true;
@@ -235,21 +205,24 @@ int main(int argc, char *argv[]) {
     eDepArrayTotal[topdEArray] = 0.0;
     eDepArrayTotal[botEArray] = 0.0;
     eDepArrayTotal[botdEArray] = 0.0;
+
     if(sectionOfInterest != -1) {
       eventInteraction++;
       h_sectionEfficiency1->Fill(sectionOfInterest+1); // Fill
-	  fillEvent1DHisto(h_sectionEfficiency1_Elastic, h_sectionEfficiency1_Inelastic, elasticFlag, sectionOfInterest+1);
-      for(e_it = detEvents.begin(); e_it != detEvents.end(); e_it++) {
-		
+
+      for(e_it = detEvents.begin(); e_it != detEvents.end(); e_it++) {		
 		PolarimeterDetector detector2 = detectorType(e_it->first);
 		if(detector2 == topEArray || detector2 == topdEArray || 
 		   detector2 == botEArray || detector2 == botdEArray){
 		  eDepArrayTotal[detector2] += e_it->second->totEnergyDep;
 		}
+		
 		// Changed this on 12-March-2017 to test theory on the Recoil Proton Angle "question"
+		// This allows E/dE detectors outside the "geometric" SOI to be counted as well.  It worked!
+		// This part of the "tracking" needs some work ... lots of work.
 		if(sectionNumber(e_it->first) == sectionOfInterest) {
 		  PolarimeterDetector detector = detectorType(e_it->first);
-		  if(detector == analyzer || detector == tagger){
+		  if(detector == analyzer || detector == tagger) {
 			//|| detector == topEArray || detector == topdEArray || detector == botEArray || detector == botdEArray){
 			eDepArrayTotal[detector] += e_it->second->totEnergyDep;
 		  }
@@ -265,9 +238,9 @@ int main(int argc, char *argv[]) {
       else {
 		dEArrayOfInterest = botdEArray;
       }
+
       if(EArrayOfInterest != unknown) {
 		h_sectionEfficiency2->Fill(sectionOfInterest+1); //Fill
-		fillEvent1DHisto(h_sectionEfficiency2_Elastic, h_sectionEfficiency2_Inelastic, elasticFlag, sectionOfInterest+1);
 		double eDepAnalyzer = eDepArrayTotal[analyzer];
 		double eDepE = eDepArrayTotal[EArrayOfInterest];// energy for array filled here 
 		double eDepdE = eDepArrayTotal[dEArrayOfInterest];
@@ -275,29 +248,19 @@ int main(int argc, char *argv[]) {
 		double dTOF = -100.0;
 		double dEDepHighest = highestEDepPV(&detEvents, sectionOfInterest, dEArrayOfInterest);
 		double eDepHighest = highestEDepPV(&detEvents, sectionOfInterest, EArrayOfInterest);
-		if(eDepAnalyzer > 4.0 /*MeV*/ && eDepE > 5.0 /*MeV */ && eDepTotal >= 50.0 /*MeV*/) { // Requirements 3 and 4
+		if(eDepAnalyzer >= 4.0 /*MeV*/ && eDepE >= 5.0 /*MeV */ && eDepTotal >= 50.0 /*MeV*/) { // Requirements 3 and 4
 		  h_sectionEfficiency3->Fill(sectionOfInterest+1); //FILL
-		  fillEvent1DHisto(h_sectionEfficiency3_Elastic, h_sectionEfficiency3_Inelastic, elasticFlag, sectionOfInterest+1);
 		  if(CheckAngleRequirement(txtOut,verts->at(1),&detEvents,sectionOfInterest,EArrayOfInterest,&dTOF)) {
 		    //OutputTracks(verts,txtOut,eventCounter,&eDepArrayTotal,sectionOfInterest);
 			h_sectionEfficiency4->Fill(sectionOfInterest+1); //FILL
-			fillEvent1DHisto(h_sectionEfficiency4_Elastic, h_sectionEfficiency4_Inelastic, elasticFlag, sectionOfInterest+1);
 			h_dTOF->Fill(dTOF); //FILL
 			h_recoilAngle->Fill(azAngle); // Fill the proton recoil angle histo
-			fillEvent1DHisto(h_dTOF_Elastic, h_dTOF_Inelastic, elasticFlag, dTOF);
-			sectionEffLocalCoordinates(h_sectionEfficiencyLocalPositions[sectionOfInterest],&detEvents,sectionOfInterest,analyzer);
-			sectionEffLocalCoordinates(h_sectionEfficiencyLocalPositions_Elastic[sectionOfInterest],&detEvents,sectionOfInterest,analyzer);
-			sectionEffLocalCoordinates(h_sectionEfficiencyLocalPositions_Inelastic[sectionOfInterest],&detEvents,sectionOfInterest,analyzer);
 			if(EArrayOfInterest == topEArray) {// this is where histo for top dE/E gets filled
 			  h_dEoverEtop->Fill(eDepE,eDepdE); //FILL
-			  fillEvent2DHisto(h_dEoverEtop_Elastic, h_dEoverEtop_Inelastic, elasticFlag, eDepE, eDepdE);
 			  h_dEoverE_TopHigh->Fill(eDepHighest, dEDepHighest); //FILL
-			  fillEvent2DHisto(h_dEoverE_TopHigh_Elastic, h_dEoverE_TopHigh_Inelastic, elasticFlag, eDepE, eDepdE);
 			} else if(EArrayOfInterest == botEArray) { 
 			  h_dEoverEbot->Fill(eDepE,eDepdE);//FILL
-			  fillEvent2DHisto(h_dEoverEbot_Elastic, h_dEoverEbot_Inelastic, elasticFlag, eDepE, eDepdE);
 			  h_dEoverE_BotHigh->Fill(eDepHighest, dEDepHighest);//FILL
-			  fillEvent2DHisto(h_dEoverE_BotHigh_Elastic, h_dEoverE_BotHigh_Inelastic, elasticFlag, eDepE, eDepdE);
 			}
 			
 			eventsPassed++;
@@ -313,21 +276,22 @@ int main(int argc, char *argv[]) {
     detEvents.clear();
   } // END EVENT LOOP
   
+  std::cout << taggedEvents << " of the initial " << totalEvents << " neutrons have crossed the Npol Tagger." << std::endl;
   std::cout << eventsPassed << " events passed requirements.  "
-			<< eventsFailed << " failed." << std::endl;
-  //double temp = (((double)eventsPassed)*100)/(double)totalEvents;
-  std::cout << (((double)eventsPassed)*100)/(double)totalEvents << " % of total events passed cuts." << std::endl; 
+			<< (taggedEvents - eventsPassed) << " failed." << std::endl;
+  std::cout << (((double)eventsPassed)*100)/(double)taggedEvents << " % of the " << taggedEvents << " neutrons passed cuts." << std::endl; 
   h_sectionEfficiency1->Scale(1.0); 
   h_sectionEfficiency2->Scale(1.0); 
   h_sectionEfficiency3->Scale(1.0); 
   h_sectionEfficiency4->Scale(1.0); 
   
-  TVectorD runStatistics(5);
+  TVectorD runStatistics(6);
   runStatistics[0] = totalEvents;
   runStatistics[1] = eventInteraction;
   runStatistics[2] = eventsPassed;
   runStatistics[3] = eventsFailed;
   runStatistics[4] = eventsTrigger;
+  runStatistics[5] = taggedEvents;
   runStatistics.Write();
   h_dEoverE_TopHigh->Write();
   h_dEoverE_BotHigh->Write();
@@ -337,41 +301,16 @@ int main(int argc, char *argv[]) {
   h_sectionEfficiency2->Write();
   h_sectionEfficiency3->Write();
   h_sectionEfficiency4->Write();
-  for(int i = 0; i <= (LAYER_NUM - 1); i++) {
-    (h_sectionEfficiencyLocalPositions[i])->Write();
-  }
   h_dTOF->Write();
-  //write elastic only
-  h_dEoverE_TopHigh_Elastic->Write();
-  h_dEoverE_BotHigh_Elastic->Write();
-  h_dEoverEtop_Elastic->Write();
-  h_dEoverEbot_Elastic->Write();
-  h_sectionEfficiency1_Elastic->Write();
-  h_sectionEfficiency2_Elastic->Write();
-  h_sectionEfficiency3_Elastic->Write();
-  h_sectionEfficiency4_Elastic->Write();
-  for(int i = 0; i <= (LAYER_NUM - 1); i++) {
-	(h_sectionEfficiencyLocalPositions_Elastic[i])->Write();
-  }
-  h_dTOF_Elastic->Write();
   h_recoilAngle->Write();
-  //write inelastic only
-  h_dEoverE_TopHigh_Inelastic->Write();
-  h_dEoverE_BotHigh_Inelastic->Write();
-  h_dEoverEtop_Inelastic->Write();
-  h_dEoverEbot_Inelastic->Write();
-  h_sectionEfficiency1_Inelastic->Write();
-  h_sectionEfficiency2_Inelastic->Write();
-  h_sectionEfficiency3_Inelastic->Write();
-  h_sectionEfficiency4_Inelastic->Write();
-  for(int i = 0; i <= (LAYER_NUM - 1); i++) {
-	(h_sectionEfficiencyLocalPositions_Inelastic[i])->Write();
-  }
-  h_dTOF_Inelastic->Write();
   outFile->Close();
   txtOut.close();
   return 0;
 }
+
+// ************** End Main Program here *************** //
+
+// ************* Methods for Main below ************** //
 
 int GetAVNumber(const std::string &volName) {
   if(volName.substr(0,3) == "av_") {
@@ -603,8 +542,8 @@ int getSectionOfInterest(const std::map<std::string,NpolDetectorEvent *> *detEve
       //if(sectionOfInterest != -1) multiscatter = true;  // Turn this off by commenting out this line
       sectionOfInterest = -1;
 	  //}
-    //if((analyzerFlag && topEArrayFlag && topdEArrayFlag && !taggerFlag) || (analyzerFlag && botEArrayFlag && botdEArrayFlag && !taggerFlag)) {  
-	sectionOfInterest = section; // If this section passes requirement 1, then it may be the section of interest
+	  //if((analyzerFlag && topEArrayFlag && topdEArrayFlag && !taggerFlag) || (analyzerFlag && botEArrayFlag && botdEArrayFlag && !taggerFlag)) {  
+	  sectionOfInterest = section; // If this section passes requirement 1, then it may be the section of interest
     }
     
     //  Code inserted for future "checks" of the E-array and dE-array if necessary
@@ -615,16 +554,17 @@ int getSectionOfInterest(const std::map<std::string,NpolDetectorEvent *> *detEve
   // Reject events with more than 40 detectors with hits above 1 MeV
   // Otherwise return the ID'd section of interest
   int totalDetHit = countA + countTE + countBE + countV + countTdE + countBdE;
-  if(multiscatter) {  
-    sectionOfInterest = -1;
-    //std::cout << "Multi-hit: Event rejected!" << std::endl;
-    return sectionOfInterest;
-  } else if(totalDetHit >= 40) { 
-    std::cout << "Event Rejected! Total number of detectors with 40 keV or greater: " << totalDetHit << std::endl;
-    sectionOfInterest = -1;
-    return sectionOfInterest;
+  //if(multiscatter) {  
+  //sectionOfInterest = -1;
+  //std::cout << "Multi-hit: Event rejected!" << std::endl;
+  //return sectionOfInterest;
+  //} 
+  if(totalDetHit >= 40) { 
+	std::cout << "Event Rejected! Total number of detectors with 40 keV or greater: " << totalDetHit << std::endl;
+	sectionOfInterest = -1;
+	return sectionOfInterest;
   } else {
-    return sectionOfInterest;
+	return sectionOfInterest;
   }
 }
 
@@ -636,9 +576,9 @@ PolarimeterDetector getEArrayOfInterest(std::map<PolarimeterDetector, double> *e
   double topdETotal = (*eDepArrayTotal)[topdEArray];
   double botdETotal = (*eDepArrayTotal)[botdEArray];
 
-  if(topETotal > 20*botETotal && topdETotal > 20*botdETotal)
+  if((topETotal + topdETotal) > 20*(botETotal + botdETotal))
     return topEArray;
-  else if(botETotal > 20*topETotal && botdETotal > 20*topdETotal)
+  else if((botETotal + botdETotal) > 20*(topETotal + topdETotal))
     return botEArray;
   else
     return unknown;
@@ -757,21 +697,6 @@ void GetPoI2(double *ret, double *time, const int section, const PolarimeterDete
   *time /= totEdepSoFar;
 }
 
-//method that checks if the event is elastic or inelastic and then places it in the 
-//  correct histogram
-void fillEvent1DHisto(TH1F* elastic, TH1F* inelastic, bool flag, double someInfo) {
-
-  if(flag) elastic->Fill(someInfo);
-  else if(!flag) inelastic->Fill(someInfo);
-
-}
-
-void fillEvent2DHisto(TH2F* elastic, TH2F* inelastic, bool flag, double someInfo, double moreInfo) {
-
-  if(flag) elastic->Fill(someInfo, moreInfo);
-  else if(!flag) inelastic->Fill(someInfo, moreInfo);
-
-}
 
 void OutputTracks(const std::vector<NpolVertex *> *verticies, std::ofstream &txtOut, int eventNo, const std::map<PolarimeterDetector,double> *eDepArrayTotal, int sectionOfInterest) {
 
