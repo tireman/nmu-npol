@@ -131,8 +131,9 @@ int main(int argc, char *argv[]) {
   TH1F *h_sectionEfficiency3 = new TH1F("sectionEfficiency3","Polarimeter section efficiency after array energy total cuts",13,0.25,6.75);
   TH1F *h_sectionEfficiency4 = new TH1F("sectionEfficiency4","Polarimeter section efficiency after angle cut",13,0.25,6.75);
   TH1F *h_dTOF = new TH1F("dTOF","Delta time-of-flight",600,-30,120);
+  //********************************* End Histogram Definitions ********************************
 
-	
+  
   // BEGIN STATS LOOP
   int totalEvents = 0;
   int eventInteraction = 0;
@@ -161,12 +162,12 @@ int main(int argc, char *argv[]) {
 	// a chance to interact with an analyzer layer and thus need to be in the denominator for the efficiency 
 	// calculation.  This isn't the best since the NPOL tagger is a bit wider than the front layer of analyzers ANDdddd
 	// is about 5-7 cm in front of the first layer (just a 1-2 cm from the inside of front shield wall).
-	std::vector<NpolTagger *>::iterator t_it;
+	/*std::vector<NpolTagger *>::iterator t_it;
 	for(t_it = tagEvent->begin(); t_it != tagEvent->end(); t_it++) {
 	  NpolTagger *tagged = *t_it;
 	  if(tagged == NULL) continue;
 	  if((tagged->parentId == 0) && (tagged->particle == "neutron")) taggedEvents++;
-	}
+	  }*/
 
 
     // BEGIN STEPS LOOP: Fills the detEvent map with volumes and total energy, etc.
@@ -174,6 +175,9 @@ int main(int argc, char *argv[]) {
 	bool tripFlag = false;
     for(s_it = steps->begin(); s_it != steps->end(); s_it++) {
       NpolStep *aStep = *s_it;
+	  int imprintNum = GetImprNumber(aStep->volume);
+	  int AVNum = GetAVNumber(aStep->volume);
+	  if((aStep->parentId == 0) && (aStep->particleId == 2112) && (AVNum == 9) && (imprintNum == 1)) taggedEvents++;
 		
       if(detEvents.find(aStep->volume) == detEvents.end())
 		detEvents[aStep->volume] = new NpolDetectorEvent();
