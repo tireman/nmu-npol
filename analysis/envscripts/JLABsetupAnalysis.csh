@@ -8,8 +8,8 @@ setenv Bfield 4
 setenv NPOLLIB_DIR $BUILD_DIR/../npollib
 setenv NPOLBASENAME source$pType\_Lead$Lead\cm_$Energy\GeV_$Bfield\Bdl 
 #electronBeam_Lead$Lead\cm_$Energy\GeV_$Bfield\Bdl
-setenv NPOLDIR /volatile/hallc/cgen/tireman/TargetTaggerRuns/QENeutron/Lead$Lead\cm/$Energy\GeV/$Bfield\Bdl/Location_2
-setenv NPOLWORKDIR /volatile/hallc/cgen/tireman/TargetTaggerRuns/QENeutron/Lead$Lead\cm/$Energy\GeV/$Bfield\Bdl/Location_2
+setenv NPOLDIR /cache/hallc/cgen/simulation/tireman/TargetTaggerRuns/QENeutron/Lead$Lead\cm/$Energy\GeV/$Bfield\Bdl/Location_2
+setenv NPOLWORKDIR /work/hallc/cgen/tireman/TargetTaggerRuns/QENeutron/Lead$Lead\cm/$Energy\GeV/$Bfield\Bdl/Location_2/NpolEffTesting/28-Jan-2018
 
 setenv RawDataDir $NPOLDIR/root
 setenv OutputDir $NPOLWORKDIR/Output

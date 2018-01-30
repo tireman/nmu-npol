@@ -5,13 +5,13 @@ foreach i (`seq $1 1 $2`)
 cat > jsubscan_$i << EOF1
 PROJECT: cgen
 TRACK : simulation
-OS : centos65
-JOBNAME : SCAN-Electron_11GeV_4Bdl_15cm_$i
+OS : centos7
+JOBNAME : SCAN-QENeutron_4.4GeV_4Bdl_15cm_$i
 MAIL: tireman@jlab.org
 TIME: 120
 MEMORY: 1300 MB
-COMMAND : source JLABscanRunCommands.csh $i
-OTHER_FILES : /u/home/tireman/simulation/e11_12_009/background/nmu-npol/build/analysis/scripts/JLABscanRunCommands.csh
+COMMAND : source JLABscanRunCommands.csh $i $3
+OTHER_FILES : /u/home/tireman/simulation/e11_12_009/background/nmu-npol/analysis/scripts/JLABscanRunCommands.csh
 EOF1
 end
 
