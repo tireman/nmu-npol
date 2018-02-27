@@ -177,8 +177,10 @@ int main(int argc, char *argv[]) {
       NpolStep *aStep = *s_it;
 	// This three lines of code count up the number of particles entering into the 
 	// first analyzer array that are a neutron (2112), parent ID (0).
-	  int imprintNum = GetImprNumber(aStep->volume);
 	  int AVNum = GetAVNumber(aStep->volume);
+	  if(AVNum == -1) continue;
+	  int imprintNum = GetImprNumber(aStep->volume);
+	  int PVNum = GetPlacementNumber(aStep->volume);
 	  if((!eventFlag) && (aStep->parentId == 0) && (aStep->particleId == 2112) 
 		&& (AVNum == 9) && (imprintNum == 1)) {
 		taggedEvents++;
@@ -200,6 +202,12 @@ int main(int argc, char *argv[]) {
 		(detEvents[aStep->volume])->gPosZ = aStep->gPosZ;
 		(detEvents[aStep->volume])->time = aStep->time;
 
+		// Compute the hit position in the volume and save
+		
+		(detEvents[aStep->volume])->hPosX = 0.0;
+		(detEvents[aStep->volume])->hPosY = 0.0;
+		(detEvents[aStep->volume])->hPosZ = 0.0;
+		
 		// A counter for number of events that fire at least one Analyzer in some section
 		// This also sets a flag so we don't count more than once if more than one layer passes this requirement
 		if(tripFlag == false){
