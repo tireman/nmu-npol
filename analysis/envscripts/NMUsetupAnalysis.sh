@@ -13,7 +13,7 @@ export NPOLBASENAME=source$pType\_Lead$Lead\cm_$Energy\GeV_$Bfield\Bdl
 
 export NPOLDIR=/home/tireman/data1/TargetTaggerSource/$pType\RawSim/$Energy\GeV/$Bfield\Bdl/Lead$Lead\cm/Location_2
 
-export NPOLWORKDIR=/home/tireman/data1/TargetTaggerSource/$pType\RawSim/$Energy\GeV/$Bfield\Bdl/Lead$Lead\cm/Location_2
+export NPOLWORKDIR=/home/tireman/data1/TargetTaggerSource/$pType\RawSim/$Energy\GeV/$Bfield\Bdl/Lead$Lead\cm/Location_2/Testing_2
 
 export RawDataDir=$NPOLDIR/root
 export OutputDir=$NPOLDIR/Output
@@ -22,6 +22,7 @@ export WorkOutputDir=$NPOLWORKDIR
 export WorkInputDir=$NPOLWORKDIR
 export HistoOutputDir=$NPOLWORKDIR/histos
 export HistoInputDir=$NPOLWORKDIR/histos
+export PlotsOutputDir=$NPOLWORKDIR/Plots
 
 if [ ! -e $NPOLDIR ]
 then
