@@ -37,6 +37,7 @@ NpolPrimaryGeneratorAction::~NpolPrimaryGeneratorAction()
 // This function is called at the beginning of each event.
 void NpolPrimaryGeneratorAction::GeneratePrimaries(G4Event* anEvent)
 {
+
   fParticleGun->GeneratePrimaryVertex(anEvent);
 }
 
