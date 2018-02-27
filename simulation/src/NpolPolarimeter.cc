@@ -12,6 +12,14 @@
 
 // Polarimeter construction file
 // Modified: Daniel Wilbern - December 2014
+// This code currently (March 2018) generates NPOL volumes with
+// names of the following scheme av_xxx_impr_yyy_VolName_pv_zzz
+// xxx is the assembly volume number (runs from 1 to # of assemblies)
+// yyy is the imprint number of the assembly for multiple placements
+//     of the same assembly (runs from 1 to # of imprints)
+// zzz is the physical volume number for detectors in an assembly
+//     (runs from 0 to the # of detectors in the assembly)
+// VolName is the physical volume name given when it is created
 
 #include <string>
 #include <cstring>
