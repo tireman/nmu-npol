@@ -1,8 +1,7 @@
-/* Npol Analysis Script is designed to analyze the neutron flux on the NPOL 
-   polarimeter being designed by the CGEN 
-   collaboration at Jefferson National Laboratory. (2016)
+/* Npol Analysis Script is designed to analyze the neutron flux on the NPOL polarimeter being
+   designed by the CGEN collaboration at Jefferson National Laboratory. (2016)
    Revisions: Spring 2017 by Will Tireman and Ashley Adzima (added some histograms)
-   Revisions: January 2017 by Will Tireman (Fixed eff. calculation, cleaned up code)
+   Revisions: January 2018 by Will Tireman (Fixed eff. calculation, cleaned up code)
 */
 
 #include <iostream>
@@ -160,7 +159,7 @@ int main(int argc, char *argv[]) {
 	// NpolTagger loop to count number neutrons with parentID = 0 which cross the Npol Tagger (24-Jan-2018)
 	// This is a "rough" counter for the total number of neutrons to enter the polarimeter which have 
 	// a chance to interact with an analyzer layer and thus need to be in the denominator for the efficiency 
-	// calculation.  This isn't the best since the NPOL tagger is a bit wider than the front layer of analyzers ANDdddd
+	// calculation.  This isn't the best since the NPOL tagger is a bit wider than the front layer of analyzers AND
 	// is about 5-7 cm in front of the first layer (just a 1-2 cm from the inside of front shield wall).
 	/*std::vector<NpolTagger *>::iterator t_it;
 	for(t_it = tagEvent->begin(); t_it != tagEvent->end(); t_it++) {
@@ -171,13 +170,20 @@ int main(int argc, char *argv[]) {
 
 
     // BEGIN STEPS LOOP: Fills the detEvent map with volumes and total energy, etc.
-    std::vector<NpolStep *>::iterator s_it;
-	bool tripFlag = false;
+    std::vector<NpolStep *>::iterator s_it;	
+    bool tripFlag = false;
+    bool eventFlag = false;
     for(s_it = steps->begin(); s_it != steps->end(); s_it++) {
       NpolStep *aStep = *s_it;
+	// This three lines of code count up the number of particles entering into the 
+	// first analyzer array that are a neutron (2112), parent ID (0).
 	  int imprintNum = GetImprNumber(aStep->volume);
 	  int AVNum = GetAVNumber(aStep->volume);
-	  if((aStep->parentId == 0) && (aStep->particleId == 2112) && (AVNum == 9) && (imprintNum == 1)) taggedEvents++;
+	  if((!eventFlag) && (aStep->parentId == 0) && (aStep->particleId == 2112) 
+		&& (AVNum == 9) && (imprintNum == 1)) {
+		taggedEvents++;
+		eventFlag = true;
+	  }
 		
       if(detEvents.find(aStep->volume) == detEvents.end())
 		detEvents[aStep->volume] = new NpolDetectorEvent();
@@ -230,17 +236,18 @@ int main(int argc, char *argv[]) {
 	  // E or dE detector be in a particular "geometric section (vertical slice).
 	  // This allows E/dE detectors outside the "geometric" SOI to be counted as well.  It worked!
 	  // This part of the "tracking" needs some work ... lots of work.
-      for(e_it = detEvents.begin(); e_it != detEvents.end(); e_it++) {		
-		PolarimeterDetector detector2 = detectorType(e_it->first);
+      for(e_it = detEvents.begin(); e_it != detEvents.end(); e_it++) {	
+		
+		/*PolarimeterDetector detector2 = detectorType(e_it->first);
 		if(detector2 == topEArray || detector2 == topdEArray || 
 		   detector2 == botEArray || detector2 == botdEArray){
 		  eDepArrayTotal[detector2] += e_it->second->totEnergyDep;
-		}
+		}*/
 				
 		if(sectionNumber(e_it->first) == sectionOfInterest) {
 		  PolarimeterDetector detector = detectorType(e_it->first);
-		  if(detector == analyzer || detector == tagger) {
-			//|| detector == topEArray || detector == topdEArray || detector == botEArray || detector == botdEArray){ // see note above
+		  if(detector == analyzer || detector == tagger /*) {*/	
+		|| detector == topEArray || detector == topdEArray || detector == botEArray || detector == botdEArray){ // see note above
 			eDepArrayTotal[detector] += e_it->second->totEnergyDep;
 		  }
 		}
@@ -607,9 +614,9 @@ PolarimeterDetector getEArrayOfInterest(std::map<PolarimeterDetector, double> *e
   double topdETotal = (*eDepArrayTotal)[topdEArray];
   double botdETotal = (*eDepArrayTotal)[botdEArray];
 
-  if((topETotal + topdETotal) > 20*(botETotal + botdETotal))
+  if((topETotal > 20*botETotal) && (topdETotal > 20*botdETotal))
     return topEArray;
-  else if((botETotal + botdETotal) > 20*(topETotal + topdETotal))
+  else if((botETotal > 20*topETotal) && (botdETotal > 20*topdETotal))
     return botEArray;
   else
     return unknown;
