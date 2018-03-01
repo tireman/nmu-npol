@@ -24,6 +24,7 @@
 #include "TStyle.h"
 #include "TSystem.h"
 #include "TString.h"
+#include "TRandom.h"
 
 #include "NpolVertex.hh"
 #include "NpolTagger.hh"
@@ -39,6 +40,7 @@
 #define LAYER_NUM 4         /* number of analyzer layers; not general; only good for 4 and 6 layers */
 #define angleLow 45.3       /*degrees: low angle recoil proton cut*/
 #define angleHigh 81.6      /*degrees; high angle recoil proton cut*/
+#define NpolAng -0.48869        /*radians; angle of NPOL relative to beam axis*/
 
 enum PolarimeterDetector {
   analyzer = 0,
@@ -60,6 +62,12 @@ TString OutputDir = "";
 TString InputDir = "";
 TString CType = "";
 
+void HitPosCompute(double hitPos[]);
+void AnalyzerTaggerHitPosition(double hitPos[],double lPos[],int detNums[]);
+void DeltaEarrayHitPosition(double hitPos[],double lPos[],int detNums[]);
+void EarrayHitPosition(double hitPos[],double lPos[],int detNums[]);
+void RotateNpolToG4(double hitPos[]);
+void RotateDetToNpol(double hitPos[],int detNums[]);
 void RetrieveENVvariables();
 TString FormInputFile(TString InputDir);
 TString FormOutputFile(TString OutputDir);
@@ -101,7 +109,8 @@ int main(int argc, char *argv[]) {
   
   std::ofstream txtOut;
   //txtOut.open("/data1/dEoverE_txt_files/" + outFilenamePrefix + ".txt");
-  txtOut.open("/dev/null");
+  //txtOut.open("/dev/null");
+  txtOut.open("HitPositions.txt");
   
   TChain *npolTree = new TChain("T");
   TChain *statsTree = new TChain("T2");
@@ -203,11 +212,24 @@ int main(int argc, char *argv[]) {
 		(detEvents[aStep->volume])->time = aStep->time;
 
 		// Compute the hit position in the volume and save
+		double hitPos[3] = { 0.0, 0.0, 0.0 };
+		double lPos[3] = { aStep->lPosX, aStep->lPosY, aStep->lPosZ };
+		int detNums[3] = { AVNum, imprintNum, PVNum };
+
+		if((AVNum == 9) || (AVNum == 10) || (AVNum == 11) || (AVNum == 12)){
+		  AnalyzerTaggerHitPosition(hitPos, lPos, detNums);
+		} else if((AVNum == 3) || (AVNum == 4) || (AVNum == 7) || (AVNum == 8)){
+		  DeltaEarrayHitPosition(hitPos, lPos, detNums);
+		} else if((AVNum == 1) || (AVNum == 2) || (AVNum == 5) || (AVNum == 6)){
+		  EarrayHitPosition(hitPos, lPos, detNums);
+		}
 		
-		(detEvents[aStep->volume])->hPosX = 0.0;
-		(detEvents[aStep->volume])->hPosY = 0.0;
-		(detEvents[aStep->volume])->hPosZ = 0.0;
-		
+		(detEvents[aStep->volume])->hPosX = hitPos[0]; 
+		(detEvents[aStep->volume])->hPosY = hitPos[1]; 
+		(detEvents[aStep->volume])->hPosZ = hitPos[2]; 
+
+		//std::cout << "Hit position after: " << hitPos[0] << " " << hitPos[1] << " " << hitPos[2] << " " << std::endl;
+		txtOut << hitPos[0] << "\t\t" << hitPos[1] << "\t\t" << hitPos[2] << std::endl;
 		// A counter for number of events that fire at least one Analyzer in some section
 		// This also sets a flag so we don't count more than once if more than one layer passes this requirement
 		if(tripFlag == false){
@@ -349,6 +371,114 @@ int main(int argc, char *argv[]) {
 // ************** End Main Program here *************** //
 
 // ************* Methods for Main below ************** //
+
+void AnalyzerTaggerHitPosition(double hPos[],double lPos[], int detNums[]){
+
+  gRandom = new TRandom();
+  do{
+	hPos[0] = lPos[0] + gRandom->Gaus(0.0, 4.0);
+  } while (TMath::Abs(hPos[0]) > 50.0);
+  hPos[1] = 0.0;
+  hPos[2] = 0.0;
+   
+  if((detNums[0] == 9) || (detNums[0] == 11)) hPos[1] = -25 + 10.*float(detNums[2]) +  hPos[1];
+  if((detNums[0] == 10) || (detNums[0] == 12)) hPos[1] = -35 + 10.*float(detNums[2]) +  hPos[1];
+  
+  if((detNums[0] == 9) && (detNums[1] == 1)) hPos[2] = hPos[2] + 700.;
+  if((detNums[0] == 9) && (detNums[1] == 2)) hPos[2] = hPos[2] + 760.;
+  if((detNums[0] == 10) && (detNums[1] == 1)) hPos[2] = hPos[2] + 820.;
+  if((detNums[0] == 10) && (detNums[1] == 2)) hPos[2] = hPos[2] + 880.;
+  if((detNums[0] == 11) && (detNums[1] == 1)) hPos[2] = hPos[2] + 693.;
+  if((detNums[0] == 11) && (detNums[1] == 2)) hPos[2] = hPos[2] + 753.;
+  if((detNums[0] == 12) && (detNums[1] == 1)) hPos[2] = hPos[2] + 813.;
+  if((detNums[0] == 12) && (detNums[1] == 2)) hPos[2] = hPos[2] + 873.;
+
+  //RotateNpolToG4(hPos);
+
+  //std::cout << "Hit position after: " << hPos[0] << " " << hPos[1] << " " << hPos[2] << " " << std::endl;
+  //std::cout << "Detector Numbers: " << detNums[0] << " " << detNums[1] << " " << detNums[2] << " " << std::endl;
+  return;
+}
+
+void DeltaEarrayHitPosition(double hPos[],double lPos[], int detNums[]){
+  
+  double VertOffSet = 42.0;
+  
+  gRandom = new TRandom();
+  do {
+	hPos[0] = lPos[0] + gRandom->Gaus(0.0, 4.0);
+  } while (TMath::Abs(hPos[0]) > 80.0);
+  hPos[1] = 0.0;
+  hPos[2] = 0.0;
+  
+  if(detNums[0] == 3) hPos[1] = hPos[1] + VertOffSet;
+  if(detNums[0] == 4) hPos[1] = hPos[1] + VertOffSet + 10.0;
+  if(detNums[0] == 7) hPos[1] = hPos[1] + (-VertOffSet);
+  if(detNums[0] == 8) hPos[1] = hPos[1] + (-(VertOffSet + 10.0));
+  
+  if((detNums[0] == 3) || (detNums[0] == 7)) hPos[2] = hPos[2] + 700. + (13. - (detNums[2] + 1)) * 10.;
+  if((detNums[0] == 4) || (detNums[0] == 8)) hPos[2] = hPos[2] + 830. + (14. - (detNums[2] + 1)) * 10.;
+  //RotateNpolToG4(hPos);
+  
+  return;
+}
+
+void EarrayHitPosition(double hPos[],double lPos[], int detNums[]){
+
+  double VertOffSet = 90.0;
+  double HorOffSet = 60.2;
+  
+  gRandom = new TRandom();
+  do {
+	hPos[0] = lPos[0] + gRandom->Gaus(0.0, 4.0);
+  } while (TMath::Abs(hPos[0]) > 80.0);
+  hPos[1] = 0.0;
+  hPos[2] = 0.0;
+  RotateDetToNpol(hPos,detNums);
+  
+  if(((detNums[0] == 1) || (detNums[0] == 2)) && (detNums[1] == 1)) hPos[0] = hPos[0] + HorOffSet;
+  if(((detNums[0] == 5) || (detNums[0] == 6)) && (detNums[1] == 1)) hPos[0] = hPos[0] + HorOffSet;
+  if(((detNums[0] == 1) || (detNums[0] == 2)) && (detNums[1] == 2)) hPos[0] = hPos[0] - HorOffSet;
+  if(((detNums[0] == 5) || (detNums[0] == 6)) && (detNums[1] == 2)) hPos[0] = hPos[0] - HorOffSet;
+  
+  if(detNums[0] == 1) hPos[1] = hPos[1] + VertOffSet;
+  if(detNums[0] == 2) hPos[1] = hPos[1] + (VertOffSet + 10.0);
+  if(detNums[0] == 5) hPos[1] = hPos[1] - VertOffSet;
+  if(detNums[0] == 6) hPos[1] = hPos[1] - (VertOffSet + 10.0);
+  
+  if((detNums[0] == 1) || (detNums[0] == 5)) hPos[2] = hPos[2] + 700. + (13. - (detNums[2] + 1)) * 10.;
+  if((detNums[0] == 2) || (detNums[0] == 6)) hPos[2] = hPos[2] + 830. + (14. - (detNums[2] + 1)) * 10.;
+
+  return;
+}
+
+void RotateNpolToG4(double hPos[]){
+
+  double tempPos[3] = { hPos[0], hPos[1], hPos[2] };
+  double RightAng = TMath::Pi()/2;
+  
+  hPos[0] = TMath::Cos(NpolAng) * tempPos[0] + TMath::Cos(TMath::Pi()/4) * tempPos[1] + TMath::Cos(RightAng+NpolAng) * tempPos[2];
+  hPos[1] = TMath::Cos(RightAng) * tempPos[0] + TMath::Cos(0) * tempPos[1] + TMath::Cos(RightAng) * tempPos[2];
+  hPos[2] = TMath::Cos(RightAng-NpolAng) * tempPos[0] + TMath::Cos(RightAng) * tempPos[1] + TMath::Cos(NpolAng) * tempPos[2];
+
+  return;
+}
+
+void RotateDetToNpol(double hPos[], int detNums[]){
+
+  double tempPos[3] = { hPos[0], hPos[1], hPos[2] };
+  double DetAng = TMath::Pi()/4;
+  double RightAng = TMath::Pi()/2;
+ 
+  if(((detNums[0] == 1) || (detNums[0] == 2)) && (detNums[1] == 2)) DetAng = -1*DetAng;
+  if(((detNums[0] == 5) || (detNums[0] == 6)) && (detNums[1] == 1)) DetAng = -1*DetAng;
+   
+  hPos[0] = TMath::Cos(DetAng) * tempPos[0] + TMath::Cos(RightAng - DetAng) * tempPos[1] + TMath::Cos(RightAng) * tempPos[2];
+  hPos[1] = TMath::Cos(RightAng + DetAng) * tempPos[0] + TMath::Cos(DetAng) * tempPos[1] + TMath::Cos(RightAng) * tempPos[2];
+  hPos[2] = TMath::Cos(RightAng) * tempPos[0] + TMath::Cos(RightAng) * tempPos[1] + TMath::Cos(0) * tempPos[2];
+  
+  return;
+}
 
 int GetAVNumber(const std::string &volName) {
   if(volName.substr(0,3) == "av_") {
@@ -690,9 +820,9 @@ void GetPoI(double *ret, double *time, const int section, const PolarimeterDetec
   for(it = detEvents->begin(); it != detEvents->end(); it++) {
     if(sectionNumber(it->first) == section && detectorType(it->first) == type) {
       if(it->second->thresholdExceeded) {
-		ret[0] += (it->second->totEnergyDep)*(it->second->gPosX);
-		ret[1] += (it->second->totEnergyDep)*(it->second->gPosY);
-		ret[2] += (it->second->totEnergyDep)*(it->second->gPosZ);
+		ret[0] += (it->second->totEnergyDep)*(it->second->hPosX); //gPosX
+		ret[1] += (it->second->totEnergyDep)*(it->second->hPosY); //gPosY
+		ret[2] += (it->second->totEnergyDep)*(it->second->hPosZ); //gPosZ
 		*time += (it->second->totEnergyDep)*(it->second->time);
 		totEdepSoFar += it->second->totEnergyDep;
       }
@@ -716,9 +846,9 @@ void GetPoI2(double *ret, double *time, const int section, const PolarimeterDete
   for(it = detEvents->begin(); it != detEvents->end(); it++) {
     if((sectionNumber(it->first) == section || sectionNumber(it->first) == (section + 1) || sectionNumber(it->first) == (section + 2)) && detectorType(it->first) == type) {
       if(it->second->thresholdExceeded) {
-		ret[0] += (it->second->totEnergyDep)*(it->second->gPosX);
-		ret[1] += (it->second->totEnergyDep)*(it->second->gPosY);
-		ret[2] += (it->second->totEnergyDep)*(it->second->gPosZ);
+		ret[0] += (it->second->totEnergyDep)*(it->second->hPosX); //gPosX
+		ret[1] += (it->second->totEnergyDep)*(it->second->hPosY);
+		ret[2] += (it->second->totEnergyDep)*(it->second->hPosZ);
 		*time += (it->second->totEnergyDep)*(it->second->time);
 		totEdepSoFar += it->second->totEnergyDep;
       }
