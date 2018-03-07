@@ -40,7 +40,7 @@
 #define LAYER_NUM 4         /* number of analyzer layers; not general; only good for 4 and 6 layers */
 #define angleLow 45.3       /*degrees: low angle recoil proton cut*/
 #define angleHigh 81.6      /*degrees; high angle recoil proton cut*/
-#define NpolAng -0.48869        /*radians; angle of NPOL relative to beam axis*/
+#define NpolAng 0.48869        /*radians; angle of NPOL relative to beam axis*/
 
 enum PolarimeterDetector {
   analyzer = 0,
@@ -66,7 +66,7 @@ void HitPosCompute(double hitPos[]);
 void AnalyzerTaggerHitPosition(double hitPos[],double lPos[],int detNums[]);
 void DeltaEarrayHitPosition(double hitPos[],double lPos[],int detNums[]);
 void EarrayHitPosition(double hitPos[],double lPos[],int detNums[]);
-void RotateNpolToG4(double hitPos[]);
+void RotateNpolToG4(double hitPos[],double RotationAngle);
 void RotateDetToNpol(double hitPos[],int detNums[]);
 void RetrieveENVvariables();
 TString FormInputFile(TString InputDir);
@@ -110,7 +110,7 @@ int main(int argc, char *argv[]) {
   std::ofstream txtOut;
   //txtOut.open("/data1/dEoverE_txt_files/" + outFilenamePrefix + ".txt");
   //txtOut.open("/dev/null");
-  txtOut.open("HitPositions.txt");
+  txtOut.open("HitPositions_" + JobNum + ".txt");
   
   TChain *npolTree = new TChain("T");
   TChain *statsTree = new TChain("T2");
@@ -218,10 +218,13 @@ int main(int argc, char *argv[]) {
 
 		if((AVNum == 9) || (AVNum == 10) || (AVNum == 11) || (AVNum == 12)){
 		  AnalyzerTaggerHitPosition(hitPos, lPos, detNums);
+		  //RotateNpolToG4(hitPos,NpolAng);
 		} else if((AVNum == 3) || (AVNum == 4) || (AVNum == 7) || (AVNum == 8)){
 		  DeltaEarrayHitPosition(hitPos, lPos, detNums);
+		  //RotateNpolToG4(hitPos,NpolAng);
 		} else if((AVNum == 1) || (AVNum == 2) || (AVNum == 5) || (AVNum == 6)){
 		  EarrayHitPosition(hitPos, lPos, detNums);
+		  //RotateNpolToG4(hitPos,NpolAng);
 		}
 		
 		(detEvents[aStep->volume])->hPosX = hitPos[0]; 
@@ -380,7 +383,8 @@ void AnalyzerTaggerHitPosition(double hPos[],double lPos[], int detNums[]){
   } while (TMath::Abs(hPos[0]) > 50.0);
   hPos[1] = 0.0;
   hPos[2] = 0.0;
-   
+  RotateNpolToG4(hPos, NpolAng);
+  
   if((detNums[0] == 9) || (detNums[0] == 11)) hPos[1] = -25 + 10.*float(detNums[2]) +  hPos[1];
   if((detNums[0] == 10) || (detNums[0] == 12)) hPos[1] = -35 + 10.*float(detNums[2]) +  hPos[1];
   
@@ -392,11 +396,7 @@ void AnalyzerTaggerHitPosition(double hPos[],double lPos[], int detNums[]){
   if((detNums[0] == 11) && (detNums[1] == 2)) hPos[2] = hPos[2] + 753.;
   if((detNums[0] == 12) && (detNums[1] == 1)) hPos[2] = hPos[2] + 813.;
   if((detNums[0] == 12) && (detNums[1] == 2)) hPos[2] = hPos[2] + 873.;
-
-  //RotateNpolToG4(hPos);
-
-  //std::cout << "Hit position after: " << hPos[0] << " " << hPos[1] << " " << hPos[2] << " " << std::endl;
-  //std::cout << "Detector Numbers: " << detNums[0] << " " << detNums[1] << " " << detNums[2] << " " << std::endl;
+  RotateNpolToG4(hPos, NpolAng);
   return;
 }
 
@@ -410,6 +410,7 @@ void DeltaEarrayHitPosition(double hPos[],double lPos[], int detNums[]){
   } while (TMath::Abs(hPos[0]) > 80.0);
   hPos[1] = 0.0;
   hPos[2] = 0.0;
+  RotateNpolToG4(hPos, NpolAng);
   
   if(detNums[0] == 3) hPos[1] = hPos[1] + VertOffSet;
   if(detNums[0] == 4) hPos[1] = hPos[1] + VertOffSet + 10.0;
@@ -418,8 +419,7 @@ void DeltaEarrayHitPosition(double hPos[],double lPos[], int detNums[]){
   
   if((detNums[0] == 3) || (detNums[0] == 7)) hPos[2] = hPos[2] + 700. + (13. - (detNums[2] + 1)) * 10.;
   if((detNums[0] == 4) || (detNums[0] == 8)) hPos[2] = hPos[2] + 830. + (14. - (detNums[2] + 1)) * 10.;
-  //RotateNpolToG4(hPos);
-  
+  RotateNpolToG4(hPos, NpolAng);
   return;
 }
 
@@ -434,32 +434,36 @@ void EarrayHitPosition(double hPos[],double lPos[], int detNums[]){
   } while (TMath::Abs(hPos[0]) > 80.0);
   hPos[1] = 0.0;
   hPos[2] = 0.0;
-  RotateDetToNpol(hPos,detNums);
-  
+ 
   if(((detNums[0] == 1) || (detNums[0] == 2)) && (detNums[1] == 1)) hPos[0] = hPos[0] + HorOffSet;
   if(((detNums[0] == 5) || (detNums[0] == 6)) && (detNums[1] == 1)) hPos[0] = hPos[0] + HorOffSet;
   if(((detNums[0] == 1) || (detNums[0] == 2)) && (detNums[1] == 2)) hPos[0] = hPos[0] - HorOffSet;
   if(((detNums[0] == 5) || (detNums[0] == 6)) && (detNums[1] == 2)) hPos[0] = hPos[0] - HorOffSet;
+  RotateDetToNpol(hPos,detNums);
+  RotateNpolToG4(hPos, NpolAng);
+  // Need to position the hit in the detector then rotate to 45 degrees and then to 28 degrees.
   
   if(detNums[0] == 1) hPos[1] = hPos[1] + VertOffSet;
   if(detNums[0] == 2) hPos[1] = hPos[1] + (VertOffSet + 10.0);
   if(detNums[0] == 5) hPos[1] = hPos[1] - VertOffSet;
   if(detNums[0] == 6) hPos[1] = hPos[1] - (VertOffSet + 10.0);
-  
+ 
   if((detNums[0] == 1) || (detNums[0] == 5)) hPos[2] = hPos[2] + 700. + (13. - (detNums[2] + 1)) * 10.;
   if((detNums[0] == 2) || (detNums[0] == 6)) hPos[2] = hPos[2] + 830. + (14. - (detNums[2] + 1)) * 10.;
-
+  RotateNpolToG4(hPos, NpolAng);
+  // now we vertically and z-axis offset and rotate 28 degrees to the G4 global coordinates 
+  
   return;
 }
 
-void RotateNpolToG4(double hPos[]){
+void RotateNpolToG4(double hPos[], double RotAng){
 
   double tempPos[3] = { hPos[0], hPos[1], hPos[2] };
   double RightAng = TMath::Pi()/2;
   
-  hPos[0] = TMath::Cos(NpolAng) * tempPos[0] + TMath::Cos(TMath::Pi()/4) * tempPos[1] + TMath::Cos(RightAng+NpolAng) * tempPos[2];
+  hPos[0] = TMath::Cos(RotAng) * tempPos[0] + TMath::Cos(RightAng) * tempPos[1] + TMath::Cos(RightAng+RotAng) * tempPos[2];
   hPos[1] = TMath::Cos(RightAng) * tempPos[0] + TMath::Cos(0) * tempPos[1] + TMath::Cos(RightAng) * tempPos[2];
-  hPos[2] = TMath::Cos(RightAng-NpolAng) * tempPos[0] + TMath::Cos(RightAng) * tempPos[1] + TMath::Cos(NpolAng) * tempPos[2];
+  hPos[2] = TMath::Cos(RightAng-RotAng) * tempPos[0] + TMath::Cos(RightAng) * tempPos[1] + TMath::Cos(RotAng) * tempPos[2];
 
   return;
 }
