@@ -80,7 +80,7 @@ TH1F *h_sectionEff_AllEvents[4];
    //beginName = beginName + beginEndAll;
    //const char *name = beginName.c_str(); 
    h_sectionEff_AllEvents[i] = (TH1F*)sourceNeutron->Get(hname);
-   // h_sectionEff_AllEvents[i]->Scale(100/eventInteraction);
+   h_sectionEff_AllEvents[i]->Scale(100/eventInteraction);
  }
  
  
