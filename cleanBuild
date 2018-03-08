@@ -16,5 +16,5 @@ fi
 set -e
 mkdir "$BUILDDIR"
 cd "$BUILDDIR"
-cmake CMakeLists.txt ../
+cmake3 CMakeLists.txt ../
 make -j${NPROC} 
