@@ -218,20 +218,16 @@ int main(int argc, char *argv[]) {
 
 		if((AVNum == 9) || (AVNum == 10) || (AVNum == 11) || (AVNum == 12)){
 		  AnalyzerTaggerHitPosition(hitPos, lPos, detNums);
-		  //RotateNpolToG4(hitPos,NpolAng);
 		} else if((AVNum == 3) || (AVNum == 4) || (AVNum == 7) || (AVNum == 8)){
 		  DeltaEarrayHitPosition(hitPos, lPos, detNums);
-		  //RotateNpolToG4(hitPos,NpolAng);
 		} else if((AVNum == 1) || (AVNum == 2) || (AVNum == 5) || (AVNum == 6)){
 		  EarrayHitPosition(hitPos, lPos, detNums);
-		  //RotateNpolToG4(hitPos,NpolAng);
 		}
 		
 		(detEvents[aStep->volume])->hPosX = hitPos[0]; 
 		(detEvents[aStep->volume])->hPosY = hitPos[1]; 
 		(detEvents[aStep->volume])->hPosZ = hitPos[2]; 
 
-		//std::cout << "Hit position after: " << hitPos[0] << " " << hitPos[1] << " " << hitPos[2] << " " << std::endl;
 		txtOut << hitPos[0] << "\t\t" << hitPos[1] << "\t\t" << hitPos[2] << std::endl;
 		// A counter for number of events that fire at least one Analyzer in some section
 		// This also sets a flag so we don't count more than once if more than one layer passes this requirement
@@ -434,14 +430,14 @@ void EarrayHitPosition(double hPos[],double lPos[], int detNums[]){
   } while (TMath::Abs(hPos[0]) > 80.0);
   hPos[1] = 0.0;
   hPos[2] = 0.0;
- 
+  RotateDetToNpol(hPos,detNums);
+   
   if(((detNums[0] == 1) || (detNums[0] == 2)) && (detNums[1] == 1)) hPos[0] = hPos[0] + HorOffSet;
   if(((detNums[0] == 5) || (detNums[0] == 6)) && (detNums[1] == 1)) hPos[0] = hPos[0] + HorOffSet;
   if(((detNums[0] == 1) || (detNums[0] == 2)) && (detNums[1] == 2)) hPos[0] = hPos[0] - HorOffSet;
   if(((detNums[0] == 5) || (detNums[0] == 6)) && (detNums[1] == 2)) hPos[0] = hPos[0] - HorOffSet;
-  RotateDetToNpol(hPos,detNums);
+  // Need to position the hit in the detector then rotate to 28 degrees.
   RotateNpolToG4(hPos, NpolAng);
-  // Need to position the hit in the detector then rotate to 45 degrees and then to 28 degrees.
   
   if(detNums[0] == 1) hPos[1] = hPos[1] + VertOffSet;
   if(detNums[0] == 2) hPos[1] = hPos[1] + (VertOffSet + 10.0);
