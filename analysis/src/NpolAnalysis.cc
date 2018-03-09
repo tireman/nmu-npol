@@ -1,7 +1,7 @@
 /* Npol Analysis Script is designed to analyze the neutron flux on the NPOL polarimeter being
    designed by the CGEN collaboration at Jefferson National Laboratory. (2016)
    Revisions: Spring 2017 by Will Tireman and Ashley Adzima (added some histograms)
-   Revisions: January 2018 by Will Tireman (Fixed eff. calculation, cleaned up code)
+   Revisions: January-March 2018 by Will Tireman (Fixed eff. calculation, cleaned up code)
 */
 
 #include <iostream>
@@ -40,7 +40,7 @@
 #define LAYER_NUM 4         /* number of analyzer layers; not general; only good for 4 and 6 layers */
 #define angleLow 45.3       /*degrees: low angle recoil proton cut*/
 #define angleHigh 81.6      /*degrees; high angle recoil proton cut*/
-#define NpolAng 0.48869        /*radians; angle of NPOL relative to beam axis*/
+#define NpolAng 0.48869     /*radians; angle of NPOL relative to beam axis*/
 
 enum PolarimeterDetector {
   analyzer = 0,
@@ -81,16 +81,16 @@ bool checkdEarrayHits(const std::map<std::string,NpolDetectorEvent *> *detEvents
 int getSectionOfInterest(const std::map<std::string,NpolDetectorEvent *> *detEvents);
 PolarimeterDetector getEArrayOfInterest(std::map<PolarimeterDetector, double> *eDepArrayTotal, int sectionOfInterest);
 double getTotalEnergyDep(const std::map<std::string,NpolDetectorEvent *> *detEvents);
-void sectionEffLocalCoordinates(TH1F *h_sectionEfficiencyLocalPositions, const std::map<std::string,NpolDetectorEvent *> *detEvents, 
-								int sectionOfInterest, PolarimeterDetector detector);
+void sectionEffLocalCoordinates(TH1F *h_sectionEfficiencyLocalPositions, const std::map<std::string,NpolDetectorEvent *>
+								*detEvents, int sectionOfInterest, PolarimeterDetector detector);
 double getAzimuthAngle(const double p1x, const double p1y, const double p1z,const double p2x, const double p2y, 
 					   const double p2z, const double p3x, const double p3y, const double p3z);
 void GetPoI(double *ret, double *time, const int section, const PolarimeterDetector type, 
 			const std::map<std::string,NpolDetectorEvent *> *detEvents); 
 void GetPoI2(double *ret, double *time, const int section, const PolarimeterDetector type, 
 			 const std::map<std::string,NpolDetectorEvent *> *detEvents);
-double ReturnAngle(NpolVertex *incNeutronVert, std::map<std::string,
-						   NpolDetectorEvent *> *detEvents, const int section, const PolarimeterDetector EArrayOfInterest, double *dTOF ); 
+double ReturnAngle(NpolVertex *incNeutronVert, std::map<std::string, NpolDetectorEvent *> *detEvents,
+				   const int section, const PolarimeterDetector EArrayOfInterest, double *dTOF ); 
 
 //***************** End Definitions of Variables and Methods ***********************//
 
@@ -187,7 +187,7 @@ int main(int argc, char *argv[]) {
 	  if(AVNum == -1) continue;
 	  int imprintNum = GetImprNumber(aStep->volume);
 	  int PVNum = GetPlacementNumber(aStep->volume);
-	  if((!eventFlag) && (aStep->parentId == 0) && (aStep->particleId == 2112) 
+	  if((!eventFlag) && (aStep->parentId == 0) && (aStep->trackId == 1) && (aStep->particleId == 2112) 
 		&& (AVNum ==11) && (imprintNum == 1)) {
 		taggedEvents++;
 		eventFlag = true;
@@ -346,6 +346,7 @@ int main(int argc, char *argv[]) {
   runStatistics[3] = eventsFailed;
   runStatistics[4] = eventsTrigger;
   runStatistics[5] = taggedEvents;
+  
   runStatistics.Write();
   h_dEoverEtop->Write();
   h_dEoverEbot->Write();
