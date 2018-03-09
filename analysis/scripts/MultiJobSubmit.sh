@@ -7,6 +7,7 @@ do
     NUM1=($i-1)*$3+1
     NUM2=$i*$3
 
-    ./scripts/NMUjobSubmit.sh $NUM1 $NUM2 &
+    /home/tireman/simulation/jlab/nmu-npol/analysis/scripts/NMUjobSubmit.sh $NUM1 $NUM2 &
+ 
 done
 
