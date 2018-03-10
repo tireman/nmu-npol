@@ -50,8 +50,8 @@ void NpolEffHistos() {
 TVectorT<double> *stats_sourceNeutron;
 stats_sourceNeutron = (TVectorT<double>*)sourceNeutron->Get("TVectorT<double>;1");
 
-// Event Interaction variable retrieved from TVector (actually, you want eventsTrigger variable from NpolAnalysis code).
- double eventInteraction = ((*stats_sourceNeutron)[5]);
+// We want taggedEvents variable from NpolAnalysis code which is total QE neutrons entering NPOL.
+ double eventInteraction = ((*stats_sourceNeutron)[1]);  // was [5] before 3/10/2018
 
 // The Histograms we are going to make
 TH2F *h_dEoverE_AllEvents_Top;
