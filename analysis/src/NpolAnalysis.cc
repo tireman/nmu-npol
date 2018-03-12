@@ -114,8 +114,8 @@ int main(int argc, char *argv[]) {
   npolTree->Add(InputFile);
   statsTree->Add(InputFile);
 
-  npolTree->SetCacheSize(500000000);
-  statsTree->SetCacheSize(500000000);
+  npolTree->SetCacheSize(250000000);
+  statsTree->SetCacheSize(250000000);
   
   std::vector<NpolStep *> *steps = NULL;
   std::vector<NpolVertex *> *verts = NULL;
@@ -138,14 +138,10 @@ int main(int argc, char *argv[]) {
   TH1F *h_dTOF = new TH1F("dTOF","Delta time-of-flight",600,-30,120);
   //********************************* End Histogram Definitions ********************************
 
-  
   // BEGIN STATS LOOP
   int totalEvents = 0;
-  int eventInteraction = 0;
-  int eventCounter = 0;
   int eventsPassed = 0;
   int eventsFailed = 0;
-  int eventsTrigger = 0;
   int taggedEvents = 0;
   for(int i = 0; i < statsTree->GetEntries(); i++) {
     statsTree->GetEntry(i);
@@ -157,32 +153,20 @@ int main(int argc, char *argv[]) {
   int nentries = npolTree->GetEntries();
   for(int i = 0; i < nentries; i++) {
     //for(int i = 0; i < 100; i++) {
-    if(++eventCounter % 1000 == 0)
-      std::cout << "Processing event #" << eventCounter << std::endl;
+    //if(++eventCounter % 1000 == 0)
+	if(i % 1000 == 0)
+      std::cout << "Processing event #" << i << std::endl;
     npolTree->GetEntry(i);
     std::map<std::string,NpolDetectorEvent *> detEvents;
 
-	// NpolTagger loop to count number neutrons with parentID = 0 which cross the Npol Tagger (24-Jan-2018)
-	// This is a "rough" counter for the total number of neutrons to enter the polarimeter which have 
-	// a chance to interact with an analyzer layer and thus need to be in the denominator for the efficiency 
-	// calculation.  This isn't the best since the NPOL tagger is a bit wider than the front layer of analyzers AND
-	// is about 5-7 cm in front of the first layer (just a 1-2 cm from the inside of front shield wall).
-	/*std::vector<NpolTagger *>::iterator t_it;
-	for(t_it = tagEvent->begin(); t_it != tagEvent->end(); t_it++) {
-	  NpolTagger *tagged = *t_it;
-	  if(tagged == NULL) continue;
-	  if((tagged->parentId == 0) && (tagged->particle == "neutron")) taggedEvents++;
-	  }*/
-
-
     // BEGIN STEPS LOOP: Fills the detEvent map with volumes and total energy, etc.
     std::vector<NpolStep *>::iterator s_it;	
-    bool tripFlag = false;
+    //bool tripFlag = false;
     bool eventFlag = false;
     for(s_it = steps->begin(); s_it != steps->end(); s_it++) {
       NpolStep *aStep = *s_it;
-	// This lines of code count up the number of particles entering into the 
-	// first analyzer array that are a neutron (2112), parent ID (0).
+	// These lines of code count up the number of particles entering into the 
+	// first analyzer array that are a neutron (2112), parent ID = 0, track ID = 1.
 	  int AVNum = GetAVNumber(aStep->volume);
 	  if(AVNum == -1) continue;
 	  int imprintNum = GetImprNumber(aStep->volume);
@@ -210,8 +194,8 @@ int main(int argc, char *argv[]) {
 		(detEvents[aStep->volume])->gPosZ = aStep->gPosZ;
 		(detEvents[aStep->volume])->time = (aStep->time) + gRandom->Gaus(0.0, 0.200);
 
-		// Compute the hit position in the volume and save. This is done to "simulate" what we could
-		// see in a real scintillation detector based on detector specifics.
+		//****** Compute the hit position in the volume and save. This is done to "simulate" ****** // 
+		// what we could see in a real scintillation detector based on detector resolutions.
 		double hitPos[3] = { 0.0, 0.0, 0.0 };
 		double lPos[3] = { aStep->lPosX, aStep->lPosY, aStep->lPosZ };
 		int detNums[3] = { AVNum, imprintNum, PVNum };
@@ -228,17 +212,10 @@ int main(int argc, char *argv[]) {
 		(detEvents[aStep->volume])->hPosY = hitPos[1]; 
 		(detEvents[aStep->volume])->hPosZ = hitPos[2]; 
 		txtOut << hitPos[0] << "\t\t" << hitPos[1] << "\t\t" << hitPos[2] << "\t\t" <<
-		  (detEvents[aStep->volume])->time << std::endl;
+		  (detEvents[aStep->volume])->time << std::endl; // write to text file to read with MatLab
 
-		// A counter for number of events that fire at least one Analyzer in some section
-		// This also sets a flag so we don't count more than once if more than one layer passes this requirement
-		if(tripFlag == false){
-		  if(detectorType(aStep->volume) == analyzer){
-			eventsTrigger++;
-			tripFlag = true;
-		  }
-		}
-      }
+		// ****** End of the hit position computations section ******* //
+	  }
     } // END STEPS LOOP
 	
 
@@ -258,8 +235,7 @@ int main(int argc, char *argv[]) {
     eDepArrayTotal[botdEArray] = 0.0;
 
     if(sectionOfInterest != -1) {
-      eventInteraction++;
-      h_sectionEfficiency1->Fill(sectionOfInterest+1); // Fill
+	  h_sectionEfficiency1->Fill(sectionOfInterest+1); // Fill
 
 	  
 	  // Changed this on 12-March-2017 to test theory on the Recoil Proton Angle "question" by not requiring an
@@ -333,20 +309,23 @@ int main(int argc, char *argv[]) {
   std::cout << taggedEvents << " of the initial " << totalEvents << " neutrons have crossed the Npol Tagger." << std::endl;
   std::cout << eventsPassed << " events passed requirements.  "
 			<< (taggedEvents - eventsPassed) << " failed." << std::endl;
-  std::cout << (((double)eventsPassed)*100)/(double)taggedEvents << " % of the " << taggedEvents << " neutrons passed cuts." << std::endl; 
-  h_sectionEfficiency1->Scale(1.0); 
+  std::cout << (((double)eventsPassed)*100)/(double)taggedEvents << " % of the " << taggedEvents
+			<< " neutrons passed cuts." << std::endl; 
+  /*h_sectionEfficiency1->Scale(1.0); 
   h_sectionEfficiency2->Scale(1.0); 
   h_sectionEfficiency3->Scale(1.0); 
-  h_sectionEfficiency4->Scale(1.0); 
-  
+  h_sectionEfficiency4->Scale(1.0); */
+
+  // **** Fill the statistics vector ****** //
   TVectorD runStatistics(6);
   runStatistics[0] = totalEvents;
-  runStatistics[1] = eventInteraction;
+  runStatistics[1] = taggedEvents;
   runStatistics[2] = eventsPassed;
   runStatistics[3] = eventsFailed;
-  runStatistics[4] = eventsTrigger;
-  runStatistics[5] = taggedEvents;
-  
+  runStatistics[4] = -1.0;         
+  runStatistics[5] = -1.0;
+
+  // ****** Write out all the results to the root file and close the file(s) ******** //
   runStatistics.Write();
   h_dEoverEtop->Write();
   h_dEoverEbot->Write();
@@ -364,7 +343,7 @@ int main(int argc, char *argv[]) {
 
 // ************** End Main Program here *************** //
 
-// ************* Methods for Main below ************** //
+// ************* Methods for Main Program are below  this line ************** //
 
 void AnalyzerTaggerHitPosition(double hPos[],double lPos[], int detNums[]){
 
