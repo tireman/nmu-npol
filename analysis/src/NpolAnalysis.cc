@@ -106,7 +106,8 @@ int main(int argc, char *argv[]) {
   TFile *outFile = new TFile(OutputFile,"RECREATE"); 
   
   std::ofstream txtOut;
-  txtOut.open("HitPositions_" + JobNum + ".txt");
+  TString RunOutput = getenv("OutputDir");
+  txtOut.open(RunOutput + "/HitPositions_" + JobNum + ".txt");
   
   TChain *npolTree = new TChain("T");
   TChain *statsTree = new TChain("T2");
@@ -140,9 +141,10 @@ int main(int argc, char *argv[]) {
 
   // BEGIN STATS LOOP
   int totalEvents = 0;
+  int taggedEvents = 0;
   int eventsPassed = 0;
   int eventsFailed = 0;
-  int taggedEvents = 0;
+  
   for(int i = 0; i < statsTree->GetEntries(); i++) {
     statsTree->GetEntry(i);
     totalEvents += ((*stats)[0])->totalEvents;
@@ -318,7 +320,7 @@ int main(int argc, char *argv[]) {
 
   // **** Fill the statistics vector ****** //
   TVectorD runStatistics(6);
-  runStatistics[0] = totalEvents;
+  runStatistics[0] = static_cast<double>(totalEvents);
   runStatistics[1] = taggedEvents;
   runStatistics[2] = eventsPassed;
   runStatistics[3] = eventsFailed;
@@ -475,10 +477,10 @@ int GetImprNumber(const std::string &volName) {
 int GetPlacementNumber(const std::string &volName) {
   if(volName.substr(0,3) == "av_") {
     int underscorePos = volName.find_first_of("_",1+
-											  volName.find_first_of("_",1+
-																	volName.find_first_of("_",1+
-																						  volName.find_first_of("_",1+
-																												volName.find_first_of("_",3)))));
+      volName.find_first_of("_",1+
+      volName.find_first_of("_",1+
+      volName.find_first_of("_",1+
+      volName.find_first_of("_",3)))));
     return atoi(volName.substr(underscorePos+1,std::string::npos).c_str());
   } else
     return -1;
@@ -801,20 +803,27 @@ void GetPoI2(double *ret, double *time, const int section, const PolarimeterDete
   for(it = detEvents->begin(); it != detEvents->end(); it++) {
     if((sectionNumber(it->first) == section || sectionNumber(it->first) == (section + 1) || sectionNumber(it->first) == (section + 2)) && detectorType(it->first) == type) {
       if(it->second->thresholdExceeded) {
-		ret[0] += (it->second->totEnergyDep)*(it->second->hPosX); //gPosX
+		if((it->second->totEnergyDep) > totEdepSoFar){
+		  totEdepSoFar = it->second->totEnergyDep;
+		  ret[0] = (it->second->hPosX);
+		  ret[1] = (it->second->hPosY);
+		  ret[2] = (it->second->hPosZ);
+		  *time  = (it->second->time);
+		}
+		/*ret[0] += (it->second->totEnergyDep)*(it->second->hPosX); //gPosX
 		ret[1] += (it->second->totEnergyDep)*(it->second->hPosY);
 		ret[2] += (it->second->totEnergyDep)*(it->second->hPosZ);
 		*time += (it->second->totEnergyDep)*(it->second->time);
-		totEdepSoFar += it->second->totEnergyDep;
+		totEdepSoFar += it->second->totEnergyDep;*/
       }
     }
   }
 
   // Compute the weighted average
-  ret[0] /= totEdepSoFar;
+  /*ret[0] /= totEdepSoFar;
   ret[1] /= totEdepSoFar;
   ret[2] /= totEdepSoFar;
-  *time /= totEdepSoFar;
+  *time /= totEdepSoFar;*/
 }
 
 // Return the Azimuth angle only.  Check is in main code.
