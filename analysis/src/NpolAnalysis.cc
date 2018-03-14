@@ -214,9 +214,11 @@ int main(int argc, char *argv[]) {
 		
 		(detEvents[aStep->volume])->hPosX = hitPos[0]; 
 		(detEvents[aStep->volume])->hPosY = hitPos[1]; 
-		(detEvents[aStep->volume])->hPosZ = hitPos[2]; 
-		txtOut << hitPos[0] << "\t\t" << hitPos[1] << "\t\t" << hitPos[2] << "\t\t" <<
-		  (detEvents[aStep->volume])->time << std::endl; // write to text file to read with MatLab
+		(detEvents[aStep->volume])->hPosZ = hitPos[2];
+		
+		txtOut << AVNum << "\t\t" << imprintNum << "\t\t" << PVNum << "\t\t" << hitPos[0] << "\t\t"
+			   << hitPos[1] << "\t\t" << hitPos[2] << "\t\t" << (detEvents[aStep->volume])->time << std::endl;
+		// write to text file to read with MatLab
 
 		// ****** End of the hit position computations section ******* //
 	  }
