@@ -54,10 +54,12 @@ stats_sourceNeutron = (TVectorT<double>*)sourceNeutron->Get("TVectorT<double>;1"
  double eventInteraction = ((*stats_sourceNeutron)[1]);  // was [5] before 3/10/2018
 
 // The Histograms we are going to make
-TH2F *h_dEoverE_AllEvents_Top;
-TH2F *h_dEoverE_AllEvents_Bot;
-TH1F *h_dTOF_AllEvents;
-TH1F *h_sectionEff_AllEvents[4];
+ TH2F *h_dEoverE_AllEvents_Top;
+ TH2F *h_dEoverE_AllEvents_Bot;
+ TH1F *h_dTOF_AllEvents;
+ TH1F *h_sectionEff_AllEvents[4];
+ TH1F *h_recoil_angle;
+ TH1F *h_recoil_angle_raw;
  
 // Assign Histos from the input file to a pointer
 // dE/E
@@ -68,6 +70,10 @@ TH1F *h_sectionEff_AllEvents[4];
  
  // dTof
  h_dTOF_AllEvents = (TH1F*)sourceNeutron->Get("dTOF;1");
+
+ // Angle Plots
+ h_recoil_angle = (TH1F*)sourceNeutron->Get("recoil_angle;1");
+ h_recoil_angle_raw = (TH1F*)sourceNeutron->Get("recoil_angle_raw;1");
  
  // Section Efficiency histograms are assigned based on cuts
  // All Events
@@ -87,6 +93,7 @@ TH1F *h_sectionEff_AllEvents[4];
  // CREATE TCANVAS
  TCanvas *dEoverE_dToF = new TCanvas("dEoverE_Two","dE Over E - All Events",800, 600);
  TCanvas *sectionEff_AllEvents = new TCanvas("sectionEff_AllEvents","Section Efficiency - All Events",800, 600);
+ TCanvas *angularPlots = new TCanvas("angularPlots","Protoon Recoil Angle",800, 600);
  
  // Histogram Stats Removed**
  gStyle->SetOptStat(0);
@@ -137,14 +144,21 @@ TH1F *h_sectionEff_AllEvents[4];
    std::cout << "The Total " << h_sectionEff_AllEvents[i]->GetTitle() << " is " << h_sectionEff_AllEvents[i]->Integral() << "." << std::endl;
  }
 
+ angularPlots->Divide(2,2,0.0001, 0.00001,0);
+ angularPlots->cd(1);
+ h_recoil_angle_raw->DrawCopy();
+ angularPlots->cd(2);
+ h_recoil_angle->DrawCopy();
+ 
+ 
  // Write out canvases to file 
-dEoverE_dToF->Write();
-sectionEff_AllEvents->Write();
-
-// Close files
+ dEoverE_dToF->Write();
+ sectionEff_AllEvents->Write();
+ angularPlots->Write();
+ // Close files
 outFile->Close();
-sourceNeutron->Close();
-
+ sourceNeutron->Close();
+ 
 }
 
 TString FormInputFile(TString InputDir){

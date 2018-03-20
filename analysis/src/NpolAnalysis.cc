@@ -81,6 +81,8 @@ bool checkdEarrayHits(const std::map<std::string,NpolDetectorEvent *> *detEvents
 int getSectionOfInterest(const std::map<std::string,NpolDetectorEvent *> *detEvents);
 PolarimeterDetector getEArrayOfInterest(std::map<PolarimeterDetector, double> *eDepArrayTotal, int sectionOfInterest);
 double getTotalEnergyDep(const std::map<std::string,NpolDetectorEvent *> *detEvents);
+double highestEDepPV(const std::map<std::string,NpolDetectorEvent *> *detEvents, int sectionOfInterest,
+					 PolarimeterDetector detectorOfInterest);
 void sectionEffLocalCoordinates(TH1F *h_sectionEfficiencyLocalPositions, const std::map<std::string,NpolDetectorEvent *>
 								*detEvents, int sectionOfInterest, PolarimeterDetector detector);
 double getAzimuthAngle(const double p1x, const double p1y, const double p1z,const double p2x, const double p2y, 
@@ -106,7 +108,8 @@ int main(int argc, char *argv[]) {
   TFile *outFile = new TFile(OutputFile,"RECREATE"); 
   
   std::ofstream txtOut;
-  txtOut.open("HitPositions_" + JobNum + ".txt");
+  TString RunOutput = getenv("OutputDir");
+  txtOut.open(RunOutput + "/HitPositions_" + JobNum + ".txt");
   
   TChain *npolTree = new TChain("T");
   TChain *statsTree = new TChain("T2");
@@ -140,9 +143,10 @@ int main(int argc, char *argv[]) {
 
   // BEGIN STATS LOOP
   int totalEvents = 0;
+  int taggedEvents = 0;
   int eventsPassed = 0;
   int eventsFailed = 0;
-  int taggedEvents = 0;
+  
   for(int i = 0; i < statsTree->GetEntries(); i++) {
     statsTree->GetEntry(i);
     totalEvents += ((*stats)[0])->totalEvents;
@@ -210,9 +214,11 @@ int main(int argc, char *argv[]) {
 		
 		(detEvents[aStep->volume])->hPosX = hitPos[0]; 
 		(detEvents[aStep->volume])->hPosY = hitPos[1]; 
-		(detEvents[aStep->volume])->hPosZ = hitPos[2]; 
-		txtOut << hitPos[0] << "\t\t" << hitPos[1] << "\t\t" << hitPos[2] << "\t\t" <<
-		  (detEvents[aStep->volume])->time << std::endl; // write to text file to read with MatLab
+		(detEvents[aStep->volume])->hPosZ = hitPos[2];
+		
+		txtOut << AVNum << "\t\t" << imprintNum << "\t\t" << PVNum << "\t\t" << hitPos[0] << "\t\t"
+			   << hitPos[1] << "\t\t" << hitPos[2] << "\t\t" << (detEvents[aStep->volume])->time << std::endl;
+		// write to text file to read with MatLab
 
 		// ****** End of the hit position computations section ******* //
 	  }
@@ -318,12 +324,12 @@ int main(int argc, char *argv[]) {
 
   // **** Fill the statistics vector ****** //
   TVectorD runStatistics(6);
-  runStatistics[0] = totalEvents;
-  runStatistics[1] = taggedEvents;
-  runStatistics[2] = eventsPassed;
-  runStatistics[3] = eventsFailed;
-  runStatistics[4] = -1.0;         
-  runStatistics[5] = -1.0;
+  runStatistics[0] = static_cast<double>(totalEvents);
+  runStatistics[1] = static_cast<double>(taggedEvents);
+  runStatistics[2] = static_cast<double>(eventsPassed);
+  runStatistics[3] = static_cast<double>(eventsFailed);
+  runStatistics[4] = static_cast<double>(-1.0);         
+  runStatistics[5] = static_cast<double>(-1.0);
 
   // ****** Write out all the results to the root file and close the file(s) ******** //
   runStatistics.Write();
@@ -405,29 +411,29 @@ void EarrayHitPosition(double hPos[],double lPos[], int detNums[]){
   hPos[1] = 0.0;
   hPos[2] = 0.0;
   RotateDetToNpol(hPos,detNums);
-   
+ 
   if(((detNums[0] == 1) || (detNums[0] == 2)) && (detNums[1] == 1)) hPos[0] = hPos[0] + HorOffSet;
   if(((detNums[0] == 5) || (detNums[0] == 6)) && (detNums[1] == 1)) hPos[0] = hPos[0] + HorOffSet;
   if(((detNums[0] == 1) || (detNums[0] == 2)) && (detNums[1] == 2)) hPos[0] = hPos[0] - HorOffSet;
   if(((detNums[0] == 5) || (detNums[0] == 6)) && (detNums[1] == 2)) hPos[0] = hPos[0] - HorOffSet;
-  // Need to position the hit in the detector then rotate to 28 degrees.
+  
   RotateNpolToG4(hPos, NpolAng);
   
   if(detNums[0] == 1) hPos[1] = hPos[1] + VertOffSet;
   if(detNums[0] == 2) hPos[1] = hPos[1] + (VertOffSet + 10.0);
   if(detNums[0] == 5) hPos[1] = hPos[1] - VertOffSet;
   if(detNums[0] == 6) hPos[1] = hPos[1] - (VertOffSet + 10.0);
- 
+
   if((detNums[0] == 1) || (detNums[0] == 5)) hPos[2] = hPos[2] + 700. + (13. - (detNums[2] + 1)) * 10.;
   if((detNums[0] == 2) || (detNums[0] == 6)) hPos[2] = hPos[2] + 830. + (14. - (detNums[2] + 1)) * 10.;
-  RotateNpolToG4(hPos, NpolAng);
-  // now we vertically and z-axis offset and rotate 28 degrees to the G4 global coordinates 
   
+  RotateNpolToG4(hPos, NpolAng);
+ 
   return;
 }
 
 void RotateNpolToG4(double hPos[], double RotAng){
-
+  // Rotate the hit point by RotAng (generally NpolAng) so hits in NPOL volumes are in the sim's G4 coordinates
   double tempPos[3] = { hPos[0], hPos[1], hPos[2] };
   double RightAng = TMath::Pi()/2;
   
@@ -439,7 +445,7 @@ void RotateNpolToG4(double hPos[], double RotAng){
 }
 
 void RotateDetToNpol(double hPos[], int detNums[]){
-
+  // A 45 degree rotation to move E-array hit positions into the NPOL coordinates
   double tempPos[3] = { hPos[0], hPos[1], hPos[2] };
   double DetAng = TMath::Pi()/4;
   double RightAng = TMath::Pi()/2;
@@ -475,10 +481,10 @@ int GetImprNumber(const std::string &volName) {
 int GetPlacementNumber(const std::string &volName) {
   if(volName.substr(0,3) == "av_") {
     int underscorePos = volName.find_first_of("_",1+
-											  volName.find_first_of("_",1+
-																	volName.find_first_of("_",1+
-																						  volName.find_first_of("_",1+
-																												volName.find_first_of("_",3)))));
+      volName.find_first_of("_",1+
+      volName.find_first_of("_",1+
+      volName.find_first_of("_",1+
+      volName.find_first_of("_",3)))));
     return atoi(volName.substr(underscorePos+1,std::string::npos).c_str());
   } else
     return -1;
@@ -801,20 +807,43 @@ void GetPoI2(double *ret, double *time, const int section, const PolarimeterDete
   for(it = detEvents->begin(); it != detEvents->end(); it++) {
     if((sectionNumber(it->first) == section || sectionNumber(it->first) == (section + 1) || sectionNumber(it->first) == (section + 2)) && detectorType(it->first) == type) {
       if(it->second->thresholdExceeded) {
-		ret[0] += (it->second->totEnergyDep)*(it->second->hPosX); //gPosX
+		if((it->second->totEnergyDep) > totEdepSoFar){
+		  totEdepSoFar = it->second->totEnergyDep;
+		  ret[0] = (it->second->hPosX);
+		  ret[1] = (it->second->hPosY);
+		  ret[2] = (it->second->hPosZ);
+		  *time  = (it->second->time);
+		}
+		/*ret[0] += (it->second->totEnergyDep)*(it->second->hPosX); //gPosX
 		ret[1] += (it->second->totEnergyDep)*(it->second->hPosY);
 		ret[2] += (it->second->totEnergyDep)*(it->second->hPosZ);
 		*time += (it->second->totEnergyDep)*(it->second->time);
-		totEdepSoFar += it->second->totEnergyDep;
+		totEdepSoFar += it->second->totEnergyDep;*/
       }
     }
   }
 
   // Compute the weighted average
-  ret[0] /= totEdepSoFar;
+  /*ret[0] /= totEdepSoFar;
   ret[1] /= totEdepSoFar;
   ret[2] /= totEdepSoFar;
-  *time /= totEdepSoFar;
+  *time /= totEdepSoFar;*/
+}
+
+double highestEDepPV(const std::map<std::string,NpolDetectorEvent *> *detEvents, int sectionOfInterest, PolarimeterDetector detectorOfInterest) {
+
+  double highestE_Dep = -1.0;
+
+  std::map<std::string,NpolDetectorEvent *>::const_iterator it;
+
+  for(it = detEvents->begin(); it != detEvents->end(); it++) {
+    if((sectionOfInterest == sectionNumber(it->first)) && (detectorOfInterest == detectorType(it->first))) { 
+      if((it->second->totEnergyDep) > highestE_Dep) 
+		highestE_Dep = it->second->totEnergyDep;
+
+    }
+  }
+  return highestE_Dep;
 }
 
 // Return the Azimuth angle only.  Check is in main code.
