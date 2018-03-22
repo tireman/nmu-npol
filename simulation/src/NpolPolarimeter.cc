@@ -46,9 +46,7 @@ G4double NpolPolarimeter::NDetThickness = 10.0*cm;
 G4double NpolPolarimeter::NVetoThickness = 1.00*cm;
 G4double NpolPolarimeter::NDetHeight = 10.0*cm;
 G4double NpolPolarimeter::NDetStandardLength = 100.0*cm;
-G4double NpolPolarimeter::EArrayVertOffset = 0.90*m;
 G4double NpolPolarimeter::dEArrayVertOffset = 0.42*m; // orig was 0.32*m
-G4double NpolPolarimeter::EArrayHoriOffset = 0.602*m; // computed offset 0.601*m
 G4double NpolPolarimeter::dEArrayHoriOffset = 0.4288*m; // offset is 0.569*m for angle dEs
 G4double NpolPolarimeter::Array1zPos = -1.10*m;
 G4double NpolPolarimeter::Array2zPos = +0.300*m;
@@ -124,8 +122,9 @@ void NpolPolarimeter::ImprintPlate(G4AssemblyVolume *plate,
 //---------------------------
 void NpolPolarimeter::ConstructTopDetArray(G4LogicalVolume *motherLV) {
   
-  G4double VertPos1 = EArrayVertOffset; 
-  G4double VertPos2 = EArrayVertOffset + 0.10*m;
+  G4double VertPos1 = (NDetStandardLength + 60.0*cm)/2 * sin(EarrayRotAngle) + 40.0*cm;
+  G4double VertPos2 = VertPos1 + 0.10*m;
+  G4double HorPos = (NDetStandardLength + 60.0*cm)/2 * cos(EarrayRotAngle) + NDetThickness/2 * sin(EarrayRotAngle);
  
   G4VSolid *TopDet = new G4Box("TopDet",(NDetStandardLength + 60.0*cm)/2,NDetHeight/2,NDetThickness/2);
   G4LogicalVolume *TopDetLV = new G4LogicalVolume(TopDet,
@@ -134,10 +133,10 @@ void NpolPolarimeter::ConstructTopDetArray(G4LogicalVolume *motherLV) {
   G4AssemblyVolume *TopDetArray1 = MakePlate(TopDetLV, 13, 0.0*m, 0.0*m, 0.60*m, 0.0*m, 0.0*m, 0.10*m);
   G4AssemblyVolume *TopDetArray2 = MakePlate(TopDetLV, 14, 0.0*m, 0.0*m, 0.60*m, 0.0*m, 0.0*m, 0.10*m);
   
-  ImprintPlate(TopDetArray1, motherLV, EArrayHoriOffset, VertPos1, Array1zPos, -EarrayRotAngle);
-  ImprintPlate(TopDetArray1, motherLV, -EArrayHoriOffset, VertPos1, Array1zPos, EarrayRotAngle);
-  ImprintPlate(TopDetArray2, motherLV, EArrayHoriOffset, VertPos2, Array2zPos, -EarrayRotAngle);
-  ImprintPlate(TopDetArray2, motherLV, -EArrayHoriOffset, VertPos2, Array2zPos, EarrayRotAngle);
+  ImprintPlate(TopDetArray1, motherLV, HorPos, VertPos1, Array1zPos, -EarrayRotAngle);
+  ImprintPlate(TopDetArray1, motherLV, -HorPos, VertPos1, Array1zPos, EarrayRotAngle);
+  ImprintPlate(TopDetArray2, motherLV, HorPos, VertPos2, Array2zPos, -EarrayRotAngle);
+  ImprintPlate(TopDetArray2, motherLV, -HorPos, VertPos2, Array2zPos, EarrayRotAngle);
   
   G4VisAttributes *TopVisAtt= new G4VisAttributes(G4Colour(1.0,0.5,0.0));
   TopDetLV->SetVisAttributes(TopVisAtt);
@@ -176,8 +175,11 @@ void NpolPolarimeter::ConstructTopVetoArray(G4LogicalVolume *motherLV) {
 // Andrei's 2012 Plan B setup using 160 cm long 10cm by 10cm detectors
 //------------------------------
 void NpolPolarimeter::ConstructBottomDetArray(G4LogicalVolume *motherLV) {
-  G4double VertPos1 = -1*EArrayVertOffset; 
-  G4double VertPos2 = -1*(EArrayVertOffset + 0.10*m);
+
+  G4double VertPos1 = -1*((NDetStandardLength + 60.0*cm)/2 * sin(EarrayRotAngle) + 40.0*cm);
+  G4double VertPos2 = VertPos1 - 0.10*m;
+  G4double HorPos = (NDetStandardLength + 60.0*cm)/2 * cos(EarrayRotAngle) + NDetThickness/2 * sin(EarrayRotAngle);
+  
   G4VSolid *BottomDet = new G4Box("BottomDet",(NDetStandardLength + 60.0*cm)/2,NDetHeight/2,NDetThickness/2);
   G4LogicalVolume *BottomDetLV = new G4LogicalVolume(BottomDet,
 	NpolMaterials::GetInstance()->GetMaterial("Scint"), "BottomDetLV",0,0,0);
@@ -187,10 +189,10 @@ void NpolPolarimeter::ConstructBottomDetArray(G4LogicalVolume *motherLV) {
   G4AssemblyVolume *BottomDetArray2 = MakePlate(BottomDetLV,
 	14, 0.0*m, 0.0*m, 0.60*m, 0.0*m, 0.0*m, 0.10*m);
 
-  ImprintPlate(BottomDetArray1, motherLV, EArrayHoriOffset, VertPos1, Array1zPos, EarrayRotAngle);
-  ImprintPlate(BottomDetArray1, motherLV, -EArrayHoriOffset, VertPos1, Array1zPos, EarrayRotAngle + 90*deg);
-  ImprintPlate(BottomDetArray2, motherLV, EArrayHoriOffset, VertPos2, Array2zPos, EarrayRotAngle);
-  ImprintPlate(BottomDetArray2, motherLV, -EArrayHoriOffset, VertPos2, Array2zPos, EarrayRotAngle + 90*deg);
+  ImprintPlate(BottomDetArray1, motherLV, HorPos, VertPos1, Array1zPos, EarrayRotAngle);
+  ImprintPlate(BottomDetArray1, motherLV, -HorPos, VertPos1, Array1zPos, -EarrayRotAngle);
+  ImprintPlate(BottomDetArray2, motherLV, HorPos, VertPos2, Array2zPos, EarrayRotAngle);
+  ImprintPlate(BottomDetArray2, motherLV, -HorPos, VertPos2, Array2zPos, -EarrayRotAngle);
   
   G4VisAttributes *BotVisAtt= new G4VisAttributes(G4Colour(1.0,0.50,0.0));
   BottomDetLV->SetVisAttributes(BotVisAtt);

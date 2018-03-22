@@ -108,8 +108,8 @@ int main(int argc, char *argv[]) {
   TFile *outFile = new TFile(OutputFile,"RECREATE"); 
   
   std::ofstream txtOut;
-  TString RunOutput = getenv("OutputDir");
-  txtOut.open(RunOutput + "/HitPositions_" + JobNum + ".txt");
+  TString RunOutput = getenv("NPOLWORKDIR");
+  txtOut.open(RunOutput + "/Output/HitPositions_" + JobNum + ".txt");
   
   TChain *npolTree = new TChain("T");
   TChain *statsTree = new TChain("T2");
@@ -117,8 +117,8 @@ int main(int argc, char *argv[]) {
   npolTree->Add(InputFile);
   statsTree->Add(InputFile);
 
-  npolTree->SetCacheSize(250000000);
-  statsTree->SetCacheSize(250000000);
+  //npolTree->SetCacheSize(250000000);  // This increases the amount of data loaded 
+  //statsTree->SetCacheSize(250000000); // per call for more data to chew on. 
   
   std::vector<NpolStep *> *steps = NULL;
   std::vector<NpolVertex *> *verts = NULL;
@@ -316,11 +316,8 @@ int main(int argc, char *argv[]) {
   std::cout << eventsPassed << " events passed requirements.  "
 			<< (taggedEvents - eventsPassed) << " failed." << std::endl;
   std::cout << (((double)eventsPassed)*100)/(double)taggedEvents << " % of the " << taggedEvents
-			<< " neutrons passed cuts." << std::endl; 
-  /*h_sectionEfficiency1->Scale(1.0); 
-  h_sectionEfficiency2->Scale(1.0); 
-  h_sectionEfficiency3->Scale(1.0); 
-  h_sectionEfficiency4->Scale(1.0); */
+			<< " neutrons passed cuts." << std::endl;
+  
 
   // **** Fill the statistics vector ****** //
   TVectorD runStatistics(6);
@@ -355,7 +352,7 @@ void AnalyzerTaggerHitPosition(double hPos[],double lPos[], int detNums[]){
 
   gRandom = new TRandom();
   do{
-	hPos[0] = lPos[0] + gRandom->Gaus(0.0, 4.0);
+	hPos[0] = lPos[0] + gRandom->Gaus(0.0, 2.0);
   } while (TMath::Abs(hPos[0]) > 50.0);
   hPos[1] = 0.0;
   hPos[2] = 0.0;
@@ -382,7 +379,7 @@ void DeltaEarrayHitPosition(double hPos[],double lPos[], int detNums[]){
   
   gRandom = new TRandom();
   do {
-	hPos[0] = lPos[0] + gRandom->Gaus(0.0, 4.0);
+	hPos[0] = lPos[0] + gRandom->Gaus(0.0, 2.0);
   } while (TMath::Abs(hPos[0]) > 80.0);
   hPos[1] = 0.0;
   hPos[2] = 0.0;
@@ -400,13 +397,19 @@ void DeltaEarrayHitPosition(double hPos[],double lPos[], int detNums[]){
 }
 
 void EarrayHitPosition(double hPos[],double lPos[], int detNums[]){
-
-  double VertOffSet = 90.0;
-  double HorOffSet = 60.2;
+  double NDetStandardLength = 100.0;  // (cm)
+  double NDetThickness = 10.0; // (cm)
+  double EarrayRotAngle = 45.0 *TMath::Pi()/180.; // Erray rotation angle
+  double VertOffSet = (NDetStandardLength + 60.0)/2 * sin(EarrayRotAngle) + 40.0; // 40*cm offset from geometry
+  double VertOffSet2 = VertOffSet + 10.0;
+  double HorOffSet = (NDetStandardLength + 60.0)/2 * cos(EarrayRotAngle) + NDetThickness/2 * sin(EarrayRotAngle);
+  
+  //double VertOffSet = 90.0;
+  //double HorOffSet = 60.2;
   
   gRandom = new TRandom();
   do {
-	hPos[0] = lPos[0] + gRandom->Gaus(0.0, 4.0);
+	hPos[0] = lPos[0] + gRandom->Gaus(0.0, 2.0);
   } while (TMath::Abs(hPos[0]) > 80.0);
   hPos[1] = 0.0;
   hPos[2] = 0.0;
@@ -420,9 +423,9 @@ void EarrayHitPosition(double hPos[],double lPos[], int detNums[]){
   RotateNpolToG4(hPos, NpolAng);
   
   if(detNums[0] == 1) hPos[1] = hPos[1] + VertOffSet;
-  if(detNums[0] == 2) hPos[1] = hPos[1] + (VertOffSet + 10.0);
+  if(detNums[0] == 2) hPos[1] = hPos[1] + (VertOffSet2);
   if(detNums[0] == 5) hPos[1] = hPos[1] - VertOffSet;
-  if(detNums[0] == 6) hPos[1] = hPos[1] - (VertOffSet + 10.0);
+  if(detNums[0] == 6) hPos[1] = hPos[1] - (VertOffSet2);
 
   if((detNums[0] == 1) || (detNums[0] == 5)) hPos[2] = hPos[2] + 700. + (13. - (detNums[2] + 1)) * 10.;
   if((detNums[0] == 2) || (detNums[0] == 6)) hPos[2] = hPos[2] + 830. + (14. - (detNums[2] + 1)) * 10.;
@@ -632,8 +635,8 @@ bool checkEarrayHits(const std::map<std::string,NpolDetectorEvent *> *detEvents)
 	if((detectorType(it->first) == topEArray) && (it->second->thresholdExceeded == true)) countTop++;
 	if((detectorType(it->first) == botEArray) && (it->second->thresholdExceeded == true)) countBottom++;
   }
-  //std::cout << "Number Top E-Array Detectors 'Hit' =  " << countTop << std::endl;
-  //std::cout << "Number Bottom E-Array Detectors 'Hit' =  " << countBottom << std::endl;
+  std::cout << "Number Top E-Array Detectors 'Hit' =  " << countTop << std::endl;
+  std::cout << "Number Bottom E-Array Detectors 'Hit' =  " << countBottom << std::endl;
   return true;
 }
 
@@ -645,8 +648,8 @@ bool checkdEarrayHits(const std::map<std::string,NpolDetectorEvent *> *detEvents
 	if((detectorType(it->first) == topdEArray) && (it->second->thresholdExceeded == true)) countTop++;
 	if((detectorType(it->first) == botdEArray) && (it->second->thresholdExceeded == true)) countBottom++;
   }
-  //std::cout << "Number Top dE-Array Detectors 'Hit' =  " << countTop << std::endl;
-  //std::cout << "Number Bottom dE-Array Detectors 'Hit' =  " << countBottom << std::endl;
+  std::cout << "Number Top dE-Array Detectors 'Hit' =  " << countTop << std::endl;
+  std::cout << "Number Bottom dE-Array Detectors 'Hit' =  " << countBottom << std::endl;
   return true;
 }
 
@@ -704,7 +707,7 @@ int getSectionOfInterest(const std::map<std::string,NpolDetectorEvent *> *detEve
     }
     
     //  Code inserted for future "checks" of the E-array and dE-array if necessary
-    //if(checkEarrayHits(detEvents) && checkdEarrayHits(detEvents)){ } 	
+    if(checkEarrayHits(detEvents) && checkdEarrayHits(detEvents)){ } 	
   }
  
   // Reject events with hits in multiple sections of interest
