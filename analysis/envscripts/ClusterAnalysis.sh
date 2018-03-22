@@ -18,6 +18,7 @@ export WorkInputDir=$NPOLWORKDIR
 export RawDataDir=$NPOLDIR/root
 export HistoOutputDir=$NPOLWORKDIR/histos
 export HistoInputDir=$NPOLWORKDIR/histos
+export PlotsOutputDir=$NPOLWORKDIR/Plots
 
 if [ ! -e $NPOLDIR ]
 then
