@@ -1,11 +1,11 @@
 #!/bin/bash
 #
 #$ -S /bin/bash
-#$ -t 2-200
+#$ -t 2001-5000
 #$ -cwd
 
 export BUILD_DIR=/home/tireman/simulation/jlab/nmu-npol/build
-export PType=Neutron
+export PType=QENeutron
 
 source $BUILD_DIR/simulation/scripts/NMUCluster/ClusterRunSetup.sh
 
@@ -14,7 +14,7 @@ export SEED=$SGE_TASK_ID
 
 
 echo "Starting up Job Number $JOBNUMBER."
-$BUILD_DIR/simulation/Npolapp $BUILD_DIR/simulation/macros/Run4.4GeV/QE$PType.mac
+$BUILD_DIR/simulation/Npolapp $BUILD_DIR/simulation/macros/Run4.4GeV/ParticleFlux$PType.mac
 
 /share/apps/root/6.09.02/bin/hadd -f -k /scratch/root/$NPOLBASENAME\_$SGE_TASK_ID.root /scratch/root/$NPOLBASENAME\_$SGE_TASK_ID\_*.root
 
