@@ -79,6 +79,7 @@ PolarimeterDetector detectorType(const std::string &volName);
 bool checkEarrayHits(const std::map<std::string,NpolDetectorEvent *> *detEvents);
 bool checkdEarrayHits(const std::map<std::string,NpolDetectorEvent *> *detEvents);
 int getSectionOfInterest(const std::map<std::string,NpolDetectorEvent *> *detEvents);
+void getEDepArrayTotal(std::map<std::string,NpolDetectorEvent* > *detEvents, std::map<PolarimeterDetector, double> *eDepArrayTotal, int SOI);
 PolarimeterDetector getEArrayOfInterest(std::map<PolarimeterDetector, double> *eDepArrayTotal, int sectionOfInterest);
 double getTotalEnergyDep(const std::map<std::string,NpolDetectorEvent *> *detEvents);
 double highestEDepPV(const std::map<std::string,NpolDetectorEvent *> *detEvents, int sectionOfInterest,
@@ -230,7 +231,7 @@ int main(int argc, char *argv[]) {
     std::map<std::string,NpolDetectorEvent *>::iterator e_it;
     //double totalEnergyDep = getTotalEnergyDep(&detEvents);
     int sectionOfInterest = getSectionOfInterest(&detEvents); // determine SOI
-
+	
 	// Total energy map for each array; currently only does analyzer, analyzer taggers and top/bottom E and dE arrays
     std::map<PolarimeterDetector, double> eDepArrayTotal;     
     eDepArrayTotal[analyzer] = 0.0;
@@ -240,30 +241,12 @@ int main(int argc, char *argv[]) {
     eDepArrayTotal[botEArray] = 0.0;
     eDepArrayTotal[botdEArray] = 0.0;
 
-    if(sectionOfInterest != -1) {
+    
+	if(sectionOfInterest != -1) {
 	  h_sectionEfficiency1->Fill(sectionOfInterest+1); // Fill
 
-	  
-	  // Changed this on 12-March-2017 to test theory on the Recoil Proton Angle "question" by not requiring an
-	  // E or dE detector be in a particular "geometric section (vertical slice).
-	  // This allows E/dE detectors outside the "geometric" SOI to be counted as well.  It worked! (well, helped)
-	  // This part of the "tracking" needs some work ... lots of work.
-      for(e_it = detEvents.begin(); e_it != detEvents.end(); e_it++) {	
-		
-		PolarimeterDetector detector2 = detectorType(e_it->first);
-		if(detector2 == topEArray || detector2 == topdEArray || 
-		   detector2 == botEArray || detector2 == botdEArray){
-		  eDepArrayTotal[detector2] += e_it->second->totEnergyDep;
-		}
-				
-		if(sectionNumber(e_it->first) == sectionOfInterest) {
-		  PolarimeterDetector detector = detectorType(e_it->first);
-		  if(detector == analyzer || detector == tagger) {	
-			//|| detector == topEArray || detector == topdEArray || detector == botEArray || detector == botdEArray){ // see note above
-			eDepArrayTotal[detector] += e_it->second->totEnergyDep;
-		  }
-		}
-	  }
+	  getEDepArrayTotal(&detEvents, &eDepArrayTotal, sectionOfInterest);
+	 
 	  
 	  // Get the EArray of Interest (EOI) based on Requirement 5 of a ratio of 20:1 between the top and bottom arrays
 	  // Not convinced this is the most prudent way to do it but it is quick to implement
@@ -658,7 +641,7 @@ bool checkdEarrayHits(const std::map<std::string,NpolDetectorEvent *> *detEvents
 int getSectionOfInterest(const std::map<std::string,NpolDetectorEvent *> *detEvents) {
   int sectionOfInterest = -1; int countTdE=0; int countTE=0; 
   int countBdE=0; int countBE =0; int countA = 0; int countV = 0;
-  //bool multiscatter = false;
+  
   for(int section = (LAYER_NUM - 1); section >= 0; section--) {
     std::map<std::string,NpolDetectorEvent *>::const_iterator it;
     bool analyzerFlag = false;
@@ -686,7 +669,7 @@ int getSectionOfInterest(const std::map<std::string,NpolDetectorEvent *> *detEve
 		}
 	  }
 	}
-	if( ((analyzerFlag) && (!taggerFlag)) && ((topdEArrayFlag) || (botdEArrayFlag)) ) sectionOfInterest = section;
+	if( ((analyzerFlag) /*&& (!taggerFlag)*/) && ((topdEArrayFlag) || (botdEArrayFlag)) ) sectionOfInterest = section;
   }
 
   if(sectionOfInterest != -1){
@@ -744,7 +727,29 @@ PolarimeterDetector getEArrayOfInterest(std::map<PolarimeterDetector, double> *e
     return unknown;
 }
 
-
+void getEDepArrayTotal(std::map<std::string,NpolDetectorEvent *> *detEvents, std::map<PolarimeterDetector, double> *eDepArrayTotal, int SOI){
+ // Changed this on 12-March-2017 to test theory on the Recoil Proton Angle "question" by not requiring an
+  // E or dE detector be in a particular "geometric section (vertical slice).
+  // This allows E/dE detectors outside the "geometric" SOI to be counted as well.  It worked! (well, helped)
+  // This part of the "tracking" needs some work ... lots of work.
+  std::map<std::string,NpolDetectorEvent *>::iterator e_it;
+  for(e_it = detEvents->begin(); e_it != detEvents->end(); e_it++) {	
+	int section = sectionNumber(e_it->first);
+	PolarimeterDetector detector = detectorType(e_it->first);
+	if(section == SOI) {
+	  if(detector == analyzer || detector == tagger || detector == topdEArray || detector == botdEArray || detector == topEArray || detector == botEArray){
+		(*eDepArrayTotal)[detector] += e_it->second->totEnergyDep;
+	  }
+	}
+	if(section == (SOI + 1)){
+	  if(detector == topEArray || detector == botEArray){
+		(*eDepArrayTotal)[detector] += e_it->second->totEnergyDep;
+	  } 
+	}
+  }
+  return;
+}
+  
 double getTotalEnergyDep(const std::map<std::string,NpolDetectorEvent *> *detEvents) {
 
   double totEnergyDeposit = -1.0;
