@@ -158,15 +158,13 @@ int main(int argc, char *argv[]) {
   int nentries = npolTree->GetEntries();
   for(int i = 0; i < nentries; i++) {
     //for(int i = 0; i < 100; i++) {
-    //if(++eventCounter % 1000 == 0)
-	if(i % 1000 == 0)
+   	if(i % 1000 == 0)
       std::cout << "Processing event #" << i << std::endl;
     npolTree->GetEntry(i);
     std::map<std::string,NpolDetectorEvent *> detEvents;
 
     // BEGIN STEPS LOOP: Fills the detEvent map with volumes and total energy, etc.
     std::vector<NpolStep *>::iterator s_it;	
-    //bool tripFlag = false;
     bool eventFlag = false;
     for(s_it = steps->begin(); s_it != steps->end(); s_it++) {
       NpolStep *aStep = *s_it;
@@ -639,9 +637,8 @@ bool checkdEarrayHits(const std::map<std::string,NpolDetectorEvent *> *detEvents
 // Return the frontmost polarimeter section that passes requirements 1 and 2.
 // If -1 is returned, then no section passed requirements 1 and 2.
 int getSectionOfInterest(const std::map<std::string,NpolDetectorEvent *> *detEvents) {
-  int sectionOfInterest = -1; int countTdE=0; int countTE=0; 
-  int countBdE=0; int countBE =0; int countA = 0; int countV = 0;
-  
+  int sectionOfInterest = -1;
+  int totalDetHit = 0; int AVNum;
   for(int section = (LAYER_NUM - 1); section >= 0; section--) {
     std::map<std::string,NpolDetectorEvent *>::const_iterator it;
     bool analyzerFlag = false;
@@ -651,18 +648,18 @@ int getSectionOfInterest(const std::map<std::string,NpolDetectorEvent *> *detEve
 	
 	for(it = detEvents->begin(); it != detEvents->end(); it++) {
 	  if(sectionNumber(it->first) == section) {
+		AVNum = GetAVNumber(it->first);
+		if((AVNum >= 1) && (AVNum <=12)){
+		  if(it->second->totEnergyDep >= LOW_THRESHOLD) totalDetHit++; 
+		}
 		switch(detectorType(it->first)) {
 		case analyzer: analyzerFlag |= it->second->thresholdExceeded == true;
-		  if(it->second->totEnergyDep >= LOW_THRESHOLD) countA++;
 		  break;
 		case tagger: taggerFlag |= it->second->thresholdExceeded == true; 
-		  if(it->second->totEnergyDep >= LOW_THRESHOLD) countV++;
 		  break;
 		case topdEArray: topdEArrayFlag |= it->second->thresholdExceeded == true; 
-		  if(it->second->totEnergyDep >= LOW_THRESHOLD) countTdE++; 
 		  break;
 		case botdEArray: botdEArrayFlag |= it->second->thresholdExceeded == true; 
-		  if(it->second->totEnergyDep >= LOW_THRESHOLD) countBdE++; 
 		  break;
 		default:
 		  break;
@@ -688,10 +685,8 @@ int getSectionOfInterest(const std::map<std::string,NpolDetectorEvent *> *detEve
 		if(sectionNumber(itt->first) == section) {
 		  switch(detectorType(itt->first)) {
 		  case topEArray: topEArrayFlag |= itt->second->thresholdExceeded == true; 
-			if(itt->second->totEnergyDep >= LOW_THRESHOLD) countTE++; 
 			break;
 		  case botEArray: botEArrayFlag |= itt->second->thresholdExceeded == true; 
-			if(itt->second->totEnergyDep >= LOW_THRESHOLD) countBE++; 
 			break;
 		  default:
 			break;
@@ -702,13 +697,12 @@ int getSectionOfInterest(const std::map<std::string,NpolDetectorEvent *> *detEve
 	if(!((topEArrayFlag) || (botEArrayFlag))) sectionOfInterest = -1;
   }
 
-  // Reject events with more than 40 detectors with hits above 0.040 MeV
-  // Otherwise return the ID'd section of interest
-  int totalDetHit = countA + countTE + countBE + countV + countTdE + countBdE;
-  if(totalDetHit >= 40) { 
+  // Reject events with more than 40 detectors with hits above 0.040 MeV; Otherwise return the ID'd section of interest
+  if((sectionOfInterest != -1) && (totalDetHit >= 40)) { 
 	std::cout << "Event Rejected! Total number of detectors with 40 keV or greater: " << totalDetHit << std::endl;
-	sectionOfInterest = -1;
+	  sectionOfInterest = -1;
   }
+  
   return sectionOfInterest;
 }
 
@@ -719,9 +713,9 @@ PolarimeterDetector getEArrayOfInterest(std::map<PolarimeterDetector, double> *e
   double topdETotal = (*eDepArrayTotal)[topdEArray];
   double botdETotal = (*eDepArrayTotal)[botdEArray];
 
-  if(/*(topETotal > 20*botETotal) &&*/ (topdETotal > 20*botdETotal))
+  if((topETotal > 20*botETotal) && (topdETotal > 20*botdETotal))
     return topEArray;
-  else if(/*(botETotal > 20*topETotal) &&*/ (botdETotal > 20*topdETotal))
+  else if((botETotal > 20*topETotal) && (botdETotal > 20*topdETotal))
     return botEArray;
   else
     return unknown;
