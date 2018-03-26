@@ -60,6 +60,7 @@ stats_sourceNeutron = (TVectorT<double>*)sourceNeutron->Get("TVectorT<double>;1"
  TH1F *h_sectionEff_AllEvents[4];
  TH1F *h_recoil_angle;
  TH1F *h_recoil_angle_raw;
+ TH1F *totalEnergy;
  
 // Assign Histos from the input file to a pointer
 // dE/E
@@ -74,6 +75,9 @@ stats_sourceNeutron = (TVectorT<double>*)sourceNeutron->Get("TVectorT<double>;1"
  // Angle Plots
  h_recoil_angle = (TH1F*)sourceNeutron->Get("recoil_angle;1");
  h_recoil_angle_raw = (TH1F*)sourceNeutron->Get("recoil_angle_raw;1");
+
+ // Test plots
+ totalEnergy = (TH1F*)sourceNeutron->Get("totEnergy;1");
  
  // Section Efficiency histograms are assigned based on cuts
  // All Events
@@ -149,6 +153,8 @@ stats_sourceNeutron = (TVectorT<double>*)sourceNeutron->Get("TVectorT<double>;1"
  h_recoil_angle_raw->DrawCopy();
  angularPlots->cd(2);
  h_recoil_angle->DrawCopy();
+ angularPlots->cd(3);
+ totalEnergy->DrawCopy();
  
  
  // Write out canvases to file 
