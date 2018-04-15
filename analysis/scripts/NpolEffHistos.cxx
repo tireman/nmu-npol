@@ -60,12 +60,13 @@ stats_sourceNeutron = (TVectorT<double>*)sourceNeutron->Get("TVectorT<double>;1"
  TH1F *h_sectionEff_AllEvents[4];
  TH1F *h_recoil_angle;
  TH1F *h_recoil_angle_raw;
+ TH1F *totalEnergy;
  
 // Assign Histos from the input file to a pointer
 // dE/E
  h_dEoverE_AllEvents_Top = (TH2F*)sourceNeutron->Get("dEoverEtop;1");
  h_dEoverE_AllEvents_Bot = (TH2F*)sourceNeutron->Get("dEoverEbot;1");
- TH2F *h_dEoverE_Total = new TH2F("dEoverEtotal", "dE over E for both Top and Bottom", 400,0,150,400,0,20);
+ TH2F *h_dEoverE_Total = new TH2F("dEoverEtotal", "dE over E for both Top and Bottom", 400,0,120,400,0,20);
  h_dEoverE_Total->Add(h_dEoverE_AllEvents_Top,h_dEoverE_AllEvents_Bot);
  
  // dTof
@@ -74,6 +75,9 @@ stats_sourceNeutron = (TVectorT<double>*)sourceNeutron->Get("TVectorT<double>;1"
  // Angle Plots
  h_recoil_angle = (TH1F*)sourceNeutron->Get("recoil_angle;1");
  h_recoil_angle_raw = (TH1F*)sourceNeutron->Get("recoil_angle_raw;1");
+
+ // Test plots
+ totalEnergy = (TH1F*)sourceNeutron->Get("totEnergy;1");
  
  // Section Efficiency histograms are assigned based on cuts
  // All Events
@@ -96,7 +100,7 @@ stats_sourceNeutron = (TVectorT<double>*)sourceNeutron->Get("TVectorT<double>;1"
  TCanvas *angularPlots = new TCanvas("angularPlots","Protoon Recoil Angle",800, 600);
  
  // Histogram Stats Removed**
- gStyle->SetOptStat(0);
+ //gStyle->SetOptStat(0);
  gStyle->SetOptLogz();
 
  // dEoverE_Two (also the dToF plot)
@@ -149,6 +153,8 @@ stats_sourceNeutron = (TVectorT<double>*)sourceNeutron->Get("TVectorT<double>;1"
  h_recoil_angle_raw->DrawCopy();
  angularPlots->cd(2);
  h_recoil_angle->DrawCopy();
+ angularPlots->cd(3);
+ totalEnergy->DrawCopy();
  
  
  // Write out canvases to file 
