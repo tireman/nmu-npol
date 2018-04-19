@@ -60,6 +60,7 @@ stats_sourceNeutron = (TVectorT<double>*)sourceNeutron->Get("TVectorT<double>;1"
  TH1F *h_sectionEff_AllEvents[4];
  TH1F *h_recoil_angle;
  TH1F *h_recoil_angle_raw;
+ TH1F *h_Neutron_Theta;
  TH1F *totalEnergy;
  
 // Assign Histos from the input file to a pointer
@@ -75,6 +76,7 @@ stats_sourceNeutron = (TVectorT<double>*)sourceNeutron->Get("TVectorT<double>;1"
  // Angle Plots
  h_recoil_angle = (TH1F*)sourceNeutron->Get("recoil_angle;1");
  h_recoil_angle_raw = (TH1F*)sourceNeutron->Get("recoil_angle_raw;1");
+ h_Neutron_Theta = (TH1F*)sourceNeutron->Get("Neutron_Theta_Angle;1");
 
  // Test plots
  totalEnergy = (TH1F*)sourceNeutron->Get("totEnergy;1");
@@ -97,7 +99,7 @@ stats_sourceNeutron = (TVectorT<double>*)sourceNeutron->Get("TVectorT<double>;1"
  // CREATE TCANVAS
  TCanvas *dEoverE_dToF = new TCanvas("dEoverE_Two","dE Over E - All Events",800, 600);
  TCanvas *sectionEff_AllEvents = new TCanvas("sectionEff_AllEvents","Section Efficiency - All Events",800, 600);
- TCanvas *angularPlots = new TCanvas("angularPlots","Protoon Recoil Angle",800, 600);
+ TCanvas *angularPlots = new TCanvas("angularPlots","Proton Recoil Angle",800, 600);
  
  // Histogram Stats Removed**
  //gStyle->SetOptStat(0);
@@ -154,6 +156,8 @@ stats_sourceNeutron = (TVectorT<double>*)sourceNeutron->Get("TVectorT<double>;1"
  angularPlots->cd(2);
  h_recoil_angle->DrawCopy();
  angularPlots->cd(3);
+ h_Neutron_Theta->DrawCopy();
+ angularPlots->cd(4);
  totalEnergy->DrawCopy();
  
  
