@@ -137,7 +137,8 @@ int main(int argc, char *argv[]) {
   TH1F *h_Neutron_Theta_Angle = new TH1F("Neutron_Theta_Angle","Neutron Angle at first tagger", 100, 15.0, 40.0);
   TH1F *h_Neutron_Momentum = new TH1F("Neutron_Momentum","Neutron Momentum at the first tagger",100, 0.0, 300.0);
   TH1F *h_Neutron_Momentum_Initial = new TH1F("Neutron_Momentum_Initial","Initial Neutron Momentum when Generated",100, 0.0, 300.0);
-  TH1F *h_Neutron_Energy_Initial = new TH1F("Neutron_Energy_Initial","Initial Neutron Energyr when Generated",100, 000.0, 4000.0);
+  TH1F *h_Neutron_Energy_Initial = new TH1F("Neutron_Energy_Initial","Initial Neutron Energy when Generated",100, 000.0, 4000.0);
+  TH1F *h_Neutron_Energy = new TH1F("Neutron_Energy","Neutron Energy at NPOL Tagger",100, 000.0, 4000.0);
   TH1F *h_totEnergy = new TH1F("totEnergy","Total Energy Deposited", 100, 0.0, 350.0);
   TH2F *h_dEoverEtop = new TH2F("dEoverEtop", "dE over E for top array", 400,0,120,400,0,20);
   TH2F *h_dEoverEbot = new TH2F("dEoverEbot", "dE over E for bottom array", 400,0,120,400,0,20);
@@ -178,6 +179,7 @@ int main(int argc, char *argv[]) {
 	
     // BEGIN STEPS LOOP: Fills the detEvent map with volumes and total energy, etc.
     std::vector<NpolStep *>::iterator s_it;
+	std::vector<NpolTagger *>::iterator t_it;
 	
     bool eventFlag = false;
     for(s_it = steps->begin(); s_it != steps->end(); s_it++) {
@@ -191,6 +193,7 @@ int main(int argc, char *argv[]) {
 	  int PVNum = GetPlacementNumber(aStep->volume);
 
 	  NpolVertex *Vertex = verts->at(1);
+	  
 	  double xMomI = Vertex->momX; double yMomI = Vertex->momY; double zMomI = Vertex->momZ;
 	  double totMomI = TMath::Sqrt(TMath::Power(xMomI,2)+TMath::Power(yMomI,2)+TMath::Power(zMomI,2));
 	  h_Neutron_Energy_Initial->Fill(Vertex->energy);
@@ -201,16 +204,17 @@ int main(int argc, char *argv[]) {
 		taggedEvents++;
 		eventFlag = true;
 		
-		// Neutron Diagnostics!
-	
+		// Neutron Diagnostics!	
 		
 		double xMom = aStep->momX; double yMom = aStep->momY; double zMom = aStep->momZ;
 		double totMom = TMath::Sqrt(TMath::Power(xMom,2)+TMath::Power(yMom,2)+TMath::Power(zMom,2));
 		
-		std::cout << "Momentum at tagger: " << totMom << std::endl;
 		double Rxy = TMath::Sqrt(TMath::Power(xMom,2)+TMath::Power(yMom,2));
 		double neutronAngle = TMath::ATan(Rxy/zMom)*TMath::RadToDeg();
-		
+
+		t_it = tagEvent->begin();
+		NpolTagger *tTemp = *t_it;
+		h_Neutron_Energy->Fill(tTemp->energy);
 
 		h_Neutron_Momentum->Fill(totMom);
 		h_Neutron_Theta_Angle->Fill(neutronAngle);
@@ -345,6 +349,7 @@ int main(int argc, char *argv[]) {
   h_Neutron_Momentum->Write();
   h_Neutron_Momentum_Initial->Write();
   h_Neutron_Energy_Initial->Write();
+   h_Neutron_Energy->Write();
   outFile->Close();
   //txtOut.close();
   return 0;
