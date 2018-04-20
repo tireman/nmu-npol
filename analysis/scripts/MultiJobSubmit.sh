@@ -8,6 +8,6 @@ do
     NUM2=$i*$3
 
     /home/tireman/simulation/jlab/nmu-npol/analysis/scripts/NMUjobSubmit.sh $NUM1 $NUM2 &
-	sleep 1s
+	sleep 2s
 done
 
