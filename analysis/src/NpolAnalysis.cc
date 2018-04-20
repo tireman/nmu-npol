@@ -135,7 +135,10 @@ int main(int argc, char *argv[]) {
   TH1F *h_recoilAngle = new TH1F("recoil_angle","Proton Recoil Angle", 100, 0.0, 90.0); 
   TH1F *h_recoilAngle_Raw = new TH1F("recoil_angle_raw","Proton Recoil Angle Before Angle Cut", 100, 0.0, 90.0);
   TH1F *h_Neutron_Theta_Angle = new TH1F("Neutron_Theta_Angle","Neutron Angle at first tagger", 100, 15.0, 40.0);
-  TH1F *totEnergy = new TH1F("totEnergy","Total Energy Deposited", 100, 0.0, 350.0);
+  TH1F *h_Neutron_Momentum = new TH1F("Neutron_Momentum","Neutron Momentum at the first tagger",100, 0.0, 300.0);
+  TH1F *h_Neutron_Momentum_Initial = new TH1F("Neutron_Momentum_Initial","Initial Neutron Momentum when Generated",100, 0.0, 300.0);
+  TH1F *h_Neutron_Energy_Initial = new TH1F("Neutron_Energy_Initial","Initial Neutron Energyr when Generated",100, 000.0, 4000.0);
+  TH1F *h_totEnergy = new TH1F("totEnergy","Total Energy Deposited", 100, 0.0, 350.0);
   TH2F *h_dEoverEtop = new TH2F("dEoverEtop", "dE over E for top array", 400,0,120,400,0,20);
   TH2F *h_dEoverEbot = new TH2F("dEoverEbot", "dE over E for bottom array", 400,0,120,400,0,20);
   TH1F *h_sectionEfficiency1 = new TH1F("sectionEfficiency1","Polarimeter section efficiency before cuts",13,0.25,6.75);
@@ -174,23 +177,44 @@ int main(int argc, char *argv[]) {
     eDepArrayTotal[botdEArray] = 0.0;
 	
     // BEGIN STEPS LOOP: Fills the detEvent map with volumes and total energy, etc.
-    std::vector<NpolStep *>::iterator s_it;	
+    std::vector<NpolStep *>::iterator s_it;
+	
     bool eventFlag = false;
     for(s_it = steps->begin(); s_it != steps->end(); s_it++) {
       NpolStep *aStep = *s_it;
+	  
 	// These lines of code count up the number of particles entering into the 
 	// first analyzer array that are a neutron (2112), parent ID = 0, track ID = 1.
 	  int AVNum = GetAVNumber(aStep->volume);
 	  if(AVNum == -1) continue;
 	  int imprintNum = GetImprNumber(aStep->volume);
 	  int PVNum = GetPlacementNumber(aStep->volume);
+
+	  NpolVertex *Vertex = verts->at(1);
+	  double xMomI = Vertex->momX; double yMomI = Vertex->momY; double zMomI = Vertex->momZ;
+	  double totMomI = TMath::Sqrt(TMath::Power(xMomI,2)+TMath::Power(yMomI,2)+TMath::Power(zMomI,2));
+	  h_Neutron_Energy_Initial->Fill(Vertex->energy);
+	  h_Neutron_Momentum_Initial->Fill(totMomI);
+		
 	  if((!eventFlag) && (aStep->parentId == 0) && (aStep->trackId == 1) && (aStep->particleId == 2112) 
 		&& (AVNum == 11) && (imprintNum == 1)) {
 		taggedEvents++;
 		eventFlag = true;
-		double Rxy = TMath::Sqrt(TMath::Power(aStep->momY,2)+TMath::Power(aStep->momX,2));
-		double neutronAngle = TMath::ATan(Rxy/aStep->momZ)*TMath::RadToDeg();
+		
+		// Neutron Diagnostics!
+	
+		
+		double xMom = aStep->momX; double yMom = aStep->momY; double zMom = aStep->momZ;
+		double totMom = TMath::Sqrt(TMath::Power(xMom,2)+TMath::Power(yMom,2)+TMath::Power(zMom,2));
+		
+		std::cout << "Momentum at tagger: " << totMom << std::endl;
+		double Rxy = TMath::Sqrt(TMath::Power(xMom,2)+TMath::Power(yMom,2));
+		double neutronAngle = TMath::ATan(Rxy/zMom)*TMath::RadToDeg();
+		
+
+		h_Neutron_Momentum->Fill(totMom);
 		h_Neutron_Theta_Angle->Fill(neutronAngle);
+		
 	  }
 		
       if(detEvents.find(aStep->volume) == detEvents.end())
@@ -268,7 +292,7 @@ int main(int argc, char *argv[]) {
 		  h_recoilAngle_Raw->Fill(azAngle);
 		  if (azAngle >= angleLow && azAngle <= angleHigh){  // checks Requirement 6 
 			h_sectionEfficiency4->Fill(sectionOfInterest+1); //FILL
-			totEnergy->Fill(eDepTotal);
+			h_totEnergy->Fill(eDepTotal);
 			h_dTOF->Fill(dTOF); //FILL
 			 h_recoilAngle->Fill(azAngle); // Fill the proton recoil angle histo
 			if(EArrayOfInterest == topEArray) {// this is where histo for top dE/E gets filled
@@ -309,7 +333,7 @@ int main(int argc, char *argv[]) {
   runStatistics.Write();
   h_dEoverEtop->Write();
   h_dEoverEbot->Write();
-  totEnergy->Write();
+  h_totEnergy->Write();
   h_sectionEfficiency1->Write();
   h_sectionEfficiency2->Write();
   h_sectionEfficiency3->Write();
@@ -318,6 +342,9 @@ int main(int argc, char *argv[]) {
   h_recoilAngle->Write();
   h_recoilAngle_Raw->Write();
   h_Neutron_Theta_Angle->Write();
+  h_Neutron_Momentum->Write();
+  h_Neutron_Momentum_Initial->Write();
+  h_Neutron_Energy_Initial->Write();
   outFile->Close();
   //txtOut.close();
   return 0;
@@ -767,7 +794,7 @@ void getEDepArrayTotal(std::map<std::string,NpolDetectorEvent *> *detEvents, std
 		  }
 		} else if((detector == topEArray) || (detector == botEArray)){
 		  if((AVNum == 2) || (AVNum == 6)){
-			if((PVNum >= 3) && (PVNum <= 6)){
+			if((PVNum >= 2) && (PVNum <= 6)){
 			  (*eDepArrayTotal)[detector] += e_it->second->totEnergyDep;
 			} 
 		  }

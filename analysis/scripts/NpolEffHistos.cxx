@@ -62,7 +62,10 @@ stats_sourceNeutron = (TVectorT<double>*)sourceNeutron->Get("TVectorT<double>;1"
  TH1F *h_recoil_angle_raw;
  TH1F *h_Neutron_Theta;
  TH1F *totalEnergy;
- 
+ TH1F *h_Neutron_Momentum;
+ TH1F *h_Neutron_Momentum_Initial;
+ TH1F *h_Neutron_Energy_Initial;
+  
 // Assign Histos from the input file to a pointer
 // dE/E
  h_dEoverE_AllEvents_Top = (TH2F*)sourceNeutron->Get("dEoverEtop;1");
@@ -80,6 +83,9 @@ stats_sourceNeutron = (TVectorT<double>*)sourceNeutron->Get("TVectorT<double>;1"
 
  // Test plots
  totalEnergy = (TH1F*)sourceNeutron->Get("totEnergy;1");
+ h_Neutron_Momentum = (TH1F*)sourceNeutron->Get("Neutron_Momentum;1");
+ h_Neutron_Momentum_Initial = (TH1F*)sourceNeutron->Get("Neutron_Momentum_Initial;1");
+ h_Neutron_Energy_Initial = (TH1F*)sourceNeutron->Get("Neutron_Energy_Initial;1");
  
  // Section Efficiency histograms are assigned based on cuts
  // All Events
@@ -100,6 +106,7 @@ stats_sourceNeutron = (TVectorT<double>*)sourceNeutron->Get("TVectorT<double>;1"
  TCanvas *dEoverE_dToF = new TCanvas("dEoverE_Two","dE Over E - All Events",800, 600);
  TCanvas *sectionEff_AllEvents = new TCanvas("sectionEff_AllEvents","Section Efficiency - All Events",800, 600);
  TCanvas *angularPlots = new TCanvas("angularPlots","Proton Recoil Angle",800, 600);
+ TCanvas *neutronInformation = new TCanvas("neutronInformation","Neutron Diagnostics",800,600);
  
  // Histogram Stats Removed**
  //gStyle->SetOptStat(0);
@@ -156,17 +163,25 @@ stats_sourceNeutron = (TVectorT<double>*)sourceNeutron->Get("TVectorT<double>;1"
  angularPlots->cd(2);
  h_recoil_angle->DrawCopy();
  angularPlots->cd(3);
- h_Neutron_Theta->DrawCopy();
- angularPlots->cd(4);
  totalEnergy->DrawCopy();
- 
+
+ neutronInformation->Divide(2,2,0.0001, 0.00001,0);
+ neutronInformation->cd(1);
+ h_Neutron_Theta->DrawCopy();
+ neutronInformation->cd(2);
+ h_Neutron_Momentum->DrawCopy();
+ neutronInformation->cd(3);
+ h_Neutron_Momentum_Initial->DrawCopy();
+ neutronInformation->cd(4);   
+ h_Neutron_Energy_Initial->DrawCopy();
  
  // Write out canvases to file 
  dEoverE_dToF->Write();
  sectionEff_AllEvents->Write();
  angularPlots->Write();
+ neutronInformation->Write();
  // Close files
-outFile->Close();
+ outFile->Close();
  sourceNeutron->Close();
  
 }
