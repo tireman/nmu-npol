@@ -109,9 +109,9 @@ int main(int argc, char *argv[]) {
 
   TFile *outFile = new TFile(OutputFile,"RECREATE"); 
   
-  std::ofstream txtOut;
-  TString RunOutput = getenv("NPOLWORKDIR");
-  txtOut.open(RunOutput + "/Output/HitPositions_" + JobNum + ".txt");
+  //std::ofstream txtOut;
+  //TString RunOutput = getenv("NPOLWORKDIR");
+  //txtOut.open(RunOutput + "/Output/HitPositions_" + JobNum + ".txt");
   
   TChain *npolTree = new TChain("T");
   TChain *statsTree = new TChain("T2");
@@ -134,7 +134,12 @@ int main(int argc, char *argv[]) {
   //********************************* Define your Histograms Here *******************************
   TH1F *h_recoilAngle = new TH1F("recoil_angle","Proton Recoil Angle", 100, 0.0, 90.0); 
   TH1F *h_recoilAngle_Raw = new TH1F("recoil_angle_raw","Proton Recoil Angle Before Angle Cut", 100, 0.0, 90.0);
-  TH1F *totEnergy = new TH1F("totEnergy","Total Energy Deposited", 100, 0.0, 350.0);
+  TH1F *h_Neutron_Theta_Angle = new TH1F("Neutron_Theta_Angle","Neutron Angle at first tagger", 100, 15.0, 40.0);
+  TH1F *h_Neutron_Momentum = new TH1F("Neutron_Momentum","Neutron Momentum at the first tagger",100, 0.0, 300.0);
+  TH1F *h_Neutron_Momentum_Initial = new TH1F("Neutron_Momentum_Initial","Initial Neutron Momentum when Generated",100, 0.0, 300.0);
+  TH1F *h_Neutron_Energy_Initial = new TH1F("Neutron_Energy_Initial","Initial Neutron Energy when Generated",100, 000.0, 4000.0);
+  TH1F *h_Neutron_Energy = new TH1F("Neutron_Energy","Neutron Energy at NPOL Tagger",100, 000.0, 4000.0);
+  TH1F *h_totEnergy = new TH1F("totEnergy","Total Energy Deposited", 100, 0.0, 350.0);
   TH2F *h_dEoverEtop = new TH2F("dEoverEtop", "dE over E for top array", 400,0,120,400,0,20);
   TH2F *h_dEoverEbot = new TH2F("dEoverEbot", "dE over E for bottom array", 400,0,120,400,0,20);
   TH1F *h_sectionEfficiency1 = new TH1F("sectionEfficiency1","Polarimeter section efficiency before cuts",13,0.25,6.75);
@@ -173,20 +178,47 @@ int main(int argc, char *argv[]) {
     eDepArrayTotal[botdEArray] = 0.0;
 	
     // BEGIN STEPS LOOP: Fills the detEvent map with volumes and total energy, etc.
-    std::vector<NpolStep *>::iterator s_it;	
+    std::vector<NpolStep *>::iterator s_it;
+	std::vector<NpolTagger *>::iterator t_it;
+	
     bool eventFlag = false;
     for(s_it = steps->begin(); s_it != steps->end(); s_it++) {
       NpolStep *aStep = *s_it;
+	  
 	// These lines of code count up the number of particles entering into the 
 	// first analyzer array that are a neutron (2112), parent ID = 0, track ID = 1.
 	  int AVNum = GetAVNumber(aStep->volume);
 	  if(AVNum == -1) continue;
 	  int imprintNum = GetImprNumber(aStep->volume);
 	  int PVNum = GetPlacementNumber(aStep->volume);
+
+	  NpolVertex *Vertex = verts->at(1);
+	  
+	  double xMomI = Vertex->momX; double yMomI = Vertex->momY; double zMomI = Vertex->momZ;
+	  double totMomI = TMath::Sqrt(TMath::Power(xMomI,2)+TMath::Power(yMomI,2)+TMath::Power(zMomI,2));
+	  h_Neutron_Energy_Initial->Fill(Vertex->energy);
+	  h_Neutron_Momentum_Initial->Fill(totMomI);
+		
 	  if((!eventFlag) && (aStep->parentId == 0) && (aStep->trackId == 1) && (aStep->particleId == 2112) 
 		&& (AVNum == 11) && (imprintNum == 1)) {
 		taggedEvents++;
 		eventFlag = true;
+		
+		// Neutron Diagnostics!	
+		
+		double xMom = aStep->momX; double yMom = aStep->momY; double zMom = aStep->momZ;
+		double totMom = TMath::Sqrt(TMath::Power(xMom,2)+TMath::Power(yMom,2)+TMath::Power(zMom,2));
+		
+		double Rxy = TMath::Sqrt(TMath::Power(xMom,2)+TMath::Power(yMom,2));
+		double neutronAngle = TMath::ATan(Rxy/zMom)*TMath::RadToDeg();
+
+		t_it = tagEvent->begin();
+		NpolTagger *tTemp = *t_it;
+		h_Neutron_Energy->Fill(tTemp->energy);
+
+		h_Neutron_Momentum->Fill(totMom);
+		h_Neutron_Theta_Angle->Fill(neutronAngle);
+		
 	  }
 		
       if(detEvents.find(aStep->volume) == detEvents.end())
@@ -194,7 +226,8 @@ int main(int argc, char *argv[]) {
 	  
       (detEvents[aStep->volume])->totEnergyDep += aStep->eDep;
 	  
-      if(!(detEvents[aStep->volume])->thresholdExceeded && (detEvents[aStep->volume])->totEnergyDep >= EDEP_THRESHOLD) {
+      if(!(detEvents[aStep->volume])->thresholdExceeded &&
+		 (detEvents[aStep->volume])->totEnergyDep >= EDEP_THRESHOLD) {
 		gRandom = new TRandom();
 		
 		(detEvents[aStep->volume])->thresholdExceeded = true;
@@ -224,8 +257,8 @@ int main(int argc, char *argv[]) {
 		(detEvents[aStep->volume])->hPosY = hitPos[1]; 
 		(detEvents[aStep->volume])->hPosZ = hitPos[2];
 		
-		txtOut << AVNum << "\t\t" << imprintNum << "\t\t" << PVNum << "\t\t" << hitPos[0] << "\t\t"
-			   << hitPos[1] << "\t\t" << hitPos[2] << "\t\t" << (detEvents[aStep->volume])->time << std::endl;
+		//txtOut << AVNum << "\t\t" << imprintNum << "\t\t" << PVNum << "\t\t" << hitPos[0] << "\t\t"
+		//	   << hitPos[1] << "\t\t" << hitPos[2] << "\t\t" << (detEvents[aStep->volume])->time << std::endl;
 		// write to text file to read with MatLab
 
 		// ****** End of the hit position computations section ******* //
@@ -246,18 +279,14 @@ int main(int argc, char *argv[]) {
       PolarimeterDetector EArrayOfInterest = getEArrayOfInterest(&detEvents,&eDepArrayTotal,sectionOfInterest);
       PolarimeterDetector dEArrayOfInterest = unknown;	  
 	  
-      if(EArrayOfInterest == topEArray) {
-		dEArrayOfInterest = topdEArray;
-      }
-      else if(EArrayOfInterest == botEArray){
-		dEArrayOfInterest = botdEArray;
-      }
+      if(EArrayOfInterest == topEArray){ dEArrayOfInterest = topdEArray; }
+	  else if(EArrayOfInterest == botEArray){ dEArrayOfInterest = botdEArray; }
 
       if((EArrayOfInterest != unknown) && (dEArrayOfInterest != unknown)) {
 		h_sectionEfficiency2->Fill(sectionOfInterest+1); //Fill
-		double eDepAnalyzer = eDepArrayTotal[analyzer]; //getEDepCluster(&detEvents, sectionOfInterest,analyzer); 
-		double eDepE = eDepArrayTotal[EArrayOfInterest]; //getEDepCluster(&detEvents, sectionOfInterest,EArrayOfInterest);  
-		double eDepdE = eDepArrayTotal[dEArrayOfInterest]; //getEDepCluster(&detEvents, sectionOfInterest,dEArrayOfInterest); 
+		double eDepAnalyzer = eDepArrayTotal[analyzer]; 
+		double eDepE = eDepArrayTotal[EArrayOfInterest]; 
+		double eDepdE = eDepArrayTotal[dEArrayOfInterest];
 		double eDepTotal = eDepAnalyzer + eDepE + eDepdE;
 		double dTOF = -100.0;
 		double azAngle = ReturnAngle(verts->at(1),&detEvents,sectionOfInterest,EArrayOfInterest,&dTOF);
@@ -267,7 +296,7 @@ int main(int argc, char *argv[]) {
 		  h_recoilAngle_Raw->Fill(azAngle);
 		  if (azAngle >= angleLow && azAngle <= angleHigh){  // checks Requirement 6 
 			h_sectionEfficiency4->Fill(sectionOfInterest+1); //FILL
-			totEnergy->Fill(eDepTotal);
+			h_totEnergy->Fill(eDepTotal);
 			h_dTOF->Fill(dTOF); //FILL
 			 h_recoilAngle->Fill(azAngle); // Fill the proton recoil angle histo
 			if(EArrayOfInterest == topEArray) {// this is where histo for top dE/E gets filled
@@ -308,7 +337,7 @@ int main(int argc, char *argv[]) {
   runStatistics.Write();
   h_dEoverEtop->Write();
   h_dEoverEbot->Write();
-  totEnergy->Write();
+  h_totEnergy->Write();
   h_sectionEfficiency1->Write();
   h_sectionEfficiency2->Write();
   h_sectionEfficiency3->Write();
@@ -316,8 +345,13 @@ int main(int argc, char *argv[]) {
   h_dTOF->Write();
   h_recoilAngle->Write();
   h_recoilAngle_Raw->Write();
+  h_Neutron_Theta_Angle->Write();
+  h_Neutron_Momentum->Write();
+  h_Neutron_Momentum_Initial->Write();
+  h_Neutron_Energy_Initial->Write();
+   h_Neutron_Energy->Write();
   outFile->Close();
-  txtOut.close();
+  //txtOut.close();
   return 0;
 }
 
@@ -487,16 +521,16 @@ int sectionNumber(const std::string &volName) {
     case 3: // Top dE array 1 
     case 7: // Bottom dE array 1 
       pvNum = GetPlacementNumber(volName);
-      if(pvNum <= 12 && pvNum >= 6) {return 0;}  // section 1
-      else if(pvNum <= 5 && pvNum >= 0) {return 1;}  // section 2
+      if((pvNum <= 12) && (pvNum >= 6)) {return 0;}  // section 1
+      else if((pvNum <= 5) && (pvNum >= 0)) {return 1;}  // section 2
       else {return -1;}
     case 2: // Top E array 2
 	case 6: // Bottom E array 2
     case 4: // Top dE array 2
 	case 8: // Bottom dE array 2
       pvNum = GetPlacementNumber(volName);
-      if(pvNum <= 13 && pvNum >= 7) {return 2;}  // section 3
-      else if(pvNum <= 6 && pvNum >= 0) {return 3;}  // section 4
+      if((pvNum <= 13) && (pvNum >= 7)) {return 2;}  // section 3
+      else if((pvNum <= 6) && (pvNum >= 0)) {return 3;}  // section 4
       else {return -1;}
     case 9: // Front array 1
     case 11: // Front Veto array 1
@@ -607,32 +641,6 @@ PolarimeterDetector detectorType(const std::string &volName) {
   }
 }
 
-bool checkEarrayHits(const std::map<std::string,NpolDetectorEvent *> *detEvents){
-  std::map<std::string,NpolDetectorEvent *>::const_iterator it;
-  int countTop = 0;
-  int countBottom = 0;
-  for(it = detEvents->begin(); it != detEvents->end(); it++) {
-	if((detectorType(it->first) == topEArray) && (it->second->thresholdExceeded == true)) countTop++;
-	if((detectorType(it->first) == botEArray) && (it->second->thresholdExceeded == true)) countBottom++;
-  }
-  std::cout << "Number Top E-Array Detectors 'Hit' =  " << countTop << std::endl;
-  std::cout << "Number Bottom E-Array Detectors 'Hit' =  " << countBottom << std::endl;
-  return true;
-}
-
-bool checkdEarrayHits(const std::map<std::string,NpolDetectorEvent *> *detEvents){
-  std::map<std::string,NpolDetectorEvent *>::const_iterator it;
-  int countTop = 0;
-  int countBottom = 0;
-  for(it = detEvents->begin(); it != detEvents->end(); it++) {
-	if((detectorType(it->first) == topdEArray) && (it->second->thresholdExceeded == true)) countTop++;
-	if((detectorType(it->first) == botdEArray) && (it->second->thresholdExceeded == true)) countBottom++;
-  }
-  std::cout << "Number Top dE-Array Detectors 'Hit' =  " << countTop << std::endl;
-  std::cout << "Number Bottom dE-Array Detectors 'Hit' =  " << countBottom << std::endl;
-  return true;
-}
-
 // Return the frontmost polarimeter section that passes requirements 1 and 2.
 // If -1 is returned, then no section passed requirements 1 and 2.
 int getSectionOfInterest(const std::map<std::string,NpolDetectorEvent *> *detEvents) {
@@ -721,8 +729,8 @@ PolarimeterDetector getEArrayOfInterest(std::map<std::string,NpolDetectorEvent *
   bool topdEFlag = false;
   bool botdEFlag = false;
   
-  if((topETotal >= 5) && (topETotal <= 120)) topEFlag = true;  // energy units of MeV
-  if((botETotal >= 5) && (botETotal <= 120)) botEFlag = true;  // energy units of MeV
+  if((topETotal >= 5) && (topETotal <= 150)) topEFlag = true;  // energy units of MeV
+  if((botETotal >= 5) && (botETotal <= 150)) botEFlag = true;  // energy units of MeV
   if((topdETotal >= 1) && (topdETotal <= 25)) topdEFlag = true;  // energy units of MeV
   if((botdETotal >= 1) && (botdETotal <= 25)) botdEFlag = true;  // energy units of MeV
   
@@ -732,6 +740,7 @@ PolarimeterDetector getEArrayOfInterest(std::map<std::string,NpolDetectorEvent *
     if(!(topdEFlag) && botdEFlag) EOI = botEArray;
   } else {
     EOI = unknown;
+	std::cout << "Failed to detect top or bottom E-array" << std::endl;
   }
 
   return EOI;
@@ -744,14 +753,58 @@ void getEDepArrayTotal(std::map<std::string,NpolDetectorEvent *> *detEvents, std
 	int section = sectionNumber(e_it->first);
 	PolarimeterDetector detector = detectorType(e_it->first);
 	if(section == SOI) {
-	  if((detector == analyzer) || (detector == tagger) || (detector == topdEArray) || (detector == botdEArray) || (detector == topEArray) || (detector == botEArray)){
+	  if((detector == analyzer) || (detector == tagger) || (detector == topdEArray)
+		 || (detector == botdEArray) || (detector == topEArray) || (detector == botEArray)){
 		(*eDepArrayTotal)[detector] += e_it->second->totEnergyDep;
 	  }
 	}
+	
 	if(section == (SOI + 1)){
-	  if((detector == topEArray) || (detector == botEArray)){
-		(*eDepArrayTotal)[detector] += e_it->second->totEnergyDep;
-	  } 
+	  int AVNum = GetAVNumber(e_it->first);
+	  int PVNum = GetPlacementNumber(e_it->first);
+	  if(section == 1){
+		if((detector == topdEArray) || (detector == botdEArray)){
+		  if((AVNum == 3) || (AVNum == 7)){
+			if((PVNum == 5)){
+			  (*eDepArrayTotal)[detector] += e_it->second->totEnergyDep;
+			}
+		  }
+		} else if((detector == topEArray) || (detector == botEArray)){
+		  if((AVNum == 1) || (AVNum == 5)){
+			if((PVNum >= 1) && (PVNum <= 5)){
+			  (*eDepArrayTotal)[detector] += e_it->second->totEnergyDep;
+			} 
+		  }
+		}
+	  } else if(section == 2){
+		if((detector == topdEArray) || (detector == botdEArray)){
+		  if((AVNum == 4) || (AVNum == 8)){
+			if((PVNum == 13)){
+			  (*eDepArrayTotal)[detector] += e_it->second->totEnergyDep;
+			}
+		  }
+		} else if((detector == topEArray) || (detector == botEArray)){
+		  if((AVNum == 2) || (AVNum == 6)){
+			if((PVNum >= 9) && (PVNum <= 13)){
+			  (*eDepArrayTotal)[detector] += e_it->second->totEnergyDep;
+			} 
+		  }
+		}
+	  } else if(section == 3){
+		if((detector == topdEArray) || (detector == botdEArray)){
+		  if((AVNum == 4) || (AVNum == 8)){
+			if((PVNum == 6)){
+			  (*eDepArrayTotal)[detector] += e_it->second->totEnergyDep;
+			}
+		  }
+		} else if((detector == topEArray) || (detector == botEArray)){
+		  if((AVNum == 2) || (AVNum == 6)){
+			if((PVNum >= 2) && (PVNum <= 6)){
+			  (*eDepArrayTotal)[detector] += e_it->second->totEnergyDep;
+			} 
+		  }
+		}
+	  }
 	}
   }
   return;
@@ -819,6 +872,21 @@ double getTotalEnergyDep(const std::map<std::string,NpolDetectorEvent *> *detEve
   return totEnergyDeposit;
 }
 
+double highestEDepPV(const std::map<std::string,NpolDetectorEvent *> *detEvents, int sectionOfInterest, PolarimeterDetector detectorOfInterest) {
+
+  double highestE_Dep = -1.0;
+
+  std::map<std::string,NpolDetectorEvent *>::const_iterator it;
+
+  for(it = detEvents->begin(); it != detEvents->end(); it++) {
+    if((sectionOfInterest == sectionNumber(it->first)) && (detectorOfInterest == detectorType(it->first))) { 
+      if((it->second->totEnergyDep) > highestE_Dep) 
+		highestE_Dep = it->second->totEnergyDep;
+
+    }
+  }
+  return highestE_Dep;
+}
 
 // Return the azimuthal part of the scattering angle (in degrees) in the polarimeter given three points in global coordinates:
 // (p1x,p1y,p1z) - a point along the line of the incoming neutron's trajectory (the vertex in the target will do)
@@ -874,7 +942,7 @@ void GetPoI(double *ret, double *time, const int section, const PolarimeterDetec
   }
   }*/
 
-void GetPoI2(double *ret, double *time, const int section, const PolarimeterDetector type, const std::map<std::string,NpolDetectorEvent *> *detEvents) {
+void GetPoI2(double *ret, double *time, const int SOI, const PolarimeterDetector type, const std::map<std::string,NpolDetectorEvent *> *detEvents) {
   
   std::map<std::string,NpolDetectorEvent *>::const_iterator it;
   ret[0] = 0.0;
@@ -882,7 +950,8 @@ void GetPoI2(double *ret, double *time, const int section, const PolarimeterDete
   ret[2] = 0.0;
   double totEdepSoFar = 0.0;
   for(it = detEvents->begin(); it != detEvents->end(); it++) {
-    if((sectionNumber(it->first) == section || sectionNumber(it->first) == (section + 1)) && detectorType(it->first) == type) {
+	int section = sectionNumber(it->first);
+    if(section == SOI && detectorType(it->first) == type) {
       if(it->second->thresholdExceeded) {
 		ret[0] += (it->second->totEnergyDep)*(it->second->hPosX);
 		ret[1] += (it->second->totEnergyDep)*(it->second->hPosY);
@@ -890,7 +959,29 @@ void GetPoI2(double *ret, double *time, const int section, const PolarimeterDete
 		*time += (it->second->totEnergyDep)*(it->second->time);
 		totEdepSoFar += it->second->totEnergyDep;
       }
-    }
+    } else if((section == (SOI + 1)) && detectorType(it->first) == type){
+	  int AVNum = GetAVNumber(it->first);
+	  int PVNum = GetPlacementNumber(it->first);
+	  if((SOI == 0) && ((AVNum == 1) || (AVNum == 5)) && ((PVNum >= 1) && (PVNum <= 5))){
+		ret[0] += (it->second->totEnergyDep)*(it->second->hPosX);
+		ret[1] += (it->second->totEnergyDep)*(it->second->hPosY);
+		ret[2] += (it->second->totEnergyDep)*(it->second->hPosZ);
+		*time += (it->second->totEnergyDep)*(it->second->time);
+		totEdepSoFar += it->second->totEnergyDep;
+	  } else if((SOI == 1) && ((AVNum == 2) || (AVNum == 6)) && ((PVNum >= 9) && (PVNum <= 13))){
+		ret[0] += (it->second->totEnergyDep)*(it->second->hPosX);
+		ret[1] += (it->second->totEnergyDep)*(it->second->hPosY);
+		ret[2] += (it->second->totEnergyDep)*(it->second->hPosZ);
+		*time += (it->second->totEnergyDep)*(it->second->time);
+		totEdepSoFar += it->second->totEnergyDep;
+	  } else if((SOI == 2) && ((AVNum == 2) || (AVNum == 6)) && ((PVNum >= 2) && (PVNum <= 6))){
+		ret[0] += (it->second->totEnergyDep)*(it->second->hPosX);
+		ret[1] += (it->second->totEnergyDep)*(it->second->hPosY);
+		ret[2] += (it->second->totEnergyDep)*(it->second->hPosZ);
+		*time += (it->second->totEnergyDep)*(it->second->time);
+		totEdepSoFar += it->second->totEnergyDep;
+	  }
+	}
   }
   
   // Compute the weighted average
@@ -900,7 +991,7 @@ void GetPoI2(double *ret, double *time, const int section, const PolarimeterDete
   *time /= totEdepSoFar;
 }
 
-  /*
+/*  //This code looks for the highest energy detector and uses it.
 		if((it->second->totEnergyDep) > totEdepSoFar){
 		  totEdepSoFar = it->second->totEnergyDep;
 		  ret[0] = (it->second->hPosX);
@@ -913,25 +1004,10 @@ void GetPoI2(double *ret, double *time, const int section, const PolarimeterDete
   }
   }*/
 
-double highestEDepPV(const std::map<std::string,NpolDetectorEvent *> *detEvents, int sectionOfInterest, PolarimeterDetector detectorOfInterest) {
-
-  double highestE_Dep = -1.0;
-
-  std::map<std::string,NpolDetectorEvent *>::const_iterator it;
-
-  for(it = detEvents->begin(); it != detEvents->end(); it++) {
-    if((sectionOfInterest == sectionNumber(it->first)) && (detectorOfInterest == detectorType(it->first))) { 
-      if((it->second->totEnergyDep) > highestE_Dep) 
-		highestE_Dep = it->second->totEnergyDep;
-
-    }
-  }
-  return highestE_Dep;
-}
 
 // Return the Azimuth angle only.  Check is in main code.
 // Optionally return delta time-of-flight between the analyzer and E-array
-double ReturnAngle(NpolVertex *incNeutronVert, std::map<std::string,NpolDetectorEvent *> *detEvents, const int section, const PolarimeterDetector EArrayOfInterest, double *dTOF = NULL) {
+double ReturnAngle(NpolVertex *incNeutronVert, std::map<std::string,NpolDetectorEvent *> *detEvents, const int SOI, const PolarimeterDetector EArrayOfInterest, double *dTOF = NULL) {
   double targetPt[3];
   double analyzerPt[3];
   double EarrayPt[3];
@@ -942,8 +1018,8 @@ double ReturnAngle(NpolVertex *incNeutronVert, std::map<std::string,NpolDetector
   targetPt[1] = incNeutronVert->posY;
   targetPt[2] = incNeutronVert->posZ;
 
-  GetPoI(analyzerPt,&analyzerTime,section,analyzer,detEvents);
-  GetPoI2(EarrayPt,&EarrayTime,section,EArrayOfInterest,detEvents);
+  GetPoI(analyzerPt,&analyzerTime,SOI,analyzer,detEvents);
+  GetPoI2(EarrayPt,&EarrayTime,SOI,EArrayOfInterest,detEvents);
 
   double azAngle = getAzimuthAngle(targetPt[0],targetPt[1], targetPt[2],
 								   analyzerPt[0],analyzerPt[1],analyzerPt[2],
@@ -952,6 +1028,32 @@ double ReturnAngle(NpolVertex *incNeutronVert, std::map<std::string,NpolDetector
   if(dTOF != NULL)
     *dTOF = EarrayTime - analyzerTime;
   return azAngle;
+}
+
+bool checkEarrayHits(const std::map<std::string,NpolDetectorEvent *> *detEvents){
+  std::map<std::string,NpolDetectorEvent *>::const_iterator it;
+  int countTop = 0;
+  int countBottom = 0;
+  for(it = detEvents->begin(); it != detEvents->end(); it++) {
+	if((detectorType(it->first) == topEArray) && (it->second->thresholdExceeded == true)) countTop++;
+	if((detectorType(it->first) == botEArray) && (it->second->thresholdExceeded == true)) countBottom++;
+  }
+  std::cout << "Number Top E-Array Detectors 'Hit' =  " << countTop << std::endl;
+  std::cout << "Number Bottom E-Array Detectors 'Hit' =  " << countBottom << std::endl;
+  return true;
+}
+
+bool checkdEarrayHits(const std::map<std::string,NpolDetectorEvent *> *detEvents){
+  std::map<std::string,NpolDetectorEvent *>::const_iterator it;
+  int countTop = 0;
+  int countBottom = 0;
+  for(it = detEvents->begin(); it != detEvents->end(); it++) {
+	if((detectorType(it->first) == topdEArray) && (it->second->thresholdExceeded == true)) countTop++;
+	if((detectorType(it->first) == botdEArray) && (it->second->thresholdExceeded == true)) countBottom++;
+  }
+  std::cout << "Number Top dE-Array Detectors 'Hit' =  " << countTop << std::endl;
+  std::cout << "Number Bottom dE-Array Detectors 'Hit' =  " << countBottom << std::endl;
+  return true;
 }
 
 TString FormInputFile(TString InputDir){
