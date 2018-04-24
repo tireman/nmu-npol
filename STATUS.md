@@ -1,3 +1,7 @@
+#Update: 24-April-2018
+
+A bug was found and fixed in the analysis manager.  When cutting and pasting, check that the unit selection is the correct one.  We were setting momentum to *cm* when we wanted *MeV*.  Since G4 standard length units are *mm* that meant our momentum are off by a factor of x10 small. -- WT
+
 # Update: 12-January-2017
 
 No significant changes.  There was some clean up of the constructor files for the magnets and a geometry error in the generation of Dipole 1 was found a fixed.  Openings and positions are better determined by a few parameters. Magnetic fields are now changed with a simple change at the top of the each constructor.

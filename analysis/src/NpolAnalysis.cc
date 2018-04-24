@@ -132,13 +132,13 @@ int main(int argc, char *argv[]) {
   statsTree->SetBranchAddress("stats",&stats);
   
   //********************************* Define your Histograms Here *******************************
-  TH1F *h_recoilAngle = new TH1F("recoil_angle","Proton Recoil Angle", 100, 0.0, 90.0); 
-  TH1F *h_recoilAngle_Raw = new TH1F("recoil_angle_raw","Proton Recoil Angle Before Angle Cut", 100, 0.0, 90.0);
+  TH1F *h_recoilAngle = new TH1F("recoil_angle","Proton Recoil Angle", 100, 0.0, 120.0); 
+  TH1F *h_recoilAngle_Raw = new TH1F("recoil_angle_raw","Proton Recoil Angle Before Angle Cut", 100, 0.0, 120.0);
   TH1F *h_Neutron_Theta_Angle = new TH1F("Neutron_Theta_Angle","Neutron Angle at first tagger", 100, 15.0, 40.0);
-  TH1F *h_Neutron_Momentum = new TH1F("Neutron_Momentum","Neutron Momentum at the first tagger",100, 0.0, 300.0);
-  TH1F *h_Neutron_Momentum_Initial = new TH1F("Neutron_Momentum_Initial","Initial Neutron Momentum when Generated",100, 0.0, 300.0);
-  TH1F *h_Neutron_Energy_Initial = new TH1F("Neutron_Energy_Initial","Initial Neutron Energy when Generated",100, 000.0, 4000.0);
-  TH1F *h_Neutron_Energy = new TH1F("Neutron_Energy","Neutron Energy at NPOL Tagger",100, 000.0, 4000.0);
+  TH1F *h_Neutron_Momentum = new TH1F("Neutron_Momentum","Neutron Momentum at the first tagger",100, 1600.0, 3200.0);
+  TH1F *h_Neutron_Momentum_Initial = new TH1F("Neutron_Momentum_Initial","Initial Neutron Momentum when Generated",100, 1600.0, 3200.0);
+  TH1F *h_Neutron_Energy_Initial = new TH1F("Neutron_Energy_Initial","Initial Neutron Energy when Generated",100, 1000.0, 2400.0);
+  TH1F *h_Neutron_Energy = new TH1F("Neutron_Energy","Neutron Energy at NPOL Tagger",100, 1000.0, 2400.0);
   TH1F *h_totEnergy = new TH1F("totEnergy","Total Energy Deposited", 100, 0.0, 350.0);
   TH2F *h_dEoverEtop = new TH2F("dEoverEtop", "dE over E for top array", 400,0,120,400,0,20);
   TH2F *h_dEoverEbot = new TH2F("dEoverEbot", "dE over E for bottom array", 400,0,120,400,0,20);
