@@ -21,7 +21,7 @@
 #include "NpolTagger.hh"
 #include "NpolStatistics.hh"
 
-#define OUTFILE_VERSION 20170309 // Determined by YYYYMMDD
+#define OUTFILE_VERSION 20180423 // Determined by YYYYMMDD
 
 NpolAnalysisManager *NpolAnalysisManager::pInstance = NULL;
 
