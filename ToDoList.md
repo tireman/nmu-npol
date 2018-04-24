@@ -1,8 +1,8 @@
 # Major Issues and/or needs
 
-1. Reworking or modification of the NPOL efficency ROOT script.  The current one is off from the proposal efficiencies by a factor of about 7.  My suspicion is that some of the difference comes from how we identify the (n,p) scattering events.  We are currenlty used the same energy cuts, however, the choice of "section" in which the hit occured and then susequent choice of detectors in the top/bottom arrays affects the calcuated angle and the energy. 
+1. Reworking or modification of the NPOL efficency ROOT script progressing slowly.  WT found the "factor of 7" which was in a mistake made in the Section of Interest (SOI) section.  With this bug corrected, work has progressed on the proton track ID which still needs a lot of work/testing.
 
-2. Implementation of QE neutron generator.  Currently, through a set of hoops we can use the output from the SimC code to feed the G4 Generalized Particle Source (GPS) with the 5 necessary histograms to bias the input for a surface right in from of the first Dipole magnet. This isn't bad but perhaps implementing our own internal QE neutron generator would be useful. 
+2. Implementation of QE neutron generator.  Tongtong (Post-Doc with Dr. Michael Kohl) has written up and tested a C++ (compiled against ROOT) program to generate QE neutron events.  This has yet to be implemented into our code.  In the future, this will prove useful and more compact than the current method. 
 
 # Minor Issues and/or needs
 
