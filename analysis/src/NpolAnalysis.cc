@@ -119,8 +119,8 @@ int main(int argc, char *argv[]) {
   npolTree->Add(InputFile);
   statsTree->Add(InputFile);
 
-  npolTree->SetCacheSize(50000000);  // This increases the amount of data loaded 
-  statsTree->SetCacheSize(50000000); // per call for more data to chew on. 
+  //npolTree->SetCacheSize(50000000);  // This increases the amount of data loaded 
+  //statsTree->SetCacheSize(50000000); // per call for more data to chew on. 
   
   std::vector<NpolStep *> *steps = NULL;
   std::vector<NpolVertex *> *verts = NULL;
@@ -142,10 +142,10 @@ int main(int argc, char *argv[]) {
   TH1F *h_totEnergy = new TH1F("totEnergy","Total Energy Deposited", 100, 0.0, 350.0);
   TH2F *h_dEoverEtop = new TH2F("dEoverEtop", "dE over E for top array", 400,0,120,400,0,20);
   TH2F *h_dEoverEbot = new TH2F("dEoverEbot", "dE over E for bottom array", 400,0,120,400,0,20);
-  TH1F *h_sectionEfficiency1 = new TH1F("sectionEfficiency1","Polarimeter section efficiency before cuts",13,0.25,6.75);
-  TH1F *h_sectionEfficiency2 = new TH1F("sectionEfficiency2","Polarimeter section efficiency after asymmetry cut",13,0.25,6.75);
-  TH1F *h_sectionEfficiency3 = new TH1F("sectionEfficiency3","Polarimeter section efficiency after array energy total cuts",13,0.25,6.75);
-  TH1F *h_sectionEfficiency4 = new TH1F("sectionEfficiency4","Polarimeter section efficiency after angle cut",13,0.25,6.75);
+  TH1F *h_sectionEfficiency1 = new TH1F("sectionEfficiency1","NPOL Efficiency after SOI Selection",13,0.25,6.75);
+  TH1F *h_sectionEfficiency2 = new TH1F("sectionEfficiency2","#splitline{NPOL Efficiency after EOI Selection}{and Asymmetry Cut}",13,0.25,6.75);
+  TH1F *h_sectionEfficiency3 = new TH1F("sectionEfficiency3","#splitline{NPOL Efficiency after Array}{Total Energy Cuts}",13,0.25,6.75);
+  TH1F *h_sectionEfficiency4 = new TH1F("sectionEfficiency4","NPOL Efficiency after Angle Cut",13,0.25,6.75);
   TH1F *h_dTOF = new TH1F("dTOF","Delta time-of-flight",600,-30,120);
   //********************************* End Histogram Definitions ********************************
 
@@ -267,7 +267,7 @@ int main(int argc, char *argv[]) {
 	
 
 	// ***** This Section will retrieve SOI and EOI and then make event selections based on cuts ******* //
-    // First, we determine the SOI; then wecheck the other requirements and fill the histograms
+    // First, we determine the SOI; then we check the other requirements and fill the histograms
 	int sectionOfInterest = getSectionOfInterest(&detEvents); // call method to determine SOI
 	
 	if(sectionOfInterest != -1) {
@@ -275,7 +275,7 @@ int main(int argc, char *argv[]) {
 	  // Fill the Energy Deposited per array map for the SOI
 	  getEDepArrayTotal(&detEvents, &eDepArrayTotal, sectionOfInterest); 
 	  
-	  // E-array of Interest (EOI) needs some serious work.  Andrei suggest receieved 3/27/2018. 
+	  // E-array of Interest (EOI) needs some serious work.  Andrei suggestion receieved 3/27/2018. 
       PolarimeterDetector EArrayOfInterest = getEArrayOfInterest(&detEvents,&eDepArrayTotal,sectionOfInterest);
       PolarimeterDetector dEArrayOfInterest = unknown;	  
 	  
@@ -298,7 +298,7 @@ int main(int argc, char *argv[]) {
 			h_sectionEfficiency4->Fill(sectionOfInterest+1); //FILL
 			h_totEnergy->Fill(eDepTotal);
 			h_dTOF->Fill(dTOF); //FILL
-			 h_recoilAngle->Fill(azAngle); // Fill the proton recoil angle histo
+			h_recoilAngle->Fill(azAngle); // Fill the proton recoil angle histo
 			if(EArrayOfInterest == topEArray) {// this is where histo for top dE/E gets filled
 			  h_dEoverEtop->Fill(eDepE,eDepdE); //FILL
 			} else if(EArrayOfInterest == botEArray) { 
@@ -687,13 +687,13 @@ int getSectionOfInterest(const std::map<std::string,NpolDetectorEvent *> *detEve
 	  secondSection = sectionOfInterest + 1;
 	}
 	for(int section = firstSection; section <= secondSection; section++) {
-	  std::map<std::string,NpolDetectorEvent *>::const_iterator it;
-	  for(it = detEvents->begin(); it != detEvents->end(); it++) {
-		if(sectionNumber(it->first) == section) {
-		  switch(detectorType(it->first)) {
-		  case topEArray: topEArrayFlag |= it->second->thresholdExceeded == true; 
+	  std::map<std::string,NpolDetectorEvent *>::const_iterator E_it;
+	  for(E_it = detEvents->begin(); E_it != detEvents->end(); E_it++) {
+		if(sectionNumber(E_it->first) == section) {
+		  switch(detectorType(E_it->first)) {
+		  case topEArray: topEArrayFlag |= E_it->second->thresholdExceeded == true; 
 			break;
-		  case botEArray: botEArrayFlag |= it->second->thresholdExceeded == true; 
+		  case botEArray: botEArrayFlag |= E_it->second->thresholdExceeded == true; 
 			break;
 		  default:
 			break;
