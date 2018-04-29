@@ -106,7 +106,7 @@ stats_sourceNeutron = (TVectorT<double>*)sourceNeutron->Get("TVectorT<double>;1"
  
  // CREATE TCANVAS
  TCanvas *dEoverE_dToF = new TCanvas("dEoverE_Two","dE Over E - All Events",800, 600);
- TCanvas *sectionEff_AllEvents = new TCanvas("sectionEff_AllEvents","Section Efficiency - All Events",800, 600);
+ TCanvas *sectionEff_AllEvents = new TCanvas("sectionEff_AllEvents","Section Efficiency - All Events",800, 800);
  TCanvas *angularPlots = new TCanvas("angularPlots","Proton Recoil Angle",800, 600);
  TCanvas *neutronInformation = new TCanvas("neutronInformation","Neutron Diagnostics",800,900);
  
@@ -121,18 +121,21 @@ stats_sourceNeutron = (TVectorT<double>*)sourceNeutron->Get("TVectorT<double>;1"
  h_dEoverE_AllEvents_Top->GetXaxis()->SetTitleSize(0.05);
  h_dEoverE_AllEvents_Top->GetYaxis()->SetTitleSize(0.05);
  h_dEoverE_AllEvents_Top->GetYaxis()->SetTitle("dE-Array Energy Deposited (MeV)");
+ h_dEoverE_AllEvents_Top->Rebin2D(2);
  h_dEoverE_AllEvents_Top->DrawCopy("cont4");
  dEoverE_dToF->cd(2);
  h_dEoverE_AllEvents_Bot->GetXaxis()->SetTitle("E-Array Energy Deposited (MeV)");
  h_dEoverE_AllEvents_Bot->GetXaxis()->SetTitleSize(0.05);
  h_dEoverE_AllEvents_Bot->GetYaxis()->SetTitleSize(0.05);
  h_dEoverE_AllEvents_Bot->GetYaxis()->SetTitle("dE-Array Energy Deposited (MeV)");
+ h_dEoverE_AllEvents_Bot->Rebin2D(2);
  h_dEoverE_AllEvents_Bot->DrawCopy("cont4");
  dEoverE_dToF->cd(3);
  h_dEoverE_Total->GetXaxis()->SetTitle("E-Array Energy Deposited (MeV)");
  h_dEoverE_Total->GetXaxis()->SetTitleSize(0.05);
  h_dEoverE_Total->GetYaxis()->SetTitleSize(0.05);
  h_dEoverE_Total->GetYaxis()->SetTitle("dE-Array Energy Deposited (MeV)");
+ h_dEoverE_Total->Rebin2D(2);
  h_dEoverE_Total->DrawCopy("cont4");
  dEoverE_dToF->cd(4);
  h_dTOF_AllEvents->GetXaxis()->SetTitle("Time (ns)");
@@ -144,7 +147,7 @@ stats_sourceNeutron = (TVectorT<double>*)sourceNeutron->Get("TVectorT<double>;1"
  
 // Section Efficiencies
 // All events
- sectionEff_AllEvents->Divide(2,2,0.0001,0.00001,0);
+ sectionEff_AllEvents->Divide(2,2,0.002,0.01,0);
  for(int i = 0; i <= 3; i++){
    sectionEff_AllEvents->cd(i+1);
    h_sectionEff_AllEvents[i]->SetOption("bar");
