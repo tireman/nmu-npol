@@ -85,8 +85,7 @@ double getEDepCluster(const std::map<std::string,NpolDetectorEvent *> *detEvents
 double getTotalEnergyDep(const std::map<std::string,NpolDetectorEvent *> *detEvents);
 double highestEDepPV(const std::map<std::string,NpolDetectorEvent *> *detEvents, int sectionOfInterest,
 					 PolarimeterDetector detectorOfInterest);
-void sectionEffLocalCoordinates(TH1F *h_sectionEfficiencyLocalPositions, const std::map<std::string,NpolDetectorEvent *>
-								*detEvents, int sectionOfInterest, PolarimeterDetector detector);
+void sectionEffLocalCoordinates(TH1F *h_sectionEfficiencyLocalPositions, const std::map<std::string,NpolDetectorEvent *>*detEvents, int sectionOfInterest, PolarimeterDetector detector);
 double getAzimuthAngle(const double p1x, const double p1y, const double p1z,const double p2x, const double p2y, 
 					   const double p2z, const double p3x, const double p3y, const double p3z);
 void GetPoI(double *ret, double *time, const int section, const PolarimeterDetector type, 
@@ -132,8 +131,12 @@ int main(int argc, char *argv[]) {
   statsTree->SetBranchAddress("stats",&stats);
   
   //********************************* Define your Histograms Here *******************************
-  TH1F *h_recoilAngle = new TH1F("recoil_angle","Proton Recoil Angle", 100, 0.0, 120.0); 
-  TH1F *h_recoilAngle_Raw = new TH1F("recoil_angle_raw","Proton Recoil Angle Before Angle Cut", 100, 0.0, 120.0);
+  TH1F *h_recoilAngle_Real = new TH1F("recoilAngle_Real","Real Proton Recoil Angle",200, 0.0, 180.0);
+  TH1F *h_recoilEnergy_Real = new TH1F("recoilEnergy_Real","Real Proton Recoil Energy",200, 000.0, 2400.);
+  TH1F *h_asymmetry_Real = new TH1F("asymmetry_Real","Real Asymmetry from Recoil Proton",5, -2,+2);
+  
+  TH1F *h_recoilAngle = new TH1F("recoil_angle","Proton Recoil Angle", 200, 0.0, 180.0); 
+  TH1F *h_recoilAngle_Raw = new TH1F("recoil_angle_raw","Proton Recoil Angle Before Angle Cut", 200, 0.0, 180.0);
   TH1F *h_Neutron_Theta_Angle = new TH1F("Neutron_Theta_Angle","Neutron Angle at first tagger", 100, 15.0, 40.0);
   TH1F *h_Neutron_Momentum = new TH1F("Neutron_Momentum","Neutron Momentum at the first tagger",100, 1600.0, 3200.0);
   TH1F *h_Neutron_Momentum_Initial = new TH1F("Neutron_Momentum_Initial","Initial Neutron Momentum when Generated",100, 1600.0, 3200.0);
@@ -162,10 +165,11 @@ int main(int argc, char *argv[]) {
   std::cout << totalEvents << " neutrons thrown at setup." << std::endl;
 	
   // BEGIN EVENT LOOP
+  int asym = 1;
   int nentries = npolTree->GetEntries();
   for(int i = 0; i < nentries; i++) {
     //for(int i = 0; i < 100; i++) {
-   	if(i % 1000 == 0)
+   	if(i % 100 == 0)
       std::cout << "Processing event #" << i << std::endl;
     npolTree->GetEntry(i);
     std::map<std::string,NpolDetectorEvent *> detEvents;   // Event map (NPOL Detector Class)
@@ -176,14 +180,60 @@ int main(int argc, char *argv[]) {
     eDepArrayTotal[topdEArray] = 0.0;
     eDepArrayTotal[botEArray] = 0.0;
     eDepArrayTotal[botdEArray] = 0.0;
+
+	// BEGIN TRACK LOOP: Scans Vertex (tracks) vector and fills histograms
+	std::vector<NpolVertex *>::iterator v_it;
+	
+	for(v_it = verts->begin(); v_it != verts->end(); v_it++){
+	  NpolVertex *aVertex = *v_it;
+	  if(aVertex == NULL) continue;
+	  int PID = aVertex->parentId;
+	  int TID = aVertex->trackId;
+	  int pType = aVertex->particleId;
+	  std::string process = aVertex->process;
+	  std::string volName = aVertex->volume;
+	  int AVNum = GetAVNumber(volName);
+	  //int imprintNum = GetImprNumber(volName);
+	  //int PVNum = GetPlacementNumber(volName);
+	  
+	  if(PID == 0 && TID == 1){
+		double xMomI = aVertex->momX; double yMomI = aVertex->momY; double zMomI = aVertex->momZ;
+		double totMomI = TMath::Sqrt(TMath::Power(xMomI,2)+TMath::Power(yMomI,2)+TMath::Power(zMomI,2));
+		h_Neutron_Energy_Initial->Fill(aVertex->energy);
+		h_Neutron_Momentum_Initial->Fill(totMomI);
+	  }
+
+	  if((PID == 1 && pType == 2212 && process == "hadElastic") && (AVNum >= 9 && AVNum <= 12)){
+		h_recoilEnergy_Real->Fill(aVertex->energy);
+
+		NpolVertex *intNeutron = verts->at(1);
+		double momX = aVertex->momX; double momY = aVertex->momY; double momZ = aVertex->momZ;
+		double momTot = TMath::Sqrt(momX*momX + momY*momY + momZ*momZ);
+		double P1x = intNeutron->posX; double P1y = intNeutron->posY; double P1z = intNeutron->posZ;
+		double P2x = aVertex->posX; double P2y = aVertex->posY; double P2z = aVertex->posZ;
+
+		double P2Theta = TMath::ATan(momY/momX);
+		double P2Phi = TMath::ACos(momZ/momTot);
+				
+		double P3x = P2x + 2*TMath::Sin(P2Phi)*TMath::Cos(P2Theta);
+		double P3y = P2y + 2*TMath::Sin(P2Phi)*TMath::Sin(P2Theta);
+		double P3z = P2z + 2*TMath::Cos(P2Phi);
+		double computedAngle = getAzimuthAngle(P1x,P1y,P1z,P2x,P2y,P2z,P3x,P3y,P3z);
+		h_recoilAngle_Real->Fill(computedAngle);
+		asym = -1*asym;
+		h_asymmetry_Real->Fill(asym);
+	  }
+	}
+	// END TRACK LOOP
+
 	
     // BEGIN STEPS LOOP: Fills the detEvent map with volumes and total energy, etc.
-    std::vector<NpolStep *>::iterator s_it;
+	std::vector<NpolStep *>::iterator s_it;
 	std::vector<NpolTagger *>::iterator t_it;
-	
-    bool eventFlag = false;
+	bool eventFlag = false;
     for(s_it = steps->begin(); s_it != steps->end(); s_it++) {
       NpolStep *aStep = *s_it;
+	  if(aStep == NULL) continue;
 	  
 	// These lines of code count up the number of particles entering into the 
 	// first analyzer array that are a neutron (2112), parent ID = 0, track ID = 1.
@@ -192,13 +242,6 @@ int main(int argc, char *argv[]) {
 	  int imprintNum = GetImprNumber(aStep->volume);
 	  int PVNum = GetPlacementNumber(aStep->volume);
 
-	  NpolVertex *Vertex = verts->at(1);
-	  
-	  double xMomI = Vertex->momX; double yMomI = Vertex->momY; double zMomI = Vertex->momZ;
-	  double totMomI = TMath::Sqrt(TMath::Power(xMomI,2)+TMath::Power(yMomI,2)+TMath::Power(zMomI,2));
-	  h_Neutron_Energy_Initial->Fill(Vertex->energy);
-	  h_Neutron_Momentum_Initial->Fill(totMomI);
-		
 	  if((!eventFlag) && (aStep->parentId == 0) && (aStep->trackId == 1) && (aStep->particleId == 2112) 
 		&& (AVNum == 11) && (imprintNum == 1)) {
 		taggedEvents++;
@@ -271,7 +314,7 @@ int main(int argc, char *argv[]) {
 	int sectionOfInterest = getSectionOfInterest(&detEvents); // call method to determine SOI
 	
 	if(sectionOfInterest != -1) {
-	  h_sectionEfficiency1->Fill(sectionOfInterest+1); // Fill first histogram
+	  h_sectionEfficiency1->Fill(sectionOfInterest+1); // Fill first SOI histogram
 	  // Fill the Energy Deposited per array map for the SOI
 	  getEDepArrayTotal(&detEvents, &eDepArrayTotal, sectionOfInterest); 
 	  
@@ -349,7 +392,10 @@ int main(int argc, char *argv[]) {
   h_Neutron_Momentum->Write();
   h_Neutron_Momentum_Initial->Write();
   h_Neutron_Energy_Initial->Write();
-   h_Neutron_Energy->Write();
+  h_Neutron_Energy->Write();
+  h_recoilAngle_Real->Write();
+  h_recoilEnergy_Real->Write();
+  h_asymmetry_Real->Write();
   outFile->Close();
   //txtOut.close();
   return 0;
@@ -734,9 +780,9 @@ PolarimeterDetector getEArrayOfInterest(std::map<std::string,NpolDetectorEvent *
   if((topdETotal >= 1) && (topdETotal <= 25)) topdEFlag = true;  // energy units of MeV
   if((botdETotal >= 1) && (botdETotal <= 25)) botdEFlag = true;  // energy units of MeV
   
-  if(topEFlag && (topR >= 20) && !(botEFlag)){
+  if(topEFlag && /*(topR >= 20) &&*/ !(botEFlag)){
     if(topdEFlag && !(botdEFlag)) EOI = topEArray;
-  } else if(!(topEFlag) && botEFlag && (botR >= 20)){
+  } else if(!(topEFlag) && botEFlag /*&& (botR >= 20)*/){
     if(!(topdEFlag) && botdEFlag) EOI = botEArray;
   } else {
     EOI = unknown;
@@ -771,7 +817,7 @@ void getEDepArrayTotal(std::map<std::string,NpolDetectorEvent *> *detEvents, std
 		  }
 		} else if((detector == topEArray) || (detector == botEArray)){
 		  if((AVNum == 1) || (AVNum == 5)){
-			if((PVNum >= 1) && (PVNum <= 5)){
+			if((PVNum >= 3) && (PVNum <= 5)){
 			  (*eDepArrayTotal)[detector] += e_it->second->totEnergyDep;
 			} 
 		  }
@@ -785,7 +831,7 @@ void getEDepArrayTotal(std::map<std::string,NpolDetectorEvent *> *detEvents, std
 		  }
 		} else if((detector == topEArray) || (detector == botEArray)){
 		  if((AVNum == 2) || (AVNum == 6)){
-			if((PVNum >= 9) && (PVNum <= 13)){
+			if((PVNum >= 11) && (PVNum <= 13)){
 			  (*eDepArrayTotal)[detector] += e_it->second->totEnergyDep;
 			} 
 		  }
@@ -799,7 +845,7 @@ void getEDepArrayTotal(std::map<std::string,NpolDetectorEvent *> *detEvents, std
 		  }
 		} else if((detector == topEArray) || (detector == botEArray)){
 		  if((AVNum == 2) || (AVNum == 6)){
-			if((PVNum >= 2) && (PVNum <= 6)){
+			if((PVNum >= 4) && (PVNum <= 6)){
 			  (*eDepArrayTotal)[detector] += e_it->second->totEnergyDep;
 			} 
 		  }
@@ -962,19 +1008,19 @@ void GetPoI2(double *ret, double *time, const int SOI, const PolarimeterDetector
     } else if((section == (SOI + 1)) && detectorType(it->first) == type){
 	  int AVNum = GetAVNumber(it->first);
 	  int PVNum = GetPlacementNumber(it->first);
-	  if((SOI == 0) && ((AVNum == 1) || (AVNum == 5)) && ((PVNum >= 1) && (PVNum <= 5))){
+	  if((SOI == 0) && ((AVNum == 1) || (AVNum == 5)) && ((PVNum >= 3) && (PVNum <= 5))){
 		ret[0] += (it->second->totEnergyDep)*(it->second->hPosX);
 		ret[1] += (it->second->totEnergyDep)*(it->second->hPosY);
 		ret[2] += (it->second->totEnergyDep)*(it->second->hPosZ);
 		*time += (it->second->totEnergyDep)*(it->second->time);
 		totEdepSoFar += it->second->totEnergyDep;
-	  } else if((SOI == 1) && ((AVNum == 2) || (AVNum == 6)) && ((PVNum >= 9) && (PVNum <= 13))){
+	  } else if((SOI == 1) && ((AVNum == 2) || (AVNum == 6)) && ((PVNum >= 11) && (PVNum <= 13))){
 		ret[0] += (it->second->totEnergyDep)*(it->second->hPosX);
 		ret[1] += (it->second->totEnergyDep)*(it->second->hPosY);
 		ret[2] += (it->second->totEnergyDep)*(it->second->hPosZ);
 		*time += (it->second->totEnergyDep)*(it->second->time);
 		totEdepSoFar += it->second->totEnergyDep;
-	  } else if((SOI == 2) && ((AVNum == 2) || (AVNum == 6)) && ((PVNum >= 2) && (PVNum <= 6))){
+	  } else if((SOI == 2) && ((AVNum == 2) || (AVNum == 6)) && ((PVNum >= 4) && (PVNum <= 6))){
 		ret[0] += (it->second->totEnergyDep)*(it->second->hPosX);
 		ret[1] += (it->second->totEnergyDep)*(it->second->hPosY);
 		ret[2] += (it->second->totEnergyDep)*(it->second->hPosZ);
