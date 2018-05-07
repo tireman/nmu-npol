@@ -63,11 +63,7 @@ int main(int argc, char *argv[]) {
   TString OutputFile = FEman->FormOutputFile(FEman->OutputDir);
 
   TFile *outFile = new TFile(OutputFile,"RECREATE"); 
-  
-  //std::ofstream txtOut;
-  //TString RunOutput = getenv("NPOLWORKDIR");
-  //txtOut.open(RunOutput + "/Output/HitPositions_" + JobNum + ".txt");
-  
+    
   TChain *npolTree = new TChain("T");
   TChain *statsTree = new TChain("T2");
 
@@ -149,8 +145,6 @@ int main(int argc, char *argv[]) {
 	  std::string process = aVertex->process;
 	  std::string volName = aVertex->volume;
 	  int AVNum = PProcess->GetAVNumber(volName);
-	  //int imprintNum = PProcess->GetImprNumber(volName);
-	  //int PVNum = PProcess->PProcess->GetPlacementNumber(volName);
 	  
 	  if(PID == 0 && TID == 1){
 		double xMomI = aVertex->momX; double yMomI = aVertex->momY; double zMomI = aVertex->momZ;
@@ -257,9 +251,6 @@ int main(int argc, char *argv[]) {
 		(detEvents[aStep->volume])->hPosY = hitPos[1]; 
 		(detEvents[aStep->volume])->hPosZ = hitPos[2];
 		
-		//txtOut << AVNum << "\t\t" << imprintNum << "\t\t" << PVNum << "\t\t" << hitPos[0] << "\t\t"
-		//	   << hitPos[1] << "\t\t" << hitPos[2] << "\t\t" << (detEvents[aStep->volume])->time << std::endl;
-		// write to text file to read with MatLab
 
 		// ****** End of the hit position computations section ******* //
 	  }
@@ -354,7 +345,6 @@ int main(int argc, char *argv[]) {
   h_recoilEnergy_Real->Write();
   h_asymmetry_Real->Write();
   outFile->Close();
-  //txtOut.close();
   return 0;
 }
 
@@ -362,32 +352,9 @@ int main(int argc, char *argv[]) {
 
 // ************* Methods for Main Program are below  this line ************** //
 
-/*bool checkEarrayHits(const std::map<std::string,NpolDetectorEvent *> *detEvents){
-  std::map<std::string,NpolDetectorEvent *>::const_iterator it;
-  int countTop = 0;
-  int countBottom = 0;
-  for(it = detEvents->begin(); it != detEvents->end(); it++) {
-	if((Process->detectorType(it->first) == topEArray) && (it->second->thresholdExceeded == true)) countTop++;
-	if((Process->detectorType(it->first) == botEArray) && (it->second->thresholdExceeded == true)) countBottom++;
-  }
-  std::cout << "Number Top E-Array Detectors 'Hit' =  " << countTop << std::endl;
-  std::cout << "Number Bottom E-Array Detectors 'Hit' =  " << countBottom << std::endl;
-  return true;
-}
+// No methods here ... they have all been moved to separate classes!
 
-bool checkdEarrayHits(const std::map<std::string,NpolDetectorEvent *> *detEvents){
-  std::map<std::string,NpolDetectorEvent *>::const_iterator it;
-  int countTop = 0;
-  int countBottom = 0;
-  for(it = detEvents->begin(); it != detEvents->end(); it++) {
-	if((Process->detectorType(it->first) == topdEArray) && (it->second->thresholdExceeded == true)) countTop++;
-	if((Process->detectorType(it->first) == botdEArray) && (it->second->thresholdExceeded == true)) countBottom++;
-  }
-  std::cout << "Number Top dE-Array Detectors 'Hit' =  " << countTop << std::endl;
-  std::cout << "Number Bottom dE-Array Detectors 'Hit' =  " << countBottom << std::endl;
-  return true;
-}
-*/
+// ************* Requirements as specified in the PAC 37 proposal *********** //
 
 // Requirement 1: At least one hit (energy deposition >= 1 MeV) in some detector in the
 // analyzer and an energy deposition of >= 1 MeV in some detectors in the dE and E arrays
