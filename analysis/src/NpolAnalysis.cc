@@ -120,7 +120,7 @@ int main(int argc, char *argv[]) {
   int asym = 1;
   int nentries = npolTree->GetEntries();
   for(int i = 0; i < nentries; i++) {
-    //for(int i = 0; i < 100; i++) {
+	//for(int i = 0; i < 1; i++) {
    	if(i % 100 == 0)
       std::cout << "Processing event #" << i << std::endl;
     npolTree->GetEntry(i);
@@ -133,19 +133,49 @@ int main(int argc, char *argv[]) {
     eDepArrayTotal[botEArray] = 0.0;
     eDepArrayTotal[botdEArray] = 0.0;
 
-	// BEGIN TRACK LOOP: Scans Vertex (tracks) vector and fills histograms
+	// BEGIN TRACK LOOP: Scans Tracks vector (NpolVertex) and fills histograms
+	// This is to analyze sim output for "real" (n,p) scattering events
 	std::vector<NpolVertex *>::iterator v_it;
-	
+	int selectSOI = -1;
+
+	// This loop scans through the tracks vector and looks for an (n,p) scattering
+	// event and which assembly volume it occurred in and then saves that AVNum to
+	// 'selectSOI'.  We have to do this first to account for muiltple scattering
+	// and due to the fact that the vertices are not stored in order.
 	for(v_it = verts->begin(); v_it != verts->end(); v_it++){
 	  NpolVertex *aVertex = *v_it;
 	  if(aVertex == NULL) continue;
+	  
 	  int PID = aVertex->parentId;
 	  int TID = aVertex->trackId;
 	  int pType = aVertex->particleId;
 	  std::string process = aVertex->process;
 	  std::string volName = aVertex->volume;
 	  int AVNum = PProcess->GetAVNumber(volName);
+
+	  // We cut on parent ID = 1 (original neutron), track ID > 2 (could be changed later,
+	  // particle type = proton (2212), physics process = hadron elastic, and AV number
+	  // between 9 and 10 (analyzer volume)
+	  if((PID == 1 && TID >= 2 && pType == 2212 && process == "hadElastic") && (AVNum == 9 || AVNum == 10)){
+		if(selectSOI == -1 || AVNum < selectSOI) selectSOI = AVNum;
+	  }
+	}
+
+	// After determining the 'selectSOI' which has the (n,p) scattering, we scan through
+	// the tracks vector again to fill the histograms and use 'selectSOI' as a cut as
+	// necessary
+	for(v_it = verts->begin(); v_it != verts->end(); v_it++){
+	  NpolVertex *aVertex = *v_it;
+	  if(aVertex == NULL) continue;
 	  
+	  int PID = aVertex->parentId;
+	  int TID = aVertex->trackId;
+	  int pType = aVertex->particleId;
+	  std::string process = aVertex->process;
+	  std::string volName = aVertex->volume;
+	  int AVNum = PProcess->GetAVNumber(volName);
+
+	  // Extract out Initial Neutron Information from Tracks vector
 	  if(PID == 0 && TID == 1){
 		double xMomI = aVertex->momX; double yMomI = aVertex->momY; double zMomI = aVertex->momZ;
 		double totMomI = TMath::Sqrt(TMath::Power(xMomI,2)+TMath::Power(yMomI,2)+TMath::Power(zMomI,2));
@@ -153,9 +183,8 @@ int main(int argc, char *argv[]) {
 		h_Neutron_Momentum_Initial->Fill(totMomI);
 	  }
 
-	  if((PID == 1 && pType == 2212 && process == "hadElastic") && (AVNum >= 9 && AVNum <= 12)){
-		h_recoilEnergy_Real->Fill(aVertex->energy);
-
+	  if((PID == 1 && TID >= 2 && pType == 2212 && process == "hadElastic") && AVNum == selectSOI){
+		
 		NpolVertex *intNeutron = verts->at(1);
 		double momX = aVertex->momX; double momY = aVertex->momY; double momZ = aVertex->momZ;
 		double momTot = TMath::Sqrt(momX*momX + momY*momY + momZ*momZ);
@@ -169,10 +198,14 @@ int main(int argc, char *argv[]) {
 		double P3y = P2y + 2*TMath::Sin(P2Phi)*TMath::Sin(P2Theta);
 		double P3z = P2z + 2*TMath::Cos(P2Phi);
 		double computedAngle = PhysicsVar->getAzimuthAngle(P1x,P1y,P1z,P2x,P2y,P2z,P3x,P3y,P3z);
-		h_recoilAngle_Real->Fill(computedAngle);
-		//HistMan->FillHistograms("h_recoilAngle_Real",computedAngle);
-		asym = -1*asym;
-		h_asymmetry_Real->Fill(asym);
+		if (computedAngle >= angleLow && computedAngle <= angleHigh) {
+		  h_recoilAngle_Real->Fill(computedAngle);
+		  if(P2y > 0) asym = 1;
+		  if(P2y < 0) asym =-1;
+		  if(P2y == 0) asym = 0;
+		  h_asymmetry_Real->Fill(asym);
+		  h_recoilEnergy_Real->Fill(aVertex->energy);
+		}
 	  }
 	}
 	// END TRACK LOOP
@@ -382,3 +415,7 @@ int main(int argc, char *argv[]) {
 // range of neutron scattering angles of 4-25 degrees, we applied correspondent cuts on the
 // "recoil proton" scattering angle (viz. 45.3-81.6 degrees at Q^2 = 3.95 (GeV/c)^2,
 // 40.8-80.2 degrees at 5.22 (GeV/c)^2, and 36.0-78.3 degrees at 6.88 (GeV/c)^2).
+
+/*if((PID == 1 && TID >= 2 && pType == 2212 && process == "hadElastic") && (AVNum >= 9 && AVNum <= 12)){
+		std::cout << "Event Number= : " << i << "   PID= " << aVertex->parentId << "   TID= " << aVertex->trackId << "   pType= " << aVertex->particleId << "   Process= " << aVertex->process << std::endl;
+		}*/
