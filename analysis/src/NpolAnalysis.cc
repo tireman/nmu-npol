@@ -1,7 +1,8 @@
-/* Npol Analysis Script is designed to analyze the neutron flux on the NPOL polarimeter being
-   designed by the CGEN collaboration at Jefferson National Laboratory. (2016)
-   Revisions: Spring 2017 by Will Tireman and Ashley Adzima (added some histograms)
-   Revisions: January-March 2018 by Will Tireman (Fixed eff. calculation, cleaned up code)
+/* Npol Analysis Script is designed to analyze the neutron flux on 
+   the NPOL polarimeter being designed by the CGEN collaboration at 
+   Jefferson National Laboratory. (2016) Revisions: Spring 2017 by 
+   Will Tireman and Ashley Adzima (added some histograms) Revisions: 
+   January-March 2018 by Will Tireman (Fixed eff. calculation, cleaned up code)
 */
 
 #include <iostream>
@@ -97,6 +98,7 @@ int main(int argc, char *argv[]) {
   TH1F *h_totEnergy = new TH1F("totEnergy","Total Energy Deposited", 100, 0.0, 350.0);
   TH2F *h_dEoverEtop = new TH2F("dEoverEtop", "dE over E for top array", 400,0,120,400,0,20);
   TH2F *h_dEoverEbot = new TH2F("dEoverEbot", "dE over E for bottom array", 400,0,120,400,0,20);
+  TH2F *h_dEvsE_Real = new TH2F("dEvsE_Real", "dE over E for Real Events", 400,0,120,400,0,20);
   TH1F *h_sectionEfficiency1 = new TH1F("sectionEfficiency1","NPOL Efficiency after SOI Selection",13,0.25,6.75);
   TH1F *h_sectionEfficiency2 = new TH1F("sectionEfficiency2","#splitline{NPOL Efficiency after EOI Selection}{and Asymmetry Cut}",13,0.25,6.75);
   TH1F *h_sectionEfficiency3 = new TH1F("sectionEfficiency3","#splitline{NPOL Efficiency after Array}{Total Energy Cuts}",13,0.25,6.75);
@@ -121,8 +123,7 @@ int main(int argc, char *argv[]) {
   int nentries = npolTree->GetEntries();
   for(int i = 0; i < nentries; i++) {
 	//for(int i = 0; i < 1; i++) {
-   	if(i % 100 == 0)
-      std::cout << "Processing event #" << i << std::endl;
+   	if(i % 1000 == 0) std::cout << "Processing event #" << i << std::endl;
     npolTree->GetEntry(i);
     std::map<std::string,NpolDetectorEvent *> detEvents;   // Event map (NPOL Detector Class)
 	std::map<PolarimeterDetector, double> eDepArrayTotal;  // Total energy map for each array
@@ -136,11 +137,16 @@ int main(int argc, char *argv[]) {
 	// BEGIN TRACK LOOP: Scans Tracks vector (NpolVertex) and fills histograms
 	// This is to analyze sim output for "real" (n,p) scattering events
 	std::vector<NpolVertex *>::iterator v_it;
-	int selectSOI = -1;
-
+	int realAV = 0;
+	int realINum = 0;
+	int realPV = -1;
+	int realSOI = -2;
+	int realTID = -1;
+	bool inelasticFlag = false;
+	
 	// This loop scans through the tracks vector and looks for an (n,p) scattering
 	// event and which assembly volume it occurred in and then saves that AVNum to
-	// 'selectSOI'.  We have to do this first to account for muiltple scattering
+	// 'realAV'.  We have to do this first to account for muiltple scattering
 	// and due to the fact that the vertices are not stored in order.
 	for(v_it = verts->begin(); v_it != verts->end(); v_it++){
 	  NpolVertex *aVertex = *v_it;
@@ -152,18 +158,42 @@ int main(int argc, char *argv[]) {
 	  std::string process = aVertex->process;
 	  std::string volName = aVertex->volume;
 	  int AVNum = PProcess->GetAVNumber(volName);
-
+	  int ImprNum = PProcess->GetImprNumber(volName);
+	  int PVNum = PProcess->GetPlacementNumber(volName);
+	  int section = Process->sectionNumber(volName);
+	  
 	  // We cut on parent ID = 1 (original neutron), track ID > 2 (could be changed later,
 	  // particle type = proton (2212), physics process = hadron elastic, and AV number
 	  // between 9 and 10 (analyzer volume)
+	  if((PID == 1 && TID == 2 && pType == 2212 && process == "neutronInelastic") && (AVNum == 9 || AVNum == 10)
+		 && !inelasticFlag){
+		
+		NpolVertex *firstVertex = verts->at(1);
+		int numTracks = firstVertex->daughterIds.size();
+		std::cout << "Event #: " << i << "  Neutron Inelastic Event!" << "  Number of daughters from intial neutron: "
+				  << numTracks << std::endl;
+		
+		inelasticFlag = true;
+	  }
+		
 	  if((PID == 1 && TID >= 2 && pType == 2212 && process == "hadElastic") && (AVNum == 9 || AVNum == 10)){
-		if(selectSOI == -1 || AVNum < selectSOI) selectSOI = AVNum;
+		if(realSOI == -2 || section < realSOI) {
+		  realAV = AVNum;
+		  realINum = ImprNum;
+		  realPV = PVNum;
+		  realSOI = section;
+		  realTID = TID;
+		}
 	  }
 	}
+	if(realAV != 0) std::cout << "Event #: " << i << " AVNum = " << realAV << "   ImprintNum = "
+							  << realINum << "    PVNum = " << realPV <<  "   SOI = " << realSOI
+							  << "   Track = " << realTID << std::endl;
 
-	// After determining the 'selectSOI' which has the (n,p) scattering, we scan through
-	// the tracks vector again to fill the histograms and use 'selectSOI' as a cut as
+	// After determining the 'realAV' which has the (n,p) scattering, we scan through
+	// the tracks vector again to fill the histograms and use 'realAV' as a cut as
 	// necessary
+	bool eventFlagdE = false; bool eventFlagE = false;
 	for(v_it = verts->begin(); v_it != verts->end(); v_it++){
 	  NpolVertex *aVertex = *v_it;
 	  if(aVertex == NULL) continue;
@@ -174,43 +204,80 @@ int main(int argc, char *argv[]) {
 	  std::string process = aVertex->process;
 	  std::string volName = aVertex->volume;
 	  int AVNum = PProcess->GetAVNumber(volName);
-
+	  int ImprNum = PProcess->GetImprNumber(volName);
+	  int PVNum = PProcess->GetPlacementNumber(volName);
+	  
 	  // Extract out Initial Neutron Information from Tracks vector
+	  double intNmomX = 0.; double intNmomY = 0.; double intNmomZ = 0.; double totNmom = 0.;
+	  double P1x = 0.; double P1y = 0.; double P1z = 0.;
+	  double P2x = 0.; double P2y = 0.; double P2z = 0.;
+	  double P3x = 0.; double P3y = 0.; double P3z = 0.;
 	  if(PID == 0 && TID == 1){
-		double xMomI = aVertex->momX; double yMomI = aVertex->momY; double zMomI = aVertex->momZ;
-		double totMomI = TMath::Sqrt(TMath::Power(xMomI,2)+TMath::Power(yMomI,2)+TMath::Power(zMomI,2));
+		intNmomX = aVertex->momX; intNmomY = aVertex->momY; intNmomZ = aVertex->momZ;
+		totNmom = TMath::Sqrt(TMath::Power(intNmomX,2)+TMath::Power(intNmomY,2)+TMath::Power(intNmomZ,2));
+		P1x = aVertex->posX; P1y = aVertex->posY; P1z = aVertex->posZ;
 		h_Neutron_Energy_Initial->Fill(aVertex->energy);
-		h_Neutron_Momentum_Initial->Fill(totMomI);
+		h_Neutron_Momentum_Initial->Fill(totNmom);
 	  }
 
-	  if((PID == 1 && TID >= 2 && pType == 2212 && process == "hadElastic") && AVNum == selectSOI){
+	  
+	
+	  std::vector<NpolStep *>::iterator s_it;
+	  for(s_it = steps->begin(); s_it != steps->end(); s_it++) {
+	  	NpolStep *aStep = *s_it;
+	  	if(aStep == NULL) continue;
+
+		int PID = aStep->parentId;
+		int TID = aStep->trackId;
+		int pType = aStep->particleId;
+		if((PID == 1) && (TID == realTID) && (pType == 2212)){
+		  std::string volName = aStep->volume;
+		  int AVNum = PProcess->GetAVNumber(volName);
+		  if(AVNum == -1) continue;
+		  if(!(eventFlagE) && ((AVNum == 1) || (AVNum == 2) || (AVNum == 5) || (AVNum == 6))){
+			eventFlagE = true;
+			int impNum = PProcess->GetImprNumber(volName);
+			int PVNum = PProcess->GetPlacementNumber(volName);
+			int section = Process->sectionNumber(volName);
+			std::cout << "      E-Array Detector: " << " AVNum = " << AVNum << "   impNum = "  << impNum <<
+			  "    PVNum = " << PVNum <<  "   SOI = " << section << "   Track = " << TID << std::endl;
+		  }
+		  if(!(eventFlagdE) && ((AVNum == 3) || (AVNum == 4) || (AVNum == 7) || (AVNum == 8))){
+			eventFlagdE = true;
+			int impNum = PProcess->GetImprNumber(volName);
+			int PVNum = PProcess->GetPlacementNumber(volName);
+			int section = Process->sectionNumber(volName);
+			std::cout << "     dE-Array Detector: " << " AVNum = " << AVNum << "   impNum = " << impNum <<
+			  "    PVNum = " << PVNum <<  "   SOI = " << section << "   Track = " << TID << std::endl;
+		  }
+		}
+	  }
+
+	  if(eventFlagE && eventFlagdE && AVNum == realAV && ImprNum == realINum && PVNum == realPV && TID == realTID){
 		
-		NpolVertex *intNeutron = verts->at(1);
 		double momX = aVertex->momX; double momY = aVertex->momY; double momZ = aVertex->momZ;
 		double momTot = TMath::Sqrt(momX*momX + momY*momY + momZ*momZ);
-		double P1x = intNeutron->posX; double P1y = intNeutron->posY; double P1z = intNeutron->posZ;
-		double P2x = aVertex->posX; double P2y = aVertex->posY; double P2z = aVertex->posZ;
+		P2x = aVertex->posX; P2y = aVertex->posY; P2z = aVertex->posZ;
 
 		double P2Theta = TMath::ATan(momY/momX);
 		double P2Phi = TMath::ACos(momZ/momTot);
 				
-		double P3x = P2x + 2*TMath::Sin(P2Phi)*TMath::Cos(P2Theta);
-		double P3y = P2y + 2*TMath::Sin(P2Phi)*TMath::Sin(P2Theta);
-		double P3z = P2z + 2*TMath::Cos(P2Phi);
+		P3x = P2x + 2*TMath::Sin(P2Phi)*TMath::Cos(P2Theta);
+		P3y = P2y + 2*TMath::Sin(P2Phi)*TMath::Sin(P2Theta);
+		P3z = P2z + 2*TMath::Cos(P2Phi);
 		double computedAngle = PhysicsVar->getAzimuthAngle(P1x,P1y,P1z,P2x,P2y,P2z,P3x,P3y,P3z);
 		if (computedAngle >= angleLow && computedAngle <= angleHigh) {
 		  h_recoilAngle_Real->Fill(computedAngle);
-		  if(P2y > 0) asym = 1;
-		  if(P2y < 0) asym =-1;
-		  if(P2y == 0) asym = 0;
 		  h_asymmetry_Real->Fill(asym);
 		  h_recoilEnergy_Real->Fill(aVertex->energy);
 		}
 	  }
 	}
 	// END TRACK LOOP
+	// >>>>>>>>>>>>>>> This ends the "real NP scattering" part of the code <<<<<<<<<<<<<<<<<<<
 
-	
+
+	// >>>>>>>>>>>>>>> This begins the "event processing" part of the code <<<<<<<<<<<<<<<<<<<
     // BEGIN STEPS LOOP: Fills the detEvent map with volumes and total energy, etc.
 	std::vector<NpolStep *>::iterator s_it;
 	std::vector<NpolTagger *>::iterator t_it;
@@ -287,7 +354,7 @@ int main(int argc, char *argv[]) {
 
 		// ****** End of the hit position computations section ******* //
 	  }
-    } // END STEPS LOOP
+	} // END STEPS LOOP
 	
 
 	// ***** This Section will retrieve SOI and EOI and then make event selections based on cuts ******* //
@@ -361,6 +428,7 @@ int main(int argc, char *argv[]) {
   runStatistics.Write();
   h_dEoverEtop->Write();
   h_dEoverEbot->Write();
+  h_dEvsE_Real->Write();
   h_totEnergy->Write();
   h_sectionEfficiency1->Write();
   h_sectionEfficiency2->Write();
