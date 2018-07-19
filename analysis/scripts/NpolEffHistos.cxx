@@ -56,6 +56,7 @@ stats_sourceNeutron = (TVectorT<double>*)sourceNeutron->Get("TVectorT<double>;1"
 // The Histograms we are going to make
  TH2F *h_dEoverE_AllEvents_Top;
  TH2F *h_dEoverE_AllEvents_Bot;
+ TH2F *	h_dEvsE_Real;
  TH1F *h_dTOF_AllEvents;
  TH1F *h_sectionEff_AllEvents[4];
  TH1F *h_recoil_angle;
@@ -70,10 +71,12 @@ stats_sourceNeutron = (TVectorT<double>*)sourceNeutron->Get("TVectorT<double>;1"
  TH1F *h_Proton_Energy_Real;
  TH1F *h_asymmetry_Real;
  
+ 
 // Assign Histos from the input file to a pointer
 // dE/E
  h_dEoverE_AllEvents_Top = (TH2F*)sourceNeutron->Get("dEoverEtop;1");
  h_dEoverE_AllEvents_Bot = (TH2F*)sourceNeutron->Get("dEoverEbot;1");
+ h_dEvsE_Real = (TH2F*)sourceNeutron->Get("dEvsE_Real;1");
  TH2F *h_dEoverE_Total = new TH2F("dEoverEtotal", "dE over E for both Top and Bottom", 400,0,120,400,0,20);
  h_dEoverE_Total->Add(h_dEoverE_AllEvents_Top,h_dEoverE_AllEvents_Bot);
  
@@ -238,6 +241,8 @@ stats_sourceNeutron = (TVectorT<double>*)sourceNeutron->Get("TVectorT<double>;1"
  h_Proton_Energy_Real->DrawCopy();
  realNPevent->cd(3);
  h_asymmetry_Real->DrawCopy();
+ realNPevent->cd(4);
+ h_dEvsE_Real->DrawCopy();
  
  // Write out canvases to file 
  dEoverE_dToF->Write();
