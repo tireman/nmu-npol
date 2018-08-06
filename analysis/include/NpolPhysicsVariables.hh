@@ -22,13 +22,14 @@ public:
   void GetPoI(double *ret, double *time, const int section, const PolarimeterDetector type, const std::map<std::string,NpolDetectorEvent *> *detEvents); 
   void GetPoI2(double *ret, double *time, const int section, const PolarimeterDetector type, const std::map<std::string,NpolDetectorEvent *> *detEvents);
   double ReturnAngle(NpolVertex *incNeutronVert, std::map<std::string, NpolDetectorEvent *> *detEvents, const int section, const PolarimeterDetector EArrayOfInterest, double *dTOF );
-
+  
   double getEDepCluster(const std::map<std::string,NpolDetectorEvent *> *detEvents, int SOI, PolarimeterDetector detectorOfInterest);
-double getTotalEnergyDep(const std::map<std::string,NpolDetectorEvent *> *detEvents);
-double highestEDepPV(const std::map<std::string,NpolDetectorEvent *> *detEvents, int sectionOfInterest,	 PolarimeterDetector detectorOfInterest);
+  double getTotalEnergyDep(const std::map<std::string,NpolDetectorEvent *> *detEvents);
+  double highestEDepPV(const std::map<std::string,NpolDetectorEvent *> *detEvents, int sectionOfInterest,	 PolarimeterDetector detectorOfInterest);
+  double computeBetheBloch(double KE, double Mass, int z, double rho, double A, int Z, double I);
   
 private:
-   static NpolPhysicsVariables *PhysVars;
+  static NpolPhysicsVariables *PhysVars;
   
 };
 
