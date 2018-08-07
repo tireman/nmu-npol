@@ -2,6 +2,7 @@
 #include "NpolEventPreProcessing.hh"
 #include "NpolEventProcessing.hh"
 #include "NpolPhysicsVariables.hh"
+#include <cmath>
 
 
 NpolPhysicsVariables *NpolPhysicsVariables::PhysVars = NULL;
@@ -274,18 +275,47 @@ double NpolPhysicsVariables::computeBetheBloch(double KE, double Mass, int z, do
   // **** Computed values **** //
   double E = KE; //+ M; // Energy means KE? apparently
   double gamma = 1.+E/M;  // kinematic gamma factor
-  double beta2 = 1. - 1/(gamma*gamma);    // kinematic beta^2 factor
-  double beta = sqrt(beta2);         // beta factor
-  double K = (4. * TMath::Pi() * NA * re*re * mE); // (MeV*cm^2/g)
+  double beta2 = 1. - 1/(pow(gamma,2));    // kinematic beta^2 factor
+  //double beta = sqrt(beta2);         // beta factor
+  double K = (4. * TMath::Pi() * NA * pow(re,2) * mE); // (MeV*cm^2/g)
   
-  double Tmax = (2*mE*beta2*gamma*gamma)/(1+2*gamma*(mE/M)+ (mE/M)*(mE/M));
+  double Tmax = (2*mE*beta2*pow(gamma,2))/(1+2*gamma*(mE/M)+ pow((mE/M),2));
 
   // Correction factor that isn't working yet.  needed for higher energies?
   //hw = sqrt(4*pi()*Ne*re^3)*mE/alpha;
   //densityCorr = log(hw/I) + log(beta*gamma) - 0.5;
   //densityCorr = log(beta.*gamma);
   
-  double stoppingPower = ((rho*K*z*z*Z)/(A*beta2))*(0.5*log((2*mE*beta2*gamma*gamma*Tmax)/(I*I)) - beta2);
+  double stoppingPower = ((rho*K*z*z*Z)/(A*beta2))*(0.5*log((2*mE*beta2*pow(gamma,2)*Tmax)/(I*I)) - beta2);
   // - densityCorr*beta*gamma);
   return stoppingPower;
+}
+
+double NpolPhysicsVariables::computeEnergyLoss(double protonEnergy, double thetaP, double scintThick){
+
+  // **** This energy loss computation is designed for proton on plastic scintillator at the moment **** //
+  double A = 12.929;  // atomic mass number for plastic scintillator
+  int z = 1; // atomic number of projectile (proton currently)
+  int Z = 7; // atomic number of detector material (plastic scintillator)
+  double I = 64.7e-6; // Ionization energy of plastic scintillator
+  double rho = 1.032; // (g/cm^3) density of plastsic scintillator
+  double mP = 938.27205; // (MeV/c^2) mass of proton
+  
+  //Compute the Energy Deposition variables
+  int N = 100;// number of slices of scintillator
+  double deltaD = (scintThick)/sin(thetaP);   // (cm)
+  double dT = deltaD/N;  // transport thickness
+  double stopPower = 0.0;
+  double Eloss = 0.0;
+  double pEnergy = 0.0;  // present energy value
+  
+  for(int i = 0; i < N; i++){
+	pEnergy = protonEnergy - Eloss; 
+	if(pEnergy < 0) break;
+	stopPower = computeBetheBloch(pEnergy,mP,z,rho,A,Z,I);
+	Eloss += stopPower*dT;
+	if(Eloss >= protonEnergy){ Eloss = protonEnergy; break;}
+  }
+  
+  return Eloss;
 }

@@ -27,6 +27,8 @@ public:
   double getTotalEnergyDep(const std::map<std::string,NpolDetectorEvent *> *detEvents);
   double highestEDepPV(const std::map<std::string,NpolDetectorEvent *> *detEvents, int sectionOfInterest,	 PolarimeterDetector detectorOfInterest);
   double computeBetheBloch(double KE, double Mass, int z, double rho, double A, int Z, double I);
+  double computeEnergyLoss(double protonEnergy, double thetaP, double scintThick);
+  
   
 private:
   static NpolPhysicsVariables *PhysVars;
