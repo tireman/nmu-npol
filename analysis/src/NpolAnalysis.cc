@@ -87,7 +87,7 @@ int main(int argc, char *argv[]) {
   TH1F *h_recoilAngle_Real = new TH1F("recoilAngle_Real","Real Proton Recoil Angle",200, 0.0, 180.0);
   TH1F *h_recoilEnergy_Real = new TH1F("recoilEnergy_Real","Real Proton Recoil Energy",200, 000.0, 2400.);
   TH1F *h_asymmetry_Real = new TH1F("asymmetry_Real","Real Asymmetry from Recoil Proton",5, -2,+2);
-  
+	
   TH1F *h_recoilAngle = new TH1F("recoil_angle","Proton Recoil Angle", 200, 0.0, 180.0); 
   TH1F *h_recoilAngle_Raw = new TH1F("recoil_angle_raw","Proton Recoil Angle Before Angle Cut", 200, 0.0, 180.0);
   TH1F *h_Neutron_Theta_Angle = new TH1F("Neutron_Theta_Angle","Neutron Angle at first tagger", 100, 15.0, 40.0);
@@ -165,7 +165,7 @@ int main(int argc, char *argv[]) {
 	  // We cut on parent ID = 1 (original neutron), track ID > 2 (could be changed later,
 	  // particle type = proton (2212), physics process = hadron elastic, and AV number
 	  // between 9 and 10 (analyzer volume)
-	  if((PID == 1 && TID == 2 && pType == 2212 && process == "neutronInelastic") && (AVNum == 9 || AVNum == 10)
+	  if((PID == 1 && TID >= 2 && pType == 2212 && process == "neutronInelastic") && (AVNum == 9 || AVNum == 10)
 		 && !inelasticFlag){
 		
 		NpolVertex *firstVertex = verts->at(1);
@@ -254,7 +254,7 @@ int main(int argc, char *argv[]) {
 	  }
 
 	  if(eventFlagE && eventFlagdE && AVNum == realAV && ImprNum == realINum && PVNum == realPV && TID == realTID){
-		
+		gRandom = new TRandom();
 		double momX = aVertex->momX; double momY = aVertex->momY; double momZ = aVertex->momZ;
 		double momTot = TMath::Sqrt(momX*momX + momY*momY + momZ*momZ);
 		P2x = aVertex->posX; P2y = aVertex->posY; P2z = aVertex->posZ;
@@ -270,6 +270,16 @@ int main(int argc, char *argv[]) {
 		  h_recoilAngle_Real->Fill(computedAngle);
 		  h_asymmetry_Real->Fill(asym);
 		  h_recoilEnergy_Real->Fill(aVertex->energy);
+		  double sPower =  PhysicsVar->computeBetheBloch(aVertex->energy,938.27205,1,1.032,12.929,7,64.7e-6);
+
+		  double dEenergyLost = PhysicsVar->computeEnergyLoss(aVertex->energy, TMath::DegToRad()*computedAngle, 1. /*cm*/);
+		  //dEenergyLost = dEenergyLost*gRandom->Gaus(dEenergyLost, 0.10);
+		  double EenergyLost = PhysicsVar->computeEnergyLoss(aVertex->energy, TMath::DegToRad()*computedAngle, 10. /*cm*/);
+		  //EenergyLost = EenergyLost*gRandom->Gaus(EenergyLost, 0.10);
+
+		  h_dEvsE_Real->Fill(EenergyLost,dEenergyLost);
+		  std::cout << "Stopping Power = " << sPower << "   Proton Energy Loss in dE-array = " << dEenergyLost
+					<< "   Proton Energy Loss in E-array = " << EenergyLost << std::endl;
 		}
 	  }
 	}
