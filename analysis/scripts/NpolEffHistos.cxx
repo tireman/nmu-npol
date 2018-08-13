@@ -236,13 +236,35 @@ stats_sourceNeutron = (TVectorT<double>*)sourceNeutron->Get("TVectorT<double>;1"
 
  realNPevent->Divide(3,2,0.0001, 0.00001,0);
  realNPevent->cd(1);
+ h_Proton_Recoil_Real->GetXaxis()->SetTitle("Proton Recoil Angle (deg)");
+ h_Proton_Recoil_Real->GetYaxis()->SetTitle("Proton Count");
+ h_Proton_Recoil_Real->GetXaxis()->SetNdivisions(9);
+ h_Proton_Recoil_Real->SetTitleSize(0.05);
+ h_Proton_Recoil_Real->SetTitleSize(0.05);
  h_Proton_Recoil_Real->DrawCopy();
  realNPevent->cd(2);
+ h_Proton_Energy_Real->GetXaxis()->SetTitle("Proton Recoil Energy (MeV)");
+ h_Proton_Energy_Real->GetYaxis()->SetTitle("Proton Count");
+ h_Proton_Energy_Real->GetXaxis()->SetNdivisions(9);
+ h_Proton_Energy_Real->SetTitleSize(0.05);
+ h_Proton_Energy_Real->SetTitleSize(0.05);
  h_Proton_Energy_Real->DrawCopy();
  realNPevent->cd(3);
+ h_asymmetry_Real->GetXaxis()->SetTitle("Proton Recoil Asymmetry");
+ h_asymmetry_Real->GetYaxis()->SetTitle("Proton Count");
+ h_asymmetry_Real->GetXaxis()->SetNdivisions(4);
+ h_asymmetry_Real->SetTitleSize(0.05);
+ h_asymmetry_Real->SetTitleSize(0.05);
+ h_asymmetry_Real->DrawCopy();
  h_asymmetry_Real->DrawCopy();
  realNPevent->cd(4);
- h_dEvsE_Real->DrawCopy();
+ h_dEvsE_Real->GetXaxis()->SetTitle("E-Array Energy Deposited (MeV)");
+ h_dEvsE_Real->GetXaxis()->SetTitleSize(0.05);
+ h_dEvsE_Real->GetYaxis()->SetTitleSize(0.05);
+ h_dEvsE_Real->GetYaxis()->SetTitle("dE-Array Energy Deposited (MeV)");
+ h_dEvsE_Real->Rebin2D(2);
+ h_dEvsE_Real->DrawCopy("cont4");
+ //h_dEvsE_Real->DrawCopy();
  
  // Write out canvases to file 
  dEoverE_dToF->Write();
