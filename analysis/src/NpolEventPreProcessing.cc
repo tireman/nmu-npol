@@ -52,9 +52,8 @@ void  NpolEventPreProcessing::AnalyzerTaggerHitPosition(double hPos[],double lPo
   double DetSpacing = 65.; // (cm)
   double TaggerOffset = 693.; // (cm)
   
-  gRandom = new TRandom();
   do{
-	hPos[0] = lPos[0] + gRandom->Gaus(0.0, 2.0);
+	hPos[0] = lPos[0] + rand->Gaus(0.0,2.0);
   } while (TMath::Abs(hPos[0]) > 50.0);
   hPos[1] = 0.0;
   hPos[2] = 0.0;
@@ -79,9 +78,8 @@ void  NpolEventPreProcessing::DeltaEarrayHitPosition(double hPos[],double lPos[]
   
   double VertOffSet = 42.0;
   
-  gRandom = new TRandom();
   do {
-	hPos[0] = lPos[0] + gRandom->Gaus(0.0, 2.0);
+	hPos[0] = lPos[0] + rand->Gaus(0.0, 2.0);
   } while (TMath::Abs(hPos[0]) > 80.0);
   hPos[1] = 0.0;
   hPos[2] = 0.0;
@@ -109,9 +107,8 @@ void NpolEventPreProcessing::EarrayHitPosition(double hPos[],double lPos[], int 
   //double VertOffSet = 90.0;
   //double HorOffSet = 60.2;
   
-  gRandom = new TRandom();
   do {
-	hPos[0] = lPos[0] + gRandom->Gaus(0.0, 2.0);
+	hPos[0] = lPos[0] + rand->Gaus(0.0, 2.0);
   } while (TMath::Abs(hPos[0]) > 80.0);
   hPos[1] = 0.0;
   hPos[2] = 0.0;
