@@ -25,6 +25,7 @@
 #include "TStyle.h"
 #include "TSystem.h"
 #include "TString.h"
+#include "TRandom3.h"
 
 #include "NpolVertex.hh"
 #include "NpolTagger.hh"
@@ -87,7 +88,7 @@ int main(int argc, char *argv[]) {
   TH1F *h_recoilAngle_Real = new TH1F("recoilAngle_Real","Real Proton Recoil Angle",200, 0.0, 180.0);
   TH1F *h_recoilEnergy_Real = new TH1F("recoilEnergy_Real","Real Proton Recoil Energy",200, 000.0, 2400.);
   TH1F *h_asymmetry_Real = new TH1F("asymmetry_Real","Real Asymmetry from Recoil Proton",5, -2,+2);
-	
+    
   TH1F *h_recoilAngle = new TH1F("recoil_angle","Proton Recoil Angle", 200, 0.0, 180.0); 
   TH1F *h_recoilAngle_Raw = new TH1F("recoil_angle_raw","Proton Recoil Angle Before Angle Cut", 200, 0.0, 180.0);
   TH1F *h_Neutron_Theta_Angle = new TH1F("Neutron_Theta_Angle","Neutron Angle at first tagger", 100, 15.0, 40.0);
@@ -99,6 +100,7 @@ int main(int argc, char *argv[]) {
   TH2F *h_dEoverEtop = new TH2F("dEoverEtop", "dE over E for top array", 400,0,120,400,0,20);
   TH2F *h_dEoverEbot = new TH2F("dEoverEbot", "dE over E for bottom array", 400,0,120,400,0,20);
   TH2F *h_dEvsE_Real = new TH2F("dEvsE_Real", "dE over E for Real Events", 400,0,120,400,0,20);
+  TH2F *h_dEvsE_Real2 = new TH2F("dEvsE_Real2", "dE over E for Real Events with Energy Resolution", 400,0,120,400,0,20);
   TH1F *h_sectionEfficiency1 = new TH1F("sectionEfficiency1","NPOL Efficiency after SOI Selection",13,0.25,6.75);
   TH1F *h_sectionEfficiency2 = new TH1F("sectionEfficiency2","#splitline{NPOL Efficiency after EOI Selection}{and Asymmetry Cut}",13,0.25,6.75);
   TH1F *h_sectionEfficiency3 = new TH1F("sectionEfficiency3","#splitline{NPOL Efficiency after Array}{Total Energy Cuts}",13,0.25,6.75);
@@ -121,6 +123,7 @@ int main(int argc, char *argv[]) {
   // BEGIN EVENT LOOP
   int asym = 1;
   int nentries = npolTree->GetEntries();
+  TRandom *rand = new TRandom3();
   for(int i = 0; i < nentries; i++) {
 	//for(int i = 0; i < 1; i++) {
    	if(i % 1000 == 0) std::cout << "Processing event #" << i << std::endl;
@@ -220,8 +223,6 @@ int main(int argc, char *argv[]) {
 		h_Neutron_Momentum_Initial->Fill(totNmom);
 	  }
 
-	  
-	
 	  std::vector<NpolStep *>::iterator s_it;
 	  for(s_it = steps->begin(); s_it != steps->end(); s_it++) {
 	  	NpolStep *aStep = *s_it;
@@ -252,13 +253,12 @@ int main(int argc, char *argv[]) {
 		  }
 		}
 	  }
-
+	  
 	  if(eventFlagE && eventFlagdE && AVNum == realAV && ImprNum == realINum && PVNum == realPV && TID == realTID){
-		gRandom = new TRandom();
 		double momX = aVertex->momX; double momY = aVertex->momY; double momZ = aVertex->momZ;
 		double momTot = TMath::Sqrt(momX*momX + momY*momY + momZ*momZ);
 		P2x = aVertex->posX; P2y = aVertex->posY; P2z = aVertex->posZ;
-
+		
 		double P2Theta = TMath::ATan(momY/momX);
 		double P2Phi = TMath::ACos(momZ/momTot);
 				
@@ -268,16 +268,23 @@ int main(int argc, char *argv[]) {
 		double computedAngle = PhysicsVar->getAzimuthAngle(P1x,P1y,P1z,P2x,P2y,P2z,P3x,P3y,P3z);
 		if (computedAngle >= angleLow && computedAngle <= angleHigh) {
 		  h_recoilAngle_Real->Fill(computedAngle);
+
+		  // Guess at the 'real' asymmetry 
+		  if(momY < 0) asym = -1;
+		  if(momY > 0) asym = +1;
+		  if(momY == 0) asym = 0;
 		  h_asymmetry_Real->Fill(asym);
+
 		  h_recoilEnergy_Real->Fill(aVertex->energy);
 		  double sPower =  PhysicsVar->computeBetheBloch(aVertex->energy,938.27205,1,1.032,12.929,7,64.7e-6);
 
 		  double dEenergyLost = PhysicsVar->computeEnergyLoss(aVertex->energy, TMath::DegToRad()*computedAngle, 1. /*cm*/);
-		  //dEenergyLost = dEenergyLost*gRandom->Gaus(dEenergyLost, 0.10);
+		  Double_t dEenergyLost2 = rand->Gaus(dEenergyLost, 0.10*dEenergyLost);
 		  double EenergyLost = PhysicsVar->computeEnergyLoss(aVertex->energy, TMath::DegToRad()*computedAngle, 10. /*cm*/);
-		  //EenergyLost = EenergyLost*gRandom->Gaus(EenergyLost, 0.10);
+		  Double_t EenergyLost2 = rand->Gaus(EenergyLost, 0.10*EenergyLost);
 
 		  h_dEvsE_Real->Fill(EenergyLost,dEenergyLost);
+		  h_dEvsE_Real2->Fill(EenergyLost2,dEenergyLost2);
 		  std::cout << "Stopping Power = " << sPower << "   Proton Energy Loss in dE-array = " << dEenergyLost
 					<< "   Proton Energy Loss in E-array = " << EenergyLost << std::endl;
 		}
@@ -286,7 +293,7 @@ int main(int argc, char *argv[]) {
 	// END TRACK LOOP
 	// >>>>>>>>>>>>>>> This ends the "real NP scattering" part of the code <<<<<<<<<<<<<<<<<<<
 
-
+	//if(!(eventFlagE && eventFlagdE)) continue;
 	// >>>>>>>>>>>>>>> This begins the "event processing" part of the code <<<<<<<<<<<<<<<<<<<
     // BEGIN STEPS LOOP: Fills the detEvent map with volumes and total energy, etc.
 	std::vector<NpolStep *>::iterator s_it;
@@ -439,6 +446,7 @@ int main(int argc, char *argv[]) {
   h_dEoverEtop->Write();
   h_dEoverEbot->Write();
   h_dEvsE_Real->Write();
+  h_dEvsE_Real2->Write();
   h_totEnergy->Write();
   h_sectionEfficiency1->Write();
   h_sectionEfficiency2->Write();
