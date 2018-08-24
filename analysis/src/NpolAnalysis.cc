@@ -109,10 +109,10 @@ int main(int argc, char *argv[]) {
   //********************************* End Histogram Definitions ********************************
 
   // BEGIN STATS LOOP
-  int totalEvents = 0;
-  int taggedEvents = 0;
-  int eventsPassed = 0;
-  int eventsFailed = 0;
+  int totalEvents = 0;   // Total number of neutrons (events) generated and recorded in the data file
+  int taggedEvents = 0;  // Total number of neutrons (events) which make it through magnets and lead curtain
+  int eventsPassed = 0;  // Total number of neutron scattering events which pass all Proposal 37 cuts
+  int eventsFailed = 0;  // Total number of neutron scattering events which do not pass all Proposal 37 cuts
   
   for(int i = 0; i < statsTree->GetEntries(); i++) {
     statsTree->GetEntry(i);
@@ -293,9 +293,10 @@ int main(int argc, char *argv[]) {
 	// END TRACK LOOP
 	// >>>>>>>>>>>>>>> This ends the "real NP scattering" part of the code <<<<<<<<<<<<<<<<<<<
 
-	//if(!(eventFlagE && eventFlagdE)) continue;
 	// >>>>>>>>>>>>>>> This begins the "event processing" part of the code <<<<<<<<<<<<<<<<<<<
     // BEGIN STEPS LOOP: Fills the detEvent map with volumes and total energy, etc.
+	// This allows only events that pass NP real to be run through "our" cuts
+	if(!(eventFlagE && eventFlagdE)) continue;  
 	std::vector<NpolStep *>::iterator s_it;
 	std::vector<NpolTagger *>::iterator t_it;
 	bool eventFlag = false;
