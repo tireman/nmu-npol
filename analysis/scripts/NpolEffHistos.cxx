@@ -259,7 +259,7 @@ stats_sourceNeutron = (TVectorT<double>*)sourceNeutron->Get("TVectorT<double>;1"
  h_asymmetry_Real->SetTitleSize(0.05);
  h_asymmetry_Real->SetTitleSize(0.05);
  h_asymmetry_Real->DrawCopy();
- h_asymmetry_Real->DrawCopy();
+ std::cout << "Real Up/Down asymmetry = " << (h_asymmetry_Real->GetBinContent(4)/h_asymmetry_Real->GetBinContent(2)) << std::endl;
  realNPevent->cd(4);
  h_dEvsE_Real->GetXaxis()->SetTitle("E-Array Energy Deposited (MeV)");
  h_dEvsE_Real->GetXaxis()->SetTitleSize(0.05);
