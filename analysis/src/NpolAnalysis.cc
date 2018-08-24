@@ -269,7 +269,7 @@ int main(int argc, char *argv[]) {
 		if (computedAngle >= angleLow && computedAngle <= angleHigh) {
 		  h_recoilAngle_Real->Fill(computedAngle);
 
-		  // Guess at the 'real' asymmetry 
+		  // Guess at the 'real' asymmetry; this is done by looking to see if Y-momentum points up or down
 		  if(momY < 0) asym = -1;
 		  if(momY > 0) asym = +1;
 		  if(momY == 0) asym = 0;
@@ -284,7 +284,7 @@ int main(int argc, char *argv[]) {
 		  Double_t EenergyLost2 = rand->Gaus(EenergyLost, 0.10*EenergyLost);
 
 		  h_dEvsE_Real->Fill(EenergyLost,dEenergyLost);
-		  h_dEvsE_Real2->Fill(EenergyLost2,dEenergyLost2);
+		  h_dEvsE_Real2->Fill(EenergyLost2,dEenergyLost2); // An attempt at "energy" resolution of the scintillators
 		  std::cout << "Stopping Power = " << sPower << "   Proton Energy Loss in dE-array = " << dEenergyLost
 					<< "   Proton Energy Loss in E-array = " << EenergyLost << std::endl;
 		}
