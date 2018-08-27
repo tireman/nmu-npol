@@ -32,6 +32,7 @@ public:
   double eDep;
   int particleId;  // comment out for old electron data
   std::string volume;
+  std::string process;
 
   inline NpolStep() {};
   virtual ~NpolStep() {};
