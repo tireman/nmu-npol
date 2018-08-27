@@ -108,19 +108,20 @@ int main(int argc, char *argv[]) {
   TH1F *h_dTOF = new TH1F("dTOF","Delta time-of-flight",600,-30,120);
   //********************************* End Histogram Definitions ********************************
 
-  // BEGIN STATS LOOP
+  // ****** BEGIN STATS LOOP ******
   int totalEvents = 0;   // Total number of neutrons (events) generated and recorded in the data file
   int taggedEvents = 0;  // Total number of neutrons (events) which make it through magnets and lead curtain
   int eventsPassed = 0;  // Total number of neutron scattering events which pass all Proposal 37 cuts
   int eventsFailed = 0;  // Total number of neutron scattering events which do not pass all Proposal 37 cuts
-  
-  for(int i = 0; i < statsTree->GetEntries(); i++) {
+    for(int i = 0; i < statsTree->GetEntries(); i++) {
     statsTree->GetEntry(i);
     totalEvents += ((*stats)[0])->totalEvents;
-  }// END STATS LOOP
+  }
   std::cout << totalEvents << " neutrons thrown at setup." << std::endl;
-	
-  // BEGIN EVENT LOOP
+  // ****** END STATS LOOP ****** 
+
+  
+  // ****** BEGIN EVENT LOOP ****** 
   int asym = 1;
   int nentries = npolTree->GetEntries();
   TRandom *rand = new TRandom3();
@@ -137,7 +138,7 @@ int main(int argc, char *argv[]) {
     eDepArrayTotal[botEArray] = 0.0;
     eDepArrayTotal[botdEArray] = 0.0;
 
-	// BEGIN TRACK LOOP: Scans Tracks vector (NpolVertex) and fills histograms
+	// ****** BEGIN TRACK LOOP: Scans Tracks vector (NpolVertex) and fills histograms ****** 
 	// This is to analyze sim output for "real" (n,p) scattering events
 	std::vector<NpolVertex *>::iterator v_it;
 	int realAV = 0;
@@ -145,7 +146,7 @@ int main(int argc, char *argv[]) {
 	int realPV = -1;
 	int realSOI = -2;
 	int realTID = -1;
-	bool inelasticFlag = false;
+	bool inelasticFlag = false; bool quasielasticFlag = false; bool elasticFlag = false;
 	
 	// This loop scans through the tracks vector and looks for an (n,p) scattering
 	// event and which assembly volume it occurred in and then saves that AVNum to
@@ -168,18 +169,92 @@ int main(int argc, char *argv[]) {
 	  // We cut on parent ID = 1 (original neutron), track ID > 2 (could be changed later,
 	  // particle type = proton (2212), physics process = hadron elastic, and AV number
 	  // between 9 and 10 (analyzer volume)
-	  if((PID == 1 && TID >= 2 && pType == 2212 && process == "neutronInelastic") && (AVNum == 9 || AVNum == 10)
-		 && !inelasticFlag){
-		
-		NpolVertex *firstVertex = verts->at(1);
-		int numTracks = firstVertex->daughterIds.size();
-		std::cout << "Event #: " << i << "  Neutron Inelastic Event!" << "  Number of daughters from intial neutron: "
-				  << numTracks << std::endl;
-		
-		inelasticFlag = true;
+	  if((process == "neutronInelastic") && !(inelasticFlag || quasielasticFlag)){
+		//if((PID >= 1 && TID >= 2 && pType == 2212) && (AVNum == 9 || AVNum == 10)){
+		  
+		  NpolVertex *firstVertex = verts->at(1);
+		  int numDaughters = firstVertex->daughterIds.size();
+		  if(numDaughters > 3){
+			std::cout << "Event #: " << i << "  Neutron Inelastic Event!" <<
+			  "  Number of daughters from intial neutron: " << numDaughters << std::endl;
+			inelasticFlag = true;
+			
+			/*std::vector<NpolStep *>::iterator s_it;
+			int nCount = 0;
+			NpolVertex *firstVertex = verts->at(1);
+			double nMomInitial = sqrt((firstVertex->momX*firstVertex->momX) + (firstVertex->momY*firstVertex->momY) + (firstVertex->momZ*firstVertex->momZ));
+			std::cout << "Intitial Neutron Momentum = " << nMomInitial << std::endl;
+			for(s_it = steps->begin(); s_it != steps->end(); s_it++) {
+			  nCount++;
+			  NpolStep *aStep = *s_it;
+			  if(aStep == NULL) continue;
+			  int nPID = aStep->parentId; int nTID = aStep->trackId;
+			  if((nPID == 0 && nTID == 1) || (nPID == 1 && nTID >= 2)){
+				double momX = aStep->momX; double momY = aStep->momY; double momZ = aStep->momZ;
+				double momTotal = sqrt(momX*momX + momY*momY + momZ*momZ);
+				if(nPID == 0) std::cout << "Step #: " << nCount << " PID = "<< nPID << " TID = " << nTID
+										<< "   Particle " << aStep->particleId << " current momentum = " << momTotal
+										<< " AV #: " << PProcess->GetAVNumber(aStep->volume) << " Time = " << aStep->time
+										<< std::endl;
+				if(nPID == 1) std::cout << "    Step #: " << nCount << " PID = "<< nPID << " TID = " << nTID
+										<< "   Particle " << aStep->particleId << " current momentum = " << momTotal
+										<< " AV #: " << PProcess->GetAVNumber(aStep->volume) << " Time = " << aStep->time
+										<< std::endl;
+			  }
+			  //}
+			  }*/
+
+		  if(numDaughters == 3){
+			std::cout << "Event #: " << i << "  Neutron Quasielastic Event!" <<
+			  "  Number of daughters from intial neutron: " << numDaughters << std::endl;
+			quasielasticFlag = true;
+		  }
+		}
 	  }
-		
-	  if((PID == 1 && TID >= 2 && pType == 2212 && process == "hadElastic") && (AVNum == 9 || AVNum == 10)){
+	  
+	  if(process == "hadElastic" && !elasticFlag){
+		//if((PID == 1 && TID >= 2 && pType == 2212) && (AVNum == 9 || AVNum == 10)){
+		  NpolVertex *firstVertex = verts->at(1);
+		  int numTracks = firstVertex->daughterIds.size();
+		  std::cout << "Event #: " << i << "  Neutron Elastic Event!" <<
+			"  Number of daughters from intial neutron: " << numTracks << std::endl;
+		  
+		  elasticFlag = true;
+		  
+		  std::vector<NpolStep *>::iterator s_it;
+		  int nCount = 0;
+		  //		  NpolVertex *firstVertex = verts->at(1);
+		  double nMomInitial = sqrt((firstVertex->momX*firstVertex->momX) + (firstVertex->momY*firstVertex->momY) + (firstVertex->momZ*firstVertex->momZ));
+		  std::cout << "Intitial Neutron Momentum = " << nMomInitial << std::endl;
+		  for(s_it = steps->begin(); s_it != steps->end(); s_it++) {
+			nCount++;
+			NpolStep *aStep = *s_it;
+			if(aStep == NULL) continue;
+			int nPID = aStep->parentId; int nTID = aStep->trackId;
+			if((nPID == 0 && nTID == 1) || (nPID == 1 && nTID >= 2)){
+			  double momX = aStep->momX; double momY = aStep->momY; double momZ = aStep->momZ;
+			  double momTotal = sqrt(momX*momX + momY*momY + momZ*momZ);
+			  if(nPID == 0) std::cout << "Step #: " << nCount << " PID = "<< nPID << " TID = " << nTID
+									  << "   Particle " << aStep->particleId << " current momentum = " << momTotal
+									  << " AV #: " << PProcess->GetAVNumber(aStep->volume) << " Time = " << aStep->time
+									  << std::endl;
+			  if(nPID == 1) std::cout << "    Step #: " << nCount << " PID = "<< nPID << " TID = " << nTID
+									  << "   Particle " << aStep->particleId << " current momentum = " << momTotal
+									  << " AV #: " << PProcess->GetAVNumber(aStep->volume) << " Time = " << aStep->time
+									  << std::endl;
+			}
+			//}
+			//}
+		  
+		}
+	  }
+
+	  /*if(PID == 1) std::cout << "Event #: " << i << " AVNum = " << AVNum << "   ImprintNum = "
+							  << ImprNum << "    PVNum = " << PVNum <<  "   SOI = " << section
+							  << "   Track = " << TID << std::endl;*/
+	  
+	  //if((PID == 1 && TID >= 2 && pType == 2212 && process == "hadElastic") && (AVNum == 9 || AVNum == 10)){
+	  if((PID == 1 && TID >= 2 && pType == 2212 && (elasticFlag || quasielasticFlag)) && (AVNum == 9 || AVNum == 10)){
 		if(realSOI == -2 || section < realSOI) {
 		  realAV = AVNum;
 		  realINum = ImprNum;
@@ -189,10 +264,11 @@ int main(int argc, char *argv[]) {
 		}
 	  }
 	}
-	if(realAV != 0) std::cout << "Event #: " << i << " AVNum = " << realAV << "   ImprintNum = "
+	/*if(realAV != 0) std::cout << "Event #: " << i << " AVNum = " << realAV << "   ImprintNum = "
 							  << realINum << "    PVNum = " << realPV <<  "   SOI = " << realSOI
-							  << "   Track = " << realTID << std::endl;
+							  << "   Track = " << realTID << std::endl;*/
 
+		
 	// After determining the 'realAV' which has the (n,p) scattering, we scan through
 	// the tracks vector again to fill the histograms and use 'realAV' as a cut as
 	// necessary
@@ -340,8 +416,7 @@ int main(int argc, char *argv[]) {
 	  
       if(!(detEvents[aStep->volume])->thresholdExceeded &&
 		 (detEvents[aStep->volume])->totEnergyDep >= EDEP_THRESHOLD) {
-		gRandom = new TRandom();
-		
+			
 		(detEvents[aStep->volume])->thresholdExceeded = true;
 		(detEvents[aStep->volume])->lPosX = aStep->lPosX;
 		(detEvents[aStep->volume])->lPosY = aStep->lPosY;
@@ -349,7 +424,7 @@ int main(int argc, char *argv[]) {
 		(detEvents[aStep->volume])->gPosX = aStep->gPosX;
 		(detEvents[aStep->volume])->gPosY = aStep->gPosY;
 		(detEvents[aStep->volume])->gPosZ = aStep->gPosZ;
-		(detEvents[aStep->volume])->time = (aStep->time) + gRandom->Gaus(0.0, 0.200);
+		(detEvents[aStep->volume])->time = (aStep->time) + rand->Gaus(0.0, 0.200);
 
 		//****** Compute the hit position in the volume and save. This is done to "simulate" ****** // 
 		// what we could see in a real scintillation detector based on detector resolutions.
