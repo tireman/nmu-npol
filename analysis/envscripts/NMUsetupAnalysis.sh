@@ -13,7 +13,7 @@ export NPOLBASENAME=source$pType\_Lead$Lead\cm_$Energy\GeV_$Bfield\Bdl
 
 export NPOLDIR=/home/tireman/data1/TargetTaggerSource/$pType\RawSim/$Energy\GeV/$Bfield\Bdl/Lead$Lead\cm/Location_2
 
-export NPOLWORKDIR=/home/tireman/data1/TargetTaggerSource/$pType\RawSim/$Energy\GeV/$Bfield\Bdl/Lead$Lead\cm/Location_2/Testing_7
+export NPOLWORKDIR=/home/tireman/data1/TargetTaggerSource/$pType\RawSim/$Energy\GeV/$Bfield\Bdl/Lead$Lead\cm/Location_2/Test_1 #NPreal_Cut
 
 #export NPOLDIR=/home/tireman/data1/PointSource/NeutronBeam/$Energy\GeV/$Bfield\Bdl/Lead$Lead\cm/Location_2
 #export NPOLWORKDIR=/home/tireman/data1/PointSource/NeutronBeam/$Energy\GeV/$Bfield\Bdl/Lead$Lead\cm/Location_2
@@ -59,6 +59,11 @@ fi
 if [ ! -e $NPOLDIR/dumpFiles ]
 then
 	mkdir $NPOLDIR/dumpFiles
+fi
+
+if [ ! -e $NPOLWORKDIR/dumpFiles ]
+then
+	mkdir $NPOLWORKDIR/dumpFiles
 fi
 
 if [ ! -e $NPOLWORKDIR/histos ]
