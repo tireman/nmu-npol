@@ -9,7 +9,7 @@
 #include <string>
 #include "TString.h"
 #include "TMath.h"
-#include "TRandom.h"
+#include "TRandom3.h"
 
 class NpolEventPreProcessing {
   
@@ -31,7 +31,7 @@ public:
   
 private:
   static NpolEventPreProcessing *PreProcess;
-
+  TRandom *rand = new TRandom3();
 };
 
 

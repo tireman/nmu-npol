@@ -231,7 +231,7 @@ int NpolEventProcessing::getSectionOfInterest(const std::map<std::string,NpolDet
 
   // Reject events with more than 40 detectors with hits above 0.040 MeV; Otherwise return the ID'd section of interest
   if((sectionOfInterest != -1) && (totalDetHit >= 40)) { 
-	std::cout << "Event Rejected! Total number of detectors with 40 keV or greater: " << totalDetHit << std::endl;
+	std::cout << "Event #  Rejected! Total number of detectors with 40 keV or greater: " << totalDetHit << std::endl;
 	  sectionOfInterest = -1;
   }
   
@@ -265,7 +265,7 @@ PolarimeterDetector NpolEventProcessing::getEArrayOfInterest(std::map<std::strin
     if(!(topdEFlag) && botdEFlag) EOI = botEArray;
   } else {
     EOI = unknown;
-	std::cout << "Failed to detect top or bottom E-array" << std::endl;
+	//std::cout << "Failed to detect top or bottom E-array" << std::endl;
   }
 
   return EOI;

@@ -1,7 +1,8 @@
-/* Npol Analysis Script is designed to analyze the neutron flux on the NPOL polarimeter being
-   designed by the CGEN collaboration at Jefferson National Laboratory. (2016)
-   Revisions: Spring 2017 by Will Tireman and Ashley Adzima (added some histograms)
-   Revisions: January-March 2018 by Will Tireman (Fixed eff. calculation, cleaned up code)
+/* Npol Analysis Script is designed to analyze the neutron flux on 
+   the NPOL polarimeter being designed by the CGEN collaboration at 
+   Jefferson National Laboratory. (2016) Revisions: Spring 2017 by 
+   Will Tireman and Ashley Adzima (added some histograms) Revisions: 
+   January-March 2018 by Will Tireman (Fixed eff. calculation, cleaned up code)
 */
 
 #include <iostream>
@@ -24,6 +25,7 @@
 #include "TStyle.h"
 #include "TSystem.h"
 #include "TString.h"
+#include "TRandom3.h"
 
 #include "NpolVertex.hh"
 #include "NpolTagger.hh"
@@ -86,7 +88,7 @@ int main(int argc, char *argv[]) {
   TH1F *h_recoilAngle_Real = new TH1F("recoilAngle_Real","Real Proton Recoil Angle",200, 0.0, 180.0);
   TH1F *h_recoilEnergy_Real = new TH1F("recoilEnergy_Real","Real Proton Recoil Energy",200, 000.0, 2400.);
   TH1F *h_asymmetry_Real = new TH1F("asymmetry_Real","Real Asymmetry from Recoil Proton",5, -2,+2);
-  
+    
   TH1F *h_recoilAngle = new TH1F("recoil_angle","Proton Recoil Angle", 200, 0.0, 180.0); 
   TH1F *h_recoilAngle_Raw = new TH1F("recoil_angle_raw","Proton Recoil Angle Before Angle Cut", 200, 0.0, 180.0);
   TH1F *h_Neutron_Theta_Angle = new TH1F("Neutron_Theta_Angle","Neutron Angle at first tagger", 100, 15.0, 40.0);
@@ -97,6 +99,8 @@ int main(int argc, char *argv[]) {
   TH1F *h_totEnergy = new TH1F("totEnergy","Total Energy Deposited", 100, 0.0, 350.0);
   TH2F *h_dEoverEtop = new TH2F("dEoverEtop", "dE over E for top array", 400,0,120,400,0,20);
   TH2F *h_dEoverEbot = new TH2F("dEoverEbot", "dE over E for bottom array", 400,0,120,400,0,20);
+  TH2F *h_dEvsE_Real = new TH2F("dEvsE_Real", "dE over E for Real Events", 400,0,120,400,0,20);
+  TH2F *h_dEvsE_Real2 = new TH2F("dEvsE_Real2", "dE over E for Real Events with Energy Resolution", 400,0,120,400,0,20);
   TH1F *h_sectionEfficiency1 = new TH1F("sectionEfficiency1","NPOL Efficiency after SOI Selection",13,0.25,6.75);
   TH1F *h_sectionEfficiency2 = new TH1F("sectionEfficiency2","#splitline{NPOL Efficiency after EOI Selection}{and Asymmetry Cut}",13,0.25,6.75);
   TH1F *h_sectionEfficiency3 = new TH1F("sectionEfficiency3","#splitline{NPOL Efficiency after Array}{Total Energy Cuts}",13,0.25,6.75);
@@ -104,25 +108,26 @@ int main(int argc, char *argv[]) {
   TH1F *h_dTOF = new TH1F("dTOF","Delta time-of-flight",600,-30,120);
   //********************************* End Histogram Definitions ********************************
 
-  // BEGIN STATS LOOP
-  int totalEvents = 0;
-  int taggedEvents = 0;
-  int eventsPassed = 0;
-  int eventsFailed = 0;
-  
-  for(int i = 0; i < statsTree->GetEntries(); i++) {
+  // ****** BEGIN STATS LOOP ******
+  int totalEvents = 0;   // Total number of neutrons (events) generated and recorded in the data file
+  int taggedEvents = 0;  // Total number of neutrons (events) which make it through magnets and lead curtain
+  int eventsPassed = 0;  // Total number of neutron scattering events which pass all Proposal 37 cuts
+  int eventsFailed = 0;  // Total number of neutron scattering events which do not pass all Proposal 37 cuts
+    for(int i = 0; i < statsTree->GetEntries(); i++) {
     statsTree->GetEntry(i);
     totalEvents += ((*stats)[0])->totalEvents;
-  }// END STATS LOOP
+  }
   std::cout << totalEvents << " neutrons thrown at setup." << std::endl;
-	
-  // BEGIN EVENT LOOP
+  // ****** END STATS LOOP ****** 
+
+  
+  // ****** BEGIN EVENT LOOP ****** 
   int asym = 1;
   int nentries = npolTree->GetEntries();
+  TRandom *rand = new TRandom3();
   for(int i = 0; i < nentries; i++) {
-    //for(int i = 0; i < 100; i++) {
-   	if(i % 100 == 0)
-      std::cout << "Processing event #" << i << std::endl;
+	//for(int i = 0; i < 1; i++) {
+   	if(i % 1000 == 0) std::cout << "Processing event #" << i << std::endl;
     npolTree->GetEntry(i);
     std::map<std::string,NpolDetectorEvent *> detEvents;   // Event map (NPOL Detector Class)
 	std::map<PolarimeterDetector, double> eDepArrayTotal;  // Total energy map for each array
@@ -133,52 +138,241 @@ int main(int argc, char *argv[]) {
     eDepArrayTotal[botEArray] = 0.0;
     eDepArrayTotal[botdEArray] = 0.0;
 
-	// BEGIN TRACK LOOP: Scans Vertex (tracks) vector and fills histograms
+	// ****** BEGIN TRACK LOOP: Scans Tracks vector (NpolVertex) and fills histograms ****** 
+	// This is to analyze sim output for "real" (n,p) scattering events
 	std::vector<NpolVertex *>::iterator v_it;
+	int realAV = 0;
+	int realINum = 0;
+	int realPV = -1;
+	int realSOI = -2;
+	int realTID = -1;
+	bool inelasticFlag = false; bool quasielasticFlag = false; bool elasticFlag = false;
 	
+	// This loop scans through the tracks vector and looks for an (n,p) scattering
+	// event and which assembly volume it occurred in and then saves that AVNum to
+	// 'realAV'.  We have to do this first to account for muiltple scattering
+	// and due to the fact that the vertices are not stored in order.
 	for(v_it = verts->begin(); v_it != verts->end(); v_it++){
 	  NpolVertex *aVertex = *v_it;
 	  if(aVertex == NULL) continue;
+	  
 	  int PID = aVertex->parentId;
 	  int TID = aVertex->trackId;
 	  int pType = aVertex->particleId;
 	  std::string process = aVertex->process;
 	  std::string volName = aVertex->volume;
 	  int AVNum = PProcess->GetAVNumber(volName);
+	  int ImprNum = PProcess->GetImprNumber(volName);
+	  int PVNum = PProcess->GetPlacementNumber(volName);
+	  int section = Process->sectionNumber(volName);
 	  
-	  if(PID == 0 && TID == 1){
-		double xMomI = aVertex->momX; double yMomI = aVertex->momY; double zMomI = aVertex->momZ;
-		double totMomI = TMath::Sqrt(TMath::Power(xMomI,2)+TMath::Power(yMomI,2)+TMath::Power(zMomI,2));
-		h_Neutron_Energy_Initial->Fill(aVertex->energy);
-		h_Neutron_Momentum_Initial->Fill(totMomI);
+	  // We cut on parent ID = 1 (original neutron), track ID > 2 (could be changed later,
+	  // particle type = proton (2212), physics process = hadron elastic, and AV number
+	  // between 9 and 10 (analyzer volume)
+	  if((process == "neutronInelastic") && !(inelasticFlag || quasielasticFlag)){
+		//if((PID >= 1 && TID >= 2 && pType == 2212) && (AVNum == 9 || AVNum == 10)){
+		  
+		  NpolVertex *firstVertex = verts->at(1);
+		  int numDaughters = firstVertex->daughterIds.size();
+		  if(numDaughters > 3){
+			std::cout << "Event #: " << i << "  Neutron Inelastic Event!" <<
+			  "  Number of daughters from intial neutron: " << numDaughters << std::endl;
+			inelasticFlag = true;
+			
+			/*std::vector<NpolStep *>::iterator s_it;
+			int nCount = 0;
+			NpolVertex *firstVertex = verts->at(1);
+			double nMomInitial = sqrt((firstVertex->momX*firstVertex->momX) + (firstVertex->momY*firstVertex->momY) + (firstVertex->momZ*firstVertex->momZ));
+			std::cout << "Intitial Neutron Momentum = " << nMomInitial << std::endl;
+			for(s_it = steps->begin(); s_it != steps->end(); s_it++) {
+			  nCount++;
+			  NpolStep *aStep = *s_it;
+			  if(aStep == NULL) continue;
+			  int nPID = aStep->parentId; int nTID = aStep->trackId;
+			  if((nPID == 0 && nTID == 1) || (nPID == 1 && nTID >= 2)){
+				double momX = aStep->momX; double momY = aStep->momY; double momZ = aStep->momZ;
+				double momTotal = sqrt(momX*momX + momY*momY + momZ*momZ);
+				if(nPID == 0) std::cout << "Step #: " << nCount << " PID = "<< nPID << " TID = " << nTID
+										<< "   Particle " << aStep->particleId << " current momentum = " << momTotal
+										<< " AV #: " << PProcess->GetAVNumber(aStep->volume) << " Time = " << aStep->time
+										<< std::endl;
+				if(nPID == 1) std::cout << "    Step #: " << nCount << " PID = "<< nPID << " TID = " << nTID
+										<< "   Particle " << aStep->particleId << " current momentum = " << momTotal
+										<< " AV #: " << PProcess->GetAVNumber(aStep->volume) << " Time = " << aStep->time
+										<< std::endl;
+			  }
+			  //}
+			  }*/
+
+		  if(numDaughters == 3){
+			std::cout << "Event #: " << i << "  Neutron Quasielastic Event!" <<
+			  "  Number of daughters from intial neutron: " << numDaughters << std::endl;
+			quasielasticFlag = true;
+		  }
+		}
+	  }
+	  
+	  if(process == "hadElastic" && !elasticFlag){
+		//if((PID == 1 && TID >= 2 && pType == 2212) && (AVNum == 9 || AVNum == 10)){
+		  NpolVertex *firstVertex = verts->at(1);
+		  int numTracks = firstVertex->daughterIds.size();
+		  std::cout << "Event #: " << i << "  Neutron Elastic Event!" <<
+			"  Number of daughters from intial neutron: " << numTracks << std::endl;
+		  
+		  elasticFlag = true;
+		  
+		  std::vector<NpolStep *>::iterator s_it;
+		  int nCount = 0;
+		  //		  NpolVertex *firstVertex = verts->at(1);
+		  double nMomInitial = sqrt((firstVertex->momX*firstVertex->momX) + (firstVertex->momY*firstVertex->momY) + (firstVertex->momZ*firstVertex->momZ));
+		  std::cout << "Intitial Neutron Momentum = " << nMomInitial << std::endl;
+		  for(s_it = steps->begin(); s_it != steps->end(); s_it++) {
+			nCount++;
+			NpolStep *aStep = *s_it;
+			if(aStep == NULL) continue;
+			int nPID = aStep->parentId; int nTID = aStep->trackId;
+			if((nPID == 0 && nTID == 1) || (nPID == 1 && nTID >= 2)){
+			  double momX = aStep->momX; double momY = aStep->momY; double momZ = aStep->momZ;
+			  double momTotal = sqrt(momX*momX + momY*momY + momZ*momZ);
+			  if(nPID == 0) std::cout << "Step #: " << nCount << " PID = "<< nPID << " TID = " << nTID
+									  << "   Particle " << aStep->particleId << " current momentum = " << momTotal
+									  << " AV #: " << PProcess->GetAVNumber(aStep->volume) << " Time = " << aStep->time
+									  << std::endl;
+			  if(nPID == 1) std::cout << "    Step #: " << nCount << " PID = "<< nPID << " TID = " << nTID
+									  << "   Particle " << aStep->particleId << " current momentum = " << momTotal
+									  << " AV #: " << PProcess->GetAVNumber(aStep->volume) << " Time = " << aStep->time
+									  << std::endl;
+			}
+			//}
+			//}
+		  
+		}
 	  }
 
-	  if((PID == 1 && pType == 2212 && process == "hadElastic") && (AVNum >= 9 && AVNum <= 12)){
-		h_recoilEnergy_Real->Fill(aVertex->energy);
+	  /*if(PID == 1) std::cout << "Event #: " << i << " AVNum = " << AVNum << "   ImprintNum = "
+							  << ImprNum << "    PVNum = " << PVNum <<  "   SOI = " << section
+							  << "   Track = " << TID << std::endl;*/
+	  
+	  //if((PID == 1 && TID >= 2 && pType == 2212 && process == "hadElastic") && (AVNum == 9 || AVNum == 10)){
+	  if((PID == 1 && TID >= 2 && pType == 2212 && (elasticFlag || quasielasticFlag)) && (AVNum == 9 || AVNum == 10)){
+		if(realSOI == -2 || section < realSOI) {
+		  realAV = AVNum;
+		  realINum = ImprNum;
+		  realPV = PVNum;
+		  realSOI = section;
+		  realTID = TID;
+		}
+	  }
+	}
+	/*if(realAV != 0) std::cout << "Event #: " << i << " AVNum = " << realAV << "   ImprintNum = "
+							  << realINum << "    PVNum = " << realPV <<  "   SOI = " << realSOI
+							  << "   Track = " << realTID << std::endl;*/
 
-		NpolVertex *intNeutron = verts->at(1);
+		
+	// After determining the 'realAV' which has the (n,p) scattering, we scan through
+	// the tracks vector again to fill the histograms and use 'realAV' as a cut as
+	// necessary
+	bool eventFlagdE = false; bool eventFlagE = false;
+	for(v_it = verts->begin(); v_it != verts->end(); v_it++){
+	  NpolVertex *aVertex = *v_it;
+	  if(aVertex == NULL) continue;
+	  
+	  int PID = aVertex->parentId;
+	  int TID = aVertex->trackId;
+	  int pType = aVertex->particleId;
+	  std::string process = aVertex->process;
+	  std::string volName = aVertex->volume;
+	  int AVNum = PProcess->GetAVNumber(volName);
+	  int ImprNum = PProcess->GetImprNumber(volName);
+	  int PVNum = PProcess->GetPlacementNumber(volName);
+	  
+	  // Extract out Initial Neutron Information from Tracks vector
+	  double intNmomX = 0.; double intNmomY = 0.; double intNmomZ = 0.; double totNmom = 0.;
+	  double P1x = 0.; double P1y = 0.; double P1z = 0.;
+	  double P2x = 0.; double P2y = 0.; double P2z = 0.;
+	  double P3x = 0.; double P3y = 0.; double P3z = 0.;
+	  if(PID == 0 && TID == 1){
+		intNmomX = aVertex->momX; intNmomY = aVertex->momY; intNmomZ = aVertex->momZ;
+		totNmom = TMath::Sqrt(TMath::Power(intNmomX,2)+TMath::Power(intNmomY,2)+TMath::Power(intNmomZ,2));
+		P1x = aVertex->posX; P1y = aVertex->posY; P1z = aVertex->posZ;
+		h_Neutron_Energy_Initial->Fill(aVertex->energy);
+		h_Neutron_Momentum_Initial->Fill(totNmom);
+	  }
+
+	  std::vector<NpolStep *>::iterator s_it;
+	  for(s_it = steps->begin(); s_it != steps->end(); s_it++) {
+	  	NpolStep *aStep = *s_it;
+	  	if(aStep == NULL) continue;
+
+		int PID = aStep->parentId;
+		int TID = aStep->trackId;
+		int pType = aStep->particleId;
+		if((PID == 1) && (TID == realTID) && (pType == 2212)){
+		  std::string volName = aStep->volume;
+		  int AVNum = PProcess->GetAVNumber(volName);
+		  if(AVNum == -1) continue;
+		  if(!(eventFlagE) && ((AVNum == 1) || (AVNum == 2) || (AVNum == 5) || (AVNum == 6))){
+			eventFlagE = true;
+			int impNum = PProcess->GetImprNumber(volName);
+			int PVNum = PProcess->GetPlacementNumber(volName);
+			int section = Process->sectionNumber(volName);
+			std::cout << "      E-Array Detector: " << " AVNum = " << AVNum << "   impNum = "  << impNum <<
+			  "    PVNum = " << PVNum <<  "   SOI = " << section << "   Track = " << TID << std::endl;
+		  }
+		  if(!(eventFlagdE) && ((AVNum == 3) || (AVNum == 4) || (AVNum == 7) || (AVNum == 8))){
+			eventFlagdE = true;
+			int impNum = PProcess->GetImprNumber(volName);
+			int PVNum = PProcess->GetPlacementNumber(volName);
+			int section = Process->sectionNumber(volName);
+			std::cout << "     dE-Array Detector: " << " AVNum = " << AVNum << "   impNum = " << impNum <<
+			  "    PVNum = " << PVNum <<  "   SOI = " << section << "   Track = " << TID << std::endl;
+		  }
+		}
+	  }
+	  
+	  if(eventFlagE && eventFlagdE && AVNum == realAV && ImprNum == realINum && PVNum == realPV && TID == realTID){
 		double momX = aVertex->momX; double momY = aVertex->momY; double momZ = aVertex->momZ;
 		double momTot = TMath::Sqrt(momX*momX + momY*momY + momZ*momZ);
-		double P1x = intNeutron->posX; double P1y = intNeutron->posY; double P1z = intNeutron->posZ;
-		double P2x = aVertex->posX; double P2y = aVertex->posY; double P2z = aVertex->posZ;
-
+		P2x = aVertex->posX; P2y = aVertex->posY; P2z = aVertex->posZ;
+		
 		double P2Theta = TMath::ATan(momY/momX);
 		double P2Phi = TMath::ACos(momZ/momTot);
 				
-		double P3x = P2x + 2*TMath::Sin(P2Phi)*TMath::Cos(P2Theta);
-		double P3y = P2y + 2*TMath::Sin(P2Phi)*TMath::Sin(P2Theta);
-		double P3z = P2z + 2*TMath::Cos(P2Phi);
+		P3x = P2x + 2*TMath::Sin(P2Phi)*TMath::Cos(P2Theta);
+		P3y = P2y + 2*TMath::Sin(P2Phi)*TMath::Sin(P2Theta);
+		P3z = P2z + 2*TMath::Cos(P2Phi);
 		double computedAngle = PhysicsVar->getAzimuthAngle(P1x,P1y,P1z,P2x,P2y,P2z,P3x,P3y,P3z);
-		h_recoilAngle_Real->Fill(computedAngle);
-		//HistMan->FillHistograms("h_recoilAngle_Real",computedAngle);
-		asym = -1*asym;
-		h_asymmetry_Real->Fill(asym);
+		if (computedAngle >= angleLow && computedAngle <= angleHigh) {
+		  h_recoilAngle_Real->Fill(computedAngle);
+
+		  // Guess at the 'real' asymmetry; this is done by looking to see if Y-momentum points up or down
+		  if(momY < 0) asym = -1;
+		  if(momY > 0) asym = +1;
+		  if(momY == 0) asym = 0;
+		  h_asymmetry_Real->Fill(asym);
+
+		  h_recoilEnergy_Real->Fill(aVertex->energy);
+		  double sPower =  PhysicsVar->computeBetheBloch(aVertex->energy,938.27205,1,1.032,12.929,7,64.7e-6);
+
+		  double dEenergyLost = PhysicsVar->computeEnergyLoss(aVertex->energy, TMath::DegToRad()*computedAngle, 1. /*cm*/);
+		  Double_t dEenergyLost2 = rand->Gaus(dEenergyLost, 0.10*dEenergyLost);
+		  double EenergyLost = PhysicsVar->computeEnergyLoss(aVertex->energy, TMath::DegToRad()*computedAngle, 10. /*cm*/);
+		  Double_t EenergyLost2 = rand->Gaus(EenergyLost, 0.10*EenergyLost);
+
+		  h_dEvsE_Real->Fill(EenergyLost,dEenergyLost);
+		  h_dEvsE_Real2->Fill(EenergyLost2,dEenergyLost2); // An attempt at "energy" resolution of the scintillators
+		  std::cout << "Stopping Power = " << sPower << "   Proton Energy Loss in dE-array = " << dEenergyLost
+					<< "   Proton Energy Loss in E-array = " << EenergyLost << std::endl;
+		}
 	  }
 	}
 	// END TRACK LOOP
+	// >>>>>>>>>>>>>>> This ends the "real NP scattering" part of the code <<<<<<<<<<<<<<<<<<<
 
-	
+	// >>>>>>>>>>>>>>> This begins the "event processing" part of the code <<<<<<<<<<<<<<<<<<<
     // BEGIN STEPS LOOP: Fills the detEvent map with volumes and total energy, etc.
+	// This allows only events that pass NP real to be run through "our" cuts
+	if(!(eventFlagE && eventFlagdE)) continue;  
 	std::vector<NpolStep *>::iterator s_it;
 	std::vector<NpolTagger *>::iterator t_it;
 	bool eventFlag = false;
@@ -222,8 +416,7 @@ int main(int argc, char *argv[]) {
 	  
       if(!(detEvents[aStep->volume])->thresholdExceeded &&
 		 (detEvents[aStep->volume])->totEnergyDep >= EDEP_THRESHOLD) {
-		gRandom = new TRandom();
-		
+			
 		(detEvents[aStep->volume])->thresholdExceeded = true;
 		(detEvents[aStep->volume])->lPosX = aStep->lPosX;
 		(detEvents[aStep->volume])->lPosY = aStep->lPosY;
@@ -231,7 +424,7 @@ int main(int argc, char *argv[]) {
 		(detEvents[aStep->volume])->gPosX = aStep->gPosX;
 		(detEvents[aStep->volume])->gPosY = aStep->gPosY;
 		(detEvents[aStep->volume])->gPosZ = aStep->gPosZ;
-		(detEvents[aStep->volume])->time = (aStep->time) + gRandom->Gaus(0.0, 0.200);
+		(detEvents[aStep->volume])->time = (aStep->time) + rand->Gaus(0.0, 0.200);
 
 		//****** Compute the hit position in the volume and save. This is done to "simulate" ****** // 
 		// what we could see in a real scintillation detector based on detector resolutions.
@@ -254,7 +447,7 @@ int main(int argc, char *argv[]) {
 
 		// ****** End of the hit position computations section ******* //
 	  }
-    } // END STEPS LOOP
+	} // END STEPS LOOP
 	
 
 	// ***** This Section will retrieve SOI and EOI and then make event selections based on cuts ******* //
@@ -328,6 +521,8 @@ int main(int argc, char *argv[]) {
   runStatistics.Write();
   h_dEoverEtop->Write();
   h_dEoverEbot->Write();
+  h_dEvsE_Real->Write();
+  h_dEvsE_Real2->Write();
   h_totEnergy->Write();
   h_sectionEfficiency1->Write();
   h_sectionEfficiency2->Write();
@@ -382,3 +577,7 @@ int main(int argc, char *argv[]) {
 // range of neutron scattering angles of 4-25 degrees, we applied correspondent cuts on the
 // "recoil proton" scattering angle (viz. 45.3-81.6 degrees at Q^2 = 3.95 (GeV/c)^2,
 // 40.8-80.2 degrees at 5.22 (GeV/c)^2, and 36.0-78.3 degrees at 6.88 (GeV/c)^2).
+
+/*if((PID == 1 && TID >= 2 && pType == 2212 && process == "hadElastic") && (AVNum >= 9 && AVNum <= 12)){
+		std::cout << "Event Number= : " << i << "   PID= " << aVertex->parentId << "   TID= " << aVertex->trackId << "   pType= " << aVertex->particleId << "   Process= " << aVertex->process << std::endl;
+		}*/

@@ -21,7 +21,7 @@
 #include "NpolTagger.hh"
 #include "NpolStatistics.hh"
 
-#define OUTFILE_VERSION 20180423 // Determined by YYYYMMDD
+#define OUTFILE_VERSION 20180827 // Determined by YYYYMMDD
 
 NpolAnalysisManager *NpolAnalysisManager::pInstance = NULL;
 
@@ -177,6 +177,7 @@ void NpolAnalysisManager::RecordTrack(const G4Track *aTrack) {
 void NpolAnalysisManager::RecordStep(const G4Step *aStep) {
 	G4Track *aTrack = aStep->GetTrack();
 	G4StepPoint *preStepPoint = aStep->GetPreStepPoint();
+	G4StepPoint *postStepPoint = aStep->GetPostStepPoint();
 	std::string volName = preStepPoint->GetPhysicalVolume()->GetName();
 	G4ThreeVector worldPosition = preStepPoint->GetPosition();
 	G4ThreeVector localPosition = preStepPoint->GetTouchableHandle()->GetHistory()
@@ -200,6 +201,11 @@ void NpolAnalysisManager::RecordStep(const G4Step *aStep) {
 		npolStep->eDep = (aStep->GetTotalEnergyDeposit())/MeV;
 		npolStep->particleId = aTrack->GetDefinition()->GetPDGEncoding();
 		npolStep->volume = volName;
+		if(postStepPoint->GetProcessDefinedStep() != NULL)
+		  npolStep->process = (postStepPoint->GetProcessDefinedStep()->GetProcessName());
+		else
+		  npolStep->process = "";
+		
 		steps->push_back(npolStep);
 	}
 

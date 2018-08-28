@@ -56,6 +56,8 @@ stats_sourceNeutron = (TVectorT<double>*)sourceNeutron->Get("TVectorT<double>;1"
 // The Histograms we are going to make
  TH2F *h_dEoverE_AllEvents_Top;
  TH2F *h_dEoverE_AllEvents_Bot;
+ TH2F *h_dEvsE_Real;
+ TH2F *h_dEvsE_Real2;
  TH1F *h_dTOF_AllEvents;
  TH1F *h_sectionEff_AllEvents[4];
  TH1F *h_recoil_angle;
@@ -70,10 +72,14 @@ stats_sourceNeutron = (TVectorT<double>*)sourceNeutron->Get("TVectorT<double>;1"
  TH1F *h_Proton_Energy_Real;
  TH1F *h_asymmetry_Real;
  
+ 
 // Assign Histos from the input file to a pointer
+ 
 // dE/E
  h_dEoverE_AllEvents_Top = (TH2F*)sourceNeutron->Get("dEoverEtop;1");
  h_dEoverE_AllEvents_Bot = (TH2F*)sourceNeutron->Get("dEoverEbot;1");
+ h_dEvsE_Real = (TH2F*)sourceNeutron->Get("dEvsE_Real;1");
+ h_dEvsE_Real2 = (TH2F*)sourceNeutron->Get("dEvsE_Real2;1");
  TH2F *h_dEoverE_Total = new TH2F("dEoverEtotal", "dE over E for both Top and Bottom", 400,0,120,400,0,20);
  h_dEoverE_Total->Add(h_dEoverE_AllEvents_Top,h_dEoverE_AllEvents_Bot);
  
@@ -233,11 +239,41 @@ stats_sourceNeutron = (TVectorT<double>*)sourceNeutron->Get("TVectorT<double>;1"
 
  realNPevent->Divide(3,2,0.0001, 0.00001,0);
  realNPevent->cd(1);
+ h_Proton_Recoil_Real->GetXaxis()->SetTitle("Proton Recoil Angle (deg)");
+ h_Proton_Recoil_Real->GetYaxis()->SetTitle("Proton Count");
+ h_Proton_Recoil_Real->GetXaxis()->SetNdivisions(9);
+ h_Proton_Recoil_Real->SetTitleSize(0.05);
+ h_Proton_Recoil_Real->SetTitleSize(0.05);
  h_Proton_Recoil_Real->DrawCopy();
  realNPevent->cd(2);
+ h_Proton_Energy_Real->GetXaxis()->SetTitle("Proton Recoil Energy (MeV)");
+ h_Proton_Energy_Real->GetYaxis()->SetTitle("Proton Count");
+ h_Proton_Energy_Real->GetXaxis()->SetNdivisions(9);
+ h_Proton_Energy_Real->SetTitleSize(0.05);
+ h_Proton_Energy_Real->SetTitleSize(0.05);
  h_Proton_Energy_Real->DrawCopy();
  realNPevent->cd(3);
+ h_asymmetry_Real->GetXaxis()->SetTitle("Proton Recoil Asymmetry");
+ h_asymmetry_Real->GetYaxis()->SetTitle("Proton Count");
+ h_asymmetry_Real->GetXaxis()->SetNdivisions(4);
+ h_asymmetry_Real->SetTitleSize(0.05);
+ h_asymmetry_Real->SetTitleSize(0.05);
  h_asymmetry_Real->DrawCopy();
+ std::cout << "Real Up/Down asymmetry = " << (h_asymmetry_Real->GetBinContent(4)/h_asymmetry_Real->GetBinContent(2)) << std::endl;
+ realNPevent->cd(4);
+ h_dEvsE_Real->GetXaxis()->SetTitle("E-Array Energy Deposited (MeV)");
+ h_dEvsE_Real->GetXaxis()->SetTitleSize(0.05);
+ h_dEvsE_Real->GetYaxis()->SetTitleSize(0.05);
+ h_dEvsE_Real->GetYaxis()->SetTitle("dE-Array Energy Deposited (MeV)");
+ h_dEvsE_Real->Rebin2D(2);
+ h_dEvsE_Real->DrawCopy("cont4");
+ realNPevent->cd(5);
+ h_dEvsE_Real2->GetXaxis()->SetTitle("E-Array Energy Deposited (MeV)");
+ h_dEvsE_Real2->GetXaxis()->SetTitleSize(0.05);
+ h_dEvsE_Real2->GetYaxis()->SetTitleSize(0.05);
+ h_dEvsE_Real2->GetYaxis()->SetTitle("dE-Array Energy Deposited (MeV)");
+ h_dEvsE_Real2->Rebin2D(2);
+ h_dEvsE_Real2->DrawCopy("cont4");
  
  // Write out canvases to file 
  dEoverE_dToF->Write();

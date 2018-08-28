@@ -2,6 +2,7 @@
 #include "NpolEventPreProcessing.hh"
 #include "NpolEventProcessing.hh"
 #include "NpolPhysicsVariables.hh"
+#include <cmath>
 
 
 NpolPhysicsVariables *NpolPhysicsVariables::PhysVars = NULL;
@@ -241,4 +242,80 @@ double NpolPhysicsVariables::highestEDepPV(const std::map<std::string,NpolDetect
     }
   }
   return highestE_Dep;
+}
+
+double NpolPhysicsVariables::computeBetheBloch(double KE, double Mass, int z, double rho, double A, int Z, double I){
+
+  /*   This function computes the stopping power of a charged 
+	   particle throughMatter using Bethe formula. Returns the
+	   stopping power in units of MeV/cm.
+	   Detailed explanation goes here
+  */
+  
+  /* Inputs
+	 KE = kinetic energy of incident particle (MeV)
+	 M = mass of incident particle (MeV/c^2)
+	 z = atomic number of incident particle
+	 rho = density of absorber
+	 A = 12.929;  // (g/mol) Atomic Mass of Absorber (plastic Scintillator)
+	 Z = 7; // Atomic Number of Absorber (plastic Scintillator)
+	 I = 64.7 * 10 ^(-6); // (MeV) (plastic scintillator)
+  */
+  // **** Constants **** //
+  //double c = 2.998e8;  // speed-of-light
+  //double MolarMassConstant = 1; // (g/mol)
+  //double alpha = 1/137.035; // fine structure constant
+  //double Ne = (NA * Z * rho)/(A * MolarMassConstant);
+  // Tc = 00.000350; // (MeV) // no clue; Critical thingy // not used currently
+  double M = Mass; // * c^2;
+  double mE = 0.510998; // (MeV) mass-energy of electron
+  double NA = 6.0221409e23;// Avogadro's Number
+  double re = 2.817940e-15 * 100.; // (cm) Classical electron Radius
+
+  // **** Computed values **** //
+  double E = KE; //+ M; // Energy means KE? apparently
+  double gamma = 1.+E/M;  // kinematic gamma factor
+  double beta2 = 1. - 1/(pow(gamma,2));    // kinematic beta^2 factor
+  //double beta = sqrt(beta2);         // beta factor
+  double K = (4. * TMath::Pi() * NA * pow(re,2) * mE); // (MeV*cm^2/g)
+  
+  double Tmax = (2*mE*beta2*pow(gamma,2))/(1+2*gamma*(mE/M)+ pow((mE/M),2));
+
+  // Correction factor that isn't working yet.  needed for higher energies?
+  //hw = sqrt(4*pi()*Ne*re^3)*mE/alpha;
+  //densityCorr = log(hw/I) + log(beta*gamma) - 0.5;
+  //densityCorr = log(beta.*gamma);
+  
+  double stoppingPower = ((rho*K*z*z*Z)/(A*beta2))*(0.5*log((2*mE*beta2*pow(gamma,2)*Tmax)/(I*I)) - beta2);
+  // - densityCorr*beta*gamma);
+  return stoppingPower;
+}
+
+double NpolPhysicsVariables::computeEnergyLoss(double protonEnergy, double thetaP, double scintThick){
+
+  // **** This energy loss computation is designed for proton on plastic scintillator at the moment **** //
+  double A = 12.929;  // atomic mass number for plastic scintillator
+  int z = 1; // atomic number of projectile (proton currently)
+  int Z = 7; // atomic number of detector material (plastic scintillator)
+  double I = 64.7e-6; // Ionization energy of plastic scintillator
+  double rho = 1.032; // (g/cm^3) density of plastsic scintillator
+  double mP = 938.27205; // (MeV/c^2) mass of proton
+  
+  //Compute the Energy Deposition variables
+  int N = 100;// number of slices of scintillator
+  double deltaD = (scintThick)/sin(thetaP);   // (cm)
+  double dT = deltaD/N;  // transport thickness
+  double stopPower = 0.0;
+  double Eloss = 0.0;
+  double pEnergy = 0.0;  // present energy value
+  
+  for(int i = 0; i < N; i++){
+	pEnergy = protonEnergy - Eloss; 
+	if(pEnergy < 0) break;
+	stopPower = computeBetheBloch(pEnergy,mP,z,rho,A,Z,I);
+	Eloss += stopPower*dT;
+	if(Eloss >= protonEnergy){ Eloss = protonEnergy; break;}
+  }
+  
+  return Eloss;
 }
