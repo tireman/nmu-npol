@@ -150,7 +150,6 @@ int main(int argc, char *argv[]) {
 	int nCount = 0;
 
 	std::vector<NpolStep *>::iterator ps_it;
-	std::cout << "Processing event #" << i << std::endl;
 	for(ps_it = steps->begin(); ps_it != steps->end(); ps_it++) {
 	  nCount++;
 	  NpolStep *aStep = *ps_it;
@@ -180,11 +179,11 @@ int main(int argc, char *argv[]) {
 
 		double momX = aStep->momX; double momY = aStep->momY; double momZ = aStep->momZ;
 		double momTotal = sqrt(momX*momX + momY*momY + momZ*momZ);
-		if(PID == 0) std::cout << "Step #: " << nCount << " PID = "<< PID << " TID = " << TID
+		/*if(PID == 0) std::cout << "Step #: " << nCount << " PID = "<< PID << " TID = " << TID
 								<< "   Particle " << aStep->particleId << " current momentum = " << momTotal
 								<< " AV #: " << PProcess->GetAVNumber(aStep->volume) << " Imprint Number: "
 								<< PProcess->GetImprNumber(aStep->volume) <<" Time = " << aStep->time
-								<< " Process: " << physProcess << " E-Deposited = " << aStep->eDep << std::endl;
+								<< " Process: " << physProcess << " E-Deposited = " << aStep->eDep << std::endl;*/
 		break;
 	  }
 	}
@@ -192,71 +191,94 @@ int main(int argc, char *argv[]) {
 	// If no flag set, do not continue to next analysis section
 	if(!(elasticFlag || inelasticFlag || quasielasticFlag)) continue;  // This kills the EVENT as a WHOLE; Beware!!
 
-	bool dEdetFlag = false; bool EdetFlag = false;
-	std::vector<NpolStep *>::iterator ss_it;
-	for(ss_it = steps->begin(); ss_it != steps->end(); ss_it++) {
-	  NpolStep *aStep = *ss_it;
-	  if(aStep == NULL) continue;
-	  
-	  int stepPID = aStep->parentId;
-	  int stepTID = aStep->trackId;
-	  int steppType = aStep->particleId;
-	  if((stepPID == npPID) && (stepTID >= 2) && (steppType == 2212)){
-		std::string stepvolName = aStep->volume;
-		int stepAVNum = PProcess->GetAVNumber(stepvolName);
-		int stepsection = Process->sectionNumber(stepvolName);
-		if(stepAVNum == -1) continue;
-		if(!(EdetFlag) && (stepsection == npSOI) && ((stepAVNum == 1) || (stepAVNum == 2) || (stepAVNum == 5) || (stepAVNum == 6))){
-		  EdetFlag = true;
-		  int stepimpNum = PProcess->GetImprNumber(stepvolName);
-		  int stepPVNum = PProcess->GetPlacementNumber(stepvolName);
-		  std::cout << "      E-Array Detector: " << " AVNum = " << stepAVNum << "   impNum = "  << stepimpNum <<
-			"    PVNum = " << stepPVNum <<  "   SOI = " << stepsection << "   Track = " << stepTID << std::endl;
-		}
-		if(!(dEdetFlag) && (stepsection == npSOI) && ((stepAVNum == 3) || (stepAVNum == 4) || (stepAVNum == 7) || (stepAVNum == 8))){
-		  dEdetFlag = true;
-		  int stepimpNum = PProcess->GetImprNumber(stepvolName);
-		  int stepPVNum = PProcess->GetPlacementNumber(stepvolName);
-		  std::cout << "     dE-Array Detector: " << " AVNum = " << stepAVNum << "   impNum = " << stepimpNum <<
-			"    PVNum = " << stepPVNum <<  "   SOI = " << stepsection << "   Track = " << stepTID << std::endl;
-		}
-	  }
-	}
 	
 	// After determining the 'npAVNum' which has the (n,p) scattering, we scan through
 	// the tracks vector again to fill the histograms and use 'npAVNum' as a cut as
 	// necessary
 	
-
+	std::set<int> goodProtonTracks;
 	std::vector<NpolVertex *>::iterator v_it;
 	for(v_it = verts->begin(); v_it != verts->end(); v_it++){
 	  NpolVertex *aVertex = *v_it;
 	  if(aVertex == NULL) continue;
-	  
+
+	 
 	  int PID = aVertex->parentId;
 	  int TID = aVertex->trackId;
 	  int pType = aVertex->particleId;
 	  std::string process = aVertex->process;
 	  std::string volName = aVertex->volume;
-	  int AVNum = PProcess->GetAVNumber(volName);
-	  int ImprNum = PProcess->GetImprNumber(volName);
-	  int PVNum = PProcess->GetPlacementNumber(volName);
-	  
-	  // Extract out Initial Neutron Information from Tracks vector
-	  double intNmomX = 0.; double intNmomY = 0.; double intNmomZ = 0.; double totNmom = 0.;
-	  double P1x = 0.; double P1y = 0.; double P1z = 0.;
-	  double P2x = 0.; double P2y = 0.; double P2z = 0.;
-	  double P3x = 0.; double P3y = 0.; double P3z = 0.;
-	  if(PID == 0 && TID == 1){
-		intNmomX = aVertex->momX; intNmomY = aVertex->momY; intNmomZ = aVertex->momZ;
-		totNmom = TMath::Sqrt(TMath::Power(intNmomX,2)+TMath::Power(intNmomY,2)+TMath::Power(intNmomZ,2));
-		P1x = aVertex->posX; P1y = aVertex->posY; P1z = aVertex->posZ;
-		h_Neutron_Energy_Initial->Fill(aVertex->energy);
-		h_Neutron_Momentum_Initial->Fill(totNmom);
+	  //int AVNum = PProcess->GetAVNumber(volName);
+	  //int ImprNum = PProcess->GetImprNumber(volName);
+	  //int PVNum = PProcess->GetPlacementNumber(volName);
+	  //int section = Process->sectionNumber(volName);
+
+
+
+	  // ***** This alogrithm will test each track to see if it is a 'good' proton track for this event *****
+	  bool TopdEdetFlag = false; bool TopEdetFlag = false;
+	  bool BotdEdetFlag = false; bool BotEdetFlag = false;
+	  if(PID == npPID && pType == 2212){
+		double particleEnergy = aVertex->energy;
+		if(particleEnergy >= 25 /*MeV*/){
+		  std::vector<NpolStep *>::iterator ss_it;
+		  for(ss_it = steps->begin(); ss_it != steps->end(); ss_it++) {
+			NpolStep *aStep = *ss_it;
+			if(aStep == NULL) continue;
+			
+			int stepPID = aStep->parentId;
+			int stepTID = aStep->trackId;
+			int steppType = aStep->particleId;
+			if((stepPID == PID) && (stepTID == TID) && (steppType == 2212)){
+			  std::string stepVolName = aStep->volume;
+			  int stepAVNum = PProcess->GetAVNumber(stepVolName);
+			  //int stepImprNum = PProcess->GetImprNumber(stepVolName);
+			  //int stepPVNum = PProcess->GetPlacementNumber(stepVolName);
+			  int stepSection = Process->sectionNumber(stepVolName);
+			  if(stepSection == npSOI){
+				if(stepAVNum == 1 || stepAVNum == 2) TopEdetFlag = true;
+				if(stepAVNum == 3 || stepAVNum == 4) TopdEdetFlag = true;
+				if(stepAVNum == 5 || stepAVNum == 6) BotEdetFlag = true;
+				if(stepAVNum == 7 || stepAVNum == 8) BotdEdetFlag = true;
+			  }
+			}
+		  }
+		}
 	  }
 
-	  if(PID == npPID && pType == 2212){
-		if(EdetFlag && dEdetFlag && AVNum == npAVNum && ImprNum == npImprNum && PVNum == npPVNum ){
+	  bool TopFlag = false; bool BotFlag = false;
+	  if(TopEdetFlag && TopdEdetFlag) TopFlag = true;
+	  if(BotEdetFlag && BotdEdetFlag) BotFlag = true;
+	  if((TopFlag  && !BotFlag) || (!TopFlag && BotFlag)) goodProtonTracks.insert(TID);
+	}
+	  
+	// After the proton track has been found, this code will run to compute values, fill histograms
+	std::set<int>::iterator set_it;
+	if(goodProtonTracks.size() == 1){
+	  std::vector<NpolVertex *>::iterator vv_it;
+	  for(vv_it = verts->begin(); vv_it != verts->end(); vv_it++){
+		NpolVertex *aVertex = *vv_it;
+		if(aVertex == NULL) continue;
+		
+		int PID = aVertex->parentId; int TID = aVertex->trackId;
+		double intNmomX = 0.; double intNmomY = 0.; double intNmomZ = 0.; double totNmom = 0.;
+		double P1x = 0.; double P1y = 0.; double P1z = 0.;
+		double P2x = 0.; double P2y = 0.; double P2z = 0.;
+		double P3x = 0.; double P3y = 0.; double P3z = 0.;
+		
+		// Extract out Initial Neutron Information from Tracks vector need for scattering angle cal.
+		// This section also fills the Initial Neutron histograms for diagnostics
+		if(PID == 0 && TID == 1){
+		  intNmomX = aVertex->momX; intNmomY = aVertex->momY; intNmomZ = aVertex->momZ;
+		  totNmom = TMath::Sqrt(TMath::Power(intNmomX,2)+TMath::Power(intNmomY,2)+TMath::Power(intNmomZ,2));
+		  P1x = aVertex->posX; P1y = aVertex->posY; P1z = aVertex->posZ;
+		  h_Neutron_Energy_Initial->Fill(aVertex->energy);
+		  h_Neutron_Momentum_Initial->Fill(totNmom);
+		}
+		
+		// Process the good Proton Track
+		int GoodTID = (*goodProtonTracks.begin());
+		if(PID == npPID && TID == GoodTID){
 		  double momX = aVertex->momX; double momY = aVertex->momY; double momZ = aVertex->momZ;
 		  double momTot = TMath::Sqrt(momX*momX + momY*momY + momZ*momZ);
 		  P2x = aVertex->posX; P2y = aVertex->posY; P2z = aVertex->posZ;
@@ -289,18 +311,19 @@ int main(int argc, char *argv[]) {
 			h_dEvsE_Real->Fill(EenergyLost,dEenergyLost);
 			h_dEvsE_Real2->Fill(EenergyLost2,dEenergyLost2); // An attempt at "energy" resolution of the scintillators
 			std::cout << "Stopping Power = " << sPower << "   Proton Energy Loss in dE-array = " << dEenergyLost
-					<< "   Proton Energy Loss in E-array = " << EenergyLost << std::endl;
+					  << "   Proton Energy Loss in E-array = " << EenergyLost << std::endl;
 		  }
 		}
 	  }
 	}
+  
 	// END TRACK LOOP
 	// >>>>>>>>>>>>>>> This ends the "real NP scattering" part of the code <<<<<<<<<<<<<<<<<<<
 
+	
 	// >>>>>>>>>>>>>>> This begins the "event processing" part of the code <<<<<<<<<<<<<<<<<<<
     // BEGIN STEPS LOOP: Fills the detEvent map with volumes and total energy, etc.
 	// This allows only events that pass NP real to be run through "our" cuts
-	if(!(EdetFlag && dEdetFlag)) continue;  
 	std::vector<NpolStep *>::iterator s_it;
 	std::vector<NpolTagger *>::iterator t_it;
 	bool eventFlag = false;
