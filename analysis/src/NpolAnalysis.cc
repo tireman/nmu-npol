@@ -233,7 +233,7 @@ int main(int argc, char *argv[]) {
 	  bool TopFlag = false; bool BotFlag = false;
 	  if(TopEdetFlag && TopdEdetFlag) TopFlag = true;
 	  if(BotEdetFlag && BotdEdetFlag) BotFlag = true;
-	  if((TopFlag  && !BotFlag) || (!TopFlag && BotFlag)) goodProtonTracks.insert(TID);
+	  if((TopFlag  && !BotFlag) || (!TopFlag && BotFlag)) goodProtonTracks.insert(TID); // ExOR
 	}
 	  
 	// After the proton track has been found, this code will run to compute values, fill histograms
@@ -300,6 +300,7 @@ int main(int argc, char *argv[]) {
 		}
 	  }
 	}
+	goodProtonTracks.clear();
   
 	// END TRACK LOOP
 	// >>>>>>>>>>>>>>> This ends the "real NP scattering" part of the code <<<<<<<<<<<<<<<<<<<
