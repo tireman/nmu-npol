@@ -138,141 +138,97 @@ int main(int argc, char *argv[]) {
     eDepArrayTotal[botEArray] = 0.0;
     eDepArrayTotal[botdEArray] = 0.0;
 
-	// ****** BEGIN TRACK LOOP: Scans Tracks vector (NpolVertex) and fills histograms ****** 
-	// This is to analyze sim output for "real" (n,p) scattering events
-	std::vector<NpolVertex *>::iterator v_it;
-	int realAV = 0;
-	int realINum = 0;
-	int realPV = -1;
-	int realSOI = -2;
-	int realTID = -1;
-	bool inelasticFlag = false; bool quasielasticFlag = false; bool elasticFlag = false;
+	// ****** BEGIN STEP LOOP: Scans Steps vector (NpolStep) and IDs the event type (elastic, inelastic) ****** 
+	// This loop scans through the Steps Vector and checks PID = 0, TID = 1 (original neutron) and checks
+	// the physics process to identify elastic or inelastic event and which AV (SOI) it occurs within.  Since
+	// quasi-elastic is wrapped up with inelastic in G4, a seperate method will be needed to separate out those
+	// two types of events.  For now (28-Aug-2018), this will only separate elastic and inelastic events.
+	// This is to analyze simulation output for "real" (n,p) scattering events
 	
-	// This loop scans through the tracks vector and looks for an (n,p) scattering
-	// event and which assembly volume it occurred in and then saves that AVNum to
-	// 'realAV'.  We have to do this first to account for muiltple scattering
-	// and due to the fact that the vertices are not stored in order.
-	for(v_it = verts->begin(); v_it != verts->end(); v_it++){
-	  NpolVertex *aVertex = *v_it;
-	  if(aVertex == NULL) continue;
+	int npAVNum = 0; int npImprNum = 0; int npPVNum = -1; int npSOI = -2; int npPID = -1;
+	bool inelasticFlag = false; bool quasielasticFlag = false; bool elasticFlag = false;
+	int nCount = 0;
+
+	std::vector<NpolStep *>::iterator ps_it;
+	std::cout << "Processing event #" << i << std::endl;
+	for(ps_it = steps->begin(); ps_it != steps->end(); ps_it++) {
+	  nCount++;
+	  NpolStep *aStep = *ps_it;
+	  if(aStep == NULL) continue;
 	  
-	  int PID = aVertex->parentId;
-	  int TID = aVertex->trackId;
-	  int pType = aVertex->particleId;
-	  std::string process = aVertex->process;
-	  std::string volName = aVertex->volume;
+	  std::string physProcess = aStep->process;
+	  std::string volName = aStep->volume;
 	  int AVNum = PProcess->GetAVNumber(volName);
 	  int ImprNum = PProcess->GetImprNumber(volName);
 	  int PVNum = PProcess->GetPlacementNumber(volName);
 	  int section = Process->sectionNumber(volName);
-	  
-	  // We cut on parent ID = 1 (original neutron), track ID > 2 (could be changed later,
-	  // particle type = proton (2212), physics process = hadron elastic, and AV number
-	  // between 9 and 10 (analyzer volume)
-	  if((process == "neutronInelastic") && !(inelasticFlag || quasielasticFlag)){
-		//if((PID >= 1 && TID >= 2 && pType == 2212) && (AVNum == 9 || AVNum == 10)){
-		  
-		  NpolVertex *firstVertex = verts->at(1);
-		  int numDaughters = firstVertex->daughterIds.size();
-		  if(numDaughters > 3){
-			std::cout << "Event #: " << i << "  Neutron Inelastic Event!" <<
-			  "  Number of daughters from intial neutron: " << numDaughters << std::endl;
-			inelasticFlag = true;
-			
-			/*std::vector<NpolStep *>::iterator s_it;
-			int nCount = 0;
-			NpolVertex *firstVertex = verts->at(1);
-			double nMomInitial = sqrt((firstVertex->momX*firstVertex->momX) + (firstVertex->momY*firstVertex->momY) + (firstVertex->momZ*firstVertex->momZ));
-			std::cout << "Intitial Neutron Momentum = " << nMomInitial << std::endl;
-			for(s_it = steps->begin(); s_it != steps->end(); s_it++) {
-			  nCount++;
-			  NpolStep *aStep = *s_it;
-			  if(aStep == NULL) continue;
-			  int nPID = aStep->parentId; int nTID = aStep->trackId;
-			  if((nPID == 0 && nTID == 1) || (nPID == 1 && nTID >= 2)){
-				double momX = aStep->momX; double momY = aStep->momY; double momZ = aStep->momZ;
-				double momTotal = sqrt(momX*momX + momY*momY + momZ*momZ);
-				if(nPID == 0) std::cout << "Step #: " << nCount << " PID = "<< nPID << " TID = " << nTID
-										<< "   Particle " << aStep->particleId << " current momentum = " << momTotal
-										<< " AV #: " << PProcess->GetAVNumber(aStep->volume) << " Time = " << aStep->time
-										<< std::endl;
-				if(nPID == 1) std::cout << "    Step #: " << nCount << " PID = "<< nPID << " TID = " << nTID
-										<< "   Particle " << aStep->particleId << " current momentum = " << momTotal
-										<< " AV #: " << PProcess->GetAVNumber(aStep->volume) << " Time = " << aStep->time
-										<< std::endl;
-			  }
-			  //}
-			  }*/
-
-		  if(numDaughters == 3){
-			std::cout << "Event #: " << i << "  Neutron Quasielastic Event!" <<
-			  "  Number of daughters from intial neutron: " << numDaughters << std::endl;
-			quasielasticFlag = true;
-		  }
-		}
-	  }
-	  
-	  if(process == "hadElastic" && !elasticFlag){
-		//if((PID == 1 && TID >= 2 && pType == 2212) && (AVNum == 9 || AVNum == 10)){
-		  NpolVertex *firstVertex = verts->at(1);
-		  int numTracks = firstVertex->daughterIds.size();
-		  std::cout << "Event #: " << i << "  Neutron Elastic Event!" <<
-			"  Number of daughters from intial neutron: " << numTracks << std::endl;
-		  
+	  int PID = aStep->parentId;
+	  int TID = aStep->trackId;
+	  if((PID == 0 && TID == 1) && (AVNum == 9 || AVNum == 10)){
+		if(physProcess == "hadElastic"){
 		  elasticFlag = true;
-		  
-		  std::vector<NpolStep *>::iterator s_it;
-		  int nCount = 0;
-		  //		  NpolVertex *firstVertex = verts->at(1);
-		  double nMomInitial = sqrt((firstVertex->momX*firstVertex->momX) + (firstVertex->momY*firstVertex->momY) + (firstVertex->momZ*firstVertex->momZ));
-		  std::cout << "Intitial Neutron Momentum = " << nMomInitial << std::endl;
-		  for(s_it = steps->begin(); s_it != steps->end(); s_it++) {
-			nCount++;
-			NpolStep *aStep = *s_it;
-			if(aStep == NULL) continue;
-			int nPID = aStep->parentId; int nTID = aStep->trackId;
-			if((nPID == 0 && nTID == 1) || (nPID == 1 && nTID >= 2)){
-			  double momX = aStep->momX; double momY = aStep->momY; double momZ = aStep->momZ;
-			  double momTotal = sqrt(momX*momX + momY*momY + momZ*momZ);
-			  if(nPID == 0) std::cout << "Step #: " << nCount << " PID = "<< nPID << " TID = " << nTID
-									  << "   Particle " << aStep->particleId << " current momentum = " << momTotal
-									  << " AV #: " << PProcess->GetAVNumber(aStep->volume) << " Time = " << aStep->time
-									  << std::endl;
-			  if(nPID == 1) std::cout << "    Step #: " << nCount << " PID = "<< nPID << " TID = " << nTID
-									  << "   Particle " << aStep->particleId << " current momentum = " << momTotal
-									  << " AV #: " << PProcess->GetAVNumber(aStep->volume) << " Time = " << aStep->time
-									  << std::endl;
-			}
-			//}
-			//}
-		  
+		} else if(physProcess == "neutronInelastic"){
+		  inelasticFlag = true;
+		} else {
+		  continue;
 		}
-	  }
+		npAVNum = AVNum;
+		npImprNum = ImprNum;
+		npPVNum = PVNum;
+		npSOI = section;
+		npPID = TID;   // Track ID of neutron is Parent ID of the generated secondary(ies)
 
-	  /*if(PID == 1) std::cout << "Event #: " << i << " AVNum = " << AVNum << "   ImprintNum = "
-							  << ImprNum << "    PVNum = " << PVNum <<  "   SOI = " << section
-							  << "   Track = " << TID << std::endl;*/
+		double momX = aStep->momX; double momY = aStep->momY; double momZ = aStep->momZ;
+		double momTotal = sqrt(momX*momX + momY*momY + momZ*momZ);
+		if(PID == 0) std::cout << "Step #: " << nCount << " PID = "<< PID << " TID = " << TID
+								<< "   Particle " << aStep->particleId << " current momentum = " << momTotal
+								<< " AV #: " << PProcess->GetAVNumber(aStep->volume) << " Imprint Number: "
+								<< PProcess->GetImprNumber(aStep->volume) <<" Time = " << aStep->time
+								<< " Process: " << physProcess << " E-Deposited = " << aStep->eDep << std::endl;
+		break;
+	  }
+	}
+
+	// If no flag set, do not continue to next analysis section
+	if(!(elasticFlag || inelasticFlag || quasielasticFlag)) continue;  // This kills the EVENT as a WHOLE; Beware!!
+
+	bool dEdetFlag = false; bool EdetFlag = false;
+	std::vector<NpolStep *>::iterator ss_it;
+	for(ss_it = steps->begin(); ss_it != steps->end(); ss_it++) {
+	  NpolStep *aStep = *ss_it;
+	  if(aStep == NULL) continue;
 	  
-	  //if((PID == 1 && TID >= 2 && pType == 2212 && process == "hadElastic") && (AVNum == 9 || AVNum == 10)){
-	  if((PID == 1 && TID >= 2 && pType == 2212 && (elasticFlag || quasielasticFlag)) && (AVNum == 9 || AVNum == 10)){
-		if(realSOI == -2 || section < realSOI) {
-		  realAV = AVNum;
-		  realINum = ImprNum;
-		  realPV = PVNum;
-		  realSOI = section;
-		  realTID = TID;
+	  int stepPID = aStep->parentId;
+	  int stepTID = aStep->trackId;
+	  int steppType = aStep->particleId;
+	  if((stepPID == npPID) && (stepTID >= 2) && (steppType == 2212)){
+		std::string stepvolName = aStep->volume;
+		int stepAVNum = PProcess->GetAVNumber(stepvolName);
+		int stepsection = Process->sectionNumber(stepvolName);
+		if(stepAVNum == -1) continue;
+		if(!(EdetFlag) && (stepsection == npSOI) && ((stepAVNum == 1) || (stepAVNum == 2) || (stepAVNum == 5) || (stepAVNum == 6))){
+		  EdetFlag = true;
+		  int stepimpNum = PProcess->GetImprNumber(stepvolName);
+		  int stepPVNum = PProcess->GetPlacementNumber(stepvolName);
+		  std::cout << "      E-Array Detector: " << " AVNum = " << stepAVNum << "   impNum = "  << stepimpNum <<
+			"    PVNum = " << stepPVNum <<  "   SOI = " << stepsection << "   Track = " << stepTID << std::endl;
+		}
+		if(!(dEdetFlag) && (stepsection == npSOI) && ((stepAVNum == 3) || (stepAVNum == 4) || (stepAVNum == 7) || (stepAVNum == 8))){
+		  dEdetFlag = true;
+		  int stepimpNum = PProcess->GetImprNumber(stepvolName);
+		  int stepPVNum = PProcess->GetPlacementNumber(stepvolName);
+		  std::cout << "     dE-Array Detector: " << " AVNum = " << stepAVNum << "   impNum = " << stepimpNum <<
+			"    PVNum = " << stepPVNum <<  "   SOI = " << stepsection << "   Track = " << stepTID << std::endl;
 		}
 	  }
 	}
-	/*if(realAV != 0) std::cout << "Event #: " << i << " AVNum = " << realAV << "   ImprintNum = "
-							  << realINum << "    PVNum = " << realPV <<  "   SOI = " << realSOI
-							  << "   Track = " << realTID << std::endl;*/
-
-		
-	// After determining the 'realAV' which has the (n,p) scattering, we scan through
-	// the tracks vector again to fill the histograms and use 'realAV' as a cut as
+	
+	// After determining the 'npAVNum' which has the (n,p) scattering, we scan through
+	// the tracks vector again to fill the histograms and use 'npAVNum' as a cut as
 	// necessary
-	bool eventFlagdE = false; bool eventFlagE = false;
+	
+
+	std::vector<NpolVertex *>::iterator v_it;
 	for(v_it = verts->begin(); v_it != verts->end(); v_it++){
 	  NpolVertex *aVertex = *v_it;
 	  if(aVertex == NULL) continue;
@@ -299,70 +255,42 @@ int main(int argc, char *argv[]) {
 		h_Neutron_Momentum_Initial->Fill(totNmom);
 	  }
 
-	  std::vector<NpolStep *>::iterator s_it;
-	  for(s_it = steps->begin(); s_it != steps->end(); s_it++) {
-	  	NpolStep *aStep = *s_it;
-	  	if(aStep == NULL) continue;
-
-		int PID = aStep->parentId;
-		int TID = aStep->trackId;
-		int pType = aStep->particleId;
-		if((PID == 1) && (TID == realTID) && (pType == 2212)){
-		  std::string volName = aStep->volume;
-		  int AVNum = PProcess->GetAVNumber(volName);
-		  if(AVNum == -1) continue;
-		  if(!(eventFlagE) && ((AVNum == 1) || (AVNum == 2) || (AVNum == 5) || (AVNum == 6))){
-			eventFlagE = true;
-			int impNum = PProcess->GetImprNumber(volName);
-			int PVNum = PProcess->GetPlacementNumber(volName);
-			int section = Process->sectionNumber(volName);
-			std::cout << "      E-Array Detector: " << " AVNum = " << AVNum << "   impNum = "  << impNum <<
-			  "    PVNum = " << PVNum <<  "   SOI = " << section << "   Track = " << TID << std::endl;
-		  }
-		  if(!(eventFlagdE) && ((AVNum == 3) || (AVNum == 4) || (AVNum == 7) || (AVNum == 8))){
-			eventFlagdE = true;
-			int impNum = PProcess->GetImprNumber(volName);
-			int PVNum = PProcess->GetPlacementNumber(volName);
-			int section = Process->sectionNumber(volName);
-			std::cout << "     dE-Array Detector: " << " AVNum = " << AVNum << "   impNum = " << impNum <<
-			  "    PVNum = " << PVNum <<  "   SOI = " << section << "   Track = " << TID << std::endl;
-		  }
-		}
-	  }
-	  
-	  if(eventFlagE && eventFlagdE && AVNum == realAV && ImprNum == realINum && PVNum == realPV && TID == realTID){
-		double momX = aVertex->momX; double momY = aVertex->momY; double momZ = aVertex->momZ;
-		double momTot = TMath::Sqrt(momX*momX + momY*momY + momZ*momZ);
-		P2x = aVertex->posX; P2y = aVertex->posY; P2z = aVertex->posZ;
-		
-		double P2Theta = TMath::ATan(momY/momX);
-		double P2Phi = TMath::ACos(momZ/momTot);
-				
-		P3x = P2x + 2*TMath::Sin(P2Phi)*TMath::Cos(P2Theta);
-		P3y = P2y + 2*TMath::Sin(P2Phi)*TMath::Sin(P2Theta);
-		P3z = P2z + 2*TMath::Cos(P2Phi);
-		double computedAngle = PhysicsVar->getAzimuthAngle(P1x,P1y,P1z,P2x,P2y,P2z,P3x,P3y,P3z);
-		if (computedAngle >= angleLow && computedAngle <= angleHigh) {
-		  h_recoilAngle_Real->Fill(computedAngle);
-
-		  // Guess at the 'real' asymmetry; this is done by looking to see if Y-momentum points up or down
-		  if(momY < 0) asym = -1;
-		  if(momY > 0) asym = +1;
-		  if(momY == 0) asym = 0;
-		  h_asymmetry_Real->Fill(asym);
-
-		  h_recoilEnergy_Real->Fill(aVertex->energy);
-		  double sPower =  PhysicsVar->computeBetheBloch(aVertex->energy,938.27205,1,1.032,12.929,7,64.7e-6);
-
-		  double dEenergyLost = PhysicsVar->computeEnergyLoss(aVertex->energy, TMath::DegToRad()*computedAngle, 1. /*cm*/);
-		  Double_t dEenergyLost2 = rand->Gaus(dEenergyLost, 0.10*dEenergyLost);
-		  double EenergyLost = PhysicsVar->computeEnergyLoss(aVertex->energy, TMath::DegToRad()*computedAngle, 10. /*cm*/);
-		  Double_t EenergyLost2 = rand->Gaus(EenergyLost, 0.10*EenergyLost);
-
-		  h_dEvsE_Real->Fill(EenergyLost,dEenergyLost);
-		  h_dEvsE_Real2->Fill(EenergyLost2,dEenergyLost2); // An attempt at "energy" resolution of the scintillators
-		  std::cout << "Stopping Power = " << sPower << "   Proton Energy Loss in dE-array = " << dEenergyLost
+	  if(PID == npPID && pType == 2212){
+		if(EdetFlag && dEdetFlag && AVNum == npAVNum && ImprNum == npImprNum && PVNum == npPVNum ){
+		  double momX = aVertex->momX; double momY = aVertex->momY; double momZ = aVertex->momZ;
+		  double momTot = TMath::Sqrt(momX*momX + momY*momY + momZ*momZ);
+		  P2x = aVertex->posX; P2y = aVertex->posY; P2z = aVertex->posZ;
+		  
+		  double P2Theta = TMath::ATan(momY/momX);
+		  double P2Phi = TMath::ACos(momZ/momTot);
+		  
+		  P3x = P2x + 2*TMath::Sin(P2Phi)*TMath::Cos(P2Theta);
+		  P3y = P2y + 2*TMath::Sin(P2Phi)*TMath::Sin(P2Theta);
+		  P3z = P2z + 2*TMath::Cos(P2Phi);
+		  double computedAngle = PhysicsVar->getAzimuthAngle(P1x,P1y,P1z,P2x,P2y,P2z,P3x,P3y,P3z);
+		  if (computedAngle >= angleLow && computedAngle <= angleHigh) {
+			h_recoilAngle_Real->Fill(computedAngle);
+			
+			// Guess at the 'real' asymmetry; this is done by looking to see if Y-momentum points up or down
+			if(momY < 0) asym = -1;
+			if(momY > 0) asym = +1;
+			if(momY == 0) asym = 0;
+			h_asymmetry_Real->Fill(asym);
+			
+			double protonVertexEnergy = aVertex->energy;
+			h_recoilEnergy_Real->Fill(protonVertexEnergy);
+			double sPower =  PhysicsVar->computeBetheBloch(protonVertexEnergy,938.27205,1,1.032,12.929,7,64.7e-6);
+			
+			double dEenergyLost = PhysicsVar->computeEnergyLoss(protonVertexEnergy, TMath::DegToRad()*computedAngle, 1. /*cm*/);
+			Double_t dEenergyLost2 = rand->Gaus(dEenergyLost, 0.10*dEenergyLost);
+			double EenergyLost = PhysicsVar->computeEnergyLoss(protonVertexEnergy, TMath::DegToRad()*computedAngle, 10. /*cm*/);
+			Double_t EenergyLost2 = rand->Gaus(EenergyLost, 0.10*EenergyLost);
+			
+			h_dEvsE_Real->Fill(EenergyLost,dEenergyLost);
+			h_dEvsE_Real2->Fill(EenergyLost2,dEenergyLost2); // An attempt at "energy" resolution of the scintillators
+			std::cout << "Stopping Power = " << sPower << "   Proton Energy Loss in dE-array = " << dEenergyLost
 					<< "   Proton Energy Loss in E-array = " << EenergyLost << std::endl;
+		  }
 		}
 	  }
 	}
@@ -372,7 +300,7 @@ int main(int argc, char *argv[]) {
 	// >>>>>>>>>>>>>>> This begins the "event processing" part of the code <<<<<<<<<<<<<<<<<<<
     // BEGIN STEPS LOOP: Fills the detEvent map with volumes and total energy, etc.
 	// This allows only events that pass NP real to be run through "our" cuts
-	if(!(eventFlagE && eventFlagdE)) continue;  
+	if(!(EdetFlag && dEdetFlag)) continue;  
 	std::vector<NpolStep *>::iterator s_it;
 	std::vector<NpolTagger *>::iterator t_it;
 	bool eventFlag = false;
