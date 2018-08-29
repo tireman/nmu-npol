@@ -179,11 +179,6 @@ int main(int argc, char *argv[]) {
 
 		double momX = aStep->momX; double momY = aStep->momY; double momZ = aStep->momZ;
 		double momTotal = sqrt(momX*momX + momY*momY + momZ*momZ);
-		/*if(PID == 0) std::cout << "Step #: " << nCount << " PID = "<< PID << " TID = " << TID
-								<< "   Particle " << aStep->particleId << " current momentum = " << momTotal
-								<< " AV #: " << PProcess->GetAVNumber(aStep->volume) << " Imprint Number: "
-								<< PProcess->GetImprNumber(aStep->volume) <<" Time = " << aStep->time
-								<< " Process: " << physProcess << " E-Deposited = " << aStep->eDep << std::endl;*/
 		break;
 	  }
 	}
@@ -202,19 +197,12 @@ int main(int argc, char *argv[]) {
 	  NpolVertex *aVertex = *v_it;
 	  if(aVertex == NULL) continue;
 
-	 
 	  int PID = aVertex->parentId;
 	  int TID = aVertex->trackId;
 	  int pType = aVertex->particleId;
 	  std::string process = aVertex->process;
 	  std::string volName = aVertex->volume;
-	  //int AVNum = PProcess->GetAVNumber(volName);
-	  //int ImprNum = PProcess->GetImprNumber(volName);
-	  //int PVNum = PProcess->GetPlacementNumber(volName);
-	  //int section = Process->sectionNumber(volName);
-
-
-
+	  
 	  // ***** This alogrithm will test each track to see if it is a 'good' proton track for this event *****
 	  bool TopdEdetFlag = false; bool TopEdetFlag = false;
 	  bool BotdEdetFlag = false; bool BotEdetFlag = false;
@@ -232,8 +220,6 @@ int main(int argc, char *argv[]) {
 			if((stepPID == PID) && (stepTID == TID) && (steppType == 2212)){
 			  std::string stepVolName = aStep->volume;
 			  int stepAVNum = PProcess->GetAVNumber(stepVolName);
-			  //int stepImprNum = PProcess->GetImprNumber(stepVolName);
-			  //int stepPVNum = PProcess->GetPlacementNumber(stepVolName);
 			  int stepSection = Process->sectionNumber(stepVolName);
 			  if(stepSection == npSOI){
 				if(stepAVNum == 1 || stepAVNum == 2) TopEdetFlag = true;
