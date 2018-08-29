@@ -177,9 +177,7 @@ int main(int argc, char *argv[]) {
 		npSOI = section;
 		npPID = TID;   // Track ID of neutron is Parent ID of the generated secondary(ies)
 
-		double momX = aStep->momX; double momY = aStep->momY; double momZ = aStep->momZ;
-		double momTotal = sqrt(momX*momX + momY*momY + momZ*momZ);
-		break;
+		break;        // Break out of the loop once the original neutron interacts!
 	  }
 	}
 
