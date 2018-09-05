@@ -116,11 +116,12 @@ G4Material *NpolMaterials::CreateAl(){
 G4Material *NpolMaterials::CreateScint() {
   
   G4Element* H = nistMan->FindOrBuildElement("H");
-  G4Element* C = nistMan->FindOrBuildElement("C");
+  // G4Element* C = nistMan->FindOrBuildElement("C");
+  G4Material* C = nistMan->FindOrBuildMaterial("G4_C");
   G4Material* scint = new G4Material("Scint", 1.02*g/cm3, 2);
   scint->AddElement(H, 8.451*perCent);
-  scint->AddElement(C, 91.549*perCent);
-  
+  //scint->AddElement(C, 91.549*perCent);
+  scint->AddMaterial(C, 91.549*perCent);
   return scint;
 }
 
