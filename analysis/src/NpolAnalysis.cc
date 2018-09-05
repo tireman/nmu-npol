@@ -127,7 +127,7 @@ int main(int argc, char *argv[]) {
   TRandom *rand = new TRandom3();
   for(int i = 0; i < nentries; i++) {
 	//for(int i = 0; i < 1; i++) {
-   	if(i % 1000 == 0) std::cout << "Processing event #" << i << std::endl;
+   	if(i % 1 == 0) std::cout << "Processing event #" << i << std::endl;
     npolTree->GetEntry(i);
     std::map<std::string,NpolDetectorEvent *> detEvents;   // Event map (NPOL Detector Class)
 	std::map<PolarimeterDetector, double> eDepArrayTotal;  // Total energy map for each array
@@ -167,10 +167,39 @@ int main(int argc, char *argv[]) {
 		if(physProcess == "hadElastic"){
 		  elasticFlag = true;
 		} else if(physProcess == "neutronInelastic"){
-		  inelasticFlag = true;
+
+		  int neutronCount = 0; int protonCount = 0; int gammaCount = 0; int othersCount = 0;
+		  bool bootFlag = false;
+		  std::vector<NpolVertex *>::iterator pv_it;
+		  for(pv_it = verts->begin(); pv_it != verts->end(); pv_it++){
+			NpolVertex *aVertex = *pv_it;
+			if(aVertex == NULL) continue;
+			std::string vertVolName = aVertex->volume;
+			int vertAVNum = PProcess->GetAVNumber(volName);
+			int vertImprNum = PProcess->GetImprNumber(volName);
+			int vertPVNum = PProcess->GetPlacementNumber(volName);
+			int vertsection = Process->sectionNumber(volName);
+			int vertPID = aVertex->parentId;
+			int vertTID = aVertex->trackId;
+			long int pType = aVertex->particleId;
+			if(vertPID == 1){
+			  if(pType == 2112) neutronCount++;
+			  if(pType == 2212) protonCount++;
+			  if(pType == 22) gammaCount++;
+			  if(pType >= 1000000) othersCount++;
+			  if(pType == 111 || pType == 211 || pType == -211) bootFlag = true;
+			}
+		  }
+		  if(bootFlag) continue;
+		  if(protonCount == 1 && neutronCount == 1) {
+			quasielasticFlag = true;
+		  } else {
+			inelasticFlag = true;
+		  }
 		} else {
 		  continue;
 		}
+		
 		npAVNum = AVNum;
 		npImprNum = ImprNum;
 		npPVNum = PVNum;
@@ -182,8 +211,8 @@ int main(int argc, char *argv[]) {
 	}
 
 	// If no flag set, do not continue to next analysis section
-	if(!(elasticFlag || inelasticFlag || quasielasticFlag)) continue;  // This kills the EVENT as a WHOLE; Beware!!
-
+	//if(!(elasticFlag || inelasticFlag || quasielasticFlag)) continue;  // This kills the EVENT as a WHOLE; Beware!!
+	if(elasticFlag || inelasticFlag) continue;
 	
 	// After determining the 'npAVNum' which has the (n,p) scattering, we scan through
 	// the tracks vector again to fill the histograms and use 'npAVNum' as a cut as
@@ -197,15 +226,23 @@ int main(int argc, char *argv[]) {
 
 	  int PID = aVertex->parentId;
 	  int TID = aVertex->trackId;
-	  int pType = aVertex->particleId;
+	  long int pType = aVertex->particleId;
 	  std::string process = aVertex->process;
 	  std::string volName = aVertex->volume;
+	  if(PID == 0 && TID == 1){
+		std::cout << "  Original neutron energy: " << aVertex->energy << std::endl;
+	  }
 	  
 	  // ***** This alogrithm will test each track to see if it is a 'good' proton track for this event *****
 	  bool TopdEdetFlag = false; bool TopEdetFlag = false;
 	  bool BotdEdetFlag = false; bool BotEdetFlag = false;
 	  if(PID == npPID && pType == 2212){
 		double particleEnergy = aVertex->energy;
+		std::cout << "      Event #: " << i << " PID = "<< PID << " TID = " << TID
+				  << "   Particle " << pType << " " << aVertex->particle << " AV #: " << PProcess->GetAVNumber(volName)
+				  << " Impr #: " << PProcess->GetImprNumber(volName) << " PV #: " << PProcess->GetPlacementNumber(volName)
+				  << " SOI: " << Process->sectionNumber(volName) << " Time = " << aVertex->time << " Particle Energy: "
+				  << aVertex->energy << std::endl;
 		if(particleEnergy >= 25 /*MeV*/){
 		  std::vector<NpolStep *>::iterator ss_it;
 		  for(ss_it = steps->begin(); ss_it != steps->end(); ss_it++) {
@@ -215,7 +252,7 @@ int main(int argc, char *argv[]) {
 			int stepPID = aStep->parentId;
 			int stepTID = aStep->trackId;
 			int steppType = aStep->particleId;
-			if((stepPID == PID) && (stepTID == TID) && (steppType == 2212)){
+			if(((stepPID == PID) && (stepTID == TID) && (steppType == 2212))){
 			  std::string stepVolName = aStep->volume;
 			  int stepAVNum = PProcess->GetAVNumber(stepVolName);
 			  int stepSection = Process->sectionNumber(stepVolName);
@@ -300,7 +337,7 @@ int main(int argc, char *argv[]) {
 		}
 	  }
 	}
-	goodProtonTracks.clear();
+	goodProtonTracks.clear(); // Make sure the set is cleared before the next event
   
 	// END TRACK LOOP
 	// >>>>>>>>>>>>>>> This ends the "real NP scattering" part of the code <<<<<<<<<<<<<<<<<<<
