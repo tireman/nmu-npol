@@ -147,11 +147,9 @@ int main(int argc, char *argv[]) {
 	
 	int npAVNum = 0; int npImprNum = 0; int npPVNum = -1; int npSOI = -2; int npPID = -1;
 	bool inelasticFlag = false; bool quasielasticFlag = false; bool elasticFlag = false;
-	int nCount = 0;
 
 	std::vector<NpolStep *>::iterator ps_it;
 	for(ps_it = steps->begin(); ps_it != steps->end(); ps_it++) {
-	  nCount++;
 	  NpolStep *aStep = *ps_it;
 	  if(aStep == NULL) continue;
 	  
@@ -169,7 +167,7 @@ int main(int argc, char *argv[]) {
 		} else if(physProcess == "neutronInelastic"){
 
 		  int neutronCount = 0; int protonCount = 0; int gammaCount = 0; int othersCount = 0;
-		  bool bootFlag = false;
+		  bool pionFlag = false;
 		  std::vector<NpolVertex *>::iterator pv_it;
 		  for(pv_it = verts->begin(); pv_it != verts->end(); pv_it++){
 			NpolVertex *aVertex = *pv_it;
@@ -187,13 +185,15 @@ int main(int argc, char *argv[]) {
 			  if(pType == 2212) protonCount++;
 			  if(pType == 22) gammaCount++;
 			  if(pType >= 1000000) othersCount++;
-			  if(pType == 111 || pType == 211 || pType == -211) bootFlag = true;
+			  if(pType == 111 || pType == 211 || pType == -211) pionFlag = true;
 			}
 		  }
-		  if(bootFlag) continue;
-		  if(protonCount == 1 && neutronCount == 1) {
+		  std::cout << "Protons: " << protonCount << " Neutrons: " << neutronCount << " Gammas: " << gammaCount
+					<< " Others: " << othersCount << std::endl;
+		  if(protonCount == 1 && neutronCount == 1 && gammaCount >=0 && othersCount == 0 && !(pionFlag)) {
 			quasielasticFlag = true;
-		  } else {
+			
+		  } else if(pionFlag) {
 			inelasticFlag = true;
 		  }
 		} else {
@@ -210,9 +210,11 @@ int main(int argc, char *argv[]) {
 	  }
 	}
 
-	// If no flag set, do not continue to next analysis section
-	//if(!(elasticFlag || inelasticFlag || quasielasticFlag)) continue;  // This kills the EVENT as a WHOLE; Beware!!
-	if(elasticFlag || inelasticFlag) continue;
+	// ***** This statement checks to see if the flags of events NOT of interest are set. If so ***** //
+	// then the event processing is canceled by the continue statment which cycles the loop. 
+	// This kills the EVENT as a WHOLE; Beware!! //
+	//if(!(elasticFlag || inelasticFlag || quasielasticFlag)) continue; 
+	if(quasielasticFlag || elasticFlag) continue;
 	
 	// After determining the 'npAVNum' which has the (n,p) scattering, we scan through
 	// the tracks vector again to fill the histograms and use 'npAVNum' as a cut as
