@@ -124,6 +124,7 @@ stats_sourceNeutron = (TVectorT<double>*)sourceNeutron->Get("TVectorT<double>;1"
  TCanvas *angularPlots = new TCanvas("angularPlots","Proton Recoil Angle",800, 600);
  TCanvas *neutronInformation = new TCanvas("neutronInformation","Neutron Diagnostics",800,900);
  TCanvas *realNPevent = new TCanvas("realNPevent","Plots for Real NP Event",1000,1200);
+ TCanvas *dEvsENPevent = new TCanvas("dEvsENPevent","dE vs. E for Real NP Event",1000,1200);
  
  // Histogram Stats Removed**
  //gStyle->SetOptStat(0);
@@ -274,6 +275,15 @@ stats_sourceNeutron = (TVectorT<double>*)sourceNeutron->Get("TVectorT<double>;1"
  h_dEvsE_Real2->GetYaxis()->SetTitle("dE-Array Energy Deposited (MeV)");
  h_dEvsE_Real2->Rebin2D(2);
  h_dEvsE_Real2->DrawCopy("cont4");
+
+ dEvsENPevent->Divide(1,1,0.0001, 0.00001,0);
+ dEvsENPevent->cd(1);
+ h_dEvsE_Real->GetXaxis()->SetTitle("E-Array Energy Deposited (MeV)");
+ h_dEvsE_Real->GetXaxis()->SetTitleSize(0.03);
+ h_dEvsE_Real->GetYaxis()->SetTitleSize(0.03);
+ h_dEvsE_Real->GetYaxis()->SetTitle("dE-Array Energy Deposited (MeV)");
+ //h_dEvsE_Real->Rebin2D(2);
+ h_dEvsE_Real->DrawCopy("cont4");
  
  // Write out canvases to file 
  dEoverE_dToF->Write();
@@ -281,6 +291,7 @@ stats_sourceNeutron = (TVectorT<double>*)sourceNeutron->Get("TVectorT<double>;1"
  angularPlots->Write();
  neutronInformation->Write();
  realNPevent->Write();
+ dEvsENPevent->Write();
  // Close files
  outFile->Close();
  sourceNeutron->Close();
