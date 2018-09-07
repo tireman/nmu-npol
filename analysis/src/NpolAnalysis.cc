@@ -173,12 +173,7 @@ int main(int argc, char *argv[]) {
 			NpolVertex *aVertex = *pv_it;
 			if(aVertex == NULL) continue;
 			std::string vertVolName = aVertex->volume;
-			int vertAVNum = PProcess->GetAVNumber(volName);
-			int vertImprNum = PProcess->GetImprNumber(volName);
-			int vertPVNum = PProcess->GetPlacementNumber(volName);
-			int vertsection = Process->sectionNumber(volName);
 			int vertPID = aVertex->parentId;
-			int vertTID = aVertex->trackId;
 			long int pType = aVertex->particleId;
 			if(vertPID == 1){
 			  if(pType == 2112) neutronCount++;
@@ -188,33 +183,40 @@ int main(int argc, char *argv[]) {
 			  if(pType == 111 || pType == 211 || pType == -211) pionFlag = true;
 			}
 		  }
+		  
 		  std::cout << "Protons: " << protonCount << " Neutrons: " << neutronCount << " Gammas: " << gammaCount
 					<< " Others: " << othersCount << std::endl;
 		  if(protonCount == 1 && neutronCount == 1 && gammaCount >=0 && othersCount == 0 && !(pionFlag)) {
 			quasielasticFlag = true;
 			
-		  } else if(pionFlag) {
+		  } else if(pionFlag || othersCount > 1) {
 			inelasticFlag = true;
 		  }
-		} else {
-		  continue;
 		}
-		
+	  }
+
+	  if(elasticFlag || quasielasticFlag || inelasticFlag){
 		npAVNum = AVNum;
 		npImprNum = ImprNum;
 		npPVNum = PVNum;
 		npSOI = section;
 		npPID = TID;   // Track ID of neutron is Parent ID of the generated secondary(ies)
-
-		break;        // Break out of the loop once the original neutron interacts!
+		break;         // Break out of the loop once the original neutron interacts!
+		} else {
+		continue;
 	  }
 	}
+	
 
 	// ***** This statement checks to see if the flags of events NOT of interest are set. If so ***** //
 	// then the event processing is canceled by the continue statment which cycles the loop. 
 	// This kills the EVENT as a WHOLE; Beware!! //
-	//if(!(elasticFlag || inelasticFlag || quasielasticFlag)) continue; 
-	if(quasielasticFlag || elasticFlag) continue;
+	if(!(elasticFlag) && !(inelasticFlag) && !(quasielasticFlag)) continue;  // Check if NO flags set; kill event processing
+	// Comment out the corresponding statement below in order to select the events you want to analyze
+	// Comment out all to keep all events
+	//if(quasielasticFlag || inelasticFlag) continue; // Elastic events only
+	//if(elasticFlag || inelasticFlag) continue;  // Quasielastic events only
+	if(quasielasticFlag || elasticFlag) continue; // Inelastic events only
 	
 	// After determining the 'npAVNum' which has the (n,p) scattering, we scan through
 	// the tracks vector again to fill the histograms and use 'npAVNum' as a cut as
