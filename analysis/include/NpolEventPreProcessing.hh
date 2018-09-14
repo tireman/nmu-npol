@@ -31,7 +31,7 @@ public:
   
 private:
   static NpolEventPreProcessing *PreProcess;
-  TRandom *rand = new TRandom3();
+  TRandom3 *rand = new TRandom3();
 };
 
 
