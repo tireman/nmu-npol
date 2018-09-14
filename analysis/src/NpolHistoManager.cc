@@ -5,8 +5,8 @@
 NpolHistoManager *NpolHistoManager::HistoMan = NULL;
 
 NpolHistoManager *NpolHistoManager::GetInstance() {
-	if(HistoMan == NULL) HistoMan = new NpolHistoManager();
-	return HistoMan;
+  if(HistoMan == NULL) HistoMan = new NpolHistoManager();
+  return HistoMan;
 }
 
 NpolHistoManager::NpolHistoManager(){
@@ -25,10 +25,10 @@ NpolHistoManager::~NpolHistoManager(){
 void NpolHistoManager::CreateHistograms(){
   //NpolHistoManager *HistoMan = NpolHistoManager::GetInstance();
   //if(HistoMan->histograms.find("h_recoilAngle_Real") == HistoMan->histograms.end())
-  //	HistoMan->histograms["h_recoilAngle_Real"] = new TH1F("recoilAngle_Real","Real Proton Recoil Angle",200, 0.0, 180.0);
+  	//HistoMan->histograms["h_recoilAngle_Real"] = new TH1F("recoilAngle_Real","Real Proton Recoil Angle",200, 0.0, 180.0);
 }
 
-void NpolHistoManager::FillHistograms(std::string hName, double value){
+void NpolHistoManager::Fill1DHistograms(std::string hName, double value){
 
   //HistoMan->histograms[hName]->Fill(value);
   
