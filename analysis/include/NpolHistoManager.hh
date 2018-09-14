@@ -26,7 +26,7 @@ public:
   void CreateHistograms();
   void ClearHistograms();
   void DeleteHistograms();
-  void FillHistograms(std::string hName, double value);
+  void Fill1DHistograms(std::string hName, double value);
   void WriteHistograms();
   
 private:
