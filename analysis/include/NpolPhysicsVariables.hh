@@ -6,6 +6,8 @@
 #include <string>
 #include <map>
 #include "TMath.h"
+#include "NpolStep.hh"
+#include "TRandom3.h"
 
 class NpolEventProcessing;
 class NpolEventPreProcessing;
@@ -28,11 +30,14 @@ public:
   double highestEDepPV(const std::map<std::string,NpolDetectorEvent *> *detEvents, int sectionOfInterest,	 PolarimeterDetector detectorOfInterest);
   double computeBetheBloch(double KE, double Mass, int z, double rho, double A, int Z, double I);
   double computeEnergyLoss(double protonEnergy, double thetaP, double scintThick);
-  
-  
+  void fillDetectorEventMap(std::map<std::string,NpolDetectorEvent *> &eventMap, const NpolStep *aStep);
+  double computeMomentum(double xMom, double yMom, double zMom);
+  double computeScatTheta(double xMom, double yMom);
+  double computeScatPhi(double zMom, double totalMom);
+     
 private:
   static NpolPhysicsVariables *PhysVars;
-  
+  TRandom3 *randN = new TRandom3();
 };
 
 #endif

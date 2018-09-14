@@ -2,8 +2,11 @@
 #include "NpolEventPreProcessing.hh"
 #include "NpolEventProcessing.hh"
 #include "NpolPhysicsVariables.hh"
+#include "NpolStep.hh"
+
 #include <cmath>
 
+#define EDEP_THRESHOLD 1.0  /*MeV*/
 
 NpolPhysicsVariables *NpolPhysicsVariables::PhysVars = NULL;
 
@@ -24,7 +27,8 @@ NpolPhysicsVariables::~NpolPhysicsVariables(){}
 // (p3x,p3y,p3z) - a point along the trajectory of the scattered proton (in the E array)
 // The calculation is done by forming a triangle with these points and using the law of cosines
 double NpolPhysicsVariables::getAzimuthAngle(const double p1x, const double p1y, const double p1z, const double p2x, const double p2y, const double p2z, const double p3x, const double p3y, const double p3z) {
-  
+
+ 
   double s1, s2, s3; // the lengths of the triangle's three sides
   s1 = TMath::Sqrt(TMath::Power(p2x-p1x,2) + TMath::Power(p2y-p1y,2) + TMath::Power(p2z-p1z,2));
   s2 = TMath::Sqrt(TMath::Power(p3x-p2x,2) + TMath::Power(p3y-p2y,2) + TMath::Power(p3z-p2z,2));
@@ -244,12 +248,11 @@ double NpolPhysicsVariables::highestEDepPV(const std::map<std::string,NpolDetect
   return highestE_Dep;
 }
 
+
 double NpolPhysicsVariables::computeBetheBloch(double KE, double Mass, int z, double rho, double A, int Z, double I){
 
-  /*   This function computes the stopping power of a charged 
-	   particle throughMatter using Bethe formula. Returns the
-	   stopping power in units of MeV/cm.
-	   Detailed explanation goes here
+  /*   This function computes the stopping power of a charged  particle throughMatter using Bethe formula. 
+	   Returns the stopping power in units of MeV/cm. Detailed explanation goes here
   */
   
   /* Inputs
@@ -318,4 +321,72 @@ double NpolPhysicsVariables::computeEnergyLoss(double protonEnergy, double theta
   }
   
   return Eloss;
+}
+
+
+void NpolPhysicsVariables::fillDetectorEventMap(std::map<std::string,NpolDetectorEvent *> &eventMap, const NpolStep *aStep){
+  
+  NpolEventPreProcessing *PProcess = NpolEventPreProcessing::GetInstance();
+ 
+  int AVNum = PProcess->GetAVNumber(aStep->volume);
+  int imprintNum = PProcess->GetImprNumber(aStep->volume);
+  int PVNum = PProcess->GetPlacementNumber(aStep->volume);
+    
+  if(eventMap.find(aStep->volume) == eventMap.end())
+	eventMap[aStep->volume] = new NpolDetectorEvent();
+  
+  (eventMap[aStep->volume])->totEnergyDep += aStep->eDep;
+  
+  if(!((eventMap[aStep->volume])->thresholdExceeded) &&
+	 (eventMap[aStep->volume])->totEnergyDep >= EDEP_THRESHOLD) {
+	(eventMap[aStep->volume])->thresholdExceeded = true;
+	(eventMap[aStep->volume])->lPosX = aStep->lPosX;
+	(eventMap[aStep->volume])->lPosY = aStep->lPosY;
+	(eventMap[aStep->volume])->lPosZ = aStep->lPosZ;
+	(eventMap[aStep->volume])->gPosX = aStep->gPosX;
+	(eventMap[aStep->volume])->gPosY = aStep->gPosY;
+	(eventMap[aStep->volume])->gPosZ = aStep->gPosZ;
+	(eventMap[aStep->volume])->time = (aStep->time) + randN->Gaus(0.0,0.200);
+	
+	//****** Compute the hit position in the volume and save. This is done to "simulate" ****** // 
+	// what we could see in a real scintillation detector based on detector resolutions.
+	double hitPos[3] = { 0.0, 0.0, 0.0 };
+	double lPos[3] = { aStep->lPosX, aStep->lPosY, aStep->lPosZ };
+	int detNums[3] = { AVNum, imprintNum, PVNum };
+	
+	if((AVNum == 9) || (AVNum == 10) || (AVNum == 11) || (AVNum == 12)){
+	  PProcess->AnalyzerTaggerHitPosition(hitPos, lPos, detNums);
+	} else if((AVNum == 3) || (AVNum == 4) || (AVNum == 7) || (AVNum == 8)){
+	  PProcess->DeltaEarrayHitPosition(hitPos, lPos, detNums);
+	} else if((AVNum == 1) || (AVNum == 2) || (AVNum == 5) || (AVNum == 6)){
+	  PProcess->EarrayHitPosition(hitPos, lPos, detNums);
+	}
+	
+	(eventMap[aStep->volume])->hPosX = hitPos[0]; 
+	(eventMap[aStep->volume])->hPosY = hitPos[1]; 
+	(eventMap[aStep->volume])->hPosZ = hitPos[2];
+  }
+}
+
+double NpolPhysicsVariables::computeMomentum(double xMom, double yMom, double zMom){
+  double momentumMagnitude = 0.;
+
+  return momentumMagnitude = sqrt(xMom*xMom + yMom*yMom + zMom*zMom);
+  
+}
+
+double NpolPhysicsVariables::computeScatTheta(double xMom, double yMom){
+
+  double Theta = 0.;
+
+  return Theta = atan(yMom/xMom);
+  
+}
+
+double NpolPhysicsVariables::computeScatPhi(double zMom, double totalMom){
+
+  double Phi = 0.;
+
+  return Phi = acos(zMom/totalMom);
+
 }
