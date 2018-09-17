@@ -92,6 +92,8 @@ int main(int argc, char *argv[]) {
   TH1F *h_recoilAngle = new TH1F("recoil_angle","Proton Recoil Angle", 200, 0.0, 180.0); 
   TH1F *h_recoilAngle_Raw =
 	new TH1F("recoil_angle_raw","Proton Recoil Angle Before Angle Cut", 200, 0.0, 180.0);
+  TH1F *selectedRecoilMomentum = new TH1F("selectedRecoilMomentum","Highest Energy Recoil Proton Momentum",200, -3000.0, 1000.0);
+
   TH1F *h_Neutron_Theta_Angle =
 	new TH1F("Neutron_Theta_Angle","Neutron Angle at first tagger", 100, 15.0, 40.0);
   TH1F *h_Neutron_Momentum =
@@ -137,7 +139,9 @@ int main(int argc, char *argv[]) {
   for(int i = 0; i < nentries; i++) {
 	//for(int i = 0; i < 1; i++) {
    	if(i % 1 == 0) std::cout << "Processing event #" << i << std::endl;
+
     npolTree->GetEntry(i);
+	
     std::map<std::string,NpolDetectorEvent *> detEvents;   // Event map (NPOL Detector Class)
 	std::map<PolarimeterDetector, double> eDepArrayTotal;  // Total energy map for each array
     eDepArrayTotal[analyzer] = 0.0;
@@ -155,7 +159,8 @@ int main(int argc, char *argv[]) {
 	// This is to analyze simulation output for "real" (n,p) scattering events
 	
 	int npAVNum = 0; int npImprNum = 0; int npPVNum = -1; int npSOI = -2; int npPID = -1;
-	bool inelasticFlag = false; bool quasielasticFlag = false; bool elasticFlag = false; bool pionFlag = false;
+	bool inelasticFlag = false; bool elasticFlag = false; bool pionFlag = false;
+	bool quasielasticFlag = false; 
 
 	std::vector<NpolStep *>::iterator ps_it;
 	for(ps_it = steps->begin(); ps_it != steps->end(); ps_it++) {
@@ -210,6 +215,60 @@ int main(int argc, char *argv[]) {
 	
 	// ***** After determining the 'npAVNum' which has the (n,p) scattering, we scan through *****
 	// the tracks vector again to fill the histograms and use 'npAVNum' as a cut as necessary
+
+	std::map<int,NpolVertex *> vertexMap;
+	PhysVars->fillVertexMap(vertexMap,verts,1);
+
+	std::map<int,NpolVertex *>::iterator part_it;
+	double highMomentum = 0.0; double currentMomentum = 0.0;
+	double elasticMomentum = 0.0; double neutronMomentum = 0.0;
+	double highEnergy = 0.0;
+	int selectTID = 0;
+	double P1x = 0.; double P1y = 0.; double P1z = 0.;
+	double P2x = 0.; double P2y = 0.; double P2z = 0.;
+	double P3x = 0.; double P3y = 0.; double P3z = 0.;
+	for(part_it = vertexMap.begin(); part_it != vertexMap.end(); part_it++){
+	  int TID = part_it->first;
+	  int pType = part_it->second->particleId;
+
+	  double momX = part_it->second->momX;
+	  double momY = part_it->second->momY;
+	  double momZ = part_it->second->momZ;
+	  currentMomentum = PhysVars->computeMomentum(momX,momY,momZ);
+	  
+	  if(TID == 1) {
+		P1x = part_it->second->posX;
+		P1y = part_it->second->posY;
+		P1z = part_it->second->posZ;
+		neutronMomentum = PhysVars->computeMomentum(part_it->second->momX,part_it->second->momY,part_it->second->momZ);
+	  }
+	  
+	  if(currentMomentum > highMomentum && (pType == 2212 /*|| pType == 211 || pType == -211*/)){
+		highMomentum = currentMomentum;
+		selectTID = TID;
+		highEnergy = part_it->second->energy;
+		
+		P2x = part_it->second->posX;
+		P2y = part_it->second->posY;
+		P2z = part_it->second->posZ;
+		
+		double P2Theta = PhysVars->computeScatTheta(momX,momY);
+		double P2Phi = PhysVars->computeScatPhi(momZ,currentMomentum); 
+		  
+		P3x = P2x + 2*TMath::Sin(P2Phi)*TMath::Cos(P2Theta);
+		P3y = P2y + 2*TMath::Sin(P2Phi)*TMath::Sin(P2Theta);
+		P3z = P2z + 2*TMath::Cos(P2Phi);
+		double computedAngle =
+		  PhysVars->getAzimuthAngle(P1x,P1y,P1z,P2x,P2y,P2z,P3x,P3y,P3z);
+
+		elasticMomentum = PhysVars->computeElasticMomentum(neutronMomentum, computedAngle*TMath::DegToRad());
+	  }	  
+	}
+
+	if(selectTID > 1 && highEnergy >= 50 /*MeV*/) {
+
+		selectedRecoilMomentum->Fill(highMomentum - elasticMomentum);  
+	}
 	
 	std::set<int> goodProtonTracks;
 	std::vector<NpolVertex *>::iterator v_it;
@@ -222,9 +281,6 @@ int main(int argc, char *argv[]) {
 	  long int pType = aVertex->particleId;
 	  std::string process = aVertex->process;
 	  std::string volName = aVertex->volume;
-	  if(PID == 0 && TID == 1){
-		std::cout << "  Original neutron energy: " << aVertex->energy << std::endl;
-	  }
 	  
 	  // ***** This alogrithm will test each track to see if it is a 'good' proton track for this event *****
 	  bool TopdEdetFlag = false; bool TopEdetFlag = false;
@@ -433,6 +489,11 @@ int main(int argc, char *argv[]) {
 	std::map<std::string,NpolDetectorEvent *>::iterator e_it;
     for(e_it = detEvents.begin(); e_it != detEvents.end(); e_it++) delete e_it->second;
     detEvents.clear();
+
+	std::map<int,NpolVertex *>::iterator v_it2;
+	for(v_it2 = vertexMap.begin(); v_it2 != vertexMap.end(); v_it2++) delete v_it2->second;
+	vertexMap.clear();
+	
   } // END EVENT LOOP
   
   std::cout << taggedEvents << " of the initial " << totalEvents << " neutrons have crossed the Npol Tagger."
@@ -473,6 +534,7 @@ int main(int argc, char *argv[]) {
   h_Neutron_Energy->Write();
   h_recoilAngle_Real->Write();
   h_recoilEnergy_Real->Write();
+  selectedRecoilMomentum->Write();
   h_asymmetry_Real->Write();
   outFile->Close();
   return 0;
