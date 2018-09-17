@@ -3,6 +3,7 @@
 #include "NpolEventProcessing.hh"
 #include "NpolPhysicsVariables.hh"
 #include "NpolStep.hh"
+#include "NpolVertex.hh"
 
 #include <cmath>
 
@@ -251,8 +252,9 @@ double NpolPhysicsVariables::highestEDepPV(const std::map<std::string,NpolDetect
 
 double NpolPhysicsVariables::computeBetheBloch(double KE, double Mass, int z, double rho, double A, int Z, double I){
 
-  /*   This function computes the stopping power of a charged  particle throughMatter using Bethe formula. 
-	   Returns the stopping power in units of MeV/cm. Detailed explanation goes here
+  /*   This function computes the stopping power of a charged  particle 
+	   through Matter using Bethe formula. Returns the stopping power 
+	   in units of MeV/cm. Detailed explanation goes here
   */
   
   /* Inputs
@@ -296,7 +298,9 @@ double NpolPhysicsVariables::computeBetheBloch(double KE, double Mass, int z, do
 
 double NpolPhysicsVariables::computeEnergyLoss(double protonEnergy, double thetaP, double scintThick){
 
-  // **** This energy loss computation is designed for proton on plastic scintillator at the moment **** //
+  // **** This energy loss computation is designed for proton on
+  //plastic scintillator at the moment **** //
+
   double A = 12.929;  // atomic mass number for plastic scintillator
   int z = 1; // atomic number of projectile (proton currently)
   int Z = 7; // atomic number of detector material (plastic scintillator)
@@ -325,6 +329,9 @@ double NpolPhysicsVariables::computeEnergyLoss(double protonEnergy, double theta
 
 
 void NpolPhysicsVariables::fillDetectorEventMap(std::map<std::string,NpolDetectorEvent *> &eventMap, const NpolStep *aStep){
+
+  // **** This method fills the detector event map which contains objects of
+  // NpolDetectorEvent class keyed to the detector name (string).
   
   NpolEventPreProcessing *PProcess = NpolEventPreProcessing::GetInstance();
  
@@ -369,6 +376,9 @@ void NpolPhysicsVariables::fillDetectorEventMap(std::map<std::string,NpolDetecto
 }
 
 double NpolPhysicsVariables::computeMomentum(double xMom, double yMom, double zMom){
+
+  // Computes the magnitude of the momemtum from the three momentum
+  // components.
   double momentumMagnitude = 0.;
 
   return momentumMagnitude = sqrt(xMom*xMom + yMom*yMom + zMom*zMom);
@@ -377,6 +387,7 @@ double NpolPhysicsVariables::computeMomentum(double xMom, double yMom, double zM
 
 double NpolPhysicsVariables::computeScatTheta(double xMom, double yMom){
 
+  // Computes the Theta angle in spherical coordinates.
   double Theta = 0.;
 
   return Theta = atan(yMom/xMom);
@@ -385,8 +396,81 @@ double NpolPhysicsVariables::computeScatTheta(double xMom, double yMom){
 
 double NpolPhysicsVariables::computeScatPhi(double zMom, double totalMom){
 
+  // Computes the Phi angle in spherical coordinates.
   double Phi = 0.;
 
   return Phi = acos(zMom/totalMom);
 
+}
+
+void NpolPhysicsVariables::fillVertexMap(std::map<int,NpolVertex *> &theVertexMap, const std::vector<NpolVertex *> *vertVector, int DesiredPID){
+  
+  // **** This method fills a map that is keyed with track IDs to vertex
+  // information from NpolVertex vector.  The only tracks saved in the map
+  // are the original neutron (PID = 0, TID = 1) and any particle satisfying
+  // DesiredPID == PID.  (PID = DesiredPID, TID = xx).
+  
+  std::vector<NpolVertex *>::const_iterator v_it;
+  for(v_it = vertVector->begin(); v_it != vertVector->end(); v_it++){
+	NpolVertex *aVertex = *v_it;
+	if(aVertex == NULL) continue;
+	
+	int PID = aVertex->parentId;
+	int TID = aVertex->trackId;
+	std::string process = aVertex->process;
+	std::string volName = aVertex->volume;
+	if(PID == 0 && TID == 1){
+	  std::cout << "  Original neutron energy: " << aVertex->energy
+				<< std::endl;
+	}
+
+	// Well, I can't figure out how to copy data at one pointer
+	// to data at another pointer (in a map) and then later delete
+	// the pointers in the map without it killing the original pointers
+	// So this resulted :(((
+	if(PID == DesiredPID || PID == 0){
+	  if(theVertexMap.find(TID) == theVertexMap.end()){
+		theVertexMap[TID] = new NpolVertex();
+		//theVertexMap[TID] = aVertex;
+		theVertexMap[TID]->trackId = aVertex->trackId;
+		theVertexMap[TID]->parentId = aVertex->parentId;
+		theVertexMap[TID]->posX = aVertex->posX;
+		theVertexMap[TID]->posY = aVertex->posY;
+		theVertexMap[TID]->posZ = aVertex->posZ;
+		theVertexMap[TID]->momX = aVertex->momY;
+		theVertexMap[TID]->momZ = aVertex->momZ;
+		theVertexMap[TID]->time = aVertex->time;
+		theVertexMap[TID]->energy = aVertex->energy;
+		theVertexMap[TID]->eMiss = aVertex->eMiss;
+		theVertexMap[TID]->particleId = aVertex->particleId;
+		theVertexMap[TID]->process = aVertex->process;
+		theVertexMap[TID]->volume = aVertex->volume;
+		theVertexMap[TID]->daughterIds = aVertex->daughterIds;
+	  }
+	}	
+  }
+}
+
+double NpolPhysicsVariables::computeElasticMomentum(double neutronMomentum, double thetaP){
+
+  // **** This method computes the momentum of a recoil proton struck
+  // **** by a neutron given the momentum(energy) of the neutron and
+  // **** the angle of the recoil proton from the initial neutron direction.
+  double momentum = 0.0;
+  double mN = 939.56538; // (MeV/c^2)
+  double mP = 938.27205; // (MeV/c^2)
+  double Pnc = neutronMomentum;
+  double En = sqrt(pow(Pnc,2) + pow(mN,2));
+ 
+  double alpha = En + mP;
+  double beta = Pnc * cos(thetaP);
+  double gamma = pow(mP,2) + En * mP;
+  double A = pow(alpha,2) - pow(beta,2);
+  double B = -2 * alpha * gamma;
+  double C = pow(gamma,2) + pow(beta,2) * pow(mP,2);
+
+  double recoilEnergy = (-B + sqrt(pow(B,2) - 4 * A * C))/(2 * A);
+  momentum = sqrt(pow(recoilEnergy,2) - pow(mP,2));
+  
+  return momentum;
 }
