@@ -71,7 +71,7 @@ stats_sourceNeutron = (TVectorT<double>*)sourceNeutron->Get("TVectorT<double>;1"
  TH1F *h_Proton_Recoil_Real;
  TH1F *h_Proton_Energy_Real;
  TH1F *h_asymmetry_Real;
- 
+ TH1F *h_selectedRecoilMomentum;
  
 // Assign Histos from the input file to a pointer
  
@@ -97,7 +97,7 @@ stats_sourceNeutron = (TVectorT<double>*)sourceNeutron->Get("TVectorT<double>;1"
  h_Neutron_Momentum_Initial = (TH1F*)sourceNeutron->Get("Neutron_Momentum_Initial;1");
  h_Neutron_Energy_Initial = (TH1F*)sourceNeutron->Get("Neutron_Energy_Initial;1");
  h_Neutron_Energy = (TH1F*)sourceNeutron->Get("Neutron_Energy;1");
-
+ h_selectedRecoilMomentum = (TH1F*)sourceNeutron->Get("selectedRecoilMomentum;1");
  // Real NP scattering Plots
  h_Proton_Recoil_Real = (TH1F*)sourceNeutron->Get("recoilAngle_Real;1");
  h_Proton_Energy_Real = (TH1F*)sourceNeutron->Get("recoilEnergy_Real;1");
@@ -125,6 +125,7 @@ stats_sourceNeutron = (TVectorT<double>*)sourceNeutron->Get("TVectorT<double>;1"
  TCanvas *neutronInformation = new TCanvas("neutronInformation","Neutron Diagnostics",800,900);
  TCanvas *realNPevent = new TCanvas("realNPevent","Plots for Real NP Event",1000,1200);
  TCanvas *dEvsENPevent = new TCanvas("dEvsENPevent","dE vs. E for Real NP Event",1000,1200);
+ TCanvas *recoilMomentum = new TCanvas("recoilMomentum","Recoil Proton Momentum", 1000, 1200);
  
  // Histogram Stats Removed**
  //gStyle->SetOptStat(0);
@@ -284,6 +285,14 @@ stats_sourceNeutron = (TVectorT<double>*)sourceNeutron->Get("TVectorT<double>;1"
  h_dEvsE_Real->GetYaxis()->SetTitle("dE-Array Energy Deposited (MeV)");
  //h_dEvsE_Real->Rebin2D(2);
  h_dEvsE_Real->DrawCopy("cont4");
+
+ recoilMomentum->Divide(2,2,0.0001, 0.00001,0);
+ recoilMomentum->cd(1);
+ h_selectedRecoilMomentum->SetTitle("Recoil Proton Momentum (MeV/c)^2");
+ h_selectedRecoilMomentum->GetXaxis()->SetTitleSize(0.03);
+ h_selectedRecoilMomentum->GetYaxis()->SetTitleSize(0.03);
+ h_selectedRecoilMomentum->SetTitle("Counts");
+ h_selectedRecoilMomentum->DrawCopy();
  
  // Write out canvases to file 
  dEoverE_dToF->Write();
@@ -292,6 +301,7 @@ stats_sourceNeutron = (TVectorT<double>*)sourceNeutron->Get("TVectorT<double>;1"
  neutronInformation->Write();
  realNPevent->Write();
  dEvsENPevent->Write();
+ recoilMomentum->Write();
  // Close files
  outFile->Close();
  sourceNeutron->Close();
