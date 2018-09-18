@@ -142,6 +142,7 @@ int main(int argc, char *argv[]) {
 
     npolTree->GetEntry(i);
 	
+	std::map<int,NpolVertex *> vertexMap;  // Vertex Map of tracks that originate from event of interest
     std::map<std::string,NpolDetectorEvent *> detEvents;   // Event map (NPOL Detector Class)
 	std::map<PolarimeterDetector, double> eDepArrayTotal;  // Total energy map for each array
     eDepArrayTotal[analyzer] = 0.0;
@@ -162,6 +163,7 @@ int main(int argc, char *argv[]) {
 	bool inelasticFlag = false; bool elasticFlag = false; bool pionFlag = false;
 	bool quasielasticFlag = false; 
 
+
 	std::vector<NpolStep *>::iterator ps_it;
 	for(ps_it = steps->begin(); ps_it != steps->end(); ps_it++) {
 	  NpolStep *aStep = *ps_it;
@@ -179,8 +181,11 @@ int main(int argc, char *argv[]) {
 	  if((PID == 0 && TID == 1) && (AVNum == 9 || AVNum == 10)){
 		if(physProcess == "hadElastic"){
 		  elasticFlag = true;
+		  PhysVars->fillVertexMap(vertexMap,verts,1,volName);
+		  PhysVars->printVertexMap(vertexMap,i);
 		} else if(physProcess == "neutronInelastic"){
 		  inelasticFlag = true;
+		  PhysVars->fillVertexMap(vertexMap,verts,1,volName);
 		} else {
 		  continue;
 		}
@@ -208,7 +213,7 @@ int main(int argc, char *argv[]) {
 
 	// Comment out the corresponding statement below in order to select the events you want to analyze
 	// Comment out all to keep all events
-	if(!(elasticFlag || inelasticFlag)) continue;
+	//if(!(elasticFlag || inelasticFlag)) continue;
 	//if((quasielasticFlag || inelasticFlag) && !(elasticFlag)) continue; // Elastic events only
 	//if((elasticFlag || inelasticFlag) && !(quasielasticFlag)) continue;  // Quasielastic events only
 	//if((quasielasticFlag || elasticFlag) && !(inelasticFlag)) continue; // Inelastic events only
@@ -216,8 +221,7 @@ int main(int argc, char *argv[]) {
 	// ***** After determining the 'npAVNum' which has the (n,p) scattering, we scan through *****
 	// the tracks vector again to fill the histograms and use 'npAVNum' as a cut as necessary
 
-	std::map<int,NpolVertex *> vertexMap;
-	PhysVars->fillVertexMap(vertexMap,verts,1);
+
 
 	std::map<int,NpolVertex *>::iterator part_it;
 	double highMomentum = 0.0; double currentMomentum = 0.0;
@@ -243,7 +247,7 @@ int main(int argc, char *argv[]) {
 		neutronMomentum = PhysVars->computeMomentum(part_it->second->momX,part_it->second->momY,part_it->second->momZ);
 	  }
 	  
-	  if(currentMomentum > highMomentum && (pType == 2212 /*|| pType == 211 || pType == -211*/)){
+	  if(currentMomentum > highMomentum && (pType == 2212 || pType == 211 || pType == -211)){
 		highMomentum = currentMomentum;
 		selectTID = TID;
 		highEnergy = part_it->second->energy;
@@ -264,12 +268,32 @@ int main(int argc, char *argv[]) {
 		elasticMomentum = PhysVars->computeElasticMomentum(neutronMomentum, computedAngle*TMath::DegToRad());
 	  }	  
 	}
-
-	if(selectTID > 1 && highEnergy >= 50 /*MeV*/) {
-
-		selectedRecoilMomentum->Fill(highMomentum - elasticMomentum);  
-	}
 	
+	if(selectTID > 1 && highEnergy >= 50 /*MeV*/) {
+	  std::cout << "Recoil energy is = " << highEnergy << " MeV" << std::endl;
+	  selectedRecoilMomentum->Fill(highMomentum - elasticMomentum);  
+	}
+
+	// Attempt at identifying the "good" proton track
+	std::map<int,NpolVertex *>::iterator part_it2;
+	double initNeutronEnergy = 0.0;
+	for(part_it2 = vertexMap.begin(); part_it2 != vertexMap.end(); part_it2++){
+	  int TID2 = part_it2->first;
+	  double particleEnergy = part_it2->second->energy;
+	  int pType = part_it2->second->particleId;
+	  if(TID2 == 1) initNeutronEnergy = particleEnergy;
+
+	  
+	  if(TID2 > 1){
+		if(pType == 2112 && particleEnergy >= 0.90*initNeutronEnergy){
+		  std::cout << "TID = " << TID2 << " is our neutron of interest" << std::endl;
+	  }
+		
+	  }
+	}
+
+	
+	// Old Method for identifying the "good" proton track
 	std::set<int> goodProtonTracks;
 	std::vector<NpolVertex *>::iterator v_it;
 	for(v_it = verts->begin(); v_it != verts->end(); v_it++){
