@@ -31,7 +31,8 @@ public:
   double computeBetheBloch(double KE, double Mass, int z, double rho, double A, int Z, double I);
   double computeEnergyLoss(double protonEnergy, double thetaP, double scintThick);
   void fillDetectorEventMap(std::map<std::string,NpolDetectorEvent *> &eventMap, const NpolStep *aStep);
-  void fillVertexMap(std::map<int,NpolVertex *> &theVertexMap, const std::vector<NpolVertex *> *vertVector, int DesiredPID);
+  void fillVertexMap(std::map<int,NpolVertex *> &theVertexMap, const std::vector<NpolVertex *> *vertVector, int DesiredPID, std::string eventVolume);
+  void printVertexMap(std::map<int,NpolVertex *> &theVertexMap, int eventID);
   double computeMomentum(double xMom, double yMom, double zMom);
   double computeScatTheta(double xMom, double yMom);
   double computeScatPhi(double zMom, double totalMom);
