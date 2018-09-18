@@ -403,7 +403,7 @@ double NpolPhysicsVariables::computeScatPhi(double zMom, double totalMom){
 
 }
 
-void NpolPhysicsVariables::fillVertexMap(std::map<int,NpolVertex *> &theVertexMap, const std::vector<NpolVertex *> *vertVector, int DesiredPID){
+void NpolPhysicsVariables::fillVertexMap(std::map<int,NpolVertex *> &theVertexMap, const std::vector<NpolVertex *> *vertVector, int DesiredPID, std::string eventVolume){
   
   // **** This method fills a map that is keyed with track IDs to vertex
   // information from NpolVertex vector.  The only tracks saved in the map
@@ -424,11 +424,12 @@ void NpolPhysicsVariables::fillVertexMap(std::map<int,NpolVertex *> &theVertexMa
 				<< std::endl;
 	}
 
+	
 	// Well, I can't figure out how to copy data at one pointer
 	// to data at another pointer (in a map) and then later delete
 	// the pointers in the map without it killing the original pointers
 	// So this resulted :(((
-	if(PID == DesiredPID || PID == 0){
+	if((PID == DesiredPID && volName == eventVolume) || PID == 0){
 	  if(theVertexMap.find(TID) == theVertexMap.end()){
 		theVertexMap[TID] = new NpolVertex();
 		//theVertexMap[TID] = aVertex;
@@ -443,12 +444,41 @@ void NpolPhysicsVariables::fillVertexMap(std::map<int,NpolVertex *> &theVertexMa
 		theVertexMap[TID]->energy = aVertex->energy;
 		theVertexMap[TID]->eMiss = aVertex->eMiss;
 		theVertexMap[TID]->particleId = aVertex->particleId;
+		theVertexMap[TID]->particle = aVertex->particle;
 		theVertexMap[TID]->process = aVertex->process;
 		theVertexMap[TID]->volume = aVertex->volume;
 		theVertexMap[TID]->daughterIds = aVertex->daughterIds;
 	  }
 	}	
   }
+}
+
+void NpolPhysicsVariables::printVertexMap(std::map<int,NpolVertex *> &theVertexMap, int eventID){
+  
+  NpolEventPreProcessing *PProcess = NpolEventPreProcessing::GetInstance();
+  NpolEventProcessing *Process = NpolEventProcessing::GetInstance();
+
+  std::cout << "*********Starting Vertex Map Dump**********" << std::endl;
+  std::map<int,NpolVertex *>::iterator mapIt;
+  for(mapIt = theVertexMap.begin(); mapIt != theVertexMap.end(); mapIt++){
+	int PID = mapIt->second->parentId;
+	int TID = mapIt->second->trackId;
+	int pType = mapIt->second->particleId;
+	std::string partName = mapIt->second->particle;
+	std::string volName = mapIt->second->volume;
+	double Time = mapIt->second->time;
+	double Energy = mapIt->second->energy;
+	
+	std::cout << "      Event #: " << eventID << " PID = "<< PID << " TID = " << TID
+			  << "   Particle " << pType << " " << partName << " AV #: "
+			  << PProcess->GetAVNumber(volName)
+			  << " Impr #: " << PProcess->GetImprNumber(volName) << " PV #: "
+			  << PProcess->GetPlacementNumber(volName)
+			  << " SOI: " << Process->sectionNumber(volName) << " Time = "
+			  << Time << " Particle Energy: "
+			  << Energy << std::endl;
+  }
+  std::cout << "*********Ending Vertex Map Dump**********" << std::endl;
 }
 
 double NpolPhysicsVariables::computeElasticMomentum(double neutronMomentum, double thetaP){
@@ -470,6 +500,7 @@ double NpolPhysicsVariables::computeElasticMomentum(double neutronMomentum, doub
   double C = pow(gamma,2) + pow(beta,2) * pow(mP,2);
 
   double recoilEnergy = (-B + sqrt(pow(B,2) - 4 * A * C))/(2 * A);
+  std::cout << "Recoil Energy Should be = " << recoilEnergy << " MeV" << std::endl;
   momentum = sqrt(pow(recoilEnergy,2) - pow(mP,2));
   
   return momentum;
