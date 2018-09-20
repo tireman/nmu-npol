@@ -37,6 +37,9 @@ public:
   double computeScatTheta(double xMom, double yMom);
   double computeScatPhi(double zMom, double totalMom);
   double computeElasticMomentum(double neutronMomentum, double thetaP);
+  bool checkQuasiElasticScattering(std::map<int,NpolVertex *> &theVertexMap);
+  double computeQsquared(double ParticleEnergy, int pType);
+  
 private:
   static NpolPhysicsVariables *PhysVars;
   TRandom3 *randN = new TRandom3();

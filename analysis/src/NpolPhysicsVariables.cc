@@ -460,6 +460,7 @@ void NpolPhysicsVariables::printVertexMap(std::map<int,NpolVertex *> &theVertexM
 
   std::cout << "*********Starting Vertex Map Dump**********" << std::endl;
   std::map<int,NpolVertex *>::iterator mapIt;
+  double totalEnergy = 0.0;
   for(mapIt = theVertexMap.begin(); mapIt != theVertexMap.end(); mapIt++){
 	int PID = mapIt->second->parentId;
 	int TID = mapIt->second->trackId;
@@ -468,17 +469,22 @@ void NpolPhysicsVariables::printVertexMap(std::map<int,NpolVertex *> &theVertexM
 	std::string volName = mapIt->second->volume;
 	double Time = mapIt->second->time;
 	double Energy = mapIt->second->energy;
-	
-	std::cout << "      Event #: " << eventID << " PID = "<< PID << " TID = " << TID
+	double momentum = computeMomentum(mapIt->second->momX, mapIt->second->momY, mapIt->second->momZ);
+	if(mapIt->first != 1) totalEnergy += Energy;
+	std::cout << "      Event #: " << eventID << " PID = "<< PID
+			  << " TID = " << TID
 			  << "   Particle " << pType << " " << partName << " AV #: "
 			  << PProcess->GetAVNumber(volName)
 			  << " Impr #: " << PProcess->GetImprNumber(volName) << " PV #: "
 			  << PProcess->GetPlacementNumber(volName)
 			  << " SOI: " << Process->sectionNumber(volName) << " Time = "
-			  << Time << " Particle Energy: "
-			  << Energy << std::endl;
+			  << Time << " Energy: "
+			  << Energy << " Momentum: " << momentum << std::endl;
   }
+  std::cout << " Total Energy of all particles = " << totalEnergy
+			<< " MeV" << std::endl;
   std::cout << "*********Ending Vertex Map Dump**********" << std::endl;
+  
 }
 
 double NpolPhysicsVariables::computeElasticMomentum(double neutronMomentum, double thetaP){
@@ -500,8 +506,48 @@ double NpolPhysicsVariables::computeElasticMomentum(double neutronMomentum, doub
   double C = pow(gamma,2) + pow(beta,2) * pow(mP,2);
 
   double recoilEnergy = (-B + sqrt(pow(B,2) - 4 * A * C))/(2 * A);
-  std::cout << "Recoil Energy Should be = " << recoilEnergy << " MeV" << std::endl;
   momentum = sqrt(pow(recoilEnergy,2) - pow(mP,2));
   
   return momentum;
 }
+
+
+bool NpolPhysicsVariables::checkQuasiElasticScattering(std::map<int,NpolVertex *> &theVertexMap){
+  bool flag = false;
+
+  double neutEnergy = 0.0; double protEnergy = 0.0;
+  std::map<int,NpolVertex *>::iterator mapIt;
+  for(mapIt = theVertexMap.begin(); mapIt != theVertexMap.end(); mapIt++){
+	double energy = mapIt->second->energy;
+	int pType = mapIt->second->particleId;
+	if(mapIt->first > 1){
+	  if(pType == 2112) neutEnergy = energy;
+	  if(pType == 2212) protEnergy = energy;
+	}
+  }
+
+  if(neutEnergy >= protEnergy){
+	return flag = true;
+  } else {
+	return flag = false;
+  }
+}
+
+double NpolPhysicsVariables::computeQsquared(double ParticleEnergy, int pType){
+
+  double mN = 939.56538; // (MeV/c^2)
+  double mP = 938.27205; // (MeV/c^2)
+  double mass = 0.0;
+  if(pType == 2112){
+	mass = mN;
+  } else if(pType == 2212){
+	mass = mP;
+  } else {
+	mass = 0.0;
+  }
+  
+  double nu = ParticleEnergy - mass;
+  double qsquared = -2 * mass * nu;
+  return qsquared;
+}
+
