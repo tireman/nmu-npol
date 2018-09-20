@@ -92,7 +92,8 @@ int main(int argc, char *argv[]) {
   TH1F *h_recoilAngle = new TH1F("recoil_angle","Proton Recoil Angle", 200, 0.0, 180.0); 
   TH1F *h_recoilAngle_Raw =
 	new TH1F("recoil_angle_raw","Proton Recoil Angle Before Angle Cut", 200, 0.0, 180.0);
-  TH1F *selectedRecoilMomentum = new TH1F("selectedRecoilMomentum","Highest Energy Recoil Proton Momentum",200, -3000.0, 1000.0);
+  TH1F *selectedRecoilMomentum = new TH1F("selectedRecoilMomentum","Highest Energy Recoil Proton Momentum",200, 000.0, 2.0e6);
+  TH1F *QsquaredTest = new TH1F("Qsquared"," Q-Squared Value for recoil Proton", 100, 0.0, 2e6);
 
   TH1F *h_Neutron_Theta_Angle =
 	new TH1F("Neutron_Theta_Angle","Neutron Angle at first tagger", 100, 15.0, 40.0);
@@ -138,7 +139,7 @@ int main(int argc, char *argv[]) {
   TRandom *rand = new TRandom3();
   for(int i = 0; i < nentries; i++) {
 	//for(int i = 0; i < 1; i++) {
-   	if(i % 1 == 0) std::cout << "Processing event #" << i << std::endl;
+   	if(i % 1000 == 0) std::cout << "Processing event #" << i << std::endl;
 
     npolTree->GetEntry(i);
 	
@@ -159,10 +160,10 @@ int main(int argc, char *argv[]) {
 	// two types of events.  For now (28-Aug-2018), this will only separate elastic and inelastic events.
 	// This is to analyze simulation output for "real" (n,p) scattering events
 	
-	int npAVNum = 0; int npImprNum = 0; int npPVNum = -1; int npSOI = -2; int npPID = -1;
-	bool inelasticFlag = false; bool elasticFlag = false; bool pionFlag = false;
+	int npAVNum = 0; int npImprNum = 0; int npPVNum = -1;
+	int npSOI = -2; int npPID = -1;
+	bool inelasticFlag = false; bool elasticFlag = false; //bool pionFlag = false;
 	bool quasielasticFlag = false; 
-
 
 	std::vector<NpolStep *>::iterator ps_it;
 	for(ps_it = steps->begin(); ps_it != steps->end(); ps_it++) {
@@ -177,17 +178,51 @@ int main(int argc, char *argv[]) {
 	  int section = Process->sectionNumber(volName);
 	  int PID = aStep->parentId;
 	  int TID = aStep->trackId;
-	  //int neutronCount = 0; int protonCount = 0; int gammaCount = 0; int othersCount = 0; int pionCount = 0;
+
 	  if((PID == 0 && TID == 1) && (AVNum == 9 || AVNum == 10)){
 		if(physProcess == "hadElastic"){
 		  elasticFlag = true;
 		  PhysVars->fillVertexMap(vertexMap,verts,1,volName);
-		  PhysVars->printVertexMap(vertexMap,i);
+
 		} else if(physProcess == "neutronInelastic"){
-		  inelasticFlag = true;
+		  //inelasticFlag = true;
 		  PhysVars->fillVertexMap(vertexMap,verts,1,volName);
+		  //PhysVars->printVertexMap(vertexMap,i);
+		  int neutronCount = 0; int protonCount = 0; int gammaCount = 0;
+		  int othersCount = 0; int pionCount = 0;
+		 
+		  std::map<int,NpolVertex *>::iterator mapIt;
+		  for(mapIt = vertexMap.begin(); mapIt != vertexMap.end(); mapIt++){
+			int pType = mapIt->second->particleId;
+			if(mapIt->second->parentId == 0) continue;
+			if(pType == 2112) {neutronCount++;
+			}else if(pType == 2212) {protonCount++;
+			}else if(pType == 22) {gammaCount++;
+			}else if(pType == 111 || pType == 211 || pType == -211) {pionCount++;
+			}else {othersCount++;}
+		  }
+
+		  if(pionCount != 0) {
+			inelasticFlag = true;
+		  } else if(neutronCount >= 1 && protonCount >= 1 && gammaCount >= 0){
+			quasielasticFlag = PhysVars->checkQuasiElasticScattering(vertexMap);  //Quasi-elastic check call
+		  } else {
+			continue;
+		  }
 		} else {
 		  continue;
+		}
+
+		if(elasticFlag || inelasticFlag || quasielasticFlag){
+		  std::map<int,NpolVertex *>::iterator mapIt;
+		  double partEnergy = 0.0;
+		  for(mapIt = vertexMap.begin(); mapIt != vertexMap.end(); mapIt++){
+			if(mapIt->second->energy >= partEnergy
+			   && mapIt->second->particleId == 2212)
+			  partEnergy = mapIt->second->energy;
+		  }
+		  QsquaredTest->Fill(PhysVars->computeQsquared(partEnergy,2212));
+		  PhysVars->printVertexMap(vertexMap,i);
 		}
 		
 		if(elasticFlag || quasielasticFlag || inelasticFlag){
@@ -247,7 +282,7 @@ int main(int argc, char *argv[]) {
 		neutronMomentum = PhysVars->computeMomentum(part_it->second->momX,part_it->second->momY,part_it->second->momZ);
 	  }
 	  
-	  if(currentMomentum > highMomentum && (pType == 2212 || pType == 211 || pType == -211)){
+	  if(currentMomentum > highMomentum && (pType == 2212 /*|| pType == 211 || pType == -211*/)){
 		highMomentum = currentMomentum;
 		selectTID = TID;
 		highEnergy = part_it->second->energy;
@@ -270,7 +305,6 @@ int main(int argc, char *argv[]) {
 	}
 	
 	if(selectTID > 1 && highEnergy >= 50 /*MeV*/) {
-	  std::cout << "Recoil energy is = " << highEnergy << " MeV" << std::endl;
 	  selectedRecoilMomentum->Fill(highMomentum - elasticMomentum);  
 	}
 
@@ -311,14 +345,15 @@ int main(int argc, char *argv[]) {
 	  bool BotdEdetFlag = false; bool BotEdetFlag = false;
 	  if(PID == npPID && pType == 2212){
 		double particleEnergy = aVertex->energy;
-		std::cout << "      Event #: " << i << " PID = "<< PID << " TID = " << TID
+		/*std::cout << "      Event #: " << i << " PID = "<< PID 
+		  << " TID = " << TID
 				  << "   Particle " << pType << " " << aVertex->particle << " AV #: "
 				  << PProcess->GetAVNumber(volName)
 				  << " Impr #: " << PProcess->GetImprNumber(volName) << " PV #: "
 				  << PProcess->GetPlacementNumber(volName)
 				  << " SOI: " << Process->sectionNumber(volName) << " Time = "
 				  << aVertex->time << " Particle Energy: "
-				  << aVertex->energy << std::endl;
+				  << aVertex->energy << std::endl;*/
 		if(particleEnergy >= 25 /*MeV*/){
 		  std::vector<NpolStep *>::iterator ss_it;
 		  for(ss_it = steps->begin(); ss_it != steps->end(); ss_it++) {
@@ -559,6 +594,7 @@ int main(int argc, char *argv[]) {
   h_recoilAngle_Real->Write();
   h_recoilEnergy_Real->Write();
   selectedRecoilMomentum->Write();
+  QsquaredTest->Write();
   h_asymmetry_Real->Write();
   outFile->Close();
   return 0;
