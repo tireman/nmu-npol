@@ -37,9 +37,9 @@ private:
   static NpolHistoManager *HistoMan;
 
 public:
-  TFile *outFile = NULL;
-  TH1F *h_recoilAngle_Real;
-  std::map<std::string,TH1F* > histograms;
+  TFile *outFile2 = NULL;
+  TH1F *h_recoilAngle_Real2;
+  std::map<std::string,TH1F* > histoMap;
   
 };
 
