@@ -72,6 +72,7 @@ stats_sourceNeutron = (TVectorT<double>*)sourceNeutron->Get("TVectorT<double>;1"
  TH1F *h_Proton_Energy_Real;
  TH1F *h_asymmetry_Real;
  TH1F *h_selectedRecoilMomentum;
+ TH1F *h_qsquaredTest;
  
 // Assign Histos from the input file to a pointer
  
@@ -98,6 +99,8 @@ stats_sourceNeutron = (TVectorT<double>*)sourceNeutron->Get("TVectorT<double>;1"
  h_Neutron_Energy_Initial = (TH1F*)sourceNeutron->Get("Neutron_Energy_Initial;1");
  h_Neutron_Energy = (TH1F*)sourceNeutron->Get("Neutron_Energy;1");
  h_selectedRecoilMomentum = (TH1F*)sourceNeutron->Get("selectedRecoilMomentum;1");
+ h_qsquaredTest = (TH1F*)sourceNeutron->Get("Qsquared;1");
+ 
  // Real NP scattering Plots
  h_Proton_Recoil_Real = (TH1F*)sourceNeutron->Get("recoilAngle_Real;1");
  h_Proton_Energy_Real = (TH1F*)sourceNeutron->Get("recoilEnergy_Real;1");
@@ -288,11 +291,17 @@ stats_sourceNeutron = (TVectorT<double>*)sourceNeutron->Get("TVectorT<double>;1"
 
  recoilMomentum->Divide(2,2,0.0001, 0.00001,0);
  recoilMomentum->cd(1);
- h_selectedRecoilMomentum->SetTitle("Recoil Proton Momentum (MeV/c)^2");
+ h_selectedRecoilMomentum->SetTitle("Recoil Proton Momentum (MeV/c)");
  h_selectedRecoilMomentum->GetXaxis()->SetTitleSize(0.03);
  h_selectedRecoilMomentum->GetYaxis()->SetTitleSize(0.03);
  h_selectedRecoilMomentum->SetTitle("Counts");
  h_selectedRecoilMomentum->DrawCopy();
+ recoilMomentum->cd(2);
+ h_qsquaredTest->SetTitle("Recoil Proton Q-Squared Value (MeV/c)^2");
+ h_qsquaredTest->GetXaxis()->SetTitleSize(0.03);
+ h_qsquaredTest->GetYaxis()->SetTitleSize(0.03);
+ h_qsquaredTest->SetTitle("Counts");
+ h_qsquaredTest->DrawCopy();
  
  // Write out canvases to file 
  dEoverE_dToF->Write();
