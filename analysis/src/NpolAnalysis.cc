@@ -91,7 +91,7 @@ int main(int argc, char *argv[]) {
   HistoMan->CreateHistograms("asymmetryReal","Real Asymmetry from Recoil Proton",5, -2,+2); 
   HistoMan->CreateHistograms("recoilAngle","Proton Recoil Angle", 200, 0.0, 180.0);
   HistoMan->CreateHistograms("recoilAngleRaw","Proton Recoil Angle Before Angle Cut", 200, 0.0, 180.0);
-  HistoMan->CreateHistograms("selectedRecoilMomentum","Highest Energy Recoil Proton Momentum",200, 000.0, 2.0e6);
+  HistoMan->CreateHistograms("selectedRecoilMomentum","Highest Energy Recoil Proton Momentum",200, -3000.0, 1000.);
   HistoMan->CreateHistograms("Qsquared","Q-Squared Value for recoil Proton", 100, 0.0, 2e6);					   
   HistoMan->CreateHistograms("NeutronThetaAngle","Neutron Angle at first tagger", 100, 15.0, 40.0);
   HistoMan->CreateHistograms("NeutronMomentum","Neutron Momentum at the first tagger",100, 1600.0, 3200.0);
@@ -153,7 +153,6 @@ int main(int argc, char *argv[]) {
 	// two types of events.  For now (28-Aug-2018), this will only separate elastic and inelastic events.
 	// This is to analyze simulation output for "real" (n,p) scattering events
 	
-	int npAVNum = 0; int npImprNum = 0; int npPVNum = -1;
 	int npSOI = -2; int npPID = -1;
 	bool inelasticFlag = false; bool elasticFlag = false; //bool pionFlag = false;
 	bool quasielasticFlag = false; 
@@ -162,12 +161,10 @@ int main(int argc, char *argv[]) {
 	for(ps_it = steps->begin(); ps_it != steps->end(); ps_it++) {
 	  NpolStep *aStep = *ps_it;
 	  if(aStep == NULL) continue;
-	  
+
 	  std::string physProcess = aStep->process;
 	  std::string volName = aStep->volume;
 	  int AVNum = PProcess->GetAVNumber(volName);
-	  int ImprNum = PProcess->GetImprNumber(volName);
-	  int PVNum = PProcess->GetPlacementNumber(volName);
 	  int section = Process->sectionNumber(volName);
 	  int PID = aStep->parentId;
 	  int TID = aStep->trackId;
@@ -176,52 +173,36 @@ int main(int argc, char *argv[]) {
 		if(physProcess == "hadElastic"){
 		  elasticFlag = true;
 		  PhysVars->fillVertexMap(vertexMap,verts,1,volName);
-
+		  
 		} else if(physProcess == "neutronInelastic"){
-		  //inelasticFlag = true;
-		  PhysVars->fillVertexMap(vertexMap,verts,1,volName);
-		  //PhysVars->printVertexMap(vertexMap,i);
 		  int neutronCount = 0; int protonCount = 0; int gammaCount = 0;
 		  int othersCount = 0; int pionCount = 0;
-		 
+		  
+		  PhysVars->fillVertexMap(vertexMap,verts,1,volName);
 		  std::map<int,NpolVertex *>::iterator mapIt;
 		  for(mapIt = vertexMap.begin(); mapIt != vertexMap.end(); mapIt++){
 			int pType = mapIt->second->particleId;
 			if(mapIt->second->parentId == 0) continue;
-			if(pType == 2112) {neutronCount++;
-			}else if(pType == 2212) {protonCount++;
-			}else if(pType == 22) {gammaCount++;
-			}else if(pType == 111 || pType == 211 || pType == -211) {pionCount++;
-			}else {othersCount++;}
+			if(pType == 2112) neutronCount++;
+			else if(pType == 2212) protonCount++;
+			else if(pType == 22) gammaCount++;
+			else if(pType == 111 || pType == 211 || pType == -211) pionCount++;
+			else othersCount++;
 		  }
 
 		  if(pionCount != 0) {
 			inelasticFlag = true;
-		  } else if(neutronCount >= 1 && protonCount >= 1 && gammaCount >= 0){
-			quasielasticFlag = PhysVars->checkQuasiElasticScattering(vertexMap);  //Quasi-elastic check call
+		  } else if(neutronCount >= 0 && protonCount >= 0 && gammaCount >= 0){
+			//Quasi-elastic check call
+			quasielasticFlag = PhysVars->checkQuasiElasticScattering(vertexMap);  
 		  } else {
 			continue;
 		  }
 		} else {
 		  continue;
 		}
-
-		if(elasticFlag || inelasticFlag || quasielasticFlag){
-		  std::map<int,NpolVertex *>::iterator mapIt;
-		  double partEnergy = 0.0;
-		  for(mapIt = vertexMap.begin(); mapIt != vertexMap.end(); mapIt++){
-			if(mapIt->second->energy >= partEnergy
-			   && mapIt->second->particleId == 2212)
-			  partEnergy = mapIt->second->energy;
-		  }
-		  HistoMan->FillHistograms("Qsquared",PhysVars->computeQsquared(partEnergy,2212));
-		  //PhysVars->printVertexMap(vertexMap,i);
-		}
 		
 		if(elasticFlag || quasielasticFlag || inelasticFlag){
-		  npAVNum = AVNum;
-		  npImprNum = ImprNum;
-		  npPVNum = PVNum;
 		  npSOI = section;
 		  npPID = TID;   // Track ID of neutron is Parent ID of the generated secondary(ies)
 		  break;         // Break out of the loop once the original neutron interacts!
@@ -231,146 +212,95 @@ int main(int argc, char *argv[]) {
 	  }
 	}
 	
+
   
-	// ***** This statement checks to see if the flags of events NOT of interest are set. If so ***** //
-	// then the event processing is canceled by the continue statment which cycles the loop. 
+	// ***** This statement checks to see if the flags of events NOT of interest  ***** //
+	// are set. If so then the event processing is canceled by the continue statment
+	// which cycles the loop. 
 	// This kills the EVENT as a WHOLE; Beware!! //
 	
 	// Check if NO flags set; kill event processing
 	if(!(elasticFlag) && !(inelasticFlag) && !(quasielasticFlag)) continue;  
 
-	// Comment out the corresponding statement below in order to select the events you want to analyze
-	// Comment out all to keep all events
-	//if(!(elasticFlag || inelasticFlag)) continue;
-	//if((quasielasticFlag || inelasticFlag) && !(elasticFlag)) continue; // Elastic events only
-	//if((elasticFlag || inelasticFlag) && !(quasielasticFlag)) continue;  // Quasielastic events only
-	//if((quasielasticFlag || elasticFlag) && !(inelasticFlag)) continue; // Inelastic events only
+	// Comment out the corresponding statement below in order to select
+	// the events you want to analyze.  Comment out all to keep all events
+
+	//if((quasielasticFlag || inelasticFlag) && !(elasticFlag)) continue;
+	// Elastic events only
+	//if((elasticFlag || inelasticFlag) && !(quasielasticFlag)) continue;
+	// Quasielastic events only
+	//if((quasielasticFlag || elasticFlag) && !(inelasticFlag)) continue;
+	// Inelastic events only
 	
+  
+	// ****** This section computes the (P_leading - P_elastic) ******
+	// ****** value and saves into histogram                    ******
+	double neutronMomentum = PhysVars->computeInitialNeutronMomentum(vertexMap);
+	int selectedTID = PhysVars->findLeadingParticle(vertexMap);
+	double computedAngle = PhysVars->computeLeadingParticleAngle(vertexMap,selectedTID);
+	double leadingParticleMomentum =
+	  PhysVars->computeLeadingParticleMomentum(vertexMap,selectedTID);
+	double elasticMomentum = PhysVars->computeElasticMomentum(neutronMomentum, computedAngle*TMath::DegToRad());
+  	
+	HistoMan->FillHistograms("selectedRecoilMomentum",(leadingParticleMomentum - elasticMomentum));  
+	// ****** End (P_leading - P_elastic) code ******
+
+
+
+
 	// ***** After determining the 'npAVNum' which has the (n,p) scattering, we scan through *****
 	// the tracks vector again to fill the histograms and use 'npAVNum' as a cut as necessary
-
-
-
-	std::map<int,NpolVertex *>::iterator part_it;
-	double highMomentum = 0.0; double currentMomentum = 0.0;
-	double elasticMomentum = 0.0; double neutronMomentum = 0.0;
-	double highEnergy = 0.0;
-	int selectTID = 0;
-	double P1x = 0.; double P1y = 0.; double P1z = 0.;
-	double P2x = 0.; double P2y = 0.; double P2z = 0.;
-	double P3x = 0.; double P3y = 0.; double P3z = 0.;
-	for(part_it = vertexMap.begin(); part_it != vertexMap.end(); part_it++){
-	  int TID = part_it->first;
-	  int pType = part_it->second->particleId;
-
-	  double momX = part_it->second->momX;
-	  double momY = part_it->second->momY;
-	  double momZ = part_it->second->momZ;
-	  currentMomentum = PhysVars->computeMomentum(momX,momY,momZ);
-	  
-	  if(TID == 1) {
-		P1x = part_it->second->posX;
-		P1y = part_it->second->posY;
-		P1z = part_it->second->posZ;
-		neutronMomentum = PhysVars->computeMomentum(part_it->second->momX,part_it->second->momY,part_it->second->momZ);
-	  }
-	  
-	  if(currentMomentum > highMomentum && (pType == 2212 /*|| pType == 211 || pType == -211*/)){
-		highMomentum = currentMomentum;
-		selectTID = TID;
-		highEnergy = part_it->second->energy;
-		
-		P2x = part_it->second->posX;
-		P2y = part_it->second->posY;
-		P2z = part_it->second->posZ;
-		
-		double P2Theta = PhysVars->computeScatTheta(momX,momY);
-		double P2Phi = PhysVars->computeScatPhi(momZ,currentMomentum); 
-		  
-		P3x = P2x + 2*TMath::Sin(P2Phi)*TMath::Cos(P2Theta);
-		P3y = P2y + 2*TMath::Sin(P2Phi)*TMath::Sin(P2Theta);
-		P3z = P2z + 2*TMath::Cos(P2Phi);
-		double computedAngle =
-		  PhysVars->getAzimuthAngle(P1x,P1y,P1z,P2x,P2y,P2z,P3x,P3y,P3z);
-
-		elasticMomentum = PhysVars->computeElasticMomentum(neutronMomentum, computedAngle*TMath::DegToRad());
-	  }	  
-	}
-	
-	if(selectTID > 1 && highEnergy >= 50 /*MeV*/) {
-	  HistoMan->FillHistograms("selectedRecoilMomentum",(highMomentum - elasticMomentum));  
-	}
-
-	// Attempt at identifying the "good" proton track
-	std::map<int,NpolVertex *>::iterator part_it2;
-	double initNeutronEnergy = 0.0;
-	for(part_it2 = vertexMap.begin(); part_it2 != vertexMap.end(); part_it2++){
-	  int TID2 = part_it2->first;
-	  double particleEnergy = part_it2->second->energy;
-	  int pType = part_it2->second->particleId;
-	  if(TID2 == 1) initNeutronEnergy = particleEnergy;
-
-	  
-	  if(TID2 > 1){
-		if(pType == 2112 && particleEnergy >= 0.90*initNeutronEnergy){
-		  std::cout << "TID = " << TID2 << " is our neutron of interest" << std::endl;
-	  }
-		
-	  }
-	}
-
-	
-	// Old Method for identifying the "good" proton track
-	std::set<int> goodProtonTracks;
-	std::vector<NpolVertex *>::iterator v_it;
-	for(v_it = verts->begin(); v_it != verts->end(); v_it++){
-	  NpolVertex *aVertex = *v_it;
-	  if(aVertex == NULL) continue;
-
-	  int PID = aVertex->parentId;
-	  int TID = aVertex->trackId;
-	  long int pType = aVertex->particleId;
-	  std::string process = aVertex->process;
-	  std::string volName = aVertex->volume;
 	  
 	  // ***** This alogrithm will test each track to see if it is a 'good' proton track for this event *****
+
+	double maxEnergy = 0.0;
+	int bestProtonTID = 0;
+	std::map<int,NpolVertex *>::iterator mapIt;
+	for(mapIt = vertexMap.begin(); mapIt != vertexMap.end(); mapIt++){
 	  bool TopdEdetFlag = false; bool TopEdetFlag = false;
 	  bool BotdEdetFlag = false; bool BotEdetFlag = false;
-	  if(PID == npPID && pType == 2212){
-		double particleEnergy = aVertex->energy;
-		if(particleEnergy >= 25 /*MeV*/){
-		  std::vector<NpolStep *>::iterator ss_it;
-		  for(ss_it = steps->begin(); ss_it != steps->end(); ss_it++) {
-			NpolStep *aStep = *ss_it;
-			if(aStep == NULL) continue;
-			
-			int stepPID = aStep->parentId;
-			int stepTID = aStep->trackId;
-			int steppType = aStep->particleId;
-			if(((stepPID == PID) && (stepTID == TID) && (steppType == 2212))){
-			  std::string stepVolName = aStep->volume;
-			  int stepAVNum = PProcess->GetAVNumber(stepVolName);
-			  int stepSection = Process->sectionNumber(stepVolName);
-			  if(stepSection == npSOI){
-				if(stepAVNum == 1 || stepAVNum == 2) TopEdetFlag = true;
-				if(stepAVNum == 3 || stepAVNum == 4) TopdEdetFlag = true;
-				if(stepAVNum == 5 || stepAVNum == 6) BotEdetFlag = true;
-				if(stepAVNum == 7 || stepAVNum == 8) BotdEdetFlag = true;
-			  }
+	  int pType = mapIt->second->particleId;
+	  int PID = mapIt->second->parentId;
+	  int TID = mapIt->first;
+	  double particleEnergy = mapIt->second->energy;
+	  if(pType == 2212 && particleEnergy >= 25 /*MeV*/){
+		std::vector<NpolStep *>::iterator ss_it;
+		for(ss_it = steps->begin(); ss_it != steps->end(); ss_it++) {
+		  NpolStep *aStep = *ss_it;
+		  if(aStep == NULL) continue;
+		  
+		  int stepPID = aStep->parentId;
+		  int stepTID = aStep->trackId;
+		  int steppType = aStep->particleId;
+		  if(((stepPID == PID) && (stepTID == TID) && (steppType == 2212))){
+			std::string stepVolName = aStep->volume;
+			int stepAVNum = PProcess->GetAVNumber(stepVolName);
+			int stepSection = Process->sectionNumber(stepVolName);
+			if(stepSection == npSOI){
+			  if(stepAVNum == 1 || stepAVNum == 2) TopEdetFlag = true;
+			  if(stepAVNum == 3 || stepAVNum == 4) TopdEdetFlag = true;
+			  if(stepAVNum == 5 || stepAVNum == 6) BotEdetFlag = true;
+			  if(stepAVNum == 7 || stepAVNum == 8) BotdEdetFlag = true;
 			}
 		  }
 		}
 	  }
-
+	  
 	  bool TopFlag = false; bool BotFlag = false;
 	  if(TopEdetFlag && TopdEdetFlag) TopFlag = true;
 	  if(BotEdetFlag && BotdEdetFlag) BotFlag = true;
-	  if((TopFlag  && !BotFlag) || (!TopFlag && BotFlag)) goodProtonTracks.insert(TID); // ExOR
+	  if((TopFlag  && !BotFlag) || (!TopFlag && BotFlag)){// ExOR
+		if(particleEnergy > maxEnergy){
+		  bestProtonTID = TID;
+		  maxEnergy = particleEnergy;
+		}
+	  }
 	}
-	  
-	// After the proton track has been found, this code will run to compute values, fill histograms
-	std::set<int>::iterator set_it;
-	if(goodProtonTracks.size() == 1){
+	
+	// After the proton track has been found, this code will compute values,
+	// fill histograms
+
+	if(bestProtonTID == 0) continue;
 	  std::vector<NpolVertex *>::iterator vv_it;
 	  for(vv_it = verts->begin(); vv_it != verts->end(); vv_it++){
 		NpolVertex *aVertex = *vv_it;
@@ -392,7 +322,7 @@ int main(int argc, char *argv[]) {
 		}
 		
 		// Process the good Proton Track
-		int GoodTID = (*goodProtonTracks.begin());
+		int GoodTID = bestProtonTID; 
 		if(PID == npPID && TID == GoodTID){
 		  double momX = aVertex->momX; double momY = aVertex->momY; double momZ = aVertex->momZ;
 		  double momTot = PhysVars->computeMomentum(momX,momY,momZ);
@@ -432,8 +362,7 @@ int main(int argc, char *argv[]) {
 		  }
 		}
 	  }
-	}
-	goodProtonTracks.clear(); // Make sure the set is cleared before the next event
+  
   
 	// END TRACK LOOP
 	// >>>>>>>>>>>>>>> This ends the "real NP scattering" part of the code <<<<<<<<<<<<<<<<<<<
@@ -454,7 +383,6 @@ int main(int argc, char *argv[]) {
 	  int AVNum = PProcess->GetAVNumber(aStep->volume);
 	  if(AVNum == -1) continue;
 	  int imprintNum = PProcess->GetImprNumber(aStep->volume);
-	  int PVNum = PProcess->GetPlacementNumber(aStep->volume);
 
 	  if((!eventFlag) && (aStep->parentId == 0) && (aStep->trackId == 1) && (aStep->particleId == 2112) 
 		&& (AVNum == 11) && (imprintNum == 1)) {
@@ -598,3 +526,36 @@ int main(int argc, char *argv[]) {
 // "recoil proton" scattering angle (viz. 45.3-81.6 degrees at Q^2 = 3.95 (GeV/c)^2,
 // 40.8-80.2 degrees at 5.22 (GeV/c)^2, and 36.0-78.3 degrees at 6.88 (GeV/c)^2).
 
+
+	// Attempt at identifying the "good" proton track
+	/*std::map<int,NpolVertex *>::iterator part_it2;
+	double initNeutronEnergy = 0.0;
+	for(part_it2 = vertexMap.begin(); part_it2 != vertexMap.end(); part_it2++){
+	  int TID2 = part_it2->first;
+	  double particleEnergy = part_it2->second->energy;
+	  int pType = part_it2->second->particleId;
+	  if(TID2 == 1) initNeutronEnergy = particleEnergy;
+
+	  
+	  if(TID2 > 1){
+		if(pType == 2112 && particleEnergy >= 0.90*initNeutronEnergy){
+		  std::cout << "TID = " << TID2 << " is our neutron of interest" << std::endl;
+	  }
+		
+	  }
+	  }*/
+
+
+
+		// Compute Q-squared for the recoil proton?
+		/*if(elasticFlag || inelasticFlag || quasielasticFlag){
+		  std::map<int,NpolVertex *>::iterator mapIt;
+		  double partEnergy = 0.0;
+		  for(mapIt = vertexMap.begin(); mapIt != vertexMap.end(); mapIt++){
+			if(mapIt->second->energy >= partEnergy
+			   && mapIt->second->particleId == 2212)
+			  partEnergy = mapIt->second->energy;
+		  }
+		  HistoMan->FillHistograms("Qsquared",PhysVars->computeQsquared(partEnergy,2212));
+		  //PhysVars->printVertexMap(vertexMap,i);
+		  }*/
