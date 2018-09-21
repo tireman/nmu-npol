@@ -251,10 +251,8 @@ double NpolPhysicsVariables::highestEDepPV(const std::map<std::string,NpolDetect
 
 double NpolPhysicsVariables::computeBetheBloch(double KE, double Mass, int z, double rho, double A, int Z, double I){
 
-  /*   This function computes the stopping power of a charged  particle 
-	   through Matter using Bethe formula. Returns the stopping power 
-	   in units of MeV/cm. Detailed explanation goes here
-  */
+  // This function computes the stopping power of a charged  particle through Matter using Bethe formula. 
+  // Returns the stopping power in units of MeV/cm. Detailed explanation goes here 
   
   /* Inputs
 	 KE = kinetic energy of incident particle (MeV)
@@ -285,7 +283,7 @@ double NpolPhysicsVariables::computeBetheBloch(double KE, double Mass, int z, do
   
   double Tmax = (2*mE*beta2*pow(gamma,2))/(1+2*gamma*(mE/M)+ pow((mE/M),2));
 
-  // Correction factor that isn't working yet.  needed for higher energies?
+  // Correction factor that isn't working yet.  needed for higher energies only?
   //hw = sqrt(4*pi()*Ne*re^3)*mE/alpha;
   //densityCorr = log(hw/I) + log(beta*gamma) - 0.5;
   //densityCorr = log(beta.*gamma);
@@ -512,23 +510,31 @@ double NpolPhysicsVariables::computeElasticMomentum(double neutronMomentum, doub
 
 
 bool NpolPhysicsVariables::checkQuasiElasticScattering(std::map<int,NpolVertex *> &theVertexMap){
-  bool flag = false;
+  bool QEflag = false;
 
-  double neutEnergy = 0.0; double protEnergy = 0.0;
+  double initNeutronEnergy = 0.0; double initNeutronMomentum = 0.0;
+  double highMomentum = 0.0; double highEnergy = 0.0;
+  double neutronEnergy = 0.0; double protonEnergy = 0.0;
   std::map<int,NpolVertex *>::iterator mapIt;
   for(mapIt = theVertexMap.begin(); mapIt != theVertexMap.end(); mapIt++){
-	double energy = mapIt->second->energy;
-	int pType = mapIt->second->particleId;
-	if(mapIt->first > 1){
-	  if(pType == 2112) neutEnergy = energy;
-	  if(pType == 2212) protEnergy = energy;
+	double currentEnergy = mapIt->second->energy;
+	double currentMomentum = computeMomentum(mapIt->second->momX,mapIt->second->momY,mapIt->second->momZ);
+	int currentPType = mapIt->second->particleId;
+	if(mapIt->first == 1) {
+	  initNeutronEnergy = currentEnergy;
+	  initNeutronMomentum = currentMomentum;
+	}
+	if(mapIt->first > 1 && currentMomentum > highMomentum){
+	  highMomentum = currentMomentum;
+	  highEnergy = currentEnergy;
+	  if(currentPType == 2112 && currentEnergy > neutronEnergy) neutronEnergy = currentEnergy;
 	}
   }
 
-  if(neutEnergy >= protEnergy){
-	return flag = true;
+  if((neutronEnergy >= 0.90*initNeutronEnergy) && (highMomentum >= 0.90*initNeutronMomentum)){
+	return QEflag = true;
   } else {
-	return flag = false;
+	return QEflag = false;
   }
 }
 
@@ -550,3 +556,84 @@ double NpolPhysicsVariables::computeQsquared(double ParticleEnergy, int pType){
   return qsquared;
 }
 
+double NpolPhysicsVariables::computeLeadingParticleMomentum(std::map<int,NpolVertex *> &theVertexMap,int selectedTID){
+  double maximalMomentum = 0.0;
+  
+  std::map<int,NpolVertex *>::iterator mapIt;
+  mapIt = theVertexMap.find(selectedTID);
+  maximalMomentum =
+	computeMomentum(mapIt->second->momX,mapIt->second->momY,mapIt->second->momZ);
+  return maximalMomentum;
+}
+
+double NpolPhysicsVariables::computeLeadingParticleAngle(std::map<int,NpolVertex *> &theVertexMap, int selectedTID){
+  double P1x = 0.; double P1y = 0.; double P1z = 0.;
+  double P2x = 0.; double P2y = 0.; double P2z = 0.;
+  double P3x = 0.; double P3y = 0.; double P3z = 0.;
+  double neutronMomentum = 0.0; double recoilMomentum = 0.0;
+  
+  std::map<int,NpolVertex *>::iterator mapIt;
+
+  // Find Initial Point and Initial Neutron Momentum
+  mapIt = theVertexMap.find(1);
+  P1x = mapIt->second->posX;
+  P1y = mapIt->second->posY;
+  P1z = mapIt->second->posZ;
+  neutronMomentum = computeInitialNeutronMomentum(theVertexMap);
+  //computeMomentum(mapIt->second->momX,mapIt->second->momY,mapIt->second->momZ);
+
+  // Find interaction Point from selectTID position (in vertex vector)
+  mapIt = theVertexMap.find(selectedTID);
+  P2x = mapIt->second->posX;
+  P2y = mapIt->second->posY;
+  P2z = mapIt->second->posZ;
+  recoilMomentum =
+	computeMomentum(mapIt->second->momX,mapIt->second->momY,mapIt->second->momZ);
+
+  // Compute a third point for computing the recoil angle
+  double P2Theta = computeScatTheta(mapIt->second->momX,mapIt->second->momY);
+  double P2Phi = computeScatPhi(mapIt->second->momZ,recoilMomentum); 
+  P3x = P2x + 2*TMath::Sin(P2Phi)*TMath::Cos(P2Theta);
+  P3y = P2y + 2*TMath::Sin(P2Phi)*TMath::Sin(P2Theta);
+  P3z = P2z + 2*TMath::Cos(P2Phi);
+
+  // Now compute the recoil angle
+  double recoilAngle = getAzimuthAngle(P1x,P1y,P1z,P2x,P2y,P2z,P3x,P3y,P3z);
+
+  return recoilAngle*TMath::RadToDeg();
+}
+
+
+int NpolPhysicsVariables::findLeadingParticle(std::map<int,NpolVertex *> &theVertexMap){
+
+  double maximalMomentum = 0.0;
+  int maximalTID = -1;
+  std::map<int,NpolVertex *>::iterator mapIt;
+  for(mapIt = theVertexMap.begin(); mapIt != theVertexMap.end(); mapIt++){
+	double currentMomentum =
+	  computeMomentum(mapIt->second->momX,mapIt->second->momY,mapIt->second->momZ);
+	int currentPType = mapIt->second->particleId;
+	if(mapIt->first > 1){
+	  if(currentPType == 2112 || currentPType == 2212){
+		if(currentMomentum > maximalMomentum){
+		  maximalMomentum = currentMomentum;
+		  maximalTID = mapIt->first;
+		}
+	  }
+	}
+  }
+  return maximalTID;
+}
+
+double NpolPhysicsVariables::computeInitialNeutronMomentum(std::map<int,NpolVertex *> &theVertexMap){
+
+  double neutronMomentum = 0.0;
+  std::map<int,NpolVertex *>::iterator mapIt;
+
+  // Find Initial Neutron Momentum
+  mapIt = theVertexMap.find(1);
+  neutronMomentum =
+	computeMomentum(mapIt->second->momX,mapIt->second->momY,mapIt->second->momZ);
+
+  return neutronMomentum;
+}

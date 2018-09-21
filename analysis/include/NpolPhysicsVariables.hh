@@ -39,7 +39,10 @@ public:
   double computeElasticMomentum(double neutronMomentum, double thetaP);
   bool checkQuasiElasticScattering(std::map<int,NpolVertex *> &theVertexMap);
   double computeQsquared(double ParticleEnergy, int pType);
-  
+  double computeLeadingParticleMomentum(std::map<int,NpolVertex *> &theVertexMap,int selectedTID);
+  double computeLeadingParticleAngle(std::map<int,NpolVertex *> &theVertexMap, int selectedTID);
+  double computeInitialNeutronMomentum(std::map<int,NpolVertex *> &theVertexMap);
+  int findLeadingParticle(std::map<int,NpolVertex *> &theVertexMap);
 private:
   static NpolPhysicsVariables *PhysVars;
   TRandom3 *randN = new TRandom3();
