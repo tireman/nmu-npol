@@ -16,8 +16,7 @@ NpolPhysicsVariables *NpolPhysicsVariables::GetInstance() {
 	return PhysVars;
 }
 
-NpolPhysicsVariables::NpolPhysicsVariables(){
-}
+NpolPhysicsVariables::NpolPhysicsVariables(){}
 
 NpolPhysicsVariables::~NpolPhysicsVariables(){}
 
