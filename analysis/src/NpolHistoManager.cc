@@ -16,20 +16,31 @@ NpolHistoManager::~NpolHistoManager(){
   delete outFile2;
 }
 
-void NpolHistoManager::CreateHistograms(std::string hID, std::string hTitle,int xBins, double xMin, double xMax, int yBins, double yMin, double yMax){
+void NpolHistoManager::CreateHistograms(std::string hID, std::string hTitle,int xBins, double xMin, double xMax){
   if(xBins == 0){
 	std::cout << "X Bins value must be a non-zero integer" << std::endl;
 	return;
   }
 
   std::string histogramRef = "h_" + hID;
-
-  if(yBins == 0){
-    histoMap[histogramRef] = new TH1F(hID.c_str(),hTitle.c_str(),xBins,xMin,xMax);
-  } else if(yBins != 0){
-	histoMap2D[histogramRef] = new TH2F(hID.c_str(),hTitle.c_str(),xBins,xMin,xMax,yBins,yMin,yMax);
-  }
+  histoMap[histogramRef] = new TH1F(hID.c_str(),hTitle.c_str(),xBins,xMin,xMax);
 }
+
+
+
+void NpolHistoManager::CreateHistograms(std::string hID, std::string hTitle,int xBins, double xMin, double xMax, int yBins, double yMin, double yMax){
+  if(xBins == 0){
+	std::cout << "X Bins value must be a non-zero integer" << std::endl;
+	return;
+  } else if(yBins == 0){
+	std::cout << "Y Bins value must be a non-zero integer" << std::endl;
+	return;
+  }
+
+  std::string histogramRef = "h_" + hID;
+  histoMap2D[histogramRef] = new TH2F(hID.c_str(),hTitle.c_str(),xBins,xMin,xMax,yBins,yMin,yMax);
+}
+
 void NpolHistoManager::FillHistograms(std::string hID, double value){
   std::string histogramRef = "h_"+hID;
   (histoMap[histogramRef])->Fill(value);

@@ -26,6 +26,7 @@ class NpolHistoManager {
 
 public:
   static NpolHistoManager *GetInstance();
+  void CreateHistograms(std::string hID, std::string hTitle,int xBins, double xMin, double xMax);
   void CreateHistograms(std::string hID, std::string hTitle,int xBins, double xMin, double xMax, int yBins, double yMin, double yMax);
   void ClearHistograms();
   void DeleteHistograms();

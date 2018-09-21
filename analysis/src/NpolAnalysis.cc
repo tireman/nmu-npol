@@ -85,25 +85,27 @@ int main(int argc, char *argv[]) {
   statsTree->SetBranchAddress("stats",&stats);
   
   //********************************* Define your Histograms Here *******************************
+  // 1D-Histograms
+  HistoMan->CreateHistograms("recoilAngleReal","Real Proton Recoil Angle",200, 0.0, 180.0);
+  HistoMan->CreateHistograms("recoilEnergyReal","Real Proton Recoil Energy",200, 000.0, 2400.);
+  HistoMan->CreateHistograms("asymmetryReal","Real Asymmetry from Recoil Proton",5, -2,+2); 
+  HistoMan->CreateHistograms("recoilAngle","Proton Recoil Angle", 200, 0.0, 180.0);
+  HistoMan->CreateHistograms("recoilAngleRaw","Proton Recoil Angle Before Angle Cut", 200, 0.0, 180.0);
+  HistoMan->CreateHistograms("selectedRecoilMomentum","Highest Energy Recoil Proton Momentum",200, 000.0, 2.0e6);
+  HistoMan->CreateHistograms("Qsquared","Q-Squared Value for recoil Proton", 100, 0.0, 2e6);					   
+  HistoMan->CreateHistograms("NeutronThetaAngle","Neutron Angle at first tagger", 100, 15.0, 40.0);
+  HistoMan->CreateHistograms("NeutronMomentum","Neutron Momentum at the first tagger",100, 1600.0, 3200.0);
+  HistoMan->CreateHistograms("NeutronEnergy","Neutron Energy at NPOL Tagger",100, 1000.0, 2400.0);
+  HistoMan->CreateHistograms("sectionEfficiency1","NPOL Efficiency after SOI Selection",13,0.25,6.75);
+  HistoMan->CreateHistograms("sectionEfficiency2","#splitline{NPOL Efficiency after EOI Selection}{and Asymmetry Cut}",13,0.25,6.75);
+  HistoMan->CreateHistograms("sectionEfficiency3","#splitline{NPOL Efficiency after Array}{Total Energy Cuts}",13,0.25,6.75);
+  HistoMan->CreateHistograms("sectionEfficiency4","NPOL Efficiency after Angle Cut",13,0.25,6.75);							 
+  HistoMan->CreateHistograms("NeutronMomentumInitial","Initial Neutron Momentum when Generated",100, 1600.0, 3200.0);
+  HistoMan->CreateHistograms("NeutronEnergyInitial","Initial Neutron Energy when Generated",100, 1000.0, 2400.0);							 
+  HistoMan->CreateHistograms("totalEnergy","Total Energy Deposited", 100, 0.0, 350.0);
+  HistoMan->CreateHistograms("dTOF","Delta time-of-flight",600,-30,120);
 
-  HistoMan->CreateHistograms("recoilAngleReal","Real Proton Recoil Angle",200, 0.0, 180.0, 0, 0.,0.);
-  HistoMan->CreateHistograms("recoilEnergyReal","Real Proton Recoil Energy",200, 000.0, 2400., 0, 0.,0.);
-  HistoMan->CreateHistograms("asymmetryReal","Real Asymmetry from Recoil Proton",5, -2,+2, 0, 0.,0.); 
-  HistoMan->CreateHistograms("recoilAngle","Proton Recoil Angle", 200, 0.0, 180.0, 0, 0.,0.);
-  HistoMan->CreateHistograms("recoilAngleRaw","Proton Recoil Angle Before Angle Cut", 200, 0.0, 180.0, 0, 0.,0.);
-  HistoMan->CreateHistograms("selectedRecoilMomentum","Highest Energy Recoil Proton Momentum",200, 000.0, 2.0e6, 0, 0.,0.);
-  HistoMan->CreateHistograms("Qsquared","Q-Squared Value for recoil Proton", 100, 0.0, 2e6, 0, 0.,0.);					   
-  HistoMan->CreateHistograms("NeutronThetaAngle","Neutron Angle at first tagger", 100, 15.0, 40.0, 0, 0.,0.);
-  HistoMan->CreateHistograms("NeutronMomentum","Neutron Momentum at the first tagger",100, 1600.0, 3200.0, 0, 0.,0.);
-  HistoMan->CreateHistograms("NeutronEnergy","Neutron Energy at NPOL Tagger",100, 1000.0, 2400.0, 0, 0.,0.);
-  HistoMan->CreateHistograms("sectionEfficiency1","NPOL Efficiency after SOI Selection",13,0.25,6.75, 0, 0., 0.);
-  HistoMan->CreateHistograms("sectionEfficiency2","#splitline{NPOL Efficiency after EOI Selection}{and Asymmetry Cut}",13,0.25,6.75, 0, 0., 0.);
-  HistoMan->CreateHistograms("sectionEfficiency3","#splitline{NPOL Efficiency after Array}{Total Energy Cuts}",13,0.25,6.75, 0, 0., 0.);
-  HistoMan->CreateHistograms("sectionEfficiency4","NPOL Efficiency after Angle Cut",13,0.25,6.75, 0, 0., 0.);							 
-  HistoMan->CreateHistograms("NeutronMomentumInitial","Initial Neutron Momentum when Generated",100, 1600.0, 3200.0, 0, 0., 0.);
-  HistoMan->CreateHistograms("NeutronEnergyInitial","Initial Neutron Energy when Generated",100, 1000.0, 2400.0, 0, 0., 0.);							 
-  HistoMan->CreateHistograms("totalEnergy","Total Energy Deposited", 100, 0.0, 350.0, 0, 0., 0.);
-  HistoMan->CreateHistograms("dTOF","Delta time-of-flight",600,-30,120, 0, 0., 0.);
+  // 2D-Histograms
   HistoMan->CreateHistograms("dEoverEtop", "dE over E for top array", 400,0,120,400,0,20);
   HistoMan->CreateHistograms("dEoverEbot", "dE over E for bottom array", 400,0,120,400,0,20);
   HistoMan->CreateHistograms("dEvsEReal", "dE over E for Real Events", 400,0,120,400,0,20);
