@@ -51,7 +51,7 @@ NpolEventProcessing *Process = NpolEventProcessing::GetInstance();
 NpolEventPreProcessing *PProcess = NpolEventPreProcessing::GetInstance();
 NpolPhysicsVariables *PhysVars = NpolPhysicsVariables::GetInstance();
 NpolFileEnvManager *FEman = NpolFileEnvManager::GetInstance();
-//NpolHistoManager *HistMan = NpolHistoManager::GetInstance();
+NpolHistoManager *HistoMan = NpolHistoManager::GetInstance();
 
 //***************** End Definitions of Variables and Classes ***********************//
 
@@ -64,8 +64,8 @@ int main(int argc, char *argv[]) {
   TString InputFile = FEman->FormInputFile(FEman->InputDir);
   TString OutputFile = FEman->FormOutputFile(FEman->OutputDir);
 
-  TFile *outFile = new TFile(OutputFile,"RECREATE"); 
-    
+  HistoMan->OpenFile(OutputFile);
+
   TChain *npolTree = new TChain("T");
   TChain *statsTree = new TChain("T2");
 
@@ -85,39 +85,30 @@ int main(int argc, char *argv[]) {
   statsTree->SetBranchAddress("stats",&stats);
   
   //********************************* Define your Histograms Here *******************************
-  TH1F *h_recoilAngle_Real = new TH1F("recoilAngle_Real","Real Proton Recoil Angle",200, 0.0, 180.0);
-  TH1F *h_recoilEnergy_Real = new TH1F("recoilEnergy_Real","Real Proton Recoil Energy",200, 000.0, 2400.);
-  TH1F *h_asymmetry_Real = new TH1F("asymmetry_Real","Real Asymmetry from Recoil Proton",5, -2,+2);
-    
-  TH1F *h_recoilAngle = new TH1F("recoil_angle","Proton Recoil Angle", 200, 0.0, 180.0); 
-  TH1F *h_recoilAngle_Raw =
-	new TH1F("recoil_angle_raw","Proton Recoil Angle Before Angle Cut", 200, 0.0, 180.0);
-  TH1F *selectedRecoilMomentum = new TH1F("selectedRecoilMomentum","Highest Energy Recoil Proton Momentum",200, 000.0, 2.0e6);
-  TH1F *QsquaredTest = new TH1F("Qsquared"," Q-Squared Value for recoil Proton", 100, 0.0, 2e6);
 
-  TH1F *h_Neutron_Theta_Angle =
-	new TH1F("Neutron_Theta_Angle","Neutron Angle at first tagger", 100, 15.0, 40.0);
-  TH1F *h_Neutron_Momentum =
-	new TH1F("Neutron_Momentum","Neutron Momentum at the first tagger",100, 1600.0, 3200.0);
-  TH1F *h_Neutron_Momentum_Initial =
-	new TH1F("Neutron_Momentum_Initial","Initial Neutron Momentum when Generated",100, 1600.0, 3200.0);
-  TH1F *h_Neutron_Energy_Initial =
-	new TH1F("Neutron_Energy_Initial","Initial Neutron Energy when Generated",100, 1000.0, 2400.0);
-  TH1F *h_Neutron_Energy = new TH1F("Neutron_Energy","Neutron Energy at NPOL Tagger",100, 1000.0, 2400.0);
-  TH1F *h_totEnergy = new TH1F("totEnergy","Total Energy Deposited", 100, 0.0, 350.0);
-  TH2F *h_dEoverEtop = new TH2F("dEoverEtop", "dE over E for top array", 400,0,120,400,0,20);
-  TH2F *h_dEoverEbot = new TH2F("dEoverEbot", "dE over E for bottom array", 400,0,120,400,0,20);
-  TH2F *h_dEvsE_Real = new TH2F("dEvsE_Real", "dE over E for Real Events", 400,0,120,400,0,20);
-  TH2F *h_dEvsE_Real2 =
-	new TH2F("dEvsE_Real2", "dE over E for Real Events with Energy Resolution", 400,0,120,400,0,20);
-  TH1F *h_sectionEfficiency1 =
-	new TH1F("sectionEfficiency1","NPOL Efficiency after SOI Selection",13,0.25,6.75);
-  TH1F *h_sectionEfficiency2 =
-	new TH1F("sectionEfficiency2","#splitline{NPOL Efficiency after EOI Selection}{and Asymmetry Cut}",13,0.25,6.75);
-  TH1F *h_sectionEfficiency3 =
-	new TH1F("sectionEfficiency3","#splitline{NPOL Efficiency after Array}{Total Energy Cuts}",13,0.25,6.75);
-  TH1F *h_sectionEfficiency4 = new TH1F("sectionEfficiency4","NPOL Efficiency after Angle Cut",13,0.25,6.75);
-  TH1F *h_dTOF = new TH1F("dTOF","Delta time-of-flight",600,-30,120);
+  HistoMan->CreateHistograms("recoilAngleReal","Real Proton Recoil Angle",200, 0.0, 180.0, 0, 0.,0.);
+  HistoMan->CreateHistograms("recoilEnergyReal","Real Proton Recoil Energy",200, 000.0, 2400., 0, 0.,0.);
+  HistoMan->CreateHistograms("asymmetryReal","Real Asymmetry from Recoil Proton",5, -2,+2, 0, 0.,0.); 
+  HistoMan->CreateHistograms("recoilAngle","Proton Recoil Angle", 200, 0.0, 180.0, 0, 0.,0.);
+  HistoMan->CreateHistograms("recoilAngleRaw","Proton Recoil Angle Before Angle Cut", 200, 0.0, 180.0, 0, 0.,0.);
+  HistoMan->CreateHistograms("selectedRecoilMomentum","Highest Energy Recoil Proton Momentum",200, 000.0, 2.0e6, 0, 0.,0.);
+  HistoMan->CreateHistograms("Qsquared","Q-Squared Value for recoil Proton", 100, 0.0, 2e6, 0, 0.,0.);					   
+  HistoMan->CreateHistograms("NeutronThetaAngle","Neutron Angle at first tagger", 100, 15.0, 40.0, 0, 0.,0.);
+  HistoMan->CreateHistograms("NeutronMomentum","Neutron Momentum at the first tagger",100, 1600.0, 3200.0, 0, 0.,0.);
+  HistoMan->CreateHistograms("NeutronEnergy","Neutron Energy at NPOL Tagger",100, 1000.0, 2400.0, 0, 0.,0.);
+  HistoMan->CreateHistograms("sectionEfficiency1","NPOL Efficiency after SOI Selection",13,0.25,6.75, 0, 0., 0.);
+  HistoMan->CreateHistograms("sectionEfficiency2","#splitline{NPOL Efficiency after EOI Selection}{and Asymmetry Cut}",13,0.25,6.75, 0, 0., 0.);
+  HistoMan->CreateHistograms("sectionEfficiency3","#splitline{NPOL Efficiency after Array}{Total Energy Cuts}",13,0.25,6.75, 0, 0., 0.);
+  HistoMan->CreateHistograms("sectionEfficiency4","NPOL Efficiency after Angle Cut",13,0.25,6.75, 0, 0., 0.);							 
+  HistoMan->CreateHistograms("NeutronMomentumInitial","Initial Neutron Momentum when Generated",100, 1600.0, 3200.0, 0, 0., 0.);
+  HistoMan->CreateHistograms("NeutronEnergyInitial","Initial Neutron Energy when Generated",100, 1000.0, 2400.0, 0, 0., 0.);							 
+  HistoMan->CreateHistograms("totalEnergy","Total Energy Deposited", 100, 0.0, 350.0, 0, 0., 0.);
+  HistoMan->CreateHistograms("dTOF","Delta time-of-flight",600,-30,120, 0, 0., 0.);
+  HistoMan->CreateHistograms("dEoverEtop", "dE over E for top array", 400,0,120,400,0,20);
+  HistoMan->CreateHistograms("dEoverEbot", "dE over E for bottom array", 400,0,120,400,0,20);
+  HistoMan->CreateHistograms("dEvsEReal", "dE over E for Real Events", 400,0,120,400,0,20);
+  HistoMan->CreateHistograms("dEvsEReal2", "dE over E for Real Events with Energy Resolution", 400,0,120,400,0,20);						
+  
   //********************************* End Histogram Definitions ********************************
 
   // ****** BEGIN STATS LOOP ******
@@ -138,7 +129,7 @@ int main(int argc, char *argv[]) {
   int nentries = npolTree->GetEntries();
   TRandom *rand = new TRandom3();
   for(int i = 0; i < nentries; i++) {
-	//for(int i = 0; i < 1; i++) {
+	//for(int i = 0; i < 500; i++) {
    	if(i % 1000 == 0) std::cout << "Processing event #" << i << std::endl;
 
     npolTree->GetEntry(i);
@@ -221,8 +212,8 @@ int main(int argc, char *argv[]) {
 			   && mapIt->second->particleId == 2212)
 			  partEnergy = mapIt->second->energy;
 		  }
-		  QsquaredTest->Fill(PhysVars->computeQsquared(partEnergy,2212));
-		  PhysVars->printVertexMap(vertexMap,i);
+		  HistoMan->FillHistograms("Qsquared",PhysVars->computeQsquared(partEnergy,2212));
+		  //PhysVars->printVertexMap(vertexMap,i);
 		}
 		
 		if(elasticFlag || quasielasticFlag || inelasticFlag){
@@ -305,7 +296,7 @@ int main(int argc, char *argv[]) {
 	}
 	
 	if(selectTID > 1 && highEnergy >= 50 /*MeV*/) {
-	  selectedRecoilMomentum->Fill(highMomentum - elasticMomentum);  
+	  HistoMan->FillHistograms("selectedRecoilMomentum",(highMomentum - elasticMomentum));  
 	}
 
 	// Attempt at identifying the "good" proton track
@@ -345,15 +336,6 @@ int main(int argc, char *argv[]) {
 	  bool BotdEdetFlag = false; bool BotEdetFlag = false;
 	  if(PID == npPID && pType == 2212){
 		double particleEnergy = aVertex->energy;
-		/*std::cout << "      Event #: " << i << " PID = "<< PID 
-		  << " TID = " << TID
-				  << "   Particle " << pType << " " << aVertex->particle << " AV #: "
-				  << PProcess->GetAVNumber(volName)
-				  << " Impr #: " << PProcess->GetImprNumber(volName) << " PV #: "
-				  << PProcess->GetPlacementNumber(volName)
-				  << " SOI: " << Process->sectionNumber(volName) << " Time = "
-				  << aVertex->time << " Particle Energy: "
-				  << aVertex->energy << std::endl;*/
 		if(particleEnergy >= 25 /*MeV*/){
 		  std::vector<NpolStep *>::iterator ss_it;
 		  for(ss_it = steps->begin(); ss_it != steps->end(); ss_it++) {
@@ -403,8 +385,8 @@ int main(int argc, char *argv[]) {
 		if(PID == 0 && TID == 1){
 		  totNmom = PhysVars->computeMomentum(aVertex->momX,aVertex->momY,aVertex->momZ);
 		  P1x = aVertex->posX; P1y = aVertex->posY; P1z = aVertex->posZ;
-		  h_Neutron_Energy_Initial->Fill(aVertex->energy);
-		  h_Neutron_Momentum_Initial->Fill(totNmom);
+		  HistoMan->FillHistograms("NeutronEnergyInitial",(aVertex->energy));
+		  HistoMan->FillHistograms("NeutronMomentumInitial",totNmom);
 		}
 		
 		// Process the good Proton Track
@@ -422,16 +404,16 @@ int main(int argc, char *argv[]) {
 		  P3z = P2z + 2*TMath::Cos(P2Phi);
 		  double computedAngle = PhysVars->getAzimuthAngle(P1x,P1y,P1z,P2x,P2y,P2z,P3x,P3y,P3z);
 		  if (computedAngle >= angleLow && computedAngle <= angleHigh) {
-			h_recoilAngle_Real->Fill(computedAngle);
-			
+			HistoMan->FillHistograms("recoilAngleReal",computedAngle);
+					
 			// Guess at the 'real' asymmetry; this is done by looking to see if Y-momentum points up or down
 			if(momY < 0) asym = -1;
 			if(momY > 0) asym = +1;
 			if(momY == 0) asym = 0;
-			h_asymmetry_Real->Fill(asym);
-			
+			HistoMan->FillHistograms("asymmetryReal",asym);
+				
 			double protonVertexEnergy = aVertex->energy;
-			h_recoilEnergy_Real->Fill(protonVertexEnergy);
+			HistoMan->FillHistograms("recoilEnergyReal",protonVertexEnergy);
 			double sPower =  PhysVars->computeBetheBloch(protonVertexEnergy,938.27205,1,1.032,12.929,7,64.7e-6);
 			
 			double dEenergyLost =
@@ -441,8 +423,8 @@ int main(int argc, char *argv[]) {
 			  PhysVars->computeEnergyLoss(protonVertexEnergy, TMath::DegToRad()*computedAngle, 10. /*cm*/);
 			Double_t EenergyLost2 = rand->Gaus(EenergyLost, 0.10*EenergyLost);
 			
-			h_dEvsE_Real->Fill(EenergyLost,dEenergyLost);
-			h_dEvsE_Real2->Fill(EenergyLost2,dEenergyLost2); // An attempt at "energy" resolution of the scints
+			HistoMan->FillHistograms("dEvsEReal",EenergyLost,dEenergyLost);
+			HistoMan->FillHistograms("dEvsEReal2",EenergyLost2,dEenergyLost2); // An attempt at "energy" resolution of the scints
 			std::cout << "Stopping Power = " << sPower << "   Proton Energy Loss in dE-array = " << dEenergyLost
 					  << "   Proton Energy Loss in E-array = " << EenergyLost << std::endl;
 		  }
@@ -487,10 +469,10 @@ int main(int argc, char *argv[]) {
 
 		t_it = tagEvent->begin();
 		NpolTagger *tTemp = *t_it;
-		h_Neutron_Energy->Fill(tTemp->energy);
+		HistoMan->FillHistograms("NeutronEnergy",(tTemp->energy));
 
-		h_Neutron_Momentum->Fill(totMom);
-		h_Neutron_Theta_Angle->Fill(neutronAngle);	
+		HistoMan->FillHistograms("NeutronMomentum",totMom);
+		HistoMan->FillHistograms("NeutronThetaAngle",neutronAngle);	
 	  }
 
 	  PhysVars->fillDetectorEventMap(detEvents,aStep);
@@ -503,7 +485,7 @@ int main(int argc, char *argv[]) {
 	int sectionOfInterest = Process->getSectionOfInterest(&detEvents); // call method to determine SOI
 	
 	if(sectionOfInterest != -1) {
-	  h_sectionEfficiency1->Fill(sectionOfInterest+1); // Fill first SOI histogram
+	  HistoMan->FillHistograms("sectionEfficiency1",(sectionOfInterest+1)); // Fill first SOI histogram
 	  // Fill the Energy Deposited per array map for the SOI
 	  Process->getEDepArrayTotal(&detEvents, &eDepArrayTotal, sectionOfInterest); 
 	  
@@ -516,7 +498,7 @@ int main(int argc, char *argv[]) {
 	  else if(EArrayOfInterest == botEArray){ dEArrayOfInterest = botdEArray; }
 
       if((EArrayOfInterest != unknown) && (dEArrayOfInterest != unknown)) {
-		h_sectionEfficiency2->Fill(sectionOfInterest+1); //Fill
+		HistoMan->FillHistograms("sectionEfficiency2",(sectionOfInterest+1)); //Fill
 		double eDepAnalyzer = eDepArrayTotal[analyzer]; 
 		double eDepE = eDepArrayTotal[EArrayOfInterest]; 
 		double eDepdE = eDepArrayTotal[dEArrayOfInterest];
@@ -525,17 +507,17 @@ int main(int argc, char *argv[]) {
 		double azAngle = PhysVars->ReturnAngle(verts->at(1),&detEvents,sectionOfInterest,EArrayOfInterest,&dTOF);
 
 		if(eDepAnalyzer >= 4.0 /*MeV*/ && eDepE >= 5.0 /*MeV */ && eDepTotal >= 50.0 /*MeV*/) { // Req. 3 and 4
-		  h_sectionEfficiency3->Fill(sectionOfInterest+1); //FILL
-		  h_recoilAngle_Raw->Fill(azAngle);
+		  HistoMan->FillHistograms("sectionEfficiency3",(sectionOfInterest+1)); //FILL
+		  HistoMan->FillHistograms("recoilAngleRaw",azAngle);
 		  if (azAngle >= angleLow && azAngle <= angleHigh){  // checks Requirement 6 
-			h_sectionEfficiency4->Fill(sectionOfInterest+1); //FILL
-			h_totEnergy->Fill(eDepTotal);
-			h_dTOF->Fill(dTOF); //FILL
-			h_recoilAngle->Fill(azAngle); // Fill the proton recoil angle histo
+			HistoMan->FillHistograms("sectionEfficiency4",(sectionOfInterest+1)); //FILL
+			HistoMan->FillHistograms("totalEnergy",eDepTotal);
+			HistoMan->FillHistograms("dTOF",dTOF); //FILL
+			HistoMan->FillHistograms("recoilAngle",azAngle); // Fill the proton recoil angle histo
 			if(EArrayOfInterest == topEArray) {// this is where histo for top dE/E gets filled
-			  h_dEoverEtop->Fill(eDepE,eDepdE); //FILL
+			  HistoMan->FillHistograms("dEoverEtop",eDepE,eDepdE); //FILL
 			} else if(EArrayOfInterest == botEArray) { 
-			  h_dEoverEbot->Fill(eDepE,eDepdE);//FILL
+			  HistoMan->FillHistograms("dEoverEbot",eDepE,eDepdE);//FILL
 			}
 			eventsPassed++;
 		  } else eventsFailed++;
@@ -574,29 +556,8 @@ int main(int argc, char *argv[]) {
 
   // ****** Write out all the results to the root file and close the file(s) ******** //
   runStatistics.Write();
-  h_dEoverEtop->Write();
-  h_dEoverEbot->Write();
-  h_dEvsE_Real->Write();
-  h_dEvsE_Real2->Write();
-  h_totEnergy->Write();
-  h_sectionEfficiency1->Write();
-  h_sectionEfficiency2->Write();
-  h_sectionEfficiency3->Write();
-  h_sectionEfficiency4->Write();
-  h_dTOF->Write();
-  h_recoilAngle->Write();
-  h_recoilAngle_Raw->Write();
-  h_Neutron_Theta_Angle->Write();
-  h_Neutron_Momentum->Write();
-  h_Neutron_Momentum_Initial->Write();
-  h_Neutron_Energy_Initial->Write();
-  h_Neutron_Energy->Write();
-  h_recoilAngle_Real->Write();
-  h_recoilEnergy_Real->Write();
-  selectedRecoilMomentum->Write();
-  QsquaredTest->Write();
-  h_asymmetry_Real->Write();
-  outFile->Close();
+  HistoMan->WriteHistograms();
+  HistoMan->CloseFile();
   return 0;
 }
 
