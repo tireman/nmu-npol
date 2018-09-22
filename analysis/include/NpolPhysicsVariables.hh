@@ -43,6 +43,8 @@ public:
   double computeLeadingParticleAngle(std::map<int,NpolVertex *> &theVertexMap, int selectedTID);
   double computeInitialNeutronMomentum(std::map<int,NpolVertex *> &theVertexMap);
   int findLeadingParticle(std::map<int,NpolVertex *> &theVertexMap);
+  int findBestProtonTrackID(std::map<int,NpolVertex *> &theVertexMap, const std::vector<NpolStep *> *steps, int npSOI);
+  
 private:
   static NpolPhysicsVariables *PhysVars;
   TRandom3 *randN = new TRandom3();
