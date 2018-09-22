@@ -513,8 +513,8 @@ bool NpolPhysicsVariables::checkQuasiElasticScattering(std::map<int,NpolVertex *
   bool QEflag = false;
 
   double initNeutronEnergy = 0.0; double initNeutronMomentum = 0.0;
-  double highMomentum = 0.0; double highEnergy = 0.0;
-  double neutronEnergy = 0.0; double protonEnergy = 0.0;
+  double highMomentum = 0.0; 
+  double neutronEnergy = 0.0;
   std::map<int,NpolVertex *>::iterator mapIt;
   for(mapIt = theVertexMap.begin(); mapIt != theVertexMap.end(); mapIt++){
 	double currentEnergy = mapIt->second->energy;
@@ -526,7 +526,6 @@ bool NpolPhysicsVariables::checkQuasiElasticScattering(std::map<int,NpolVertex *
 	}
 	if(mapIt->first > 1 && currentMomentum > highMomentum){
 	  highMomentum = currentMomentum;
-	  highEnergy = currentEnergy;
 	  if(currentPType == 2112 && currentEnergy > neutronEnergy) neutronEnergy = currentEnergy;
 	}
   }
@@ -570,7 +569,7 @@ double NpolPhysicsVariables::computeLeadingParticleAngle(std::map<int,NpolVertex
   double P1x = 0.; double P1y = 0.; double P1z = 0.;
   double P2x = 0.; double P2y = 0.; double P2z = 0.;
   double P3x = 0.; double P3y = 0.; double P3z = 0.;
-  double neutronMomentum = 0.0; double recoilMomentum = 0.0;
+  double recoilMomentum = 0.0;
   
   std::map<int,NpolVertex *>::iterator mapIt;
 
@@ -579,9 +578,7 @@ double NpolPhysicsVariables::computeLeadingParticleAngle(std::map<int,NpolVertex
   P1x = mapIt->second->posX;
   P1y = mapIt->second->posY;
   P1z = mapIt->second->posZ;
-  neutronMomentum = computeInitialNeutronMomentum(theVertexMap);
-  //computeMomentum(mapIt->second->momX,mapIt->second->momY,mapIt->second->momZ);
-
+    
   // Find interaction Point from selectTID position (in vertex vector)
   mapIt = theVertexMap.find(selectedTID);
   P2x = mapIt->second->posX;
@@ -636,4 +633,58 @@ double NpolPhysicsVariables::computeInitialNeutronMomentum(std::map<int,NpolVert
 	computeMomentum(mapIt->second->momX,mapIt->second->momY,mapIt->second->momZ);
 
   return neutronMomentum;
+}
+
+int NpolPhysicsVariables::findBestProtonTrackID(std::map<int,NpolVertex *> &theVertexMap, const std::vector<NpolStep *> *steps, int npSOI){
+
+  // This will return the track ID of the "good" proton track from the
+  // vertexMap of particles generated from the initial collision. 
+  NpolEventPreProcessing *PProcess = NpolEventPreProcessing::GetInstance();
+  NpolEventProcessing *Process = NpolEventProcessing::GetInstance();
+  
+  double maxEnergy = 0.0;
+  int bestProtonTID = 0;
+  std::map<int,NpolVertex *>::iterator mapIt;
+  for(mapIt = theVertexMap.begin(); mapIt != theVertexMap.end(); mapIt++){
+	bool TopdEdetFlag = false; bool TopEdetFlag = false;
+	bool BotdEdetFlag = false; bool BotEdetFlag = false;
+	int pType = mapIt->second->particleId;
+	int PID = mapIt->second->parentId;
+	int TID = mapIt->first;
+	double particleEnergy = mapIt->second->energy;
+	if(pType == 2212 && particleEnergy >= 25 /*MeV*/){
+	  std::vector<NpolStep *>::const_iterator ss_it;
+	  for(ss_it = steps->begin(); ss_it != steps->end(); ss_it++) {
+		NpolStep *aStep = *ss_it;
+		if(aStep == NULL) continue;
+		
+		int stepPID = aStep->parentId;
+		int stepTID = aStep->trackId;
+		int steppType = aStep->particleId;
+		if(((stepPID == PID) && (stepTID == TID) && (steppType == 2212))){
+		  std::string stepVolName = aStep->volume;
+		  int stepAVNum = PProcess->GetAVNumber(stepVolName);
+		  int stepSection = Process->sectionNumber(stepVolName);
+		  if(stepSection == npSOI){
+			if(stepAVNum == 1 || stepAVNum == 2) TopEdetFlag = true;
+			if(stepAVNum == 3 || stepAVNum == 4) TopdEdetFlag = true;
+			if(stepAVNum == 5 || stepAVNum == 6) BotEdetFlag = true;
+			if(stepAVNum == 7 || stepAVNum == 8) BotdEdetFlag = true;
+		  }
+		}
+	  }
+	}
+	
+	bool TopFlag = false; bool BotFlag = false;
+	if(TopEdetFlag && TopdEdetFlag) TopFlag = true;
+	if(BotEdetFlag && BotdEdetFlag) BotFlag = true;
+	if((TopFlag  && !BotFlag) || (!TopFlag && BotFlag)){// ExOR
+	  if(particleEnergy > maxEnergy){
+		bestProtonTID = TID;
+		maxEnergy = particleEnergy;
+	  }
+	}
+  }
+  
+  return bestProtonTID;
 }
