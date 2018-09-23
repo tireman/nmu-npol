@@ -435,7 +435,8 @@ void NpolPhysicsVariables::fillVertexMap(std::map<int,NpolVertex *> &theVertexMa
 		theVertexMap[TID]->posX = aVertex->posX;
 		theVertexMap[TID]->posY = aVertex->posY;
 		theVertexMap[TID]->posZ = aVertex->posZ;
-		theVertexMap[TID]->momX = aVertex->momY;
+		theVertexMap[TID]->momX = aVertex->momX;
+		theVertexMap[TID]->momY = aVertex->momY;
 		theVertexMap[TID]->momZ = aVertex->momZ;
 		theVertexMap[TID]->time = aVertex->time;
 		theVertexMap[TID]->energy = aVertex->energy;
@@ -565,7 +566,7 @@ double NpolPhysicsVariables::computeLeadingParticleMomentum(std::map<int,NpolVer
   return maximalMomentum;
 }
 
-double NpolPhysicsVariables::computeLeadingParticleAngle(std::map<int,NpolVertex *> &theVertexMap, int selectedTID){
+double NpolPhysicsVariables::computeRecoilParticleAngle(std::map<int,NpolVertex *> &theVertexMap, int selectedTID){
   double P1x = 0.; double P1y = 0.; double P1z = 0.;
   double P2x = 0.; double P2y = 0.; double P2z = 0.;
   double P3x = 0.; double P3y = 0.; double P3z = 0.;
@@ -581,15 +582,17 @@ double NpolPhysicsVariables::computeLeadingParticleAngle(std::map<int,NpolVertex
     
   // Find interaction Point from selectTID position (in vertex vector)
   mapIt = theVertexMap.find(selectedTID);
+  double xMom = mapIt->second->momX;
+  double yMom = mapIt->second->momY;
+  double zMom = mapIt->second->momZ;
   P2x = mapIt->second->posX;
   P2y = mapIt->second->posY;
   P2z = mapIt->second->posZ;
-  recoilMomentum =
-	computeMomentum(mapIt->second->momX,mapIt->second->momY,mapIt->second->momZ);
+  recoilMomentum = computeMomentum(xMom,yMom,zMom);
 
   // Compute a third point for computing the recoil angle
-  double P2Theta = computeScatTheta(mapIt->second->momX,mapIt->second->momY);
-  double P2Phi = computeScatPhi(mapIt->second->momZ,recoilMomentum); 
+  double P2Theta = computeScatTheta(xMom,yMom);
+  double P2Phi = computeScatPhi(zMom,recoilMomentum); 
   P3x = P2x + 2*TMath::Sin(P2Phi)*TMath::Cos(P2Theta);
   P3y = P2y + 2*TMath::Sin(P2Phi)*TMath::Sin(P2Theta);
   P3z = P2z + 2*TMath::Cos(P2Phi);
@@ -597,7 +600,7 @@ double NpolPhysicsVariables::computeLeadingParticleAngle(std::map<int,NpolVertex
   // Now compute the recoil angle
   double recoilAngle = getAzimuthAngle(P1x,P1y,P1z,P2x,P2y,P2z,P3x,P3y,P3z);
 
-  return recoilAngle*TMath::RadToDeg();
+  return recoilAngle;
 }
 
 
@@ -688,3 +691,4 @@ int NpolPhysicsVariables::findBestProtonTrackID(std::map<int,NpolVertex *> &theV
   
   return bestProtonTID;
 }
+

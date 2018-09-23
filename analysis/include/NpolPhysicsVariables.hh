@@ -40,7 +40,7 @@ public:
   bool checkQuasiElasticScattering(std::map<int,NpolVertex *> &theVertexMap);
   double computeQsquared(double ParticleEnergy, int pType);
   double computeLeadingParticleMomentum(std::map<int,NpolVertex *> &theVertexMap,int selectedTID);
-  double computeLeadingParticleAngle(std::map<int,NpolVertex *> &theVertexMap, int selectedTID);
+  double computeRecoilParticleAngle(std::map<int,NpolVertex *> &theVertexMap, int selectedTID);
   double computeInitialNeutronMomentum(std::map<int,NpolVertex *> &theVertexMap);
   int findLeadingParticle(std::map<int,NpolVertex *> &theVertexMap);
   int findBestProtonTrackID(std::map<int,NpolVertex *> &theVertexMap, const std::vector<NpolStep *> *steps, int npSOI);
