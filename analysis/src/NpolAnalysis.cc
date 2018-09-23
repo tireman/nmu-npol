@@ -127,7 +127,7 @@ int main(int argc, char *argv[]) {
 
   
   // ****** BEGIN EVENT LOOP ****** 
-  int asym = 1;
+  // int asym = 1;
   int nentries = npolTree->GetEntries();
   TRandom *rand = new TRandom3();
   for(int i = 0; i < nentries; i++) {
@@ -236,13 +236,16 @@ int main(int argc, char *argv[]) {
 	// ****** This section computes the (P_leading - P_elastic) ******
 	// ****** value and saves into histogram                    ******
 	double neutronMomentum = PhysVars->computeInitialNeutronMomentum(vertexMap);
-	int selectedTID = PhysVars->findLeadingParticle(vertexMap);
-	double computedAngle = PhysVars->computeLeadingParticleAngle(vertexMap,selectedTID);
+	int leadingTID = PhysVars->findLeadingParticle(vertexMap);
+	double computedRecoilAngle = PhysVars->
+	  computeRecoilParticleAngle(vertexMap,leadingTID);
 	double leadingParticleMomentum =
-	  PhysVars->computeLeadingParticleMomentum(vertexMap,selectedTID);
-	double elasticMomentum = PhysVars->computeElasticMomentum(neutronMomentum, computedAngle*TMath::DegToRad());
+	  PhysVars->computeLeadingParticleMomentum(vertexMap,leadingTID);
+	double elasticMomentum = PhysVars->
+	  computeElasticMomentum(neutronMomentum, computedRecoilAngle*TMath::DegToRad());
   	
-	HistoMan->FillHistograms("selectedRecoilMomentum",(leadingParticleMomentum - elasticMomentum));  
+	HistoMan->FillHistograms("selectedRecoilMomentum",
+							 (leadingParticleMomentum - elasticMomentum));  
 	// ****** End (P_leading - P_elastic) code ******
 
 
@@ -250,68 +253,50 @@ int main(int argc, char *argv[]) {
 	// fill histograms
 	int bestProtonTID = PhysVars->findBestProtonTrackID(vertexMap,steps,npSOI);
 	if(bestProtonTID == 0) continue;
-	std::vector<NpolVertex *>::iterator vv_it;
-	for(vv_it = verts->begin(); vv_it != verts->end(); vv_it++){
-	  NpolVertex *aVertex = *vv_it;
-	  if(aVertex == NULL) continue;
-	  
-	  int PID = aVertex->parentId; int TID = aVertex->trackId;
-	  double totNmom = 0.;
-	  double P1x = 0.; double P1y = 0.; double P1z = 0.;
-	  double P2x = 0.; double P2y = 0.; double P2z = 0.;
-	  double P3x = 0.; double P3y = 0.; double P3z = 0.;
-	  
-	  // Extract out Initial Neutron Information from Tracks vector need for scattering angle cal.
-	  // This section also fills the Initial Neutron histograms for diagnostics
-	  if(PID == 0 && TID == 1){
-		totNmom = PhysVars->computeMomentum(aVertex->momX,aVertex->momY,aVertex->momZ);
-		P1x = aVertex->posX; P1y = aVertex->posY; P1z = aVertex->posZ;
-		HistoMan->FillHistograms("NeutronEnergyInitial",(aVertex->energy));
-		HistoMan->FillHistograms("NeutronMomentumInitial",totNmom);
-	  }
-	  
-	  // Process the good Proton Track
-	  int GoodTID = bestProtonTID; 
-	  if(PID == npPID && TID == GoodTID){
-		double momX = aVertex->momX; double momY = aVertex->momY; double momZ = aVertex->momZ;
-		double momTot = PhysVars->computeMomentum(momX,momY,momZ);
-		P2x = aVertex->posX; P2y = aVertex->posY; P2z = aVertex->posZ;
-		
-		double P2Theta = PhysVars->computeScatTheta(momX,momY);
-		double P2Phi = PhysVars->computeScatPhi(momZ,momTot); 
-		
-		P3x = P2x + 2*TMath::Sin(P2Phi)*TMath::Cos(P2Theta);
-		P3y = P2y + 2*TMath::Sin(P2Phi)*TMath::Sin(P2Theta);
-		P3z = P2z + 2*TMath::Cos(P2Phi);
-		double computedAngle = PhysVars->getAzimuthAngle(P1x,P1y,P1z,P2x,P2y,P2z,P3x,P3y,P3z);
-		if (computedAngle >= angleLow && computedAngle <= angleHigh) {
-		  HistoMan->FillHistograms("recoilAngleReal",computedAngle);
-		  
-		  // Guess at the 'real' asymmetry; this is done by looking to see if Y-momentum points up or down
-		  if(momY < 0) asym = -1;
-		  if(momY > 0) asym = +1;
-		  if(momY == 0) asym = 0;
-		  HistoMan->FillHistograms("asymmetryReal",asym);
-		  
-		  double protonVertexEnergy = aVertex->energy;
-		  HistoMan->FillHistograms("recoilEnergyReal",protonVertexEnergy);
-		  double sPower =  PhysVars->computeBetheBloch(protonVertexEnergy,938.27205,1,1.032,12.929,7,64.7e-6);
-		  
-		  double dEenergyLost =
-			PhysVars->computeEnergyLoss(protonVertexEnergy, TMath::DegToRad()*computedAngle, 1. /*cm*/);
-		  Double_t dEenergyLost2 = rand->Gaus(dEenergyLost, 0.10*dEenergyLost);
-		  double EenergyLost =
-			PhysVars->computeEnergyLoss(protonVertexEnergy, TMath::DegToRad()*computedAngle, 10. /*cm*/);
-		  Double_t EenergyLost2 = rand->Gaus(EenergyLost, 0.10*EenergyLost);
-		  
-		  HistoMan->FillHistograms("dEvsEReal",EenergyLost,dEenergyLost);
-		  HistoMan->FillHistograms("dEvsEReal2",EenergyLost2,dEenergyLost2); // An attempt at "energy" resolution of the scints
-		  std::cout << "Stopping Power = " << sPower << "   Proton Energy Loss in dE-array = " << dEenergyLost
-					<< "   Proton Energy Loss in E-array = " << EenergyLost << std::endl;
-		}
-	  }
-	}
 	
+	// Extract out Initial Neutron Information from the vertexMap
+	// Initial Neutron histograms for diagnostics
+	std::map<int,NpolVertex *>::iterator mapIt2;
+	int asym = 0;
+	double initialNeutronMomentum = 0.;
+	
+	// fill initial neutron histograms
+	mapIt2 = vertexMap.find(1);
+	initialNeutronMomentum = PhysVars->computeInitialNeutronMomentum(vertexMap);
+	HistoMan->FillHistograms("NeutronMomentumInitial",initialNeutronMomentum);
+	HistoMan->FillHistograms("NeutronEnergyInitial",(mapIt2->second->energy));
+
+	// fill selected proton track histograms
+	mapIt2 = vertexMap.find(bestProtonTID);
+	double computedProtonAngle = PhysVars->
+	  computeRecoilParticleAngle(vertexMap,bestProtonTID);
+	if(computedProtonAngle >= angleLow && computedProtonAngle <= angleHigh) {
+	  HistoMan->FillHistograms("recoilAngleReal",computedProtonAngle);
+	  double protonVertexEnergy = mapIt2->second->energy;
+	  HistoMan->FillHistograms("recoilEnergyReal",protonVertexEnergy);
+	  double sPower = PhysVars->
+		computeBetheBloch(protonVertexEnergy,938.27205,1,1.032,12.929,7,64.7e-6);  
+	  double dEenergyLost = PhysVars->
+		computeEnergyLoss(protonVertexEnergy,TMath::DegToRad()*computedProtonAngle,1./*cm*/);
+	  Double_t dEenergyLost2 = rand->Gaus(dEenergyLost, 0.10*dEenergyLost);
+	  double EenergyLost = PhysVars->
+		computeEnergyLoss(protonVertexEnergy,TMath::DegToRad()*computedProtonAngle,10. /*cm*/);
+	  Double_t EenergyLost2 = rand->Gaus(EenergyLost, 0.10*EenergyLost);
+	  HistoMan->FillHistograms("dEvsEReal",EenergyLost,dEenergyLost);
+	  HistoMan->FillHistograms("dEvsEReal2",EenergyLost2,dEenergyLost2);
+	  // An attempt at "energy" resolution of the scints
+	  std::cout << "Stopping Power = " << sPower
+				<< "   Proton Energy Loss in dE-array = " << dEenergyLost
+				<< "   Proton Energy Loss in E-array = " << EenergyLost << std::endl;
+	  
+	  // Assign asymmetry in a simple way (for now)
+	  double momY = mapIt2->second->momY;
+	  std::cout << "Y-momentum: " << momY << std::endl;
+	  if(momY < 0) asym = -1;
+	  if(momY > 0) asym = +1;
+	  if(momY == 0) asym = 0;
+	  HistoMan->FillHistograms("asymmetryReal",asym);
+	}
 	
 	// END TRACK LOOP
 	// >>>>>>>>>>>>>>> This ends the "real NP scattering" part of the code <<<<<<<<<<<<<<<<<<<
