@@ -172,13 +172,13 @@ int main(int argc, char *argv[]) {
 	  if((PID == 0 && TID == 1) && (AVNum == 9 || AVNum == 10)){
 		if(physProcess == "hadElastic"){
 		  elasticFlag = true;
-		  PhysVars->fillVertexMap(vertexMap,verts,1,volName);
+		  PhysVars->fillVertexMap(vertexMap,verts,1,volName,physProcess);
 		  
 		} else if(physProcess == "neutronInelastic"){
 		  int neutronCount = 0; int protonCount = 0; int gammaCount = 0;
 		  int othersCount = 0; int pionCount = 0;
 		  
-		  PhysVars->fillVertexMap(vertexMap,verts,1,volName);
+		  PhysVars->fillVertexMap(vertexMap,verts,1,volName,physProcess);
 		  std::map<int,NpolVertex *>::iterator mapIt;
 		  for(mapIt = vertexMap.begin(); mapIt != vertexMap.end(); mapIt++){
 			int pType = mapIt->second->particleId;
@@ -196,7 +196,7 @@ int main(int argc, char *argv[]) {
 			}
 		  }
 
-		  if(pionCount != 0) {
+		  if(pionCount > 0) {
 			inelasticFlag = true;
 		  } else if(neutronCount >= 0 && protonCount >= 0 && gammaCount >= 0){
 			//Quasi-elastic check call
@@ -217,7 +217,7 @@ int main(int argc, char *argv[]) {
 		  continue;
 		}
 	  }
-	}
+	}  // End Step Loop
 	
 
   
@@ -231,24 +231,26 @@ int main(int argc, char *argv[]) {
 	// Comment out the corresponding statement below in order to select
 	// the events you want to analyze.  Comment out all to keep all events
 
-	if((quasielasticFlag || inelasticFlag) && !(elasticFlag)) continue;
+	//if((quasielasticFlag || inelasticFlag) && !(elasticFlag)) continue;
 	// Elastic events only
-	//if((elasticFlag || inelasticFlag) && !(quasielasticFlag)) continue;
+	if((elasticFlag || inelasticFlag) && !(quasielasticFlag)) continue;
 	// Quasielastic events only
 	//if((quasielasticFlag || elasticFlag) && !(inelasticFlag)) continue;
 	// Inelastic events only
 
-	if(elasticFlag) std::cout << "Elastic Event" << std::endl;
-	if(inelasticFlag) std::cout << "Inelastic Event" << std::endl;
-	if(quasielasticFlag) std::cout << "Quasi-elastic Event" << std::endl;
+	//if(elasticFlag) std::cout << "Elastic Event" << std::endl;
+	//if(inelasticFlag) std::cout << "Inelastic Event" << std::endl;
+	//if(quasielasticFlag) std::cout << "Quasi-elastic Event" << std::endl;
   
 	// ****** This section computes the (P_leading - P_elastic) ******
 	// ****** value and saves into histogram                    ******
 	double neutronMomentum = PhysVars->computeInitialNeutronMomentum(vertexMap);
+	double neutronEnergy = PhysVars->computeInitialNeutronEnergy(vertexMap);
 	int leadingTID = PhysVars->findLeadingParticle(vertexMap);
 	if(leadingTID != -1){
 	  std::cout << "******************** Begin **************************" << std::endl;
 	  std::cout << " Event #: " << i << std::endl;
+	  std::cout << "  Initial Neutron Momentum: " << neutronMomentum << std::endl;
 	  std::cout << "  TID of Leading: " << leadingTID << std::endl;
 	  
 	  double computedRecoilAngle = PhysVars->
@@ -262,7 +264,7 @@ int main(int argc, char *argv[]) {
 	  std::cout << "  Leading Momentum: " << leadingParticleMomentum << std::endl;
 	  
 	  double elasticMomentum = PhysVars->
-		computeElasticMomentum(neutronMomentum, computedRecoilAngle*TMath::DegToRad());
+		computeElasticMomentum(neutronMomentum, neutronEnergy, computedRecoilAngle*TMath::DegToRad());
 	  
 	  std::cout << "  Elastic Momentum: " << elasticMomentum << std::endl;
 	  
@@ -488,3 +490,13 @@ int main(int argc, char *argv[]) {
 //  std::cout << "  Original neutron energy: " << aVertex->energy
 // << std::endl;
 //	}
+
+		  
+/*	  std::vector<NpolStep *>::iterator bs_it;
+		  for(bs_it = steps->begin(); bs_it != steps->end(); bs_it++) {
+			NpolStep *bsStep = *bs_it;
+			if(bsStep == NULL) continue;
+			std::cout << "PID: " << bsStep->parentId << " TID: " << bsStep->trackId << " Process: " << bsStep->process << " Time: " << bsStep->time << std::endl;
+		    			
+		  }
+		  std::cout << " " << std::endl;*/
