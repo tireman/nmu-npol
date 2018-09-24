@@ -155,9 +155,9 @@ void NpolAnalysisManager::RecordTrack(const G4Track *aTrack) {
 	anNpolVertex->particleId = aTrack->GetDefinition()->GetPDGEncoding();
 	anNpolVertex->volume = (aTrack->GetVolume()->GetName()).data();
 	if(aTrack->GetCreatorProcess() != NULL)
-		anNpolVertex->process = (aTrack->GetCreatorProcess()->GetProcessName()).data();
+	  anNpolVertex->process = (aTrack->GetCreatorProcess()->GetProcessName()).data();
 	else
-		anNpolVertex->process = "";
+	  anNpolVertex->process = "";
 	
 	// Add anNpolVertex to the tracks vector with its trackId as the index.
 	// This may require the vector be resized first.
@@ -205,7 +205,7 @@ void NpolAnalysisManager::RecordStep(const G4Step *aStep) {
 		  npolStep->process = (postStepPoint->GetProcessDefinedStep()->GetProcessName());
 		else
 		  npolStep->process = "";
-		
+	
 		steps->push_back(npolStep);
 	}
 
