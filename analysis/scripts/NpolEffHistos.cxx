@@ -128,7 +128,7 @@ stats_sourceNeutron = (TVectorT<double>*)sourceNeutron->Get("TVectorT<double>;1"
  TCanvas *neutronInformation = new TCanvas("neutronInformation","Neutron Diagnostics",800,900);
  TCanvas *realNPevent = new TCanvas("realNPevent","Plots for Real NP Event",1000,1200);
  TCanvas *dEvsENPevent = new TCanvas("dEvsENPevent","dE vs. E for Real NP Event",1000,1200);
- TCanvas *recoilMomentum = new TCanvas("recoilMomentum","Recoil Proton Momentum", 1000, 1200);
+ TCanvas *recoilMomentum = new TCanvas("eventDiagnostics","Event Diagnostics", 1000, 1200);
  
  // Histogram Stats Removed**
  //gStyle->SetOptStat(0);
@@ -291,16 +291,16 @@ stats_sourceNeutron = (TVectorT<double>*)sourceNeutron->Get("TVectorT<double>;1"
 
  recoilMomentum->Divide(2,2,0.0001, 0.00001,0);
  recoilMomentum->cd(1);
- h_selectedRecoilMomentum->SetTitle("Recoil Proton Momentum (MeV/c)");
- h_selectedRecoilMomentum->GetXaxis()->SetTitleSize(0.03);
- h_selectedRecoilMomentum->GetYaxis()->SetTitleSize(0.03);
- h_selectedRecoilMomentum->SetTitle("Counts");
+ h_selectedRecoilMomentum->GetXaxis()->SetTitle("(P_leading - P_elastic) (MeV/c)");
+ h_selectedRecoilMomentum->GetYaxis()->SetTitle("Counts");
+ h_selectedRecoilMomentum->GetXaxis()->SetTitleSize(0.05);
+ h_selectedRecoilMomentum->GetYaxis()->SetTitleSize(0.05);
+ h_selectedRecoilMomentum->SetTitle("Momentum Difference");
  h_selectedRecoilMomentum->DrawCopy();
  recoilMomentum->cd(2);
  h_qsquaredTest->SetTitle("Recoil Proton Q-Squared Value (MeV/c)^2");
  h_qsquaredTest->GetXaxis()->SetTitleSize(0.03);
  h_qsquaredTest->GetYaxis()->SetTitleSize(0.03);
- h_qsquaredTest->SetTitle("Counts");
  h_qsquaredTest->DrawCopy();
  
  // Write out canvases to file 
