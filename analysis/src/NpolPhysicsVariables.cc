@@ -481,15 +481,16 @@ void NpolPhysicsVariables::printVertexMap(std::map<int,NpolVertex *> &theVertexM
   
 }
 
-  double NpolPhysicsVariables::computeElasticMomentum(double neutronMomentum, double neutronEnergy, double thetaP){
+  double NpolPhysicsVariables::computeElasticMomentum(double neutronMomentum, double thetaP){
 
   // **** This method computes the momentum of a recoil proton struck
   // **** by a neutron given the momentum(energy) of the neutron and
   // **** the angle of the recoil proton from the initial neutron direction.
   double momentum = 0.0;
+  double mN = 939.56538; // (MeV/c^2)
   double mP = 938.27205; // (MeV/c^2)
   double Pnc = neutronMomentum;
-  double En = neutronEnergy;
+  double En = sqrt(pow(Pnc,2) + pow(mN,2));
  
   double alpha = En + mP;
   double beta = Pnc * cos(thetaP);
@@ -499,7 +500,6 @@ void NpolPhysicsVariables::printVertexMap(std::map<int,NpolVertex *> &theVertexM
   double C = pow(gamma,2) + pow(beta,2) * pow(mP,2);
 
   double recoilEnergy = (-B + sqrt(pow(B,2) - 4 * A * C))/(2 * A);
-  std::cout << "  Computed Energy: " << recoilEnergy << std::endl;
   momentum = sqrt(pow(recoilEnergy,2) - pow(mP,2));
   
   return momentum;
@@ -646,13 +646,11 @@ double NpolPhysicsVariables::computeInitialNeutronMomentum(std::map<int,NpolVert
   return neutronMomentum;
 }
 
-double NpolPhysicsVariables::computeInitialNeutronEnergy(std::map<int,NpolVertex *> &theVertexMap){
+double NpolPhysicsVariables::returnParticleEnergy(std::map<int,NpolVertex *> &theVertexMap, int TID){
 
   double neutronEnergy = 0.0;
   std::map<int,NpolVertex *>::iterator mapIt;
-
-  // Find Initial Neutron Momentum
-  mapIt = theVertexMap.find(1);
+  mapIt = theVertexMap.find(TID);
   neutronEnergy = mapIt->second->energy;
 
   return neutronEnergy;

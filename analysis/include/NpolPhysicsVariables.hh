@@ -36,13 +36,13 @@ public:
   double computeMomentum(double xMom, double yMom, double zMom);
   double computeScatTheta(double xMom, double yMom);
   double computeScatPhi(double zMom, double totalMom);
-  double computeElasticMomentum(double neutronMomentum, double neutronEnergy, double thetaP);
+  double computeElasticMomentum(double neutronMomentum, double thetaP);
   bool checkQuasiElasticScattering(std::map<int,NpolVertex *> &theVertexMap);
   double computeQsquared(double ParticleEnergy, int pType);
   double computeLeadingParticleMomentum(std::map<int,NpolVertex *> &theVertexMap,int selectedTID);
   double computeRecoilParticleAngle(std::map<int,NpolVertex *> &theVertexMap, int selectedTID);
   double computeInitialNeutronMomentum(std::map<int,NpolVertex *> &theVertexMap);
-  double computeInitialNeutronEnergy(std::map<int,NpolVertex *> &theVertexMap);
+  double returnParticleEnergy(std::map<int,NpolVertex *> &theVertexMap, int TID);
   int findLeadingParticle(std::map<int,NpolVertex *> &theVertexMap);
   int findBestProtonTrackID(std::map<int,NpolVertex *> &theVertexMap, const std::vector<NpolStep *> *steps, int npSOI);
   

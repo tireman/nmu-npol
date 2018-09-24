@@ -245,34 +245,15 @@ int main(int argc, char *argv[]) {
 	// ****** This section computes the (P_leading - P_elastic) ******
 	// ****** value and saves into histogram                    ******
 	double neutronMomentum = PhysVars->computeInitialNeutronMomentum(vertexMap);
-	double neutronEnergy = PhysVars->computeInitialNeutronEnergy(vertexMap);
 	int leadingTID = PhysVars->findLeadingParticle(vertexMap);
 	if(leadingTID != -1){
-	  std::cout << "******************** Begin **************************" << std::endl;
-	  std::cout << " Event #: " << i << std::endl;
-	  std::cout << "  Initial Neutron Momentum: " << neutronMomentum << std::endl;
-	  std::cout << "  TID of Leading: " << leadingTID << std::endl;
-	  
-	  double computedRecoilAngle = PhysVars->
-		computeRecoilParticleAngle(vertexMap,leadingTID);
-
-	  std::cout << "  Recoil Angle: " << computedRecoilAngle << std::endl;
-	  
-	  double leadingParticleMomentum =
-		PhysVars->computeLeadingParticleMomentum(vertexMap,leadingTID);
-
-	  std::cout << "  Leading Momentum: " << leadingParticleMomentum << std::endl;
-	  
+	  double computedRecoilAngle = PhysVars->computeRecoilParticleAngle(vertexMap,leadingTID);
+	  double leadingParticleMomentum = PhysVars->computeLeadingParticleMomentum(vertexMap,leadingTID);
 	  double elasticMomentum = PhysVars->
-		computeElasticMomentum(neutronMomentum, neutronEnergy, computedRecoilAngle*TMath::DegToRad());
-	  
-	  std::cout << "  Elastic Momentum: " << elasticMomentum << std::endl;
-	  
-	  PhysVars->printVertexMap(vertexMap,i);
-	  HistoMan->FillHistograms("selectedRecoilMomentum",
-							   (leadingParticleMomentum - elasticMomentum));
+		computeElasticMomentum(neutronMomentum, computedRecoilAngle*TMath::DegToRad());
+	  //PhysVars->printVertexMap(vertexMap,i);
+	  HistoMan->FillHistograms("selectedRecoilMomentum",(leadingParticleMomentum - elasticMomentum));
 	
-	  std::cout << "******************** End **************************" << std::endl;
 	}
 	// ****** End (P_leading - P_elastic) code ******
 
@@ -280,6 +261,7 @@ int main(int argc, char *argv[]) {
 	// **** After the proton track has been found, this code will compute values, **** //
 	// fill histograms. Extract out Initial Neutron Information from the vertexMap
 	int bestProtonTID = PhysVars->findBestProtonTrackID(vertexMap,steps,npSOI);
+	std::cout << " Best Proton Track ID: " << bestProtonTID << std::endl;
 	if(bestProtonTID != 0){
 	  
 	  std::map<int,NpolVertex *>::iterator mapIt2;
