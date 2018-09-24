@@ -416,12 +416,7 @@ void NpolPhysicsVariables::fillVertexMap(std::map<int,NpolVertex *> &theVertexMa
 	int TID = aVertex->trackId;
 	std::string process = aVertex->process;
 	std::string volName = aVertex->volume;
-	if(PID == 0 && TID == 1){
-	  std::cout << "  Original neutron energy: " << aVertex->energy
-				<< std::endl;
-	}
-
-	
+		
 	// Well, I can't figure out how to copy data at one pointer
 	// to data at another pointer (in a map) and then later delete
 	// the pointers in the map without it killing the original pointers
@@ -597,7 +592,7 @@ double NpolPhysicsVariables::computeRecoilParticleAngle(std::map<int,NpolVertex 
   P3y = P2y + 2*TMath::Sin(P2Phi)*TMath::Sin(P2Theta);
   P3z = P2z + 2*TMath::Cos(P2Phi);
 
-  // Now compute the recoil angle
+  // Now compute the recoil angle (returned from getAzimuthAngle in degrees)
   double recoilAngle = getAzimuthAngle(P1x,P1y,P1z,P2x,P2y,P2z,P3x,P3y,P3z);
 
   return recoilAngle;
@@ -614,7 +609,7 @@ int NpolPhysicsVariables::findLeadingParticle(std::map<int,NpolVertex *> &theVer
 	  computeMomentum(mapIt->second->momX,mapIt->second->momY,mapIt->second->momZ);
 	int currentPType = mapIt->second->particleId;
 	if(mapIt->first > 1){
-	  if(currentPType == 2112 || currentPType == 2212){
+	  if(/*currentPType == 2112 ||*/ currentPType == 2212){
 		if(currentMomentum > maximalMomentum){
 		  maximalMomentum = currentMomentum;
 		  maximalTID = mapIt->first;
@@ -655,6 +650,7 @@ int NpolPhysicsVariables::findBestProtonTrackID(std::map<int,NpolVertex *> &theV
 	int PID = mapIt->second->parentId;
 	int TID = mapIt->first;
 	double particleEnergy = mapIt->second->energy;
+	if(TID == 1) continue;
 	if(pType == 2212 && particleEnergy >= 25 /*MeV*/){
 	  std::vector<NpolStep *>::const_iterator ss_it;
 	  for(ss_it = steps->begin(); ss_it != steps->end(); ss_it++) {
