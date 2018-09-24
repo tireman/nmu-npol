@@ -233,14 +233,14 @@ int main(int argc, char *argv[]) {
 
 	//if((quasielasticFlag || inelasticFlag) && !(elasticFlag)) continue;
 	// Elastic events only
-	if((elasticFlag || inelasticFlag) && !(quasielasticFlag)) continue;
+	//if((elasticFlag || inelasticFlag) && !(quasielasticFlag)) continue;
 	// Quasielastic events only
 	//if((quasielasticFlag || elasticFlag) && !(inelasticFlag)) continue;
 	// Inelastic events only
 
-	//if(elasticFlag) std::cout << "Elastic Event" << std::endl;
-	//if(inelasticFlag) std::cout << "Inelastic Event" << std::endl;
-	//if(quasielasticFlag) std::cout << "Quasi-elastic Event" << std::endl;
+	if(elasticFlag) std::cout << "Elastic Event" << std::endl;
+	if(inelasticFlag) std::cout << "Inelastic Event" << std::endl;
+	if(quasielasticFlag) std::cout << "Quasi-elastic Event" << std::endl;
   
 	// ****** This section computes the (P_leading - P_elastic) ******
 	// ****** value and saves into histogram                    ******
@@ -249,11 +249,9 @@ int main(int argc, char *argv[]) {
 	if(leadingTID != -1){
 	  double computedRecoilAngle = PhysVars->computeRecoilParticleAngle(vertexMap,leadingTID);
 	  double leadingParticleMomentum = PhysVars->computeLeadingParticleMomentum(vertexMap,leadingTID);
-	  double elasticMomentum = PhysVars->
-		computeElasticMomentum(neutronMomentum, computedRecoilAngle*TMath::DegToRad());
-	  //PhysVars->printVertexMap(vertexMap,i);
+	  double elasticMomentum = PhysVars->computeElasticMomentum(neutronMomentum, computedRecoilAngle*TMath::DegToRad());
+	  PhysVars->printVertexMap(vertexMap,i);
 	  HistoMan->FillHistograms("selectedRecoilMomentum",(leadingParticleMomentum - elasticMomentum));
-	
 	}
 	// ****** End (P_leading - P_elastic) code ******
 
