@@ -8,6 +8,7 @@
 #include "TMath.h"
 #include "NpolStep.hh"
 #include "TRandom3.h"
+#include "TVector3.h"
 
 class NpolEventProcessing;
 class NpolEventPreProcessing;
@@ -37,7 +38,7 @@ public:
   double computeScatTheta(double xMom, double yMom);
   double computeScatPhi(double zMom, double totalMom);
   double computeElasticMomentum(double neutronMomentum, double thetaP);
-  bool checkQuasiElasticScattering(std::map<int,NpolVertex *> &theVertexMap);
+  bool checkQuasiElasticScattering(std::map<int,NpolVertex *> &theVertexMap, std::pair<double,TVector3 > initNeutron4Vec);
   double computeQsquared(double ParticleEnergy, int pType);
   double computeLeadingParticleMomentum(std::map<int,NpolVertex *> &theVertexMap,int selectedTID);
   double computeRecoilParticleAngle(std::map<int,NpolVertex *> &theVertexMap, int selectedTID);

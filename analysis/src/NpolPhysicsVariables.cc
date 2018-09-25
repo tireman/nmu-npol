@@ -4,6 +4,7 @@
 #include "NpolPhysicsVariables.hh"
 #include "NpolStep.hh"
 #include "NpolVertex.hh"
+#include "TVector3.h"
 
 #include <cmath>
 
@@ -151,9 +152,9 @@ double NpolPhysicsVariables::ReturnAngle(NpolVertex *incNeutronVert, std::map<st
   double analyzerTime;
   double EarrayTime;
 
-  targetPt[0] = incNeutronVert->posX;
-  targetPt[1] = incNeutronVert->posY;
-  targetPt[2] = incNeutronVert->posZ;
+  targetPt[0] = incNeutronVert->gPosX;
+  targetPt[1] = incNeutronVert->gPosY;
+  targetPt[2] = incNeutronVert->gPosZ;
 
   GetPoI(analyzerPt,&analyzerTime,SOI,analyzer,detEvents);
   GetPoI2(EarrayPt,&EarrayTime,SOI,EArrayOfInterest,detEvents);
@@ -427,9 +428,12 @@ void NpolPhysicsVariables::fillVertexMap(std::map<int,NpolVertex *> &theVertexMa
 		//theVertexMap[TID] = aVertex;
 		theVertexMap[TID]->trackId = aVertex->trackId;
 		theVertexMap[TID]->parentId = aVertex->parentId;
-		theVertexMap[TID]->posX = aVertex->posX;
-		theVertexMap[TID]->posY = aVertex->posY;
-		theVertexMap[TID]->posZ = aVertex->posZ;
+		theVertexMap[TID]->gPosX = aVertex->gPosX;
+		theVertexMap[TID]->gPosY = aVertex->gPosY;
+		theVertexMap[TID]->gPosZ = aVertex->gPosZ;
+		theVertexMap[TID]->lPosX = aVertex->lPosX;
+		theVertexMap[TID]->lPosY = aVertex->lPosY;
+		theVertexMap[TID]->lPosZ = aVertex->lPosZ;
 		theVertexMap[TID]->momX = aVertex->momX;
 		theVertexMap[TID]->momY = aVertex->momY;
 		theVertexMap[TID]->momZ = aVertex->momZ;
@@ -506,31 +510,33 @@ void NpolPhysicsVariables::printVertexMap(std::map<int,NpolVertex *> &theVertexM
 }
 
 
-bool NpolPhysicsVariables::checkQuasiElasticScattering(std::map<int,NpolVertex *> &theVertexMap){
+bool NpolPhysicsVariables::checkQuasiElasticScattering(std::map<int,NpolVertex *> &theVertexMap, std::pair<double,TVector3 > initNeutron4Vec){
 
   bool QEflag = false;
   double initNeutronEnergy = 0.0; double initNeutronMomentum = 0.0;
   double highNeutronMomentum = 0.0; double highNeutronEnergy = 0.0;
+  TVector3 initNeutron3Mom = initNeutron4Vec.second;
 
+  initNeutronEnergy = initNeutron4Vec.first;
+  initNeutronMomentum = computeMomentum(initNeutron3Mom(0),initNeutron3Mom(1),initNeutron3Mom(2));
+  
   std::map<int,NpolVertex *>::iterator mapIt;
   for(mapIt = theVertexMap.begin(); mapIt != theVertexMap.end(); mapIt++){
 	double currentEnergy = mapIt->second->energy;
 	double currentMomentum = computeMomentum(mapIt->second->momX,mapIt->second->momY,mapIt->second->momZ);
 	int currentPType = mapIt->second->particleId;
-	if(mapIt->first == 1) {
-	  initNeutronEnergy = currentEnergy;
-	  initNeutronMomentum = currentMomentum;
-	} else if(mapIt->first > 1 && currentPType == 2112 && currentMomentum > highNeutronMomentum){
+
+	if(mapIt->first > 1 && currentPType == 2112 && currentMomentum > highNeutronMomentum){
 	  highNeutronMomentum = currentMomentum;
 	  highNeutronEnergy = currentEnergy;
 	} else {
 	  continue;
 	}
   }
-  double initialQ = sqrt(initNeutronMomentum*initNeutronMomentum - initNeutronEnergy*initNeutronEnergy);
-  double finalQ = sqrt(highNeutronMomentum*highNeutronMomentum - highNeutronEnergy*highNeutronEnergy);
+  double initial4VecMag = sqrt(initNeutronMomentum*initNeutronMomentum - initNeutronEnergy*initNeutronEnergy);
+  double final4VecMag = sqrt(highNeutronMomentum*highNeutronMomentum - highNeutronEnergy*highNeutronEnergy);
   
-  if(finalQ >= 0.95*initialQ){
+  if(final4VecMag >= 0.95*initial4VecMag){
 	return QEflag = true;
   } else {
 	return QEflag = false;
@@ -576,18 +582,18 @@ double NpolPhysicsVariables::computeRecoilParticleAngle(std::map<int,NpolVertex 
 
   // Find Initial Point and Initial Neutron Momentum
   mapIt = theVertexMap.find(1);
-  P1x = mapIt->second->posX;
-  P1y = mapIt->second->posY;
-  P1z = mapIt->second->posZ;
+  P1x = mapIt->second->gPosX;
+  P1y = mapIt->second->gPosY;
+  P1z = mapIt->second->gPosZ;
     
   // Find interaction Point from selectTID position (in vertex vector)
   mapIt = theVertexMap.find(selectedTID);
   double xMom = mapIt->second->momX;
   double yMom = mapIt->second->momY;
   double zMom = mapIt->second->momZ;
-  P2x = mapIt->second->posX;
-  P2y = mapIt->second->posY;
-  P2z = mapIt->second->posZ;
+  P2x = mapIt->second->gPosX;
+  P2y = mapIt->second->gPosY;
+  P2z = mapIt->second->gPosZ;
   recoilMomentum = computeMomentum(xMom,yMom,zMom);
 
   // Compute a third point for computing the recoil angle
