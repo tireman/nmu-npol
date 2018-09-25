@@ -507,18 +507,15 @@ void NpolPhysicsVariables::printVertexMap(std::map<int,NpolVertex *> &theVertexM
 
 
 bool NpolPhysicsVariables::checkQuasiElasticScattering(std::map<int,NpolVertex *> &theVertexMap){
-  bool QEflag = false;
 
+  bool QEflag = false;
   double initNeutronEnergy = 0.0; double initNeutronMomentum = 0.0;
-  double highNeutronMomentum = 0.0; 
-  double highNeutronEnergy = 0.0;
+  double highNeutronMomentum = 0.0; double highNeutronEnergy = 0.0;
+
   std::map<int,NpolVertex *>::iterator mapIt;
   for(mapIt = theVertexMap.begin(); mapIt != theVertexMap.end(); mapIt++){
-	double xMom = mapIt->second->momX;
-	double yMom = mapIt->second->momY;
-	double zMom = mapIt->second->momZ;
 	double currentEnergy = mapIt->second->energy;
-	double currentMomentum = computeMomentum(xMom,yMom,zMom);
+	double currentMomentum = computeMomentum(mapIt->second->momX,mapIt->second->momY,mapIt->second->momZ);
 	int currentPType = mapIt->second->particleId;
 	if(mapIt->first == 1) {
 	  initNeutronEnergy = currentEnergy;
