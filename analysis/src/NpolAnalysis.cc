@@ -168,7 +168,7 @@ int main(int argc, char *argv[]) {
 	  int section = Process->sectionNumber(volName);
 	  int PID = aStep->parentId;
 	  int TID = aStep->trackId;
-
+	  
 	  if((PID == 0 && TID == 1) && (AVNum == 9 || AVNum == 10)){
 		if(physProcess == "hadElastic"){
 		  elasticFlag = true;
@@ -200,7 +200,12 @@ int main(int argc, char *argv[]) {
 			inelasticFlag = true;
 		  } else if(neutronCount >= 0 && protonCount >= 0 && gammaCount >= 0){
 			//Quasi-elastic check call
-			quasielasticFlag = PhysVars->checkQuasiElasticScattering(vertexMap);
+			std::pair<double,TVector3 > initNeutron4Vec;
+			TVector3 pNeutron(aStep->momX,aStep->momY,aStep->momZ);
+			initNeutron4Vec.first = aStep->energy;
+			initNeutron4Vec.second = pNeutron;
+			
+			quasielasticFlag = PhysVars->checkQuasiElasticScattering(vertexMap, initNeutron4Vec);
 			if(!(quasielasticFlag)) inelasticFlag = true;
 		  } else {
 			continue;
@@ -235,12 +240,9 @@ int main(int argc, char *argv[]) {
 	// Elastic events only
 	//if((elasticFlag || inelasticFlag) && !(quasielasticFlag)) continue;
 	// Quasielastic events only
-	//if((quasielasticFlag || elasticFlag) && !(inelasticFlag)) continue;
+	if((quasielasticFlag || elasticFlag) && !(inelasticFlag)) continue;
 	// Inelastic events only
 
-	if(elasticFlag) std::cout << "Elastic Event" << std::endl;
-	if(inelasticFlag) std::cout << "Inelastic Event" << std::endl;
-	if(quasielasticFlag) std::cout << "Quasi-elastic Event" << std::endl;
   
 	// ****** This section computes the (P_leading - P_elastic) ******
 	// ****** value and saves into histogram                    ******
@@ -250,6 +252,15 @@ int main(int argc, char *argv[]) {
 	  double computedRecoilAngle = PhysVars->computeRecoilParticleAngle(vertexMap,leadingTID);
 	  double leadingParticleMomentum = PhysVars->computeLeadingParticleMomentum(vertexMap,leadingTID);
 	  double elasticMomentum = PhysVars->computeElasticMomentum(neutronMomentum, computedRecoilAngle*TMath::DegToRad());
+
+	  if(elasticFlag) std::cout << "Elastic Event" << std::endl;
+	  if(inelasticFlag) std::cout << "Inelastic Event" << std::endl;
+	  if(quasielasticFlag) std::cout << "Quasi-elastic Event" << std::endl;
+	  std::cout << "  Leading TID: " << leadingTID << std::endl;
+	  std::cout << "  Recoil Angle Computed: " << computedRecoilAngle << std::endl;
+	  std::cout << "  Leading Particle Momentum: " << leadingParticleMomentum << std::endl;
+	  std::cout << "  Elastic Momentum: " << elasticMomentum << std::endl;
+	  
 	  PhysVars->printVertexMap(vertexMap,i);
 	  HistoMan->FillHistograms("selectedRecoilMomentum",(leadingParticleMomentum - elasticMomentum));
 	}
