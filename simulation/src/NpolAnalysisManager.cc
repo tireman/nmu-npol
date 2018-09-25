@@ -21,7 +21,7 @@
 #include "NpolTagger.hh"
 #include "NpolStatistics.hh"
 
-#define OUTFILE_VERSION 20180827 // Determined by YYYYMMDD
+#define OUTFILE_VERSION 20180925 // Determined by YYYYMMDD
 
 NpolAnalysisManager *NpolAnalysisManager::pInstance = NULL;
 
@@ -133,18 +133,18 @@ void NpolAnalysisManager::RecordTrack(const G4Track *aTrack) {
 	NpolVertex *anNpolVertex = new NpolVertex();
 	G4int trackID = aTrack->GetTrackID();
 	G4int parentID = aTrack->GetParentID();
-
+	G4ThreeVector worldPosition = aTrack->GetPosition();
+	G4ThreeVector localPosition = aTrack->GetTouchableHandle()->GetHistory()
+	  ->GetTopTransform().TransformPoint(worldPosition);
+	
 	anNpolVertex->trackId = trackID;
 	anNpolVertex->parentId = parentID;
-	anNpolVertex->posX = (aTrack->GetPosition()).x()/cm;
-	anNpolVertex->posY = (aTrack->GetPosition()).y()/cm;
-	anNpolVertex->posZ = (aTrack->GetPosition()).z()/cm;
-	/*anNpolVertex->gPosX = (aTrack->GetPosition()).x()/cm;
-	anNpolVertex->gPosY = (aTrack->GetPosition()).y()/cm;
-	anNpolVertex->gPosZ = (aTrack->GetPosition()).z()/cm;
-	anNpolVertex->lPosX = (aTrack->GetPosition()).x()/cm;
-	anNpolVertex->lPosY = (aTrack->GetPosition()).y()/cm;
-	anNpolVertex->lPosZ = (aTrack->GetPosition()).z()/cm;*/
+	anNpolVertex->gPosX = worldPosition.x()/cm;
+	anNpolVertex->gPosY = worldPosition.y()/cm;
+	anNpolVertex->gPosZ = worldPosition.z()/cm;
+	anNpolVertex->lPosX = localPosition.x()/cm;
+	anNpolVertex->lPosY = localPosition.y()/cm;
+	anNpolVertex->lPosZ = localPosition.z()/cm;
 	anNpolVertex->momX = (aTrack->GetMomentum()).x()/MeV;
 	anNpolVertex->momY = (aTrack->GetMomentum()).y()/MeV;
 	anNpolVertex->momZ = (aTrack->GetMomentum()).z()/MeV;
@@ -197,6 +197,7 @@ void NpolAnalysisManager::RecordStep(const G4Step *aStep) {
 		npolStep->momX = (aTrack->GetMomentum()).x()/MeV;
 		npolStep->momY = (aTrack->GetMomentum()).y()/MeV;
 		npolStep->momZ = (aTrack->GetMomentum()).z()/MeV;
+		npolStep->energy = (aTrack->GetKineticEnergy())/MeV;
 		npolStep->time = aTrack->GetGlobalTime()/ns;
 		npolStep->eDep = (aStep->GetTotalEnergyDeposit())/MeV;
 		npolStep->particleId = aTrack->GetDefinition()->GetPDGEncoding();
