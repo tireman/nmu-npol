@@ -8,8 +8,6 @@
 
 #include <cmath>
 
-#define EDEP_THRESHOLD 1.0  /*MeV*/
-
 NpolPhysicsVariables *NpolPhysicsVariables::PhysVars = NULL;
 
 NpolPhysicsVariables *NpolPhysicsVariables::GetInstance() {
@@ -326,57 +324,9 @@ double NpolPhysicsVariables::computeEnergyLoss(double protonEnergy, double theta
 }
 
 
-void NpolPhysicsVariables::fillDetectorEventMap(std::map<std::string,NpolDetectorEvent *> &eventMap, const NpolStep *aStep){
-
-  // **** This method fills the detector event map which contains objects of
-  // NpolDetectorEvent class keyed to the detector name (string).
-  
-  NpolEventPreProcessing *PProcess = NpolEventPreProcessing::GetInstance();
- 
-  int AVNum = PProcess->GetAVNumber(aStep->volume);
-  int imprintNum = PProcess->GetImprNumber(aStep->volume);
-  int PVNum = PProcess->GetPlacementNumber(aStep->volume);
-    
-  if(eventMap.find(aStep->volume) == eventMap.end())
-	eventMap[aStep->volume] = new NpolDetectorEvent();
-  
-  (eventMap[aStep->volume])->totEnergyDep += aStep->eDep;
-  
-  if(!((eventMap[aStep->volume])->thresholdExceeded) &&
-	 (eventMap[aStep->volume])->totEnergyDep >= EDEP_THRESHOLD) {
-	(eventMap[aStep->volume])->thresholdExceeded = true;
-	(eventMap[aStep->volume])->lPosX = aStep->lPosX;
-	(eventMap[aStep->volume])->lPosY = aStep->lPosY;
-	(eventMap[aStep->volume])->lPosZ = aStep->lPosZ;
-	(eventMap[aStep->volume])->gPosX = aStep->gPosX;
-	(eventMap[aStep->volume])->gPosY = aStep->gPosY;
-	(eventMap[aStep->volume])->gPosZ = aStep->gPosZ;
-	(eventMap[aStep->volume])->time = (aStep->time) + randN->Gaus(0.0,0.200);
-	
-	//****** Compute the hit position in the volume and save. This is done to "simulate" ****** // 
-	// what we could see in a real scintillation detector based on detector resolutions.
-	double hitPos[3] = { 0.0, 0.0, 0.0 };
-	double lPos[3] = { aStep->lPosX, aStep->lPosY, aStep->lPosZ };
-	int detNums[3] = { AVNum, imprintNum, PVNum };
-	
-	if((AVNum == 9) || (AVNum == 10) || (AVNum == 11) || (AVNum == 12)){
-	  PProcess->AnalyzerTaggerHitPosition(hitPos, lPos, detNums);
-	} else if((AVNum == 3) || (AVNum == 4) || (AVNum == 7) || (AVNum == 8)){
-	  PProcess->DeltaEarrayHitPosition(hitPos, lPos, detNums);
-	} else if((AVNum == 1) || (AVNum == 2) || (AVNum == 5) || (AVNum == 6)){
-	  PProcess->EarrayHitPosition(hitPos, lPos, detNums);
-	}
-	
-	(eventMap[aStep->volume])->hPosX = hitPos[0]; 
-	(eventMap[aStep->volume])->hPosY = hitPos[1]; 
-	(eventMap[aStep->volume])->hPosZ = hitPos[2];
-  }
-}
-
 double NpolPhysicsVariables::computeMomentum(double xMom, double yMom, double zMom){
 
-  // Computes the magnitude of the momemtum from the three momentum
-  // components.
+  // Computes the magnitude of the momemtum from the three momentum components.
   double momentumMagnitude = 0.;
 
   return momentumMagnitude = sqrt(xMom*xMom + yMom*yMom + zMom*zMom);
@@ -401,91 +351,7 @@ double NpolPhysicsVariables::computeScatPhi(double zMom, double totalMom){
 
 }
 
-void NpolPhysicsVariables::fillVertexMap(std::map<int,NpolVertex *> &theVertexMap, const std::vector<NpolVertex *> *vertVector, int DesiredPID, std::string eventVolume, std::string eventProcess){
-  
-  // **** This method fills a map that is keyed with track IDs to vertex
-  // information from NpolVertex vector.  The only tracks saved in the map
-  // are the original neutron (PID = 0, TID = 1) and any particle satisfying
-  // DesiredPID == PID.  (PID = DesiredPID, TID = xx).
-  
-  std::vector<NpolVertex *>::const_iterator v_it;
-  for(v_it = vertVector->begin(); v_it != vertVector->end(); v_it++){
-	NpolVertex *aVertex = *v_it;
-	if(aVertex == NULL) continue;
-	
-	int PID = aVertex->parentId;
-	int TID = aVertex->trackId;
-	std::string process = aVertex->process;
-	std::string volName = aVertex->volume;
-		
-	// Well, I can't figure out how to copy data at one pointer
-	// to data at another pointer (in a map) and then later delete
-	// the pointers in the map without it killing the original pointers
-	// So this resulted :(((
-	if((PID == DesiredPID && volName == eventVolume && process == eventProcess) || PID == 0){
-	  if(theVertexMap.find(TID) == theVertexMap.end()){
-		theVertexMap[TID] = new NpolVertex();
-		//theVertexMap[TID] = aVertex;
-		theVertexMap[TID]->trackId = aVertex->trackId;
-		theVertexMap[TID]->parentId = aVertex->parentId;
-		theVertexMap[TID]->gPosX = aVertex->gPosX;
-		theVertexMap[TID]->gPosY = aVertex->gPosY;
-		theVertexMap[TID]->gPosZ = aVertex->gPosZ;
-		theVertexMap[TID]->lPosX = aVertex->lPosX;
-		theVertexMap[TID]->lPosY = aVertex->lPosY;
-		theVertexMap[TID]->lPosZ = aVertex->lPosZ;
-		theVertexMap[TID]->momX = aVertex->momX;
-		theVertexMap[TID]->momY = aVertex->momY;
-		theVertexMap[TID]->momZ = aVertex->momZ;
-		theVertexMap[TID]->time = aVertex->time;
-		theVertexMap[TID]->energy = aVertex->energy;
-		theVertexMap[TID]->eMiss = aVertex->eMiss;
-		theVertexMap[TID]->particleId = aVertex->particleId;
-		theVertexMap[TID]->particle = aVertex->particle;
-		theVertexMap[TID]->process = aVertex->process;
-		theVertexMap[TID]->volume = aVertex->volume;
-		theVertexMap[TID]->daughterIds = aVertex->daughterIds;
-	  }
-	}	
-  }
-}
-
-void NpolPhysicsVariables::printVertexMap(std::map<int,NpolVertex *> &theVertexMap, int eventID){
-  
-  NpolEventPreProcessing *PProcess = NpolEventPreProcessing::GetInstance();
-  NpolEventProcessing *Process = NpolEventProcessing::GetInstance();
-
-  std::cout << "*********Starting Vertex Map Dump**********" << std::endl;
-  std::map<int,NpolVertex *>::iterator mapIt;
-  double totalEnergy = 0.0;
-  for(mapIt = theVertexMap.begin(); mapIt != theVertexMap.end(); mapIt++){
-	int PID = mapIt->second->parentId;
-	int TID = mapIt->second->trackId;
-	int pType = mapIt->second->particleId;
-	std::string partName = mapIt->second->particle;
-	std::string volName = mapIt->second->volume;
-	std::string process = mapIt->second->process;
-	double Time = mapIt->second->time;
-	double Energy = mapIt->second->energy;
-	double momentum = computeMomentum(mapIt->second->momX, mapIt->second->momY, mapIt->second->momZ);
-	if(mapIt->first != 1) totalEnergy += Energy;
-	std::cout << "      Event #: " << eventID << " PID = "<< PID
-			  << " TID = " << TID
-			  << "   Particle " << pType << " " << partName << " AV #: "
-			  << PProcess->GetAVNumber(volName)
-			  << " Impr #: " << PProcess->GetImprNumber(volName) << " PV #: "
-			  << PProcess->GetPlacementNumber(volName)
-			  << " SOI: " << Process->sectionNumber(volName) << " Time = "
-			  << Time << " Energy: " << Energy << " Process: " << process
-			  << " Momentum: " << momentum << std::endl;
-  }
-  std::cout << " Total Energy of all particles = " << totalEnergy
-			<< " MeV" << std::endl;
-  std::cout << "*********Ending Vertex Map Dump**********" << std::endl;
-  
-}
-
-  double NpolPhysicsVariables::computeElasticMomentum(double neutronMomentum, double thetaP){
+double NpolPhysicsVariables::computeElasticMomentum(std::pair<double,std::vector<double>> projNeutron4Vec, double thetaP){
 
   // **** This method computes the momentum of a recoil proton struck
   // **** by a neutron given the momentum(energy) of the neutron and
@@ -493,7 +359,7 @@ void NpolPhysicsVariables::printVertexMap(std::map<int,NpolVertex *> &theVertexM
   double momentum = 0.0;
   double mN = 939.56538; // (MeV/c^2)
   double mP = 938.27205; // (MeV/c^2)
-  double Pnc = neutronMomentum;
+  double Pnc = returnParticleMomentum(projNeutron4Vec);
   double En = sqrt(pow(Pnc,2) + pow(mN,2));
  
   double alpha = En + mP;
@@ -510,31 +376,34 @@ void NpolPhysicsVariables::printVertexMap(std::map<int,NpolVertex *> &theVertexM
 }
 
 
-bool NpolPhysicsVariables::checkQuasiElasticScattering(std::map<int,NpolVertex *> &theVertexMap, std::pair<double,TVector3 > initNeutron4Vec){
+bool NpolPhysicsVariables::checkQuasiElasticScattering(std::map<int,NpolVertex *> &theVertexMap, std::pair<double,std::vector<double>> projNeutron4Vec){
 
+  NpolEventProcessing *Process = NpolEventProcessing::GetInstance();
   bool QEflag = false;
-  double initNeutronEnergy = 0.0; double initNeutronMomentum = 0.0;
-  double highNeutronMomentum = 0.0; double highNeutronEnergy = 0.0;
-  TVector3 initNeutron3Mom = initNeutron4Vec.second;
-
-  initNeutronEnergy = initNeutron4Vec.first;
-  initNeutronMomentum = computeMomentum(initNeutron3Mom(0),initNeutron3Mom(1),initNeutron3Mom(2));
-  
+  double highNeutronMomentum = 0.0; 
+  std::pair<double,std::vector<double>> currentParticle4Vec;
+  std::pair<double,std::vector<double>> highestParticle4Vec;
+	
   std::map<int,NpolVertex *>::iterator mapIt;
   for(mapIt = theVertexMap.begin(); mapIt != theVertexMap.end(); mapIt++){
-	double currentEnergy = mapIt->second->energy;
-	double currentMomentum = computeMomentum(mapIt->second->momX,mapIt->second->momY,mapIt->second->momZ);
+	NpolVertex *aVertex = mapIt->second;
+	if(aVertex == NULL) continue;
+	Process->fillFourVector(aVertex,currentParticle4Vec);
+
+	double currentMomentum = returnParticleMomentum(currentParticle4Vec);
 	int currentPType = mapIt->second->particleId;
 
 	if(mapIt->first > 1 && currentPType == 2112 && currentMomentum > highNeutronMomentum){
 	  highNeutronMomentum = currentMomentum;
-	  highNeutronEnergy = currentEnergy;
+	  Process->fillFourVector(aVertex,highestParticle4Vec);
 	} else {
 	  continue;
 	}
   }
-  double initial4VecMag = sqrt(initNeutronMomentum*initNeutronMomentum - initNeutronEnergy*initNeutronEnergy);
-  double final4VecMag = sqrt(highNeutronMomentum*highNeutronMomentum - highNeutronEnergy*highNeutronEnergy);
+  
+  
+  double initial4VecMag = sqrt(abs(compute4VecSquared(projNeutron4Vec)));
+  double final4VecMag = sqrt(abs(compute4VecSquared(highestParticle4Vec)));
   
   if(final4VecMag >= 0.95*initial4VecMag){
 	return QEflag = true;
@@ -543,22 +412,14 @@ bool NpolPhysicsVariables::checkQuasiElasticScattering(std::map<int,NpolVertex *
   }
 }
 
-double NpolPhysicsVariables::computeQsquared(double ParticleEnergy, int pType){
+double NpolPhysicsVariables::compute4VecSquared(std::pair<double,std::vector<double>> aParticle4Vec){
 
-  double mN = 939.56538; // (MeV/c^2)
-  double mP = 938.27205; // (MeV/c^2)
-  double mass = 0.0;
-  if(pType == 2112){
-	mass = mN;
-  } else if(pType == 2212){
-	mass = mP;
-  } else {
-	mass = 0.0;
-  }
+  double Squared4Vec = 0.0;
+  double particleMomentum = returnParticleMomentum(aParticle4Vec);
+  double particleEnergy = returnParticleEnergy(aParticle4Vec);
   
-  double nu = ParticleEnergy - mass;
-  double qsquared = -2 * mass * nu;
-  return qsquared;
+  Squared4Vec = pow(particleMomentum,2) - pow(particleEnergy,2); 
+  return Squared4Vec;
 }
 
 double NpolPhysicsVariables::computeLeadingParticleMomentum(std::map<int,NpolVertex *> &theVertexMap,int selectedTID){
@@ -571,46 +432,32 @@ double NpolPhysicsVariables::computeLeadingParticleMomentum(std::map<int,NpolVer
   return maximalMomentum;
 }
 
-double NpolPhysicsVariables::computeRecoilParticleAngle(std::map<int,NpolVertex *> &theVertexMap, int selectedTID){
+double NpolPhysicsVariables::computeRecoilParticleAngle(std::pair<double,std::vector<double>> projNeutron4Vec,std::map<int,NpolVertex *> &theVertexMap, int selectedTID){
   
-  double P1x = 0.; double P1y = 0.; double P1z = 0.;
-  double P2x = 0.; double P2y = 0.; double P2z = 0.;
-  double P3x = 0.; double P3y = 0.; double P3z = 0.;
-  double recoilMomentum = 0.0;
-  
+  // Extract Initial Initial Neutron Momentum 
+  std::vector<double> initNeutron3Mom = projNeutron4Vec.second;
+  double initNxMom = initNeutron3Mom[0];
+  double initNyMom = initNeutron3Mom[1];
+  double initNzMom = initNeutron3Mom[2];
+  double initNeutronMomMag = returnParticleMomentum(projNeutron4Vec);
+
+  // Extract Recoil Momentum components from vertex vector
   std::map<int,NpolVertex *>::iterator mapIt;
-
-  // Find Initial Point and Initial Neutron Momentum
-  mapIt = theVertexMap.find(1);
-  P1x = mapIt->second->gPosX;
-  P1y = mapIt->second->gPosY;
-  P1z = mapIt->second->gPosZ;
-    
-  // Find interaction Point from selectTID position (in vertex vector)
   mapIt = theVertexMap.find(selectedTID);
-  double xMom = mapIt->second->momX;
-  double yMom = mapIt->second->momY;
-  double zMom = mapIt->second->momZ;
-  P2x = mapIt->second->gPosX;
-  P2y = mapIt->second->gPosY;
-  P2z = mapIt->second->gPosZ;
-  recoilMomentum = computeMomentum(xMom,yMom,zMom);
-
-  // Compute a third point for computing the recoil angle
-  double P2Theta = computeScatTheta(xMom,yMom);
-  double P2Phi = computeScatPhi(zMom,recoilMomentum); 
-  P3x = P2x + 2*TMath::Sin(P2Phi)*TMath::Cos(P2Theta);
-  P3y = P2y + 2*TMath::Sin(P2Phi)*TMath::Sin(P2Theta);
-  P3z = P2z + 2*TMath::Cos(P2Phi);
+  double RecoilxMom = mapIt->second->momX;
+  double RecoilyMom = mapIt->second->momY;
+  double RecoilzMom = mapIt->second->momZ;
+  double recoilMomMag = computeMomentum(RecoilxMom,RecoilyMom,RecoilzMom);
   
   // Now compute the recoil angle (returned from getAzimuthAngle in degrees)
-  double recoilAngle = getAzimuthAngle(P1x,P1y,P1z,P2x,P2y,P2z,P3x,P3y,P3z);
-
-  return recoilAngle;
+  double recoilAngle =
+	TMath::ACos((initNxMom*RecoilxMom + initNyMom*RecoilyMom + initNzMom*RecoilzMom)/(initNeutronMomMag*recoilMomMag));
+  
+  return 180.0-TMath::RadToDeg()*recoilAngle;
 }
 
 
-int NpolPhysicsVariables::findLeadingParticle(std::map<int,NpolVertex *> &theVertexMap){
+int NpolPhysicsVariables::findLeadingParticle(std::map<int,NpolVertex *> &theVertexMap, std::string eventType){
 
   double maximalMomentum = 0.0; double maxNeutronMomentum = 0.0;
   int maximalTID = -1; int maxNeutronTID = -1;
@@ -620,9 +467,12 @@ int NpolPhysicsVariables::findLeadingParticle(std::map<int,NpolVertex *> &theVer
   for(mapIt = theVertexMap.begin(); mapIt != theVertexMap.end(); mapIt++){
 	double currentMomentum = computeMomentum(mapIt->second->momX,mapIt->second->momY,mapIt->second->momZ);
 	int currentPType = mapIt->second->particleId;
-	if(mapIt->first > 1  && currentPType == 2112 && currentMomentum > maxNeutronMomentum){
-	  maxNeutronMomentum = currentMomentum;
-	  maxNeutronTID = mapIt->first;
+	
+	if(eventType == "neutronInelastic"){
+	  if(mapIt->first > 1  && (currentPType == 2112 /*|| currentPType == 2212*/) && currentMomentum > maxNeutronMomentum){
+		maxNeutronMomentum = currentMomentum;
+		maxNeutronTID = mapIt->first;
+	  }
 	}
   }
   
@@ -642,17 +492,22 @@ int NpolPhysicsVariables::findLeadingParticle(std::map<int,NpolVertex *> &theVer
   return maximalTID;
 }
 
-double NpolPhysicsVariables::computeInitialNeutronMomentum(std::map<int,NpolVertex *> &theVertexMap){
 
-  double neutronMomentum = 0.0;
-  std::map<int,NpolVertex *>::iterator mapIt;
+double NpolPhysicsVariables::returnParticleMomentum(std::pair<double,std::vector<double> > aParticle4Vec){
 
-  // Find Initial Neutron Momentum
-  mapIt = theVertexMap.find(1);
-  neutronMomentum =
-	computeMomentum(mapIt->second->momX,mapIt->second->momY,mapIt->second->momZ);
+  double particleMomentum = 0.0;
+  std::vector<double> p = aParticle4Vec.second;
+  particleMomentum = computeMomentum(p[0],p[1],p[2]);
+  
+  return particleMomentum;
+}
 
-  return neutronMomentum;
+double NpolPhysicsVariables::returnParticleEnergy(std::pair<double,std::vector<double> > aParticle4Vec){
+
+  double particleEnergy = 0.0;
+  particleEnergy = aParticle4Vec.first;
+  return particleEnergy;
+  
 }
 
 double NpolPhysicsVariables::returnParticleEnergy(std::map<int,NpolVertex *> &theVertexMap, int TID){
