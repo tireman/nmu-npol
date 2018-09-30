@@ -118,13 +118,13 @@ int main(int argc, char *argv[]) {
   int taggedEvents = 0;  // Total number of neutrons (events) which make it through magnets and lead curtain
   int eventsPassed = 0;  // Total number of neutron scattering events which pass all Proposal 37 cuts
   int eventsFailed = 0;  // Total number of neutron scattering events which do not pass all Proposal 37 cuts
-    for(int i = 0; i < statsTree->GetEntries(); i++) {
+  for(int i = 0; i < statsTree->GetEntries(); i++) {
     statsTree->GetEntry(i);
     totalEvents += ((*stats)[0])->totalEvents;
   }
   std::cout << totalEvents << " neutrons thrown at setup." << std::endl;
   // ****** END STATS LOOP ****** 
-
+  
   
   // ****** BEGIN EVENT LOOP ****** 
   int nentries = npolTree->GetEntries();
@@ -132,7 +132,7 @@ int main(int argc, char *argv[]) {
   for(int i = 0; i < nentries; i++) {
 	//for(int i = 0; i < 2000; i++) {
    	if(i % 1000 == 0) std::cout << "Processing event #" << i << std::endl;
-
+	
     npolTree->GetEntry(i);
 	
 	std::pair<double,std::vector<double> > initNeutron4Vec;
@@ -149,7 +149,7 @@ int main(int argc, char *argv[]) {
     eDepArrayTotal[topdEArray] = 0.0;
     eDepArrayTotal[botEArray] = 0.0;
     eDepArrayTotal[botdEArray] = 0.0;
-
+	
 	// ****** BEGIN STEP LOOP: Scans Steps vector (NpolStep) and IDs the event type (elastic, inelastic) ****** 
 	// This loop scans through the Steps Vector and checks PID = 0, TID = 1 (original neutron) and checks
 	// the physics process to identify elastic or inelastic event and which AV (SOI) it occurs within.  Since
@@ -179,20 +179,20 @@ int main(int argc, char *argv[]) {
 	  int section = Process->sectionNumber(volName);
 	  int PID = aStep->parentId;
 	  int TID = aStep->trackId;
- 
+	  
 	  if((PID == 0 && TID == 1) && (AVNum == 9 || AVNum == 10)){			
 		if(physProcess == "hadElastic"){
 		  elasticFlag = true;
 		  Process->fillFourVector(aStepOrig,projNeutron4Vec);
 		  Process->fillVertexMap(vertexMap,verts,1,volName,physProcess,time);
- 
+		  
 		} else if(physProcess == "neutronInelastic"){
 		  int neutronCount = 0; int protonCount = 0; int gammaCount = 0;
 		  int othersCount = 0; int pionCount = 0;
-
+		  
 		  Process->fillFourVector(aStepOrig,projNeutron4Vec);
 		  Process->fillVertexMap(vertexMap,verts,1,volName,physProcess,time);
-
+		  
 		  std::map<int,NpolVertex *>::iterator mapIt;
 		  for(mapIt = vertexMap.begin(); mapIt != vertexMap.end(); mapIt++){
 			int pType = mapIt->second->particleId;
@@ -209,10 +209,10 @@ int main(int argc, char *argv[]) {
 			  othersCount++;
 			}
 		  }
-
+		  
 		  if(pionCount > 0) {
 			inelasticFlag = true;
-	
+			
 		  } else if(neutronCount >= 0 && protonCount >= 0 && gammaCount >= 0){
 			quasielasticFlag = PhysVars->checkQuasiElasticScattering(vertexMap, projNeutron4Vec);
 			if(!(quasielasticFlag)) inelasticFlag = true; 
@@ -233,96 +233,97 @@ int main(int argc, char *argv[]) {
 	  }
 	}  // End Step Loop
 	
-
-  
+	
+	
 	// ***** This statement checks to see if the flags of events NOT of interest  ***** //
 	// are set. If so then the event processing is canceled by the continue statment
 	// which cycles the loop. This kills the EVENT as a WHOLE; Beware!! //
 	
 	// Check if NO flags set; kill event processing
 	if(!(elasticFlag) && !(inelasticFlag) && !(quasielasticFlag)) continue;  
-
-
+	
+	
 	// ******* This section checks/fills histograms for the NP "real" portion ********* //
 	
-	if(elasticFlag || inelasticFlag || quasielasticFlag){
-	// ****** This section computes the (P_leading - P_elastic) ******
-	// ****** value and saves into histogram                    ******
-	int leadingTID = PhysVars->findLeadingParticle(vertexMap,physProcess);
-	if(leadingTID != -1){
-	  double computedRecoilAngle = PhysVars->computeRecoilParticleAngle(projNeutron4Vec,vertexMap,leadingTID);
-	  Process->fillFourVector(vertexMap.find(leadingTID)->second,recoilParticle4Vec);
-	  double leadingParticleMomentum = PhysVars->returnParticleMomentum(recoilParticle4Vec);
-	  double elasticMomentum = PhysVars->computeElasticMomentum(projNeutron4Vec, computedRecoilAngle*TMath::DegToRad());
-
-	  if(elasticFlag) std::cout << "Elastic Event" << std::endl;
-	  if(inelasticFlag) std::cout << "Inelastic Event" << std::endl;
-	  if(quasielasticFlag) std::cout << "Quasi-elastic Event" << std::endl;
-	  std::cout << "  Leading TID: " << leadingTID << std::endl;
-	  std::cout << "  Recoil Angle Computed: " << computedRecoilAngle << std::endl;
-	  std::cout << "  Neutron Momentum before: " <<  PhysVars->returnParticleMomentum(projNeutron4Vec) << std::endl;
-	  std::cout << "  Leading Particle Momentum: " << leadingParticleMomentum << std::endl;
-	  std::cout << "  Elastic Momentum: " << elasticMomentum << std::endl;
-	  
-	  Process->printVertexMap(vertexMap,i);
-	  HistoMan->FillHistograms("selectedRecoilMomentum",(leadingParticleMomentum - elasticMomentum));
-	}
-	// ****** End (P_leading - P_elastic) code ******
-
-
-	// **** After the proton track has been found, this code will compute values, **** //
-	// fill histograms. Extract out Initial Neutron Information from the vertexMap
-	int bestProtonTID = PhysVars->findBestProtonTrackID(vertexMap,steps,npSOI);
-	std::cout << "Event #: " << i << "  Best Proton Track ID: " << bestProtonTID << std::endl;
-	if(bestProtonTID != 0){
-	  
-	  std::map<int,NpolVertex *>::iterator mapIt2;
-	  int asym = 0;
-	  double initialNeutronMomentum = 0.;
-	  
-	  // fill initial neutron histograms
-	  mapIt2 = vertexMap.find(1);
-	  Process->fillFourVector(mapIt2->second,initNeutron4Vec);
-	  initialNeutronMomentum = PhysVars->returnParticleMomentum(initNeutron4Vec);
-	  HistoMan->FillHistograms("NeutronMomentumInitial",initialNeutronMomentum);
-	  HistoMan->FillHistograms("NeutronEnergyInitial",(mapIt2->second->energy));
-	  
-	  // fill selected proton track histograms
-	  mapIt2 = vertexMap.find(bestProtonTID);
-	  double computedProtonAngle = PhysVars->
-		computeRecoilParticleAngle(projNeutron4Vec,vertexMap,bestProtonTID);
-	  std::cout << "  Computed angle from Proton Best ID: " << computedProtonAngle << std::endl;
-	  if(computedProtonAngle >= angleLow && computedProtonAngle <= angleHigh) {
-		HistoMan->FillHistograms("recoilAngleReal",computedProtonAngle);
-		double protonVertexEnergy = mapIt2->second->energy;
-		HistoMan->FillHistograms("recoilEnergyReal",protonVertexEnergy);
-		double sPower = PhysVars->
-		  computeBetheBloch(protonVertexEnergy,938.27205,1,1.032,12.929,7,64.7e-6);  
-		double dEenergyLost = PhysVars->
-		  computeEnergyLoss(protonVertexEnergy,TMath::DegToRad()*computedProtonAngle,1./*cm*/);
-		Double_t dEenergyLost2 = rand->Gaus(dEenergyLost, 0.10*dEenergyLost);
-		double EenergyLost = PhysVars->
-		  computeEnergyLoss(protonVertexEnergy,TMath::DegToRad()*computedProtonAngle,10. /*cm*/);
-		Double_t EenergyLost2 = rand->Gaus(EenergyLost, 0.10*EenergyLost);
-		HistoMan->FillHistograms("dEvsEReal",EenergyLost,dEenergyLost);
-		HistoMan->FillHistograms("dEvsEReal2",EenergyLost2,dEenergyLost2);
-		// An attempt at "energy" resolution of the scints
-		std::cout << "Stopping Power = " << sPower
-				  << "   Proton Energy Loss in dE-array = " << dEenergyLost
-				  << "   Proton Energy Loss in E-array = " << EenergyLost << std::endl;
+	if(quasielasticFlag){
+	  // ****** This section computes the (P_leading - P_elastic) ******
+	  // ****** value and saves into histogram                    ******
+	  int leadingTID = PhysVars->findLeadingParticle(vertexMap,physProcess);
+	  if(leadingTID != -1){
+		double computedRecoilAngle = PhysVars->computeRecoilParticleAngle(projNeutron4Vec,vertexMap,leadingTID);
+		Process->fillFourVector(vertexMap.find(leadingTID)->second,recoilParticle4Vec);
+		double leadingParticleMomentum = PhysVars->returnParticleMomentum(recoilParticle4Vec);
+		double elasticMomentum = PhysVars->computeElasticMomentum(projNeutron4Vec, computedRecoilAngle*TMath::DegToRad());
+		double projectileNeutronMom = PhysVars->returnParticleMomentum(projNeutron4Vec);
 		
-		// Assign asymmetry in a simple way (for now)
-		double momY = mapIt2->second->momY;
-		std::cout << "Y-momentum: " << momY << std::endl;
-		if(momY < 0) asym = -1;
-		if(momY > 0) asym = +1;
-		if(momY == 0) asym = 0;
-		HistoMan->FillHistograms("asymmetryReal",asym);
+		if(elasticFlag) std::cout << "Elastic Event" << std::endl;
+		if(inelasticFlag) std::cout << "Inelastic Event" << std::endl;
+		if(quasielasticFlag) std::cout << "Quasi-elastic Event" << std::endl;
+		std::cout << "  Leading TID: " << leadingTID << std::endl;
+		std::cout << "  Recoil Angle Computed: " << computedRecoilAngle << std::endl;
+		std::cout << "  Neutron Momentum before: " <<  projectileNeutronMom << std::endl;
+		std::cout << "  Leading Particle Momentum: " << leadingParticleMomentum << std::endl;
+		std::cout << "  Elastic Momentum: " << elasticMomentum << std::endl;
+		
+																  //Process->printVertexMap(vertexMap,i);
+		HistoMan->FillHistograms("selectedRecoilMomentum",(leadingParticleMomentum - elasticMomentum));
 	  }
-	}
+	  // ****** End (P_leading - P_elastic) code ******
+	  
+	  
+	  // **** After the proton track has been found, this code will compute values, **** //
+	  // fill histograms. Extract out Initial Neutron Information from the vertexMap
+	  int bestProtonTID = PhysVars->findBestProtonTrackID(vertexMap,steps,npSOI);
+	  std::cout << "Event #: " << i << "  Best Proton Track ID: " << bestProtonTID << std::endl;
+	  Process->printVertexMap(vertexMap,i);
+	  if(bestProtonTID != 0){
+		
+		std::map<int,NpolVertex *>::iterator mapIt2;
+		int asym = 0;
+		double initialNeutronMomentum = 0.;
+		
+		// fill initial neutron histograms
+		mapIt2 = vertexMap.find(1);
+		Process->fillFourVector(mapIt2->second,initNeutron4Vec);
+		initialNeutronMomentum = PhysVars->returnParticleMomentum(initNeutron4Vec);
+		HistoMan->FillHistograms("NeutronMomentumInitial",initialNeutronMomentum);
+		HistoMan->FillHistograms("NeutronEnergyInitial",(mapIt2->second->energy));
+		
+		// fill selected proton track histograms
+		mapIt2 = vertexMap.find(bestProtonTID);
+		double computedProtonAngle = PhysVars->
+		  computeRecoilParticleAngle(projNeutron4Vec,vertexMap,bestProtonTID);
+		std::cout << "  Computed angle from Proton Best ID: " << computedProtonAngle << std::endl;
+		if(computedProtonAngle >= angleLow && computedProtonAngle <= angleHigh) {
+		  HistoMan->FillHistograms("recoilAngleReal",computedProtonAngle);
+		  double protonVertexEnergy = mapIt2->second->energy;
+		  HistoMan->FillHistograms("recoilEnergyReal",protonVertexEnergy);
+		  double sPower = PhysVars->
+			computeBetheBloch(protonVertexEnergy,938.27205,1,1.032,12.929,7,64.7e-6);  
+		  double dEenergyLost = PhysVars->
+			computeEnergyLoss(protonVertexEnergy,TMath::DegToRad()*computedProtonAngle,1./*cm*/);
+		  Double_t dEenergyLost2 = rand->Gaus(dEenergyLost, 0.10*dEenergyLost);
+		  double EenergyLost = PhysVars->
+			computeEnergyLoss(protonVertexEnergy,TMath::DegToRad()*computedProtonAngle,10. /*cm*/);
+		  Double_t EenergyLost2 = rand->Gaus(EenergyLost, 0.10*EenergyLost);
+		  HistoMan->FillHistograms("dEvsEReal",EenergyLost,dEenergyLost);
+		  HistoMan->FillHistograms("dEvsEReal2",EenergyLost2,dEenergyLost2);
+		  // An attempt at "energy" resolution of the scints
+		  std::cout << "Stopping Power = " << sPower
+					<< "   Proton Energy Loss in dE-array = " << dEenergyLost
+					<< "   Proton Energy Loss in E-array = " << EenergyLost << std::endl;
+		  
+		  // Assign asymmetry in a simple way (for now)
+		  double momY = mapIt2->second->momY;
+		  std::cout << "Y-momentum: " << momY << std::endl;
+		  if(momY < 0) asym = -1;
+		  if(momY > 0) asym = +1;
+		  if(momY == 0) asym = 0;
+		  HistoMan->FillHistograms("asymmetryReal",asym);
+		}
+	  }
 	
 	} // >>>>>>>>>>>>> This ends the "real NP scattering" part of the code <<<<<<<<<<<< //
-
 
 
 	
@@ -336,14 +337,14 @@ int main(int argc, char *argv[]) {
       NpolStep *aStep = *s_it;
 	  if(aStep == NULL) continue;
 	  
-	// These lines of code count up the number of particles entering into the 
-	// first analyzer array that are a neutron (2112), parent ID = 0, track ID = 1.
+	  // These lines of code count up the number of particles entering into the 
+	  // first analyzer array that are a neutron (2112), parent ID = 0, track ID = 1.
 	  int AVNum = PProcess->GetAVNumber(aStep->volume);
 	  if(AVNum == -1) continue;
 	  int imprintNum = PProcess->GetImprNumber(aStep->volume);
-
+	  
 	  if((!eventFlag) && (aStep->parentId == 0) && (aStep->trackId == 1) && (aStep->particleId == 2112) 
-		&& (AVNum == 11) && (imprintNum == 1)) {
+		 && (AVNum == 11) && (imprintNum == 1)) {
 		taggedEvents++;
 		eventFlag = true;
 		
@@ -353,20 +354,20 @@ int main(int argc, char *argv[]) {
 		
 		double Rxy = TMath::Sqrt(TMath::Power(xMom,2)+TMath::Power(yMom,2));
 		double neutronAngle = TMath::ATan(Rxy/zMom)*TMath::RadToDeg();
-
+		
 		t_it = tagEvent->begin();
 		NpolTagger *tTemp = *t_it;
 		HistoMan->FillHistograms("NeutronEnergy",(tTemp->energy));
-
+		
 		HistoMan->FillHistograms("NeutronMomentum",totMom);
 		HistoMan->FillHistograms("NeutronThetaAngle",neutronAngle);	
 	  }
-
+	  
 	  Process->fillDetectorEventMap(detEvents,aStep);
 	  // ****** End of the hit position computations section ******* //
 	} // END STEPS LOOP
 	
-
+	
 	// ***** This Section will retrieve SOI and EOI and then make event selections based on cuts ******* //
     // First, we determine the SOI; then we check the other requirements and fill the histograms
 	int sectionOfInterest = Process->getSectionOfInterest(&detEvents); // call method to determine SOI
@@ -383,7 +384,7 @@ int main(int argc, char *argv[]) {
 	  
       if(EArrayOfInterest == topEArray){ dEArrayOfInterest = topdEArray; }
 	  else if(EArrayOfInterest == botEArray){ dEArrayOfInterest = botdEArray; }
-
+	  
       if((EArrayOfInterest != unknown) && (dEArrayOfInterest != unknown)) {
 		HistoMan->FillHistograms("sectionEfficiency2",(sectionOfInterest+1)); //Fill
 		double eDepAnalyzer = eDepArrayTotal[analyzer]; 
@@ -392,7 +393,7 @@ int main(int argc, char *argv[]) {
 		double eDepTotal = eDepAnalyzer + eDepE + eDepdE;
 		double dTOF = -100.0;
 		double azAngle = PhysVars->ReturnAngle(verts->at(1),&detEvents,sectionOfInterest,EArrayOfInterest,&dTOF);
-
+		
 		if(eDepAnalyzer >= 4.0 /*MeV*/ && eDepE >= 5.0 /*MeV */ && eDepTotal >= 50.0 /*MeV*/) { // Req. 3 and 4
 		  HistoMan->FillHistograms("sectionEfficiency3",(sectionOfInterest+1)); //FILL
 		  HistoMan->FillHistograms("recoilAngleRaw",azAngle);
@@ -417,12 +418,18 @@ int main(int argc, char *argv[]) {
 	std::map<std::string,NpolDetectorEvent *>::iterator e_it;
     for(e_it = detEvents.begin(); e_it != detEvents.end(); e_it++) delete e_it->second;
     detEvents.clear();
-
+	
 	std::map<int,NpolVertex *>::iterator v_it2;
 	for(v_it2 = vertexMap.begin(); v_it2 != vertexMap.end(); v_it2++) delete v_it2->second;
 	vertexMap.clear();
 	
-  } // END EVENT LOOP
+	initNeutron4Vec.second.clear();
+	recoilParticle4Vec.second.clear();
+	projNeutron4Vec.second.clear();
+	scattNeutron4Vec.second.clear();
+	scattParticle4Vec.second.clear();
+	
+  }	// END EVENT LOOP
   
   std::cout << taggedEvents << " of the initial " << totalEvents << " neutrons have crossed the Npol Tagger."
 			<< std::endl;
@@ -431,7 +438,7 @@ int main(int argc, char *argv[]) {
   std::cout << (((double)eventsPassed)*100)/(double)taggedEvents << " % of the " << taggedEvents
 			<< " neutrons passed cuts." << std::endl;
   
-
+  
   // **** Fill the statistics vector ****** //
   TVectorD runStatistics(6);
   runStatistics[0] = static_cast<double>(totalEvents);
@@ -440,7 +447,7 @@ int main(int argc, char *argv[]) {
   runStatistics[3] = static_cast<double>(eventsFailed);
   runStatistics[4] = static_cast<double>(-1.0);         
   runStatistics[5] = static_cast<double>(-1.0);
-
+  
   // ****** Write out all the results to the root file and close the file(s) ******** //
   runStatistics.Write();
   HistoMan->WriteHistograms();
@@ -483,15 +490,5 @@ int main(int argc, char *argv[]) {
 // "recoil proton" scattering angle (viz. 45.3-81.6 degrees at Q^2 = 3.95 (GeV/c)^2,
 // 40.8-80.2 degrees at 5.22 (GeV/c)^2, and 36.0-78.3 degrees at 6.88 (GeV/c)^2).
 
-// Comment out the corresponding statement below in order to select
-	// the events you want to analyze.  Comment out all to keep all events
-
-	//if((quasielasticFlag || inelasticFlag) && !(elasticFlag)) continue;
-	// Elastic events only
-	//if((elasticFlag || inelasticFlag) && !(quasielasticFlag)) continue;
-	// Quasielastic events only
-	//if((quasielasticFlag || elasticFlag) && !(inelasticFlag)) continue;
-	// Inelastic events only
 
 
-//if( PID == 0) cout << aStep->momX << " " << aStep->momY << " " << aStep->momZ << " " << aStep->energy << " " << aStep->process << endl;

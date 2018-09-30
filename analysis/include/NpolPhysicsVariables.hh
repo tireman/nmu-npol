@@ -34,7 +34,7 @@ public:
   double computeMomentum(double xMom, double yMom, double zMom);
   double computeScatTheta(double xMom, double yMom);
   double computeScatPhi(double zMom, double totalMom);
-  double computeElasticMomentum(std::pair<double,std::vector<double>> projNeutron4Vec, double thetaP);
+  double computeElasticMomentum(const std::pair<double,std::vector<double>> projNeutron4Vec, double thetaP);
   bool checkQuasiElasticScattering(std::map<int,NpolVertex *> &theVertexMap, std::pair<double,std::vector<double> > projNeutron4Vec);
   double compute4VecSquared(std::pair<double,std::vector<double>> aParticle4Vec);
   double computeLeadingParticleMomentum(std::map<int,NpolVertex *> &theVertexMap,int selectedTID);

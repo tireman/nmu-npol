@@ -351,7 +351,7 @@ double NpolPhysicsVariables::computeScatPhi(double zMom, double totalMom){
 
 }
 
-double NpolPhysicsVariables::computeElasticMomentum(std::pair<double,std::vector<double>> projNeutron4Vec, double thetaP){
+double NpolPhysicsVariables::computeElasticMomentum(const std::pair<double,std::vector<double>> projNeutron4Vec, double thetaP){
 
   // **** This method computes the momentum of a recoil proton struck
   // **** by a neutron given the momentum(energy) of the neutron and
@@ -404,8 +404,10 @@ bool NpolPhysicsVariables::checkQuasiElasticScattering(std::map<int,NpolVertex *
   
   double initial4VecMag = sqrt(abs(compute4VecSquared(projNeutron4Vec)));
   double final4VecMag = sqrt(abs(compute4VecSquared(highestParticle4Vec)));
+  currentParticle4Vec.second.clear();
+  highestParticle4Vec.second.clear();
   
-  if(final4VecMag >= 0.95*initial4VecMag){
+  if(final4VecMag >= 0.98*initial4VecMag){
 	return QEflag = true;
   } else {
 	return QEflag = false;
@@ -432,7 +434,7 @@ double NpolPhysicsVariables::computeLeadingParticleMomentum(std::map<int,NpolVer
   return maximalMomentum;
 }
 
-double NpolPhysicsVariables::computeRecoilParticleAngle(std::pair<double,std::vector<double>> projNeutron4Vec,std::map<int,NpolVertex *> &theVertexMap, int selectedTID){
+double NpolPhysicsVariables::computeRecoilParticleAngle(const std::pair<double,std::vector<double>> projNeutron4Vec,std::map<int,NpolVertex *> &theVertexMap, int selectedTID){
   
   // Extract Initial Initial Neutron Momentum 
   std::vector<double> initNeutron3Mom = projNeutron4Vec.second;
@@ -452,8 +454,9 @@ double NpolPhysicsVariables::computeRecoilParticleAngle(std::pair<double,std::ve
   // Now compute the recoil angle (returned from getAzimuthAngle in degrees)
   double recoilAngle =
 	TMath::ACos((initNxMom*RecoilxMom + initNyMom*RecoilyMom + initNzMom*RecoilzMom)/(initNeutronMomMag*recoilMomMag));
-  
-  return 180.0-TMath::RadToDeg()*recoilAngle;
+
+  initNeutron3Mom.clear();
+  return TMath::RadToDeg()*recoilAngle; //180.0-TMath::RadToDeg()*recoilAngle;
 }
 
 
@@ -498,7 +501,7 @@ double NpolPhysicsVariables::returnParticleMomentum(std::pair<double,std::vector
   double particleMomentum = 0.0;
   std::vector<double> p = aParticle4Vec.second;
   particleMomentum = computeMomentum(p[0],p[1],p[2]);
-  
+  p.clear();
   return particleMomentum;
 }
 
@@ -527,7 +530,7 @@ int NpolPhysicsVariables::findBestProtonTrackID(std::map<int,NpolVertex *> &theV
   NpolEventPreProcessing *PProcess = NpolEventPreProcessing::GetInstance();
   NpolEventProcessing *Process = NpolEventProcessing::GetInstance();
   
-  // double maxEnergy = 0.0;
+  double maxEnergy = 0.0;
   int bestProtonTID = 0;
   std::map<int,NpolVertex *>::iterator mapIt;
   for(mapIt = theVertexMap.begin(); mapIt != theVertexMap.end(); mapIt++){
@@ -564,10 +567,10 @@ int NpolPhysicsVariables::findBestProtonTrackID(std::map<int,NpolVertex *> &theV
 	if(TopEdetFlag && TopdEdetFlag) TopFlag = true;
 	if(BotEdetFlag && BotdEdetFlag) BotFlag = true;
 	if((TopFlag  && !BotFlag) || (!TopFlag && BotFlag)){// ExOR
-	  //if(particleEnergy > maxEnergy){
+	  if(particleEnergy > maxEnergy){
 		bestProtonTID = TID;
-		//maxEnergy = particleEnergy;
-		//}
+		maxEnergy = particleEnergy;
+	  }
 	}
   }
   
