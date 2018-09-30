@@ -1,9 +1,9 @@
 
 #include "NpolEventProcessing.hh"
 #include "NpolEventPreProcessing.hh"
+#include "NpolPhysicsVariables.hh"
 
-//NpolEventPreProcessing PreData;
-
+#define EDEP_THRESHOLD 1.0  /*MeV*/
 /*MeV This threshold is a per detector low value in SOI selection */
 double NpolEventProcessing::LOW_THRESHOLD = 0.040;
 /* number of analyzer layers; not general; only good for 4 and 6 layers */
@@ -23,6 +23,140 @@ NpolEventProcessing *NpolEventProcessing::GetInstance() {
 NpolEventProcessing::NpolEventProcessing(){}
 
 NpolEventProcessing::~NpolEventProcessing(){}
+
+void NpolEventProcessing::fillDetectorEventMap(std::map<std::string,NpolDetectorEvent *> &eventMap, const NpolStep *aStep){
+
+  // **** This method fills the detector event map which contains objects of
+  // NpolDetectorEvent class keyed to the detector name (string).
+  
+  NpolEventPreProcessing *PProcess = NpolEventPreProcessing::GetInstance();
+ 
+  int AVNum = PProcess->GetAVNumber(aStep->volume);
+  int imprintNum = PProcess->GetImprNumber(aStep->volume);
+  int PVNum = PProcess->GetPlacementNumber(aStep->volume);
+    
+  if(eventMap.find(aStep->volume) == eventMap.end())
+	eventMap[aStep->volume] = new NpolDetectorEvent();
+  
+  (eventMap[aStep->volume])->totEnergyDep += aStep->eDep;
+  
+  if(!((eventMap[aStep->volume])->thresholdExceeded) &&
+	 (eventMap[aStep->volume])->totEnergyDep >= EDEP_THRESHOLD) {
+	(eventMap[aStep->volume])->thresholdExceeded = true;
+	(eventMap[aStep->volume])->lPosX = aStep->lPosX;
+	(eventMap[aStep->volume])->lPosY = aStep->lPosY;
+	(eventMap[aStep->volume])->lPosZ = aStep->lPosZ;
+	(eventMap[aStep->volume])->gPosX = aStep->gPosX;
+	(eventMap[aStep->volume])->gPosY = aStep->gPosY;
+	(eventMap[aStep->volume])->gPosZ = aStep->gPosZ;
+	(eventMap[aStep->volume])->time = (aStep->time) + randN->Gaus(0.0,0.200);
+	
+	//****** Compute the hit position in the volume and save. This is done to "simulate" ****** // 
+	// what we could see in a real scintillation detector based on detector resolutions.
+	double hitPos[3] = { 0.0, 0.0, 0.0 };
+	double lPos[3] = { aStep->lPosX, aStep->lPosY, aStep->lPosZ };
+	int detNums[3] = { AVNum, imprintNum, PVNum };
+	
+	if((AVNum == 9) || (AVNum == 10) || (AVNum == 11) || (AVNum == 12)){
+	  PProcess->AnalyzerTaggerHitPosition(hitPos, lPos, detNums);
+	} else if((AVNum == 3) || (AVNum == 4) || (AVNum == 7) || (AVNum == 8)){
+	  PProcess->DeltaEarrayHitPosition(hitPos, lPos, detNums);
+	} else if((AVNum == 1) || (AVNum == 2) || (AVNum == 5) || (AVNum == 6)){
+	  PProcess->EarrayHitPosition(hitPos, lPos, detNums);
+	}
+	
+	(eventMap[aStep->volume])->hPosX = hitPos[0]; 
+	(eventMap[aStep->volume])->hPosY = hitPos[1]; 
+	(eventMap[aStep->volume])->hPosZ = hitPos[2];
+  }
+}
+
+void NpolEventProcessing::fillVertexMap(std::map<int,NpolVertex *> &theVertexMap, const std::vector<NpolVertex *> *vertVector, int DesiredPID, std::string eventVolume, std::string eventProcess, double eventTime){
+  
+  // **** This method fills a map that is keyed with track IDs to vertex
+  // information from NpolVertex vector.  The only tracks saved in the map
+  // are the original neutron (PID = 0, TID = 1) and any particle satisfying
+  // DesiredPID == PID and any TID.  (PID = DesiredPID, TID = xx).
+  //  Added in requirements for same volume, same event type, and same event time
+  
+  std::vector<NpolVertex *>::const_iterator v_it;
+  for(v_it = vertVector->begin(); v_it != vertVector->end(); v_it++){
+	NpolVertex *aVertex = *v_it;
+	if(aVertex == NULL) continue;
+	
+	int PID = aVertex->parentId;
+	int TID = aVertex->trackId;
+	std::string process = aVertex->process;
+	std::string volName = aVertex->volume;
+	double time = aVertex->time;
+		
+	// Well, I can't figure out how to copy data at one pointer
+	// to data at another pointer (in a map) and then later delete
+	// the pointers in the map without it killing the original pointers
+	// So this resulted :(((
+	if((PID == DesiredPID && volName == eventVolume && time == eventTime /*&& process == eventProcess*/) || PID == 0){
+	  if(theVertexMap.find(TID) == theVertexMap.end()){
+		theVertexMap[TID] = new NpolVertex();
+		//theVertexMap[TID] = aVertex;
+		theVertexMap[TID]->trackId = aVertex->trackId;
+		theVertexMap[TID]->parentId = aVertex->parentId;
+		theVertexMap[TID]->gPosX = aVertex->gPosX;
+		theVertexMap[TID]->gPosY = aVertex->gPosY;
+		theVertexMap[TID]->gPosZ = aVertex->gPosZ;
+		theVertexMap[TID]->lPosX = aVertex->lPosX;
+		theVertexMap[TID]->lPosY = aVertex->lPosY;
+		theVertexMap[TID]->lPosZ = aVertex->lPosZ;
+		theVertexMap[TID]->momX = aVertex->momX;
+		theVertexMap[TID]->momY = aVertex->momY;
+		theVertexMap[TID]->momZ = aVertex->momZ;
+		theVertexMap[TID]->time = aVertex->time;
+		theVertexMap[TID]->energy = aVertex->energy;
+		theVertexMap[TID]->eMiss = aVertex->eMiss;
+		theVertexMap[TID]->particleId = aVertex->particleId;
+		theVertexMap[TID]->particle = aVertex->particle;
+		theVertexMap[TID]->process = aVertex->process;
+		theVertexMap[TID]->volume = aVertex->volume;
+		theVertexMap[TID]->daughterIds = aVertex->daughterIds;
+	  }
+	}	
+  }
+}
+
+void NpolEventProcessing::printVertexMap(std::map<int,NpolVertex *> &theVertexMap, int eventID){
+  
+  NpolEventPreProcessing *PProcess = NpolEventPreProcessing::GetInstance();
+  NpolEventProcessing *Process = NpolEventProcessing::GetInstance();
+  NpolPhysicsVariables *PhysVars = NpolPhysicsVariables::GetInstance();
+  
+  std::cout << "*********Starting Vertex Map Dump**********" << std::endl;
+  std::map<int,NpolVertex *>::iterator mapIt;
+  double totalEnergy = 0.0;
+  for(mapIt = theVertexMap.begin(); mapIt != theVertexMap.end(); mapIt++){
+	int PID = mapIt->second->parentId;
+	int TID = mapIt->second->trackId;
+	int pType = mapIt->second->particleId;
+	std::string partName = mapIt->second->particle;
+	std::string volName = mapIt->second->volume;
+	std::string process = mapIt->second->process;
+	double Time = mapIt->second->time;
+	double Energy = mapIt->second->energy;
+	double momentum = PhysVars->computeMomentum(mapIt->second->momX, mapIt->second->momY, mapIt->second->momZ);
+	if(mapIt->first != 1) totalEnergy += Energy;
+	std::cout << "      Event #: " << eventID << " PID = "<< PID
+			  << " TID = " << TID
+			  << "   Particle " << pType << " " << partName << " AV #: "
+			  << PProcess->GetAVNumber(volName)
+			  << " Impr #: " << PProcess->GetImprNumber(volName) << " PV #: "
+			  << PProcess->GetPlacementNumber(volName)
+			  << " SOI: " << Process->sectionNumber(volName) << " Time = "
+			  << Time << " Energy: " << Energy << " Process: " << process
+			  << " Momentum: " << momentum << std::endl;
+  }
+  std::cout << " Total Energy of all particles = " << totalEnergy
+			<< " MeV" << std::endl;
+  std::cout << "*********Ending Vertex Map Dump**********" << std::endl;
+  
+}
 
 // The NPOL polarimeter is divided into 4 or 6 sections.  This function takes
 // a volume name and returns the section number that the detector belongs to,
@@ -360,4 +494,40 @@ bool NpolEventProcessing::checkdEarrayHits(const std::map<std::string,NpolDetect
   std::cout << "Number Top dE-Array Detectors 'Hit' =  " << countTop << std::endl;
   std::cout << "Number Bottom dE-Array Detectors 'Hit' =  " << countBottom << std::endl;
   return true;
+}
+
+void NpolEventProcessing::fillFourVector(const NpolStep *aStep, std::pair<double,std::vector<double> > &a4Vector){
+  
+  std::vector<double> a3Vector = {0.0, 0.0,0.0};
+  double aEnergy = aStep->energy;
+  a3Vector[0] = aStep->momX;
+  a3Vector[1] = aStep->momY;
+  a3Vector[2] = aStep->momZ;
+  a4Vector.first = aEnergy;
+  a4Vector.second = a3Vector;
+
+}
+
+void NpolEventProcessing::fillFourVector(const NpolVertex *aVertex, std::pair<double,std::vector<double> > &a4Vector){
+  
+  std::vector<double> a3Vector = {0.0, 0.0,0.0};
+  double aEnergy = aVertex->energy;
+  a3Vector[0] = aVertex->momX;
+  a3Vector[1] = aVertex->momY;
+  a3Vector[2] = aVertex->momZ;
+  a4Vector.first = aEnergy;
+  a4Vector.second = a3Vector;
+
+}
+
+void NpolEventProcessing::fillFourVector(std::vector<double> &particleData, std::pair<double,std::vector<double> > &a4Vector){
+  
+  std::vector<double> a3Vector = {0.0, 0.0,0.0};
+  double aEnergy = particleData[0];
+  a3Vector[0] = particleData[1];
+  a3Vector[1] = particleData[2];
+  a3Vector[2] = particleData[3];
+  a4Vector.first = aEnergy;
+  a4Vector.second = a3Vector;
+
 }

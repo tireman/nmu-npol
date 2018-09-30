@@ -6,6 +6,9 @@
 #include <string>
 #include <map>
 #include "TMath.h"
+#include "NpolStep.hh"
+#include "TRandom3.h"
+#include "TVector3.h"
 
 class NpolEventProcessing;
 class NpolEventPreProcessing;
@@ -28,11 +31,23 @@ public:
   double highestEDepPV(const std::map<std::string,NpolDetectorEvent *> *detEvents, int sectionOfInterest,	 PolarimeterDetector detectorOfInterest);
   double computeBetheBloch(double KE, double Mass, int z, double rho, double A, int Z, double I);
   double computeEnergyLoss(double protonEnergy, double thetaP, double scintThick);
-  
+  double computeMomentum(double xMom, double yMom, double zMom);
+  double computeScatTheta(double xMom, double yMom);
+  double computeScatPhi(double zMom, double totalMom);
+  double computeElasticMomentum(const std::pair<double,std::vector<double>> projNeutron4Vec, double thetaP);
+  bool checkQuasiElasticScattering(std::map<int,NpolVertex *> &theVertexMap, std::pair<double,std::vector<double> > projNeutron4Vec);
+  double compute4VecSquared(std::pair<double,std::vector<double>> aParticle4Vec);
+  double computeLeadingParticleMomentum(std::map<int,NpolVertex *> &theVertexMap,int selectedTID);
+  double computeRecoilParticleAngle(std::pair<double,std::vector<double>> projNeutron4Vec,std::map<int,NpolVertex *> &theVertexMap, int selectedTID);
+  double returnParticleMomentum(std::pair<double,std::vector<double>> aParticle4Vec);
+  double returnParticleEnergy(std::pair<double,std::vector<double> > aParticle4Vec);
+  double returnParticleEnergy(std::map<int,NpolVertex *> &theVertexMap, int TID);
+  int findLeadingParticle(std::map<int,NpolVertex *> &theVertexMap, std::string eventType);
+  int findBestProtonTrackID(std::map<int,NpolVertex *> &theVertexMap, const std::vector<NpolStep *> *steps, int npSOI);
   
 private:
   static NpolPhysicsVariables *PhysVars;
-  
+  TRandom3 *randN = new TRandom3();
 };
 
 #endif

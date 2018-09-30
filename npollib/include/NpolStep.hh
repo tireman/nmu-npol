@@ -28,6 +28,7 @@ public:
   double momX;
   double momY;
   double momZ;
+  double energy;
   double time;
   double eDep;
   int particleId;  // comment out for old electron data

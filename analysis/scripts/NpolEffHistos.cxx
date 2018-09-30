@@ -63,7 +63,7 @@ stats_sourceNeutron = (TVectorT<double>*)sourceNeutron->Get("TVectorT<double>;1"
  TH1F *h_recoil_angle;
  TH1F *h_recoil_angle_raw;
  TH1F *h_Neutron_Theta;
- TH1F *totalEnergy;
+ TH1F *h_totalEnergy;
  TH1F *h_Neutron_Momentum;
  TH1F *h_Neutron_Momentum_Initial;
  TH1F *h_Neutron_Energy_Initial;
@@ -71,15 +71,16 @@ stats_sourceNeutron = (TVectorT<double>*)sourceNeutron->Get("TVectorT<double>;1"
  TH1F *h_Proton_Recoil_Real;
  TH1F *h_Proton_Energy_Real;
  TH1F *h_asymmetry_Real;
- 
+ TH1F *h_selectedRecoilMomentum;
+ TH1F *h_qsquaredTest;
  
 // Assign Histos from the input file to a pointer
  
 // dE/E
  h_dEoverE_AllEvents_Top = (TH2F*)sourceNeutron->Get("dEoverEtop;1");
  h_dEoverE_AllEvents_Bot = (TH2F*)sourceNeutron->Get("dEoverEbot;1");
- h_dEvsE_Real = (TH2F*)sourceNeutron->Get("dEvsE_Real;1");
- h_dEvsE_Real2 = (TH2F*)sourceNeutron->Get("dEvsE_Real2;1");
+ h_dEvsE_Real = (TH2F*)sourceNeutron->Get("dEvsEReal;1");
+ h_dEvsE_Real2 = (TH2F*)sourceNeutron->Get("dEvsEReal2;1");
  TH2F *h_dEoverE_Total = new TH2F("dEoverEtotal", "dE over E for both Top and Bottom", 400,0,120,400,0,20);
  h_dEoverE_Total->Add(h_dEoverE_AllEvents_Top,h_dEoverE_AllEvents_Bot);
  
@@ -87,21 +88,23 @@ stats_sourceNeutron = (TVectorT<double>*)sourceNeutron->Get("TVectorT<double>;1"
  h_dTOF_AllEvents = (TH1F*)sourceNeutron->Get("dTOF;1");
 
  // Angle Plots
- h_recoil_angle = (TH1F*)sourceNeutron->Get("recoil_angle;1");
- h_recoil_angle_raw = (TH1F*)sourceNeutron->Get("recoil_angle_raw;1");
- h_Neutron_Theta = (TH1F*)sourceNeutron->Get("Neutron_Theta_Angle;1");
+ h_recoil_angle = (TH1F*)sourceNeutron->Get("recoilAngle;1");
+ h_recoil_angle_raw = (TH1F*)sourceNeutron->Get("recoilAngleRaw;1");
+ h_Neutron_Theta = (TH1F*)sourceNeutron->Get("NeutronThetaAngle;1");
 
  // Test plots
- totalEnergy = (TH1F*)sourceNeutron->Get("totEnergy;1");
- h_Neutron_Momentum = (TH1F*)sourceNeutron->Get("Neutron_Momentum;1");
- h_Neutron_Momentum_Initial = (TH1F*)sourceNeutron->Get("Neutron_Momentum_Initial;1");
- h_Neutron_Energy_Initial = (TH1F*)sourceNeutron->Get("Neutron_Energy_Initial;1");
- h_Neutron_Energy = (TH1F*)sourceNeutron->Get("Neutron_Energy;1");
-
+ h_totalEnergy = (TH1F*)sourceNeutron->Get("totalEnergy;1");
+ h_Neutron_Momentum = (TH1F*)sourceNeutron->Get("NeutronMomentum;1");
+ h_Neutron_Momentum_Initial = (TH1F*)sourceNeutron->Get("NeutronMomentumInitial;1");
+ h_Neutron_Energy_Initial = (TH1F*)sourceNeutron->Get("NeutronEnergyInitial;1");
+ h_Neutron_Energy = (TH1F*)sourceNeutron->Get("NeutronEnergy;1");
+ h_selectedRecoilMomentum = (TH1F*)sourceNeutron->Get("selectedRecoilMomentum;1");
+ h_qsquaredTest = (TH1F*)sourceNeutron->Get("Qsquared;1");
+ 
  // Real NP scattering Plots
- h_Proton_Recoil_Real = (TH1F*)sourceNeutron->Get("recoilAngle_Real;1");
- h_Proton_Energy_Real = (TH1F*)sourceNeutron->Get("recoilEnergy_Real;1");
- h_asymmetry_Real = (TH1F*)sourceNeutron->Get("asymmetry_Real;1");
+ h_Proton_Recoil_Real = (TH1F*)sourceNeutron->Get("recoilAngleReal;1");
+ h_Proton_Energy_Real = (TH1F*)sourceNeutron->Get("recoilEnergyReal;1");
+ h_asymmetry_Real = (TH1F*)sourceNeutron->Get("asymmetryReal;1");
  
  // Section Efficiency histograms are assigned based on cuts
  // All Events
@@ -124,6 +127,8 @@ stats_sourceNeutron = (TVectorT<double>*)sourceNeutron->Get("TVectorT<double>;1"
  TCanvas *angularPlots = new TCanvas("angularPlots","Proton Recoil Angle",800, 600);
  TCanvas *neutronInformation = new TCanvas("neutronInformation","Neutron Diagnostics",800,900);
  TCanvas *realNPevent = new TCanvas("realNPevent","Plots for Real NP Event",1000,1200);
+ TCanvas *dEvsENPevent = new TCanvas("dEvsENPevent","dE vs. E for Real NP Event",1000,1200);
+ TCanvas *recoilMomentum = new TCanvas("eventDiagnostics","Event Diagnostics", 1000, 1200);
  
  // Histogram Stats Removed**
  //gStyle->SetOptStat(0);
@@ -193,12 +198,12 @@ stats_sourceNeutron = (TVectorT<double>*)sourceNeutron->Get("TVectorT<double>;1"
  h_recoil_angle->GetYaxis()->SetTitleSize(0.05);
  h_recoil_angle->DrawCopy();
  angularPlots->cd(3);
- totalEnergy->GetXaxis()->SetTitle("Energy Deposited (MeV)");
- totalEnergy->GetYaxis()->SetTitle("Recoil Proton Count");
- totalEnergy->GetXaxis()->SetNdivisions(9);
- totalEnergy->GetXaxis()->SetTitleSize(0.05);
- totalEnergy->GetYaxis()->SetTitleSize(0.05);
- totalEnergy->DrawCopy();
+ h_totalEnergy->GetXaxis()->SetTitle("Energy Deposited (MeV)");
+ h_totalEnergy->GetYaxis()->SetTitle("Recoil Proton Count");
+ h_totalEnergy->GetXaxis()->SetNdivisions(9);
+ h_totalEnergy->GetXaxis()->SetTitleSize(0.05);
+ h_totalEnergy->GetYaxis()->SetTitleSize(0.05);
+ h_totalEnergy->DrawCopy();
 
  neutronInformation->Divide(2,3,0.0001, 0.00001,0);
  neutronInformation->cd(1);
@@ -274,6 +279,29 @@ stats_sourceNeutron = (TVectorT<double>*)sourceNeutron->Get("TVectorT<double>;1"
  h_dEvsE_Real2->GetYaxis()->SetTitle("dE-Array Energy Deposited (MeV)");
  h_dEvsE_Real2->Rebin2D(2);
  h_dEvsE_Real2->DrawCopy("cont4");
+
+ dEvsENPevent->Divide(1,1,0.0001, 0.00001,0);
+ dEvsENPevent->cd(1);
+ h_dEvsE_Real->GetXaxis()->SetTitle("E-Array Energy Deposited (MeV)");
+ h_dEvsE_Real->GetXaxis()->SetTitleSize(0.03);
+ h_dEvsE_Real->GetYaxis()->SetTitleSize(0.03);
+ h_dEvsE_Real->GetYaxis()->SetTitle("dE-Array Energy Deposited (MeV)");
+ //h_dEvsE_Real->Rebin2D(2);
+ h_dEvsE_Real->DrawCopy("cont4");
+
+ recoilMomentum->Divide(2,2,0.0001, 0.00001,0);
+ recoilMomentum->cd(1);
+ h_selectedRecoilMomentum->GetXaxis()->SetTitle("(P_leading - P_elastic) (MeV/c)");
+ h_selectedRecoilMomentum->GetYaxis()->SetTitle("Counts");
+ h_selectedRecoilMomentum->GetXaxis()->SetTitleSize(0.05);
+ h_selectedRecoilMomentum->GetYaxis()->SetTitleSize(0.05);
+ h_selectedRecoilMomentum->SetTitle("Momentum Difference");
+ h_selectedRecoilMomentum->DrawCopy();
+ recoilMomentum->cd(2);
+ h_qsquaredTest->SetTitle("Recoil Proton Q-Squared Value (MeV/c)^2");
+ h_qsquaredTest->GetXaxis()->SetTitleSize(0.03);
+ h_qsquaredTest->GetYaxis()->SetTitleSize(0.03);
+ h_qsquaredTest->DrawCopy();
  
  // Write out canvases to file 
  dEoverE_dToF->Write();
@@ -281,6 +309,8 @@ stats_sourceNeutron = (TVectorT<double>*)sourceNeutron->Get("TVectorT<double>;1"
  angularPlots->Write();
  neutronInformation->Write();
  realNPevent->Write();
+ dEvsENPevent->Write();
+ recoilMomentum->Write();
  // Close files
  outFile->Close();
  sourceNeutron->Close();

@@ -9,11 +9,14 @@ export NPOLLIB_DIR=/home/tireman/simulation/jlab/nmu-npol/build/npollib
 export NPOLBASENAME=source$pType\_Lead$Lead\cm_$Energy\GeV_$Bfield\Bdl
 
 #electronBeam_Lead$Lead\cm_$Energy\GeV_$Bfield\Bdl 
-#source$PType\_Lead$Lead\cm_$Energy\GeV_$Bfield\Bdl 
+#source$PType\_Lead$Lead\cm_$Energy\GeV_$Bfield\Bdl
+
+#export NPOLDIR=/home/tireman/data1/NeutronBeam/FixedBeam/$Energy\GeV/$Bfield\Bdl/Lead$Lead\cm/Location_2
+#export NPOLWORKDIR=/home/tireman/data1/NeutronBeam/FixedBeam/$Energy\GeV/$Bfield\Bdl/Lead$Lead\cm/Location_2/Test_1
 
 export NPOLDIR=/home/tireman/data1/TargetTaggerSource/$pType\RawSim/$Energy\GeV/$Bfield\Bdl/Lead$Lead\cm/Location_2
-
-export NPOLWORKDIR=/home/tireman/data1/TargetTaggerSource/$pType\RawSim/$Energy\GeV/$Bfield\Bdl/Lead$Lead\cm/Location_2/Test_1 #NPreal_Cut
+export NPOLWORKDIR=/home/tireman/data1/TargetTaggerSource/$pType\RawSim/$Energy\GeV/$Bfield\Bdl/Lead$Lead\cm/Location_2/Test_11
+#NPreal_Cut
 
 #export NPOLDIR=/home/tireman/data1/PointSource/NeutronBeam/$Energy\GeV/$Bfield\Bdl/Lead$Lead\cm/Location_2
 #export NPOLWORKDIR=/home/tireman/data1/PointSource/NeutronBeam/$Energy\GeV/$Bfield\Bdl/Lead$Lead\cm/Location_2

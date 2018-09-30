@@ -2,8 +2,11 @@
 #include "NpolEventPreProcessing.hh"
 #include "NpolEventProcessing.hh"
 #include "NpolPhysicsVariables.hh"
-#include <cmath>
+#include "NpolStep.hh"
+#include "NpolVertex.hh"
+#include "TVector3.h"
 
+#include <cmath>
 
 NpolPhysicsVariables *NpolPhysicsVariables::PhysVars = NULL;
 
@@ -12,8 +15,7 @@ NpolPhysicsVariables *NpolPhysicsVariables::GetInstance() {
 	return PhysVars;
 }
 
-NpolPhysicsVariables::NpolPhysicsVariables(){
-}
+NpolPhysicsVariables::NpolPhysicsVariables(){}
 
 NpolPhysicsVariables::~NpolPhysicsVariables(){}
 
@@ -24,7 +26,8 @@ NpolPhysicsVariables::~NpolPhysicsVariables(){}
 // (p3x,p3y,p3z) - a point along the trajectory of the scattered proton (in the E array)
 // The calculation is done by forming a triangle with these points and using the law of cosines
 double NpolPhysicsVariables::getAzimuthAngle(const double p1x, const double p1y, const double p1z, const double p2x, const double p2y, const double p2z, const double p3x, const double p3y, const double p3z) {
-  
+
+ 
   double s1, s2, s3; // the lengths of the triangle's three sides
   s1 = TMath::Sqrt(TMath::Power(p2x-p1x,2) + TMath::Power(p2y-p1y,2) + TMath::Power(p2z-p1z,2));
   s2 = TMath::Sqrt(TMath::Power(p3x-p2x,2) + TMath::Power(p3y-p2y,2) + TMath::Power(p3z-p2z,2));
@@ -147,9 +150,9 @@ double NpolPhysicsVariables::ReturnAngle(NpolVertex *incNeutronVert, std::map<st
   double analyzerTime;
   double EarrayTime;
 
-  targetPt[0] = incNeutronVert->posX;
-  targetPt[1] = incNeutronVert->posY;
-  targetPt[2] = incNeutronVert->posZ;
+  targetPt[0] = incNeutronVert->gPosX;
+  targetPt[1] = incNeutronVert->gPosY;
+  targetPt[2] = incNeutronVert->gPosZ;
 
   GetPoI(analyzerPt,&analyzerTime,SOI,analyzer,detEvents);
   GetPoI2(EarrayPt,&EarrayTime,SOI,EArrayOfInterest,detEvents);
@@ -244,13 +247,11 @@ double NpolPhysicsVariables::highestEDepPV(const std::map<std::string,NpolDetect
   return highestE_Dep;
 }
 
+
 double NpolPhysicsVariables::computeBetheBloch(double KE, double Mass, int z, double rho, double A, int Z, double I){
 
-  /*   This function computes the stopping power of a charged 
-	   particle throughMatter using Bethe formula. Returns the
-	   stopping power in units of MeV/cm.
-	   Detailed explanation goes here
-  */
+  // This function computes the stopping power of a charged  particle through Matter using Bethe formula. 
+  // Returns the stopping power in units of MeV/cm. Detailed explanation goes here 
   
   /* Inputs
 	 KE = kinetic energy of incident particle (MeV)
@@ -281,7 +282,7 @@ double NpolPhysicsVariables::computeBetheBloch(double KE, double Mass, int z, do
   
   double Tmax = (2*mE*beta2*pow(gamma,2))/(1+2*gamma*(mE/M)+ pow((mE/M),2));
 
-  // Correction factor that isn't working yet.  needed for higher energies?
+  // Correction factor that isn't working yet.  needed for higher energies only?
   //hw = sqrt(4*pi()*Ne*re^3)*mE/alpha;
   //densityCorr = log(hw/I) + log(beta*gamma) - 0.5;
   //densityCorr = log(beta.*gamma);
@@ -293,7 +294,9 @@ double NpolPhysicsVariables::computeBetheBloch(double KE, double Mass, int z, do
 
 double NpolPhysicsVariables::computeEnergyLoss(double protonEnergy, double thetaP, double scintThick){
 
-  // **** This energy loss computation is designed for proton on plastic scintillator at the moment **** //
+  // **** This energy loss computation is designed for proton on
+  //plastic scintillator at the moment **** //
+
   double A = 12.929;  // atomic mass number for plastic scintillator
   int z = 1; // atomic number of projectile (proton currently)
   int Z = 7; // atomic number of detector material (plastic scintillator)
@@ -319,3 +322,258 @@ double NpolPhysicsVariables::computeEnergyLoss(double protonEnergy, double theta
   
   return Eloss;
 }
+
+
+double NpolPhysicsVariables::computeMomentum(double xMom, double yMom, double zMom){
+
+  // Computes the magnitude of the momemtum from the three momentum components.
+  double momentumMagnitude = 0.;
+
+  return momentumMagnitude = sqrt(xMom*xMom + yMom*yMom + zMom*zMom);
+  
+}
+
+double NpolPhysicsVariables::computeScatTheta(double xMom, double yMom){
+
+  // Computes the Theta angle in spherical coordinates.
+  double Theta = 0.;
+
+  return Theta = atan(yMom/xMom);
+  
+}
+
+double NpolPhysicsVariables::computeScatPhi(double zMom, double totalMom){
+
+  // Computes the Phi angle in spherical coordinates.
+  double Phi = 0.;
+
+  return Phi = acos(zMom/totalMom);
+
+}
+
+double NpolPhysicsVariables::computeElasticMomentum(const std::pair<double,std::vector<double>> projNeutron4Vec, double thetaP){
+
+  // **** This method computes the momentum of a recoil proton struck
+  // **** by a neutron given the momentum(energy) of the neutron and
+  // **** the angle of the recoil proton from the initial neutron direction.
+  double momentum = 0.0;
+  double mN = 939.56538; // (MeV/c^2)
+  double mP = 938.27205; // (MeV/c^2)
+  double Pnc = returnParticleMomentum(projNeutron4Vec);
+  double En = sqrt(pow(Pnc,2) + pow(mN,2));
+ 
+  double alpha = En + mP;
+  double beta = Pnc * cos(thetaP);
+  double gamma = pow(mP,2) + En * mP;
+  double A = pow(alpha,2) - pow(beta,2);
+  double B = -2 * alpha * gamma;
+  double C = pow(gamma,2) + pow(beta,2) * pow(mP,2);
+
+  double recoilEnergy = (-B + sqrt(pow(B,2) - 4 * A * C))/(2 * A);
+  momentum = sqrt(pow(recoilEnergy,2) - pow(mP,2));
+  
+  return momentum;
+}
+
+
+bool NpolPhysicsVariables::checkQuasiElasticScattering(std::map<int,NpolVertex *> &theVertexMap, std::pair<double,std::vector<double>> projNeutron4Vec){
+
+  NpolEventProcessing *Process = NpolEventProcessing::GetInstance();
+  bool QEflag = false;
+  double highNeutronMomentum = 0.0; 
+  std::pair<double,std::vector<double>> currentParticle4Vec;
+  std::pair<double,std::vector<double>> highestParticle4Vec;
+	
+  std::map<int,NpolVertex *>::iterator mapIt;
+  for(mapIt = theVertexMap.begin(); mapIt != theVertexMap.end(); mapIt++){
+	NpolVertex *aVertex = mapIt->second;
+	if(aVertex == NULL) continue;
+	Process->fillFourVector(aVertex,currentParticle4Vec);
+
+	double currentMomentum = returnParticleMomentum(currentParticle4Vec);
+	int currentPType = mapIt->second->particleId;
+
+	if(mapIt->first > 1 && currentPType == 2112 && currentMomentum > highNeutronMomentum){
+	  highNeutronMomentum = currentMomentum;
+	  Process->fillFourVector(aVertex,highestParticle4Vec);
+	} else {
+	  continue;
+	}
+  }
+  
+  
+  double initial4VecMag = sqrt(abs(compute4VecSquared(projNeutron4Vec)));
+  double final4VecMag = sqrt(abs(compute4VecSquared(highestParticle4Vec)));
+  currentParticle4Vec.second.clear();
+  highestParticle4Vec.second.clear();
+  
+  if(final4VecMag >= 0.98*initial4VecMag){
+	return QEflag = true;
+  } else {
+	return QEflag = false;
+  }
+}
+
+double NpolPhysicsVariables::compute4VecSquared(std::pair<double,std::vector<double>> aParticle4Vec){
+
+  double Squared4Vec = 0.0;
+  double particleMomentum = returnParticleMomentum(aParticle4Vec);
+  double particleEnergy = returnParticleEnergy(aParticle4Vec);
+  
+  Squared4Vec = pow(particleMomentum,2) - pow(particleEnergy,2); 
+  return Squared4Vec;
+}
+
+double NpolPhysicsVariables::computeLeadingParticleMomentum(std::map<int,NpolVertex *> &theVertexMap,int selectedTID){
+  double maximalMomentum = 0.0;
+  
+  std::map<int,NpolVertex *>::iterator mapIt;
+  mapIt = theVertexMap.find(selectedTID);
+  maximalMomentum =
+	computeMomentum(mapIt->second->momX,mapIt->second->momY,mapIt->second->momZ);
+  return maximalMomentum;
+}
+
+double NpolPhysicsVariables::computeRecoilParticleAngle(const std::pair<double,std::vector<double>> projNeutron4Vec,std::map<int,NpolVertex *> &theVertexMap, int selectedTID){
+  
+  // Extract Initial Initial Neutron Momentum 
+  std::vector<double> initNeutron3Mom = projNeutron4Vec.second;
+  double initNxMom = initNeutron3Mom[0];
+  double initNyMom = initNeutron3Mom[1];
+  double initNzMom = initNeutron3Mom[2];
+  double initNeutronMomMag = returnParticleMomentum(projNeutron4Vec);
+
+  // Extract Recoil Momentum components from vertex vector
+  std::map<int,NpolVertex *>::iterator mapIt;
+  mapIt = theVertexMap.find(selectedTID);
+  double RecoilxMom = mapIt->second->momX;
+  double RecoilyMom = mapIt->second->momY;
+  double RecoilzMom = mapIt->second->momZ;
+  double recoilMomMag = computeMomentum(RecoilxMom,RecoilyMom,RecoilzMom);
+  
+  // Now compute the recoil angle (returned from getAzimuthAngle in degrees)
+  double recoilAngle =
+	TMath::ACos((initNxMom*RecoilxMom + initNyMom*RecoilyMom + initNzMom*RecoilzMom)/(initNeutronMomMag*recoilMomMag));
+
+  initNeutron3Mom.clear();
+  return TMath::RadToDeg()*recoilAngle; //180.0-TMath::RadToDeg()*recoilAngle;
+}
+
+
+int NpolPhysicsVariables::findLeadingParticle(std::map<int,NpolVertex *> &theVertexMap, std::string eventType){
+
+  double maximalMomentum = 0.0; double maxNeutronMomentum = 0.0;
+  int maximalTID = -1; int maxNeutronTID = -1;
+  
+  std::map<int,NpolVertex *>::iterator mapIt;
+
+  for(mapIt = theVertexMap.begin(); mapIt != theVertexMap.end(); mapIt++){
+	double currentMomentum = computeMomentum(mapIt->second->momX,mapIt->second->momY,mapIt->second->momZ);
+	int currentPType = mapIt->second->particleId;
+	
+	if(eventType == "neutronInelastic"){
+	  if(mapIt->first > 1  && (currentPType == 2112 /*|| currentPType == 2212*/) && currentMomentum > maxNeutronMomentum){
+		maxNeutronMomentum = currentMomentum;
+		maxNeutronTID = mapIt->first;
+	  }
+	}
+  }
+  
+  for(mapIt = theVertexMap.begin(); mapIt != theVertexMap.end(); mapIt++){
+	double currentMomentum =
+	  computeMomentum(mapIt->second->momX,mapIt->second->momY,mapIt->second->momZ);
+	int currentPType = mapIt->second->particleId;
+	if(mapIt->first > 1  && mapIt->first != maxNeutronTID){
+	  if(currentPType == 2112 || currentPType == 2212){
+		if(currentMomentum > maximalMomentum){
+		  maximalMomentum = currentMomentum;
+		  maximalTID = mapIt->first;
+		}
+	  }
+	}
+  }
+  return maximalTID;
+}
+
+
+double NpolPhysicsVariables::returnParticleMomentum(std::pair<double,std::vector<double> > aParticle4Vec){
+
+  double particleMomentum = 0.0;
+  std::vector<double> p = aParticle4Vec.second;
+  particleMomentum = computeMomentum(p[0],p[1],p[2]);
+  p.clear();
+  return particleMomentum;
+}
+
+double NpolPhysicsVariables::returnParticleEnergy(std::pair<double,std::vector<double> > aParticle4Vec){
+
+  double particleEnergy = 0.0;
+  particleEnergy = aParticle4Vec.first;
+  return particleEnergy;
+  
+}
+
+double NpolPhysicsVariables::returnParticleEnergy(std::map<int,NpolVertex *> &theVertexMap, int TID){
+
+  double neutronEnergy = 0.0;
+  std::map<int,NpolVertex *>::iterator mapIt;
+  mapIt = theVertexMap.find(TID);
+  neutronEnergy = mapIt->second->energy;
+
+  return neutronEnergy;
+}
+
+int NpolPhysicsVariables::findBestProtonTrackID(std::map<int,NpolVertex *> &theVertexMap, const std::vector<NpolStep *> *steps, int npSOI){
+
+  // This will return the track ID of the "good" proton track from the
+  // vertexMap of particles generated from the initial collision. 
+  NpolEventPreProcessing *PProcess = NpolEventPreProcessing::GetInstance();
+  NpolEventProcessing *Process = NpolEventProcessing::GetInstance();
+  
+  double maxEnergy = 0.0;
+  int bestProtonTID = 0;
+  std::map<int,NpolVertex *>::iterator mapIt;
+  for(mapIt = theVertexMap.begin(); mapIt != theVertexMap.end(); mapIt++){
+	bool TopdEdetFlag = false; bool TopEdetFlag = false;
+	bool BotdEdetFlag = false; bool BotEdetFlag = false;
+	int pType = mapIt->second->particleId;
+	int PID = mapIt->second->parentId;
+	int TID = mapIt->first;  // this is equal to trackId in mapIt->second->trackId
+	double particleEnergy = mapIt->second->energy;
+	if(TID == 1) continue;
+	if(pType == 2212 && particleEnergy >= 25 /*MeV*/){
+	  std::vector<NpolStep *>::const_iterator ss_it;
+	  for(ss_it = steps->begin(); ss_it != steps->end(); ss_it++) {
+		NpolStep *aStep = *ss_it;
+		if(aStep == NULL) continue;
+		
+		int stepPID = aStep->parentId;
+		int stepTID = aStep->trackId;
+		if((stepPID == PID) && (stepTID == TID)){
+		  std::string stepVolName = aStep->volume;
+		  int stepAVNum = PProcess->GetAVNumber(stepVolName);
+		  int stepSection = Process->sectionNumber(stepVolName);
+		  if(stepSection == npSOI){
+			if(stepAVNum == 1 || stepAVNum == 2) TopEdetFlag = true;
+			if(stepAVNum == 3 || stepAVNum == 4) TopdEdetFlag = true;
+			if(stepAVNum == 5 || stepAVNum == 6) BotEdetFlag = true;
+			if(stepAVNum == 7 || stepAVNum == 8) BotdEdetFlag = true;
+		  }
+		}
+	  }
+	}
+	
+	bool TopFlag = false; bool BotFlag = false;
+	if(TopEdetFlag && TopdEdetFlag) TopFlag = true;
+	if(BotEdetFlag && BotdEdetFlag) BotFlag = true;
+	if((TopFlag  && !BotFlag) || (!TopFlag && BotFlag)){// ExOR
+	  if(particleEnergy > maxEnergy){
+		bestProtonTID = TID;
+		maxEnergy = particleEnergy;
+	  }
+	}
+  }
+  
+  return bestProtonTID;
+}
+

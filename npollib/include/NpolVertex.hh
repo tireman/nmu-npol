@@ -20,9 +20,12 @@ class NpolVertex : public TObject {
 public:
   int trackId;
   int parentId;
-  double posX;
-  double posY;
-  double posZ;
+  double gPosX;
+  double gPosY;
+  double gPosZ;
+  double lPosX;
+  double lPosY;
+  double lPosZ;
   double momX;
   double momY;
   double momZ;

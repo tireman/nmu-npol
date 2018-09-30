@@ -16,6 +16,7 @@
 #include "G4NavigationHistory.hh"
 #include "G4Track.hh"
 #include "G4Step.hh"
+#include "G4VProcess.hh"
 
 #include "NpolSteppingAction.hh"
 #include "NpolAnalysisManager.hh"
@@ -42,7 +43,7 @@ void NpolSteppingAction::UserSteppingAction(const G4Step *aStep) {
   G4VPhysicalVolume *preStepVolume = preStepPoint->GetPhysicalVolume();
   G4VPhysicalVolume *postStepVolume = postStepPoint->GetPhysicalVolume();
   G4String volName = preStepVolume->GetName();
- 
+   
   // Kill/stop tracks that will just waste precious CPU time
   if(volName == "Cap" || postStepVolume == NULL || 
      //volName == "HallShellRoof" ||volName == "HallShellFloor" || volName == "HallShellWall"){
