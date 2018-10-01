@@ -72,9 +72,6 @@ int main(int argc, char *argv[]) {
   npolTree->Add(InputFile);
   statsTree->Add(InputFile);
 
-  //npolTree->SetCacheSize(50000000);  // This increases the amount of data loaded 
-  //statsTree->SetCacheSize(50000000); // per call for more data to chew on. 
-  
   std::vector<NpolStep *> *steps = NULL;
   std::vector<NpolVertex *> *verts = NULL;
   std::vector<NpolTagger *> *tagEvent = NULL;
@@ -126,6 +123,7 @@ int main(int argc, char *argv[]) {
   // ****** END STATS LOOP ****** 
   
   
+  
   // ****** BEGIN EVENT LOOP ****** 
   int nentries = npolTree->GetEntries();
   TRandom *rand = new TRandom3();
@@ -171,6 +169,7 @@ int main(int argc, char *argv[]) {
 	  NpolStep *aStepOrig = new NpolStep();
 	  if(aStep == NULL) continue;
 	  if(stepCount >= 1) aStepOrig = steps->at(stepCount - 1); // sub. 1 to get previous pointer(entry)
+	  if(aStepOrig == NULL) continue;
 	  
 	  physProcess = aStep->process;
 	  std::string volName = aStep->volume;
@@ -185,7 +184,7 @@ int main(int argc, char *argv[]) {
 		  elasticFlag = true;
 		  Process->fillFourVector(aStepOrig,projNeutron4Vec);
 		  Process->fillVertexMap(vertexMap,verts,1,volName,physProcess,time);
-		  
+		 
 		} else if(physProcess == "neutronInelastic"){
 		  int neutronCount = 0; int protonCount = 0; int gammaCount = 0;
 		  int othersCount = 0; int pionCount = 0;
@@ -212,7 +211,6 @@ int main(int argc, char *argv[]) {
 		  
 		  if(pionCount > 0) {
 			inelasticFlag = true;
-			
 		  } else if(neutronCount >= 0 && protonCount >= 0 && gammaCount >= 0){
 			quasielasticFlag = PhysVars->checkQuasiElasticScattering(vertexMap, projNeutron4Vec);
 			if(!(quasielasticFlag)) inelasticFlag = true; 
@@ -245,7 +243,7 @@ int main(int argc, char *argv[]) {
 	
 	// ******* This section checks/fills histograms for the NP "real" portion ********* //
 	
-	if(quasielasticFlag){
+	if(inelasticFlag){
 	  // ****** This section computes the (P_leading - P_elastic) ******
 	  // ****** value and saves into histogram                    ******
 	  int leadingTID = PhysVars->findLeadingParticle(vertexMap,physProcess);
@@ -264,8 +262,8 @@ int main(int argc, char *argv[]) {
 		std::cout << "  Neutron Momentum before: " <<  projectileNeutronMom << std::endl;
 		std::cout << "  Leading Particle Momentum: " << leadingParticleMomentum << std::endl;
 		std::cout << "  Elastic Momentum: " << elasticMomentum << std::endl;
-		
-																  //Process->printVertexMap(vertexMap,i);
+		Process->printVertexMap(vertexMap,i);
+
 		HistoMan->FillHistograms("selectedRecoilMomentum",(leadingParticleMomentum - elasticMomentum));
 	  }
 	  // ****** End (P_leading - P_elastic) code ******
@@ -274,8 +272,6 @@ int main(int argc, char *argv[]) {
 	  // **** After the proton track has been found, this code will compute values, **** //
 	  // fill histograms. Extract out Initial Neutron Information from the vertexMap
 	  int bestProtonTID = PhysVars->findBestProtonTrackID(vertexMap,steps,npSOI);
-	  std::cout << "Event #: " << i << "  Best Proton Track ID: " << bestProtonTID << std::endl;
-	  Process->printVertexMap(vertexMap,i);
 	  if(bestProtonTID != 0){
 		
 		std::map<int,NpolVertex *>::iterator mapIt2;
@@ -293,7 +289,6 @@ int main(int argc, char *argv[]) {
 		mapIt2 = vertexMap.find(bestProtonTID);
 		double computedProtonAngle = PhysVars->
 		  computeRecoilParticleAngle(projNeutron4Vec,vertexMap,bestProtonTID);
-		std::cout << "  Computed angle from Proton Best ID: " << computedProtonAngle << std::endl;
 		if(computedProtonAngle >= angleLow && computedProtonAngle <= angleHigh) {
 		  HistoMan->FillHistograms("recoilAngleReal",computedProtonAngle);
 		  double protonVertexEnergy = mapIt2->second->energy;
@@ -310,12 +305,11 @@ int main(int argc, char *argv[]) {
 		  HistoMan->FillHistograms("dEvsEReal2",EenergyLost2,dEenergyLost2);
 		  // An attempt at "energy" resolution of the scints
 		  std::cout << "Stopping Power = " << sPower
-					<< "   Proton Energy Loss in dE-array = " << dEenergyLost
-					<< "   Proton Energy Loss in E-array = " << EenergyLost << std::endl;
+		  			<< "   Proton Energy Loss in dE-array = " << dEenergyLost
+		  			<< "   Proton Energy Loss in E-array = " << EenergyLost << std::endl;
 		  
 		  // Assign asymmetry in a simple way (for now)
 		  double momY = mapIt2->second->momY;
-		  std::cout << "Y-momentum: " << momY << std::endl;
 		  if(momY < 0) asym = -1;
 		  if(momY > 0) asym = +1;
 		  if(momY == 0) asym = 0;
@@ -326,7 +320,6 @@ int main(int argc, char *argv[]) {
 	} // >>>>>>>>>>>>> This ends the "real NP scattering" part of the code <<<<<<<<<<<< //
 
 
-	
 	// >>>>>>>>>>>>>>> This begins the "Experimental Processing" part of the code <<<<<<<<<<<<<<<<<<<
     // BEGIN STEPS LOOP: Fills the detEvent map with volumes and total energy, etc.
 	// This allows only events that pass NP real to be run through "our" cuts
@@ -492,3 +485,6 @@ int main(int argc, char *argv[]) {
 
 
 
+  //npolTree->SetCacheSize(50000000);  // This increases the amount of data loaded 
+  //statsTree->SetCacheSize(50000000); // per call for more data to chew on. 
+  
