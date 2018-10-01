@@ -55,8 +55,11 @@ void  NpolEventPreProcessing::AnalyzerTaggerHitPosition(double hPos[],double lPo
   do{
 	hPos[0] = lPos[0] + rand->Gaus(0.0,2.0);
   } while (TMath::Abs(hPos[0]) > 50.0);
+  
   hPos[1] = rand->Uniform(0,10)-5; // (cm)
-  hPos[2] = rand->Uniform(0,10)-5; // (cm)
+
+  if((detNums[0] == 9) || (detNums[0] == 10)) hPos[2] = rand->Uniform(0,10)-5; // (cm)
+  if((detNums[0] == 11) || (detNums[0] == 12)) hPos[2] = rand->Uniform(0,1)-0.5; // (cm)
   RotateNpolToG4(hPos, NpolAng);
   
   if((detNums[0] == 9) || (detNums[0] == 11)) hPos[1] = -25 + 10.*float(detNums[2]) +  hPos[1];
@@ -81,7 +84,8 @@ void  NpolEventPreProcessing::DeltaEarrayHitPosition(double hPos[],double lPos[]
   do {
 	hPos[0] = lPos[0] + rand->Gaus(0.0, 2.0);
   } while (TMath::Abs(hPos[0]) > 80.0);
-  hPos[1] = rand->Uniform(0,10)-5; // (cm)
+
+  hPos[1] = rand->Uniform(0,1)-0.5; // (cm)
   hPos[2] = rand->Uniform(0,10)-5; // (cm)
   RotateNpolToG4(hPos, NpolAng);
 

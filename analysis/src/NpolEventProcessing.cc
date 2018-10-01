@@ -68,6 +68,7 @@ void NpolEventProcessing::fillDetectorEventMap(std::map<std::string,NpolDetector
 	(eventMap[aStep->volume])->hPosX = hitPos[0]; 
 	(eventMap[aStep->volume])->hPosY = hitPos[1]; 
 	(eventMap[aStep->volume])->hPosZ = hitPos[2];
+
   }
 }
 
@@ -497,27 +498,32 @@ bool NpolEventProcessing::checkdEarrayHits(const std::map<std::string,NpolDetect
 }
 
 void NpolEventProcessing::fillFourVector(const NpolStep *aStep, std::pair<double,std::vector<double> > &a4Vector){
-  
+
   std::vector<double> a3Vector = {0.0, 0.0,0.0};
-  double aEnergy = aStep->energy;
-  a3Vector[0] = aStep->momX;
-  a3Vector[1] = aStep->momY;
-  a3Vector[2] = aStep->momZ;
+  double aEnergy = 0.0;
+  if(aStep != NULL) {
+	aEnergy = aStep->energy;
+	a3Vector[0] = aStep->momX;
+	a3Vector[1] = aStep->momY;
+	a3Vector[2] = aStep->momZ;
+	a4Vector.first = aEnergy;
+	a4Vector.second = a3Vector;
+  } 
   a4Vector.first = aEnergy;
   a4Vector.second = a3Vector;
-
 }
 
 void NpolEventProcessing::fillFourVector(const NpolVertex *aVertex, std::pair<double,std::vector<double> > &a4Vector){
-  
   std::vector<double> a3Vector = {0.0, 0.0,0.0};
-  double aEnergy = aVertex->energy;
-  a3Vector[0] = aVertex->momX;
-  a3Vector[1] = aVertex->momY;
-  a3Vector[2] = aVertex->momZ;
+  double aEnergy = 0.0;
+  if(aVertex != NULL){
+	aEnergy = aVertex->energy;
+	a3Vector[0] = aVertex->momX;
+	a3Vector[1] = aVertex->momY;
+	a3Vector[2] = aVertex->momZ;
+  }
   a4Vector.first = aEnergy;
   a4Vector.second = a3Vector;
-
 }
 
 void NpolEventProcessing::fillFourVector(std::vector<double> &particleData, std::pair<double,std::vector<double> > &a4Vector){
