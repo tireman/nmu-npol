@@ -473,9 +473,9 @@ int NpolPhysicsVariables::findLeadingParticle(const std::map<int,NpolVertex *> &
   for(mapIt = theVertexMap.begin(); mapIt != theVertexMap.end(); mapIt++){
 	double currentMomentum = computeMomentum(mapIt->second->momX,mapIt->second->momY,mapIt->second->momZ);
 	int currentPType = mapIt->second->particleId;
-	
+	// 10/6/2018:  Added in proton to this if statement
 	if(eventType == "neutronInelastic"){
-	  if(mapIt->first > 1  && (currentPType == 2112 /*|| currentPType == 2212*/) && currentMomentum > maxNeutronMomentum){
+	  if(mapIt->first > 1  && (currentPType == 2112 || currentPType == 2212) && currentMomentum > maxNeutronMomentum){
 		maxNeutronMomentum = currentMomentum;
 		maxNeutronTID = mapIt->first;
 	  }
