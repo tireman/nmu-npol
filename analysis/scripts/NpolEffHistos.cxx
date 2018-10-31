@@ -35,6 +35,7 @@ void RetrieveENVvariables();
 TString FormInputFile(TString InputDir);
 TString FormOutputFile(TString OutputDir);
 
+
 void NpolEffHistos() {
 
   RetrieveENVvariables();
@@ -47,274 +48,360 @@ void NpolEffHistos() {
   TFile *outFile = new TFile(OutputFile,"RECREATE"); 
 
 // Read in histos, and scale by the event interaction - stored in TVector[1]
-TVectorT<double> *stats_sourceNeutron;
-stats_sourceNeutron = (TVectorT<double>*)sourceNeutron->Get("TVectorT<double>;1");
-
+  TVectorT<double> *stats_sourceNeutron;
+  stats_sourceNeutron = (TVectorT<double>*)sourceNeutron->Get("TVectorT<double>;1");
+  
 // We want taggedEvents variable from NpolAnalysis code which is total QE neutrons entering NPOL.
- double eventInteraction = ((*stats_sourceNeutron)[1]);  // was [5] before 3/10/2018
+  double eventInteraction = ((*stats_sourceNeutron)[1]);  // was [5] before 3/10/2018
+  
+  // The Histograms we are going to make
+  //   1D Histograms
+  TH1F *h_ND_InitialNeutronEnergy_Elastic;
+  TH1F *h_ND_InitialNeutronEnergy_InElastic;
+  TH1F *h_ND_InitialNeutronEnergy_QuasiElastic;
+  TH1F *h_ND_InitialNeutronMomentum_Elastic;
+  TH1F *h_ND_InitialNeutronMomentum_InElastic;
+  TH1F *h_ND_InitialNeutronMomentum_QuasiElastic;
+  TH1F *h_ND_NeutronEnergy_Elastic;
+  TH1F *h_ND_NeutronEnergy_InElastic;
+  TH1F *h_ND_NeutronEnergy_QuasiElastic;
+  TH1F *h_ND_NeutronMomentum_Elastic;
+  TH1F *h_ND_NeutronMomentum_InElastic;
+  TH1F *h_ND_NeutronMomentum_QuasiElastic;
+  TH1F *h_ND_NeutronThetaAngle_Elastic;
+  TH1F *h_ND_NeutronThetaAngle_InElastic;
+  TH1F *h_ND_NeutronThetaAngle_QuasiElastic;
+  TH1F *h_NP_RecoilMomentum_Elastic;
+  TH1F *h_NP_RecoilMomentum_InElastic;
+  TH1F *h_NP_RecoilMomentum_QuasiElastic;
+  TH1F *h_NP_asymmetry_Elastic;
+  TH1F *h_NP_asymmetry_InElastic;
+  TH1F *h_NP_asymmetry_QuasiElastic;
+  TH1F *h_NP_recoilAngle_Elastic;
+  TH1F *h_NP_recoilAngle_InElastic;
+  TH1F *h_NP_recoilAngle_QuasiElastic;
+  TH1F *h_NP_recoilEnergy_Elastic;
+  TH1F *h_NP_recoilEnergy_InElastic;
+  TH1F *h_NP_recoilEnergy_QuasiElastic;
 
-// The Histograms we are going to make
- TH2F *h_dEoverE_AllEvents_Top;
- TH2F *h_dEoverE_AllEvents_Bot;
- TH2F *h_dEvsE_Real;
- TH2F *h_dEvsE_Real2;
- TH1F *h_dTOF_AllEvents;
- TH1F *h_sectionEff_AllEvents[4];
- TH1F *h_recoil_angle;
- TH1F *h_recoil_angle_raw;
- TH1F *h_Neutron_Theta;
- TH1F *h_totalEnergy;
- TH1F *h_Neutron_Momentum;
- TH1F *h_Neutron_Momentum_Initial;
- TH1F *h_Neutron_Energy_Initial;
- TH1F *h_Neutron_Energy;
- TH1F *h_Proton_Recoil_Real;
- TH1F *h_Proton_Energy_Real;
- TH1F *h_asymmetry_Real;
- TH1F *h_selectedRecoilMomentum;
- TH1F *h_qsquaredTest;
- 
-// Assign Histos from the input file to a pointer
- 
-// dE/E
- h_dEoverE_AllEvents_Top = (TH2F*)sourceNeutron->Get("dEoverEtop;1");
- h_dEoverE_AllEvents_Bot = (TH2F*)sourceNeutron->Get("dEoverEbot;1");
- h_dEvsE_Real = (TH2F*)sourceNeutron->Get("dEvsEReal;1");
- h_dEvsE_Real2 = (TH2F*)sourceNeutron->Get("dEvsEReal2;1");
- TH2F *h_dEoverE_Total = new TH2F("dEoverEtotal", "dE over E for both Top and Bottom", 400,0,120,400,0,20);
- h_dEoverE_Total->Add(h_dEoverE_AllEvents_Top,h_dEoverE_AllEvents_Bot);
- 
- // dTof
- h_dTOF_AllEvents = (TH1F*)sourceNeutron->Get("dTOF;1");
-
- // Angle Plots
- h_recoil_angle = (TH1F*)sourceNeutron->Get("recoilAngle;1");
- h_recoil_angle_raw = (TH1F*)sourceNeutron->Get("recoilAngleRaw;1");
- h_Neutron_Theta = (TH1F*)sourceNeutron->Get("NeutronThetaAngle;1");
-
- // Test plots
- h_totalEnergy = (TH1F*)sourceNeutron->Get("totalEnergy;1");
- h_Neutron_Momentum = (TH1F*)sourceNeutron->Get("NeutronMomentum;1");
- h_Neutron_Momentum_Initial = (TH1F*)sourceNeutron->Get("NeutronMomentumInitial;1");
- h_Neutron_Energy_Initial = (TH1F*)sourceNeutron->Get("NeutronEnergyInitial;1");
- h_Neutron_Energy = (TH1F*)sourceNeutron->Get("NeutronEnergy;1");
- h_selectedRecoilMomentum = (TH1F*)sourceNeutron->Get("selectedRecoilMomentum;1");
- h_qsquaredTest = (TH1F*)sourceNeutron->Get("Qsquared;1");
- 
- // Real NP scattering Plots
- h_Proton_Recoil_Real = (TH1F*)sourceNeutron->Get("recoilAngleReal;1");
- h_Proton_Energy_Real = (TH1F*)sourceNeutron->Get("recoilEnergyReal;1");
- h_asymmetry_Real = (TH1F*)sourceNeutron->Get("asymmetryReal;1");
- 
- // Section Efficiency histograms are assigned based on cuts
- // All Events
- for(int i = 0; i <= 3; i++){ 
-   char hname[48];
-   sprintf(hname,"sectionEfficiency%i;1",(i+1));
-   //std::string beginName = "sectionEfficiency";
-   //std::string beginEndAll = ";1";
-   //std::string beginName = std::to_string(i+1);
-   //beginName = beginName + beginEndAll;
-   //const char *name = beginName.c_str(); 
-   h_sectionEff_AllEvents[i] = (TH1F*)sourceNeutron->Get(hname);
-   h_sectionEff_AllEvents[i]->Scale(100/eventInteraction);
- }
- 
- 
- // CREATE TCANVAS
- TCanvas *dEoverE_dToF = new TCanvas("dEoverE_Two","dE Over E - All Events",1000, 800);
- TCanvas *sectionEff_AllEvents = new TCanvas("sectionEff_AllEvents","Section Efficiency - All Events",800, 800);
- TCanvas *angularPlots = new TCanvas("angularPlots","Proton Recoil Angle",800, 600);
- TCanvas *neutronInformation = new TCanvas("neutronInformation","Neutron Diagnostics",800,900);
- TCanvas *realNPevent = new TCanvas("realNPevent","Plots for Real NP Event",1000,1200);
- TCanvas *dEvsENPevent = new TCanvas("dEvsENPevent","dE vs. E for Real NP Event",1000,1200);
- TCanvas *recoilMomentum = new TCanvas("eventDiagnostics","Event Diagnostics", 1000, 1200);
- 
- // Histogram Stats Removed**
- //gStyle->SetOptStat(0);
- gStyle->SetOptLogz();
-
- // dEoverE_Two (also the dToF plot)
- dEoverE_dToF->Divide(2,2,0.0001,0.00001,0);
- dEoverE_dToF->cd(1);
- h_dEoverE_AllEvents_Top->GetXaxis()->SetTitle("E-Array Energy Deposited (MeV)");
- h_dEoverE_AllEvents_Top->GetXaxis()->SetTitleSize(0.05);
- h_dEoverE_AllEvents_Top->GetYaxis()->SetTitleSize(0.05);
- h_dEoverE_AllEvents_Top->GetYaxis()->SetTitle("dE-Array Energy Deposited (MeV)");
- h_dEoverE_AllEvents_Top->Rebin2D(2);
- h_dEoverE_AllEvents_Top->DrawCopy("cont4");
- dEoverE_dToF->cd(2);
- h_dEoverE_AllEvents_Bot->GetXaxis()->SetTitle("E-Array Energy Deposited (MeV)");
- h_dEoverE_AllEvents_Bot->GetXaxis()->SetTitleSize(0.05);
- h_dEoverE_AllEvents_Bot->GetYaxis()->SetTitleSize(0.05);
- h_dEoverE_AllEvents_Bot->GetYaxis()->SetTitle("dE-Array Energy Deposited (MeV)");
- h_dEoverE_AllEvents_Bot->Rebin2D(2);
- h_dEoverE_AllEvents_Bot->DrawCopy("cont4");
- dEoverE_dToF->cd(3);
- h_dEoverE_Total->GetXaxis()->SetTitle("E-Array Energy Deposited (MeV)");
- h_dEoverE_Total->GetXaxis()->SetTitleSize(0.05);
- h_dEoverE_Total->GetYaxis()->SetTitleSize(0.05);
- h_dEoverE_Total->GetYaxis()->SetTitle("dE-Array Energy Deposited (MeV)");
- h_dEoverE_Total->Rebin2D(2);
- h_dEoverE_Total->DrawCopy("cont4");
- dEoverE_dToF->cd(4);
- h_dTOF_AllEvents->GetXaxis()->SetTitle("Time (ns)");
- h_dTOF_AllEvents->GetXaxis()->SetTitleSize(0.05);
- h_dTOF_AllEvents->GetYaxis()->SetTitleSize(0.05);
- h_dTOF_AllEvents->GetYaxis()->SetTitle("Number of Events");
- h_dTOF_AllEvents->SetFillColor(kBlue);
- h_dTOF_AllEvents->DrawCopy();
- 
-// Section Efficiencies
-// All events
- sectionEff_AllEvents->Divide(2,2,0.002,0.01,0);
- for(int i = 0; i <= 3; i++){
-   sectionEff_AllEvents->cd(i+1);
-   h_sectionEff_AllEvents[i]->SetOption("bar");
-   h_sectionEff_AllEvents[i]->GetXaxis()->SetTitle("Section of Polarimeter");
-   h_sectionEff_AllEvents[i]->GetXaxis()->SetRangeUser(0,5);
-   h_sectionEff_AllEvents[i]->GetXaxis()->SetNdivisions(9);
-   h_sectionEff_AllEvents[i]->GetXaxis()->SetTitleSize(0.05);
-   h_sectionEff_AllEvents[i]->GetYaxis()->SetTitleSize(0.05);
-   h_sectionEff_AllEvents[i]->GetYaxis()->SetTitle("Percent Efficiency");
-   h_sectionEff_AllEvents[i]->SetFillColor(kBlue);
-   h_sectionEff_AllEvents[i]->DrawCopy();
-   std::cout << "The Total " << h_sectionEff_AllEvents[i]->GetTitle() << " is " << h_sectionEff_AllEvents[i]->Integral() << "." << std::endl;
- }
-
- angularPlots->Divide(2,2,0.0001, 0.00001,0);
- angularPlots->cd(1);
- h_recoil_angle_raw->GetXaxis()->SetTitle("Recoil Proton Angle (degrees)");
- h_recoil_angle_raw->GetYaxis()->SetTitle("Recoil Proton Count");
- h_recoil_angle_raw->GetXaxis()->SetNdivisions(9);
- h_recoil_angle_raw->GetXaxis()->SetTitleSize(0.05);
- h_recoil_angle_raw->GetYaxis()->SetTitleSize(0.05);
- h_recoil_angle_raw->DrawCopy();
- angularPlots->cd(2);
- h_recoil_angle->GetXaxis()->SetTitle("Recoil Proton Angle (degrees)");
- h_recoil_angle->GetYaxis()->SetTitle("Recoil Proton Count");
- h_recoil_angle->GetXaxis()->SetNdivisions(9);
- h_recoil_angle->GetXaxis()->SetTitleSize(0.05);
- h_recoil_angle->GetYaxis()->SetTitleSize(0.05);
- h_recoil_angle->DrawCopy();
- angularPlots->cd(3);
- h_totalEnergy->GetXaxis()->SetTitle("Energy Deposited (MeV)");
- h_totalEnergy->GetYaxis()->SetTitle("Recoil Proton Count");
- h_totalEnergy->GetXaxis()->SetNdivisions(9);
- h_totalEnergy->GetXaxis()->SetTitleSize(0.05);
- h_totalEnergy->GetYaxis()->SetTitleSize(0.05);
- h_totalEnergy->DrawCopy();
-
- neutronInformation->Divide(2,3,0.0001, 0.00001,0);
- neutronInformation->cd(1);
- h_Neutron_Momentum_Initial->GetXaxis()->SetTitle("Initial Neutron Momentum (MeV/c)");
- h_Neutron_Momentum_Initial->GetYaxis()->SetTitle("Neutron Count");
- h_Neutron_Momentum_Initial->GetXaxis()->SetNdivisions(9);
- h_Neutron_Momentum_Initial->GetXaxis()->SetTitleSize(0.05);
- h_Neutron_Momentum_Initial->GetYaxis()->SetTitleSize(0.05);
- h_Neutron_Momentum_Initial->DrawCopy();
- neutronInformation->cd(2);
- h_Neutron_Momentum->GetXaxis()->SetTitle("Neutron Momentum (MeV/c)");
- h_Neutron_Momentum->GetYaxis()->SetTitle("Neutron Count");
- h_Neutron_Momentum->GetXaxis()->SetNdivisions(9);
- h_Neutron_Momentum->GetXaxis()->SetTitleSize(0.05);
- h_Neutron_Momentum->GetYaxis()->SetTitleSize(0.05);
- h_Neutron_Momentum->DrawCopy();
- neutronInformation->cd(3);
- h_Neutron_Energy_Initial->GetXaxis()->SetTitle("Initial Neutron Energy (MeV)");
- h_Neutron_Energy_Initial->GetYaxis()->SetTitle("Neutron Count");
- h_Neutron_Energy_Initial->GetXaxis()->SetNdivisions(9);
- h_Neutron_Energy_Initial->GetXaxis()->SetTitleSize(0.05);
- h_Neutron_Energy_Initial->GetYaxis()->SetTitleSize(0.05);
- h_Neutron_Energy_Initial->DrawCopy();
- neutronInformation->cd(4);
- h_Neutron_Energy->GetXaxis()->SetTitle("Neutron Energy (MeV)");
- h_Neutron_Energy->GetYaxis()->SetTitle("Neutron Count");
- h_Neutron_Energy->GetXaxis()->SetNdivisions(9);
- h_Neutron_Energy->GetXaxis()->SetTitleSize(0.05);
- h_Neutron_Energy->GetYaxis()->SetTitleSize(0.05);
- h_Neutron_Energy->DrawCopy();
- neutronInformation->cd(5);
- h_Neutron_Theta->GetXaxis()->SetTitle("Initial Neutron Angle (degrees)");
- h_Neutron_Theta->GetYaxis()->SetTitle("Neutron Count");
- h_Neutron_Theta->GetXaxis()->SetNdivisions(9);
- h_Neutron_Theta->GetXaxis()->SetTitleSize(0.05);
- h_Neutron_Theta->GetYaxis()->SetTitleSize(0.05);
- h_Neutron_Theta->DrawCopy();
-
- realNPevent->Divide(3,2,0.0001, 0.00001,0);
- realNPevent->cd(1);
- h_Proton_Recoil_Real->GetXaxis()->SetTitle("Proton Recoil Angle (deg)");
- h_Proton_Recoil_Real->GetYaxis()->SetTitle("Proton Count");
- h_Proton_Recoil_Real->GetXaxis()->SetNdivisions(9);
- h_Proton_Recoil_Real->SetTitleSize(0.05);
- h_Proton_Recoil_Real->SetTitleSize(0.05);
- h_Proton_Recoil_Real->DrawCopy();
- realNPevent->cd(2);
- h_Proton_Energy_Real->GetXaxis()->SetTitle("Proton Recoil Energy (MeV)");
- h_Proton_Energy_Real->GetYaxis()->SetTitle("Proton Count");
- h_Proton_Energy_Real->GetXaxis()->SetNdivisions(9);
- h_Proton_Energy_Real->SetTitleSize(0.05);
- h_Proton_Energy_Real->SetTitleSize(0.05);
- h_Proton_Energy_Real->DrawCopy();
- realNPevent->cd(3);
- h_asymmetry_Real->GetXaxis()->SetTitle("Proton Recoil Asymmetry");
- h_asymmetry_Real->GetYaxis()->SetTitle("Proton Count");
- h_asymmetry_Real->GetXaxis()->SetNdivisions(4);
- h_asymmetry_Real->SetTitleSize(0.05);
- h_asymmetry_Real->SetTitleSize(0.05);
- h_asymmetry_Real->DrawCopy();
- std::cout << "Real Up/Down asymmetry = " << (h_asymmetry_Real->GetBinContent(4)/h_asymmetry_Real->GetBinContent(2)) << std::endl;
- realNPevent->cd(4);
- h_dEvsE_Real->GetXaxis()->SetTitle("E-Array Energy Deposited (MeV)");
- h_dEvsE_Real->GetXaxis()->SetTitleSize(0.05);
- h_dEvsE_Real->GetYaxis()->SetTitleSize(0.05);
- h_dEvsE_Real->GetYaxis()->SetTitle("dE-Array Energy Deposited (MeV)");
- h_dEvsE_Real->Rebin2D(2);
- h_dEvsE_Real->DrawCopy("cont4");
- realNPevent->cd(5);
- h_dEvsE_Real2->GetXaxis()->SetTitle("E-Array Energy Deposited (MeV)");
- h_dEvsE_Real2->GetXaxis()->SetTitleSize(0.05);
- h_dEvsE_Real2->GetYaxis()->SetTitleSize(0.05);
- h_dEvsE_Real2->GetYaxis()->SetTitle("dE-Array Energy Deposited (MeV)");
- h_dEvsE_Real2->Rebin2D(2);
- h_dEvsE_Real2->DrawCopy("cont4");
-
- dEvsENPevent->Divide(1,1,0.0001, 0.00001,0);
- dEvsENPevent->cd(1);
- h_dEvsE_Real->GetXaxis()->SetTitle("E-Array Energy Deposited (MeV)");
- h_dEvsE_Real->GetXaxis()->SetTitleSize(0.03);
- h_dEvsE_Real->GetYaxis()->SetTitleSize(0.03);
- h_dEvsE_Real->GetYaxis()->SetTitle("dE-Array Energy Deposited (MeV)");
- //h_dEvsE_Real->Rebin2D(2);
- h_dEvsE_Real->DrawCopy("cont4");
-
- recoilMomentum->Divide(2,2,0.0001, 0.00001,0);
- recoilMomentum->cd(1);
- h_selectedRecoilMomentum->GetXaxis()->SetTitle("(P_leading - P_elastic) (MeV/c)");
- h_selectedRecoilMomentum->GetYaxis()->SetTitle("Counts");
- h_selectedRecoilMomentum->GetXaxis()->SetTitleSize(0.05);
- h_selectedRecoilMomentum->GetYaxis()->SetTitleSize(0.05);
- h_selectedRecoilMomentum->SetTitle("Momentum Difference");
- h_selectedRecoilMomentum->DrawCopy();
- recoilMomentum->cd(2);
- h_qsquaredTest->SetTitle("Recoil Proton Q-Squared Value (MeV/c)^2");
- h_qsquaredTest->GetXaxis()->SetTitleSize(0.03);
- h_qsquaredTest->GetYaxis()->SetTitleSize(0.03);
- h_qsquaredTest->DrawCopy();
- 
- // Write out canvases to file 
- dEoverE_dToF->Write();
- sectionEff_AllEvents->Write();
- angularPlots->Write();
- neutronInformation->Write();
- realNPevent->Write();
- dEvsENPevent->Write();
- recoilMomentum->Write();
- // Close files
- outFile->Close();
- sourceNeutron->Close();
- 
+  TH1F *h_RA_dTOF_Elastic;
+  TH1F *h_RA_dTOF_InElastic;
+  TH1F *h_RA_dTOF_QuasiElastic;
+  TH1F *h_RA_recoilAngleRaw_Elastic;
+  TH1F *h_RA_recoilAngleRaw_InElastic;
+  TH1F *h_RA_recoilAngleRaw_QuasiElastic;
+  TH1F *h_RA_recoilAngle_Elastic;
+  TH1F *h_RA_recoilAngle_InElastic;
+  TH1F *h_RA_recoilAngle_QuasiElastic;
+  TH1F *h_RA_section1Efficiency_Elastic;
+  TH1F *h_RA_section1Efficiency_InElastic;
+  TH1F *h_RA_section1Efficiency_QuasiElastic;
+  TH1F *h_RA_section2Efficiency_Elastic;
+  TH1F *h_RA_section2Efficiency_InElastic;
+  TH1F *h_RA_section2Efficiency_QuasiElastic;
+  TH1F *h_RA_section3Efficiency_Elastic;
+  TH1F *h_RA_section3Efficiency_InElastic;
+  TH1F *h_RA_section3Efficiency_QuasiElastic;
+  TH1F *h_RA_section4Efficiency_Elastic;
+  TH1F *h_RA_section4Efficiency_InElastic;
+  TH1F *h_RA_section4Efficiency_QuasiElastic;
+  TH1F *h_RA_totalEnergy_Elastic;
+  TH1F *h_RA_totalEnergy_InElastic;
+  TH1F *h_RA_totalEnergy_QuasiElastic;
+  
+  //   2D Histograms
+  TH2F *h_NP_dEvsE_Elastic;
+  TH2F *h_NP_dEvsE_InElastic;
+  TH2F *h_NP_dEvsE_QuasiElastic;
+  TH2F *h_NP_dEvsE2_Elastic;
+  TH2F *h_NP_dEvsE2_InElastic;
+  TH2F *h_NP_dEvsE2_QuasiElastic;
+  TH2F *h_RA_dEoverEbot_Elastic;
+  TH2F *h_RA_dEoverEbot_InElastic;
+  TH2F *h_RA_dEoverEbot_QuasiElastic;
+  TH2F *h_RA_dEoverEtop_Elastic;
+  TH2F *h_RA_dEoverEtop_InElastic;
+  TH2F *h_RA_dEoverEtop_QuasiElastic;
+  
+  // old
+  /*TH2F *h_dEoverE_AllEvents_Top;
+  TH2F *h_dEoverE_AllEvents_Bot;
+  TH2F *h_dEvsE_Real;
+  TH2F *h_dEvsE_Real2;
+  TH1F *h_dTOF_AllEvents;
+  TH1F *h_sectionEff_AllEvents[4];
+  TH1F *h_recoil_angle;
+  TH1F *h_recoil_angle_raw;
+  TH1F *h_Neutron_Theta;
+  TH1F *h_totalEnergy;
+  TH1F *h_Neutron_Momentum;
+  TH1F *h_Neutron_Momentum_Initial;
+  TH1F *h_Neutron_Energy_Initial;
+  TH1F *h_Neutron_Energy;
+  TH1F *h_Proton_Recoil_Real;
+  TH1F *h_Proton_Energy_Real;
+  TH1F *h_asymmetry_Real;
+  TH1F *h_selectedRecoilMomentum;*/
+  
+  // Assign Histos from the input file to a pointer
+  
+  char TYPE[12];
+  sprintf(TYPE,"Elastic");  // What do you want to plot? QuasiElastic? Elastic? Inelastic?
+  char hname[56];
+  char htitle[80];
+  
+  // dE/E
+  
+  sprintf(hname,"RA_dEoverEtop%s;1",TYPE);
+  h_dEoverE_AllEvents_Top = (TH2F*)sourceNeutron->Get(hname);
+  sprintf(hname,"R_AdEoverEbot%s;1",TYPE);
+  h_dEoverE_AllEvents_Bot = (TH2F*)sourceNeutron->Get(hname);
+  sprintf(hname,"dEvsEReal%s;1",TYPE);
+  h_dEvsE_Real = (TH2F*)sourceNeutron->Get(hname);
+  sprintf(hname,"dEvsEReal2%s;1",TYPE);
+  h_dEvsE_Real2 = (TH2F*)sourceNeutron->Get(hname);
+  sprintf(hname,"dEoverEtotal%s",TYPE);
+  sprintf(htitle,"dE over E for both Top and Bottom (%s)",htitle);
+  TH2F *h_dEoverE_Total = new TH2F(hname, htitle, 400,0,120,400,0,20);
+  //h_dEoverE_Total->Add(h_dEoverE_AllEvents_Top,h_dEoverE_AllEvents_Bot);
+  
+  // dTof
+  sprintf(hname,"dTOF%s;1",TYPE);
+  h_dTOF_AllEvents = (TH1F*)sourceNeutron->Get(hname);
+  
+  // Angle Plots
+  sprintf(hname,"recoilAngle%s;1",TYPE);
+  h_recoil_angle = (TH1F*)sourceNeutron->Get(hname);
+  sprintf(hname,"recoilAngleRaw%s;1",TYPE);
+  h_recoil_angle_raw = (TH1F*)sourceNeutron->Get(hname);
+  sprintf(hname,"NeutronThetaAngle%s;1",TYPE);
+  h_Neutron_Theta = (TH1F*)sourceNeutron->Get(hname);
+  
+  // Test plots
+  sprintf(hname,"totalEnergy%s;1",TYPE);
+  h_totalEnergy = (TH1F*)sourceNeutron->Get(hname);
+  sprintf(hname,"NeutronMomentum%s;1",TYPE);
+  h_Neutron_Momentum = (TH1F*)sourceNeutron->Get(hname);
+  sprintf(hname,"NeutronMomentumInitial%s;1",TYPE);
+  h_Neutron_Momentum_Initial = (TH1F*)sourceNeutron->Get(hname);
+  sprintf(hname,"NeutronEnergyInitial%s;1",TYPE);
+  h_Neutron_Energy_Initial = (TH1F*)sourceNeutron->Get(hname);
+  sprintf(hname,"NeutronEnergy%s;1",TYPE);
+  h_Neutron_Energy = (TH1F*)sourceNeutron->Get(hname);
+  sprintf(hname,"selectedRecoilMomentum%s;1",TYPE);
+  h_selectedRecoilMomentum = (TH1F*)sourceNeutron->Get(hname);
+  
+  // Real NP scattering Plots
+  sprintf(hname,"recoilAngleReal%s;1",TYPE);
+  h_Proton_Recoil_Real = (TH1F*)sourceNeutron->Get(hname);
+  sprintf(hname,"recoilEnergyReal%s;1",TYPE);
+  h_Proton_Energy_Real = (TH1F*)sourceNeutron->Get(hname);
+  sprintf(hname,"asymmetryReal%s;1",TYPE);
+  h_asymmetry_Real = (TH1F*)sourceNeutron->Get(hname);
+  
+  // Section Efficiency histograms are assigned based on cuts
+  // All Events
+  for(int i = 0; i <= 3; i++){ 
+	sprintf(hname,"sectionEfficiency%i%s;1",(i+1),TYPE);
+	//std::string beginName = "sectionEfficiency";
+	//std::string beginEndAll = ";1";
+	//std::string beginName = std::to_string(i+1);
+	//beginName = beginName + beginEndAll;
+	//const char *name = beginName.c_str(); 
+	h_sectionEff_AllEvents[i] = (TH1F*)sourceNeutron->Get(hname);
+	h_sectionEff_AllEvents[i]->Scale(100/eventInteraction);
+  }
+  
+  
+  // CREATE TCANVAS
+  TCanvas *dEoverE_dToF = new TCanvas("dEoverE_Two","dE Over E - All Events",1000, 800);
+  TCanvas *sectionEff_AllEvents = new TCanvas("sectionEff_AllEvents","Section Efficiency - All Events",800, 800);
+  TCanvas *angularPlots = new TCanvas("angularPlots","Proton Recoil Angle",800, 600);
+  TCanvas *neutronInformation = new TCanvas("neutronInformation","Neutron Diagnostics",800,900);
+  TCanvas *realNPevent = new TCanvas("realNPevent","Plots for Real NP Event",1000,1200);
+  TCanvas *dEvsENPevent = new TCanvas("dEvsENPevent","dE vs. E for Real NP Event",1000,1200);
+  TCanvas *recoilMomentum = new TCanvas("eventDiagnostics","Event Diagnostics", 1000, 1200);
+  
+  // Histogram Stats Removed**
+  //gStyle->SetOptStat(0);
+  gStyle->SetOptLogz();
+  
+  // dEoverE_Two (also the dToF plot)
+  dEoverE_dToF->Divide(2,2,0.0001,0.00001,0);
+  dEoverE_dToF->cd(1);
+  h_dEoverE_AllEvents_Top->GetXaxis()->SetTitle("E-Array Energy Deposited (MeV)");
+  h_dEoverE_AllEvents_Top->GetXaxis()->SetTitleSize(0.05);
+  h_dEoverE_AllEvents_Top->GetYaxis()->SetTitleSize(0.05);
+  h_dEoverE_AllEvents_Top->GetYaxis()->SetTitle("dE-Array Energy Deposited (MeV)");
+  h_dEoverE_AllEvents_Top->Rebin2D(2);
+  h_dEoverE_AllEvents_Top->DrawCopy("cont4");
+  dEoverE_dToF->cd(2);
+  h_dEoverE_AllEvents_Bot->GetXaxis()->SetTitle("E-Array Energy Deposited (MeV)");
+  h_dEoverE_AllEvents_Bot->GetXaxis()->SetTitleSize(0.05);
+  h_dEoverE_AllEvents_Bot->GetYaxis()->SetTitleSize(0.05);
+  h_dEoverE_AllEvents_Bot->GetYaxis()->SetTitle("dE-Array Energy Deposited (MeV)");
+  h_dEoverE_AllEvents_Bot->Rebin2D(2);
+  h_dEoverE_AllEvents_Bot->DrawCopy("cont4");
+  dEoverE_dToF->cd(3);
+  h_dEoverE_Total->GetXaxis()->SetTitle("E-Array Energy Deposited (MeV)");
+  h_dEoverE_Total->GetXaxis()->SetTitleSize(0.05);
+  h_dEoverE_Total->GetYaxis()->SetTitleSize(0.05);
+  h_dEoverE_Total->GetYaxis()->SetTitle("dE-Array Energy Deposited (MeV)");
+  h_dEoverE_Total->Rebin2D(2);
+  h_dEoverE_Total->DrawCopy("cont4");
+  dEoverE_dToF->cd(4);
+  h_dTOF_AllEvents->GetXaxis()->SetTitle("Time (ns)");
+  h_dTOF_AllEvents->GetXaxis()->SetTitleSize(0.05);
+  h_dTOF_AllEvents->GetYaxis()->SetTitleSize(0.05);
+  h_dTOF_AllEvents->GetYaxis()->SetTitle("Number of Events");
+  h_dTOF_AllEvents->SetFillColor(kBlue);
+  h_dTOF_AllEvents->DrawCopy();
+  
+  // Section Efficiencies
+  // All events
+  sectionEff_AllEvents->Divide(2,2,0.002,0.01,0);
+  for(int i = 0; i <= 3; i++){
+	sectionEff_AllEvents->cd(i+1);
+	h_sectionEff_AllEvents[i]->SetOption("bar");
+	h_sectionEff_AllEvents[i]->GetXaxis()->SetTitle("Section of Polarimeter");
+	h_sectionEff_AllEvents[i]->GetXaxis()->SetRangeUser(0,5);
+	h_sectionEff_AllEvents[i]->GetXaxis()->SetNdivisions(9);
+	h_sectionEff_AllEvents[i]->GetXaxis()->SetTitleSize(0.05);
+	h_sectionEff_AllEvents[i]->GetYaxis()->SetTitleSize(0.05);
+	h_sectionEff_AllEvents[i]->GetYaxis()->SetTitle("Percent Efficiency");
+	h_sectionEff_AllEvents[i]->SetFillColor(kBlue);
+	h_sectionEff_AllEvents[i]->DrawCopy();
+	std::cout << "The Total " << h_sectionEff_AllEvents[i]->GetTitle() << " is " << h_sectionEff_AllEvents[i]->Integral() << "." << std::endl;
+  }
+  
+  angularPlots->Divide(2,2,0.0001, 0.00001,0);
+  angularPlots->cd(1);
+  h_recoil_angle_raw->GetXaxis()->SetTitle("Recoil Proton Angle (degrees)");
+  h_recoil_angle_raw->GetYaxis()->SetTitle("Recoil Proton Count");
+  h_recoil_angle_raw->GetXaxis()->SetNdivisions(9);
+  h_recoil_angle_raw->GetXaxis()->SetTitleSize(0.05);
+  h_recoil_angle_raw->GetYaxis()->SetTitleSize(0.05);
+  h_recoil_angle_raw->DrawCopy();
+  angularPlots->cd(2);
+  h_recoil_angle->GetXaxis()->SetTitle("Recoil Proton Angle (degrees)");
+  h_recoil_angle->GetYaxis()->SetTitle("Recoil Proton Count");
+  h_recoil_angle->GetXaxis()->SetNdivisions(9);
+  h_recoil_angle->GetXaxis()->SetTitleSize(0.05);
+  h_recoil_angle->GetYaxis()->SetTitleSize(0.05);
+  h_recoil_angle->DrawCopy();
+  angularPlots->cd(3);
+  h_totalEnergy->GetXaxis()->SetTitle("Energy Deposited (MeV)");
+  h_totalEnergy->GetYaxis()->SetTitle("Recoil Proton Count");
+  h_totalEnergy->GetXaxis()->SetNdivisions(9);
+  h_totalEnergy->GetXaxis()->SetTitleSize(0.05);
+  h_totalEnergy->GetYaxis()->SetTitleSize(0.05);
+  h_totalEnergy->DrawCopy();
+  
+  neutronInformation->Divide(2,3,0.0001, 0.00001,0);
+  neutronInformation->cd(1);
+  h_Neutron_Momentum_Initial->GetXaxis()->SetTitle("Initial Neutron Momentum (MeV/c)");
+  h_Neutron_Momentum_Initial->GetYaxis()->SetTitle("Neutron Count");
+  h_Neutron_Momentum_Initial->GetXaxis()->SetNdivisions(9);
+  h_Neutron_Momentum_Initial->GetXaxis()->SetTitleSize(0.05);
+  h_Neutron_Momentum_Initial->GetYaxis()->SetTitleSize(0.05);
+  h_Neutron_Momentum_Initial->DrawCopy();
+  neutronInformation->cd(2);
+  h_Neutron_Momentum->GetXaxis()->SetTitle("Neutron Momentum (MeV/c)");
+  h_Neutron_Momentum->GetYaxis()->SetTitle("Neutron Count");
+  h_Neutron_Momentum->GetXaxis()->SetNdivisions(9);
+  h_Neutron_Momentum->GetXaxis()->SetTitleSize(0.05);
+  h_Neutron_Momentum->GetYaxis()->SetTitleSize(0.05);
+  h_Neutron_Momentum->DrawCopy();
+  neutronInformation->cd(3);
+  h_Neutron_Energy_Initial->GetXaxis()->SetTitle("Initial Neutron Energy (MeV)");
+  h_Neutron_Energy_Initial->GetYaxis()->SetTitle("Neutron Count");
+  h_Neutron_Energy_Initial->GetXaxis()->SetNdivisions(9);
+  h_Neutron_Energy_Initial->GetXaxis()->SetTitleSize(0.05);
+  h_Neutron_Energy_Initial->GetYaxis()->SetTitleSize(0.05);
+  h_Neutron_Energy_Initial->DrawCopy();
+  neutronInformation->cd(4);
+  h_Neutron_Energy->GetXaxis()->SetTitle("Neutron Energy (MeV)");
+  h_Neutron_Energy->GetYaxis()->SetTitle("Neutron Count");
+  h_Neutron_Energy->GetXaxis()->SetNdivisions(9);
+  h_Neutron_Energy->GetXaxis()->SetTitleSize(0.05);
+  h_Neutron_Energy->GetYaxis()->SetTitleSize(0.05);
+  h_Neutron_Energy->DrawCopy();
+  neutronInformation->cd(5);
+  h_Neutron_Theta->GetXaxis()->SetTitle("Initial Neutron Angle (degrees)");
+  h_Neutron_Theta->GetYaxis()->SetTitle("Neutron Count");
+  h_Neutron_Theta->GetXaxis()->SetNdivisions(9);
+  h_Neutron_Theta->GetXaxis()->SetTitleSize(0.05);
+  h_Neutron_Theta->GetYaxis()->SetTitleSize(0.05);
+  h_Neutron_Theta->DrawCopy();
+  
+  realNPevent->Divide(3,2,0.0001, 0.00001,0);
+  realNPevent->cd(1);
+  h_Proton_Recoil_Real->GetXaxis()->SetTitle("Proton Recoil Angle (deg)");
+  h_Proton_Recoil_Real->GetYaxis()->SetTitle("Proton Count");
+  h_Proton_Recoil_Real->GetXaxis()->SetNdivisions(9);
+  h_Proton_Recoil_Real->SetTitleSize(0.05);
+  h_Proton_Recoil_Real->SetTitleSize(0.05);
+  h_Proton_Recoil_Real->DrawCopy();
+  realNPevent->cd(2);
+  h_Proton_Energy_Real->GetXaxis()->SetTitle("Proton Recoil Energy (MeV)");
+  h_Proton_Energy_Real->GetYaxis()->SetTitle("Proton Count");
+  h_Proton_Energy_Real->GetXaxis()->SetNdivisions(9);
+  h_Proton_Energy_Real->SetTitleSize(0.05);
+  h_Proton_Energy_Real->SetTitleSize(0.05);
+  h_Proton_Energy_Real->DrawCopy();
+  realNPevent->cd(3);
+  h_asymmetry_Real->GetXaxis()->SetTitle("Proton Recoil Asymmetry");
+  h_asymmetry_Real->GetYaxis()->SetTitle("Proton Count");
+  h_asymmetry_Real->GetXaxis()->SetNdivisions(4);
+  h_asymmetry_Real->SetTitleSize(0.05);
+  h_asymmetry_Real->SetTitleSize(0.05);
+  h_asymmetry_Real->DrawCopy();
+  std::cout << "Real Up/Down asymmetry = " << (h_asymmetry_Real->GetBinContent(4)/h_asymmetry_Real->GetBinContent(2)) << std::endl;
+  realNPevent->cd(4);
+  h_dEvsE_Real->GetXaxis()->SetTitle("E-Array Energy Deposited (MeV)");
+  h_dEvsE_Real->GetXaxis()->SetTitleSize(0.05);
+  h_dEvsE_Real->GetYaxis()->SetTitleSize(0.05);
+  h_dEvsE_Real->GetYaxis()->SetTitle("dE-Array Energy Deposited (MeV)");
+  h_dEvsE_Real->Rebin2D(2);
+  h_dEvsE_Real->DrawCopy("cont4");
+  realNPevent->cd(5);
+  h_dEvsE_Real2->GetXaxis()->SetTitle("E-Array Energy Deposited (MeV)");
+  h_dEvsE_Real2->GetXaxis()->SetTitleSize(0.05);
+  h_dEvsE_Real2->GetYaxis()->SetTitleSize(0.05);
+  h_dEvsE_Real2->GetYaxis()->SetTitle("dE-Array Energy Deposited (MeV)");
+  h_dEvsE_Real2->Rebin2D(2);
+  h_dEvsE_Real2->DrawCopy("cont4");
+  
+  dEvsENPevent->Divide(1,1,0.0001, 0.00001,0);
+  dEvsENPevent->cd(1);
+  h_dEvsE_Real->GetXaxis()->SetTitle("E-Array Energy Deposited (MeV)");
+  h_dEvsE_Real->GetXaxis()->SetTitleSize(0.03);
+  h_dEvsE_Real->GetYaxis()->SetTitleSize(0.03);
+  h_dEvsE_Real->GetYaxis()->SetTitle("dE-Array Energy Deposited (MeV)");
+  //h_dEvsE_Real->Rebin2D(2);
+  h_dEvsE_Real->DrawCopy("cont4");
+  
+  recoilMomentum->Divide(2,2,0.0001, 0.00001,0);
+  recoilMomentum->cd(1);
+  h_selectedRecoilMomentum->GetXaxis()->SetTitle("(P_leading - P_elastic) (MeV/c)");
+  h_selectedRecoilMomentum->GetYaxis()->SetTitle("Counts");
+  h_selectedRecoilMomentum->GetXaxis()->SetTitleSize(0.05);
+  h_selectedRecoilMomentum->GetYaxis()->SetTitleSize(0.05);
+  h_selectedRecoilMomentum->SetTitle("Momentum Difference");
+  h_selectedRecoilMomentum->DrawCopy();
+  
+  // Write out canvases to file 
+  dEoverE_dToF->Write();
+  sectionEff_AllEvents->Write();
+  angularPlots->Write();
+  neutronInformation->Write();
+  realNPevent->Write();
+  dEvsENPevent->Write();
+  recoilMomentum->Write();
+  // Close files
+  outFile->Close();
+  sourceNeutron->Close();
+  
 }
 
 TString FormInputFile(TString InputDir){
