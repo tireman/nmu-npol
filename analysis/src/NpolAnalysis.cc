@@ -82,32 +82,81 @@ int main(int argc, char *argv[]) {
   statsTree->SetBranchAddress("stats",&stats);
   
   //********************************* Define your Histograms Here *******************************
-  // 1D-Histograms
-  HistoMan->CreateHistograms("recoilAngleReal","Real Proton Recoil Angle",200, 0.0, 180.0);
-  HistoMan->CreateHistograms("recoilEnergyReal","Real Proton Recoil Energy",200, 0.0, 350.0);
-  HistoMan->CreateHistograms("asymmetryReal","Real Asymmetry from Recoil Proton",5, -2,+2); 
-  HistoMan->CreateHistograms("recoilAngle","Proton Recoil Angle", 200, 0.0, 180.0);
-  HistoMan->CreateHistograms("recoilAngleRaw","Proton Recoil Angle Before Angle Cut", 200, 0.0, 180.0);
-  HistoMan->CreateHistograms("selectedRecoilMomentum","(P_leading - P_elastic) in NP Scatter",200, -3000.0, 1000.);
-  HistoMan->CreateHistograms("Qsquared","Q-Squared Value for recoil Proton", 100, 0.0, 2e6);					   
-  HistoMan->CreateHistograms("NeutronThetaAngle","Neutron Angle at first tagger", 100, 15.0, 40.0);
-  HistoMan->CreateHistograms("NeutronMomentum","Neutron Momentum at the first tagger",100, 1600.0, 3200.0);
-  HistoMan->CreateHistograms("NeutronEnergy","Neutron Energy at NPOL Tagger",100, 1000.0, 2400.0);
-  HistoMan->CreateHistograms("sectionEfficiency1","NPOL Efficiency after SOI Selection",13,0.25,6.75);
-  HistoMan->CreateHistograms("sectionEfficiency2","#splitline{NPOL Efficiency after EOI Selection}{and Asymmetry Cut}",13,0.25,6.75);
-  HistoMan->CreateHistograms("sectionEfficiency3","#splitline{NPOL Efficiency after Array}{Total Energy Cuts}",13,0.25,6.75);
-  HistoMan->CreateHistograms("sectionEfficiency4","NPOL Efficiency after Angle Cut",13,0.25,6.75);							 
-  HistoMan->CreateHistograms("NeutronMomentumInitial","Initial Neutron Momentum when Generated",100, 1600.0, 3200.0);
-  HistoMan->CreateHistograms("NeutronEnergyInitial","Initial Neutron Energy when Generated",100, 1000.0, 2400.0); 			 
-  HistoMan->CreateHistograms("totalEnergy","Total Energy Deposited", 100, 0.0, 350.0);
-  HistoMan->CreateHistograms("dTOF","Delta time-of-flight",600,-30,120);
-
-  // 2D-Histograms
-  HistoMan->CreateHistograms("dEoverEtop", "dE over E for top array", 400,0,120,400,0,20);
-  HistoMan->CreateHistograms("dEoverEbot", "dE over E for bottom array", 400,0,120,400,0,20);
-  HistoMan->CreateHistograms("dEvsEReal", "dE over E for Real Events", 400,0,120,400,0,20);
-  HistoMan->CreateHistograms("dEvsEReal2", "dE over E for Real Events with Energy Resolution", 400,0,120,400,0,20);						
+  // NP real event histograms filled from code that uses G4 super knowledge to ID event type
+  //    1D-Histograms
+  HistoMan->CreateHistograms("NP_recoilAngle_Elastic","NP Real Elastic Proton Recoil Angle",200, 0.0, 180.0);
+  HistoMan->CreateHistograms("NP_recoilAngle_InElastic","NP Real InElastic Proton Recoil Angle",200, 0.0, 180.0);
+  HistoMan->CreateHistograms("NP_recoilAngle_QuasiElastic","NP Real QuasiElastic Proton Recoil Angle",200, 0.0, 180.0);
+  HistoMan->CreateHistograms("NP_recoilEnergy_Elastic","NP Real Elastic Proton Recoil Energy",200, 0.0, 350.0);
+  HistoMan->CreateHistograms("NP_recoilEnergy_InElastic","NP Real InElastic Proton Recoil Energy",200, 0.0, 350.0);
+  HistoMan->CreateHistograms("NP_recoilEnergy_QuasiElastic","NP Real QuasiElastic Proton Recoil Energy",200, 0.0, 350.0);
+  HistoMan->CreateHistograms("NP_asymmetry_Elastic","NP Real Elastic Asymmetry from Recoil Proton",5, -2,+2);
+  HistoMan->CreateHistograms("NP_asymmetry_InElastic","NP Real InElastic Asymmetry from Recoil Proton",5, -2,+2);
+  HistoMan->CreateHistograms("NP_asymmetry_QuasiElastic","NP Real QuasiElastic Asymmetry from Recoil Proton",5, -2,+2);
+  HistoMan->CreateHistograms("NP_RecoilMomentum_Elastic","NP Real Elastic Scattering (P_leading - P_elastic)",200, -3000.0, 1000.);
+  HistoMan->CreateHistograms("NP_RecoilMomentum_InElastic","NP Real InElastic Scattering (P_leading - P_elastic)",200, -3000.0, 1000.);
+  HistoMan->CreateHistograms("NP_RecoilMomentum_QuasiElastic","NP Real QuasiElastic Scattering (P_leading - P_elastic)",200, -3000.0, 1000.);
+  //    2D-Histograms
+  HistoMan->CreateHistograms("NP_dEvsE_Elastic", "dE over E for Real Events (Elastic)", 400,0,120,400,0,20);
+  HistoMan->CreateHistograms("NP_dEvsE_InElastic", "dE over E for Real Events (InElastic)", 400,0,120,400,0,20);
+  HistoMan->CreateHistograms("NP_dEvsE_QuasiElastic", "dE over E for Real Events (QuasiElastic)", 400,0,120,400,0,20);
+  HistoMan->CreateHistograms("NP_dEvsE2_Elastic", "dE over E for Real Events with Energy Resolution (Elastic)", 400,0,120,400,0,20);
+  HistoMan->CreateHistograms("NP_dEvsE2_InElastic", "dE over E for Real Events with Energy Resolution (InElastic)", 400,0,120,400,0,20);
+  HistoMan->CreateHistograms("NP_dEvsE2_QuasiElastic", "dE over E for Real Events with Energy Resolution (QuasiElastic)", 400,0,120,400,0,20);
   
+  // Analysis histograms filled from code that uses methods and cuts similar to experiment
+  //    1D-Histograms
+  HistoMan->CreateHistograms("RA_dTOF_Elastic","Delta time-of-flight (Elastic)",600,-30,120);
+  HistoMan->CreateHistograms("RA_dTOF_InElastic","Delta time-of-flight (InElastic)",600,-30,120);
+  HistoMan->CreateHistograms("RA_dTOF_QuasiElastic","Delta time-of-flight (QuasiElastic)",600,-30,120);
+  HistoMan->CreateHistograms("RA_totalEnergy_Elastic","Total Energy Deposited (Elastic)", 100, 0.0, 350.0);
+  HistoMan->CreateHistograms("RA_totalEnergy_InElastic","Total Energy Deposited (InElastic)", 100, 0.0, 350.0);
+  HistoMan->CreateHistograms("RA_totalEnergy_QuasiElastic","Total Energy Deposited (QuasiElastic)", 100, 0.0, 350.0);
+  HistoMan->CreateHistograms("RA_recoilAngleRaw_Elastic","Proton Recoil Angle Before Angle Cut (Elastic)", 200, 0.0, 180.0);
+  HistoMan->CreateHistograms("RA_recoilAngleRaw_InElastic","Proton Recoil Angle Before Angle Cut (InElastic)", 200, 0.0, 180.0);
+  HistoMan->CreateHistograms("RA_recoilAngleRaw_QuasiElastic","Proton Recoil Angle Before Angle Cut (QuasiElastic)", 200, 0.0, 180.0);
+  HistoMan->CreateHistograms("RA_recoilAngle_Elastic","Proton Recoil Angle (Elastic)", 200, 0.0, 180.0);
+  HistoMan->CreateHistograms("RA_recoilAngle_InElastic","Proton Recoil Angle (InElastic)", 200, 0.0, 180.0);
+  HistoMan->CreateHistograms("RA_recoilAngle_QuasiElastic","Proton Recoil Angle (QuasiElastic)", 200, 0.0, 180.0);
+  HistoMan->CreateHistograms("RA_dEoverEtop_Elastic", "dE over E for top array (Elastic)", 400,0,120,400,0,20);
+  HistoMan->CreateHistograms("RA_dEoverEbot_Elastic", "dE over E for bottom array (Elastic)", 400,0,120,400,0,20);
+  HistoMan->CreateHistograms("RA_dEoverEtop_InElastic", "dE over E for top array (InElastic)", 400,0,120,400,0,20);
+  HistoMan->CreateHistograms("RA_dEoverEbot_InElastic", "dE over E for bottom array (InElastic)", 400,0,120,400,0,20);
+  HistoMan->CreateHistograms("RA_dEoverEtop_QuasiElastic", "dE over E for top array (QuasiElastic)", 400,0,120,400,0,20);
+  HistoMan->CreateHistograms("RA_dEoverEbot_QuasiElastic", "dE over E for bottom array (QuasiElastic)", 400,0,120,400,0,20);
+   
+  HistoMan->CreateHistograms("RA_section1Efficiency_Elastic","NPOL Efficiency after SOI Selection (Elastic)",13,0.25,6.75);
+  HistoMan->CreateHistograms("RA_section2Efficiency_Elastic","#splitline{NPOL Efficiency after EOI Selection}{and Asymmetry Cut} (Elastic)",13,0.25,6.75);
+  HistoMan->CreateHistograms("RA_section3Efficiency_Elastic","#splitline{NPOL Efficiency after Array}{Total Energy Cuts} (Elastic)",13,0.25,6.75);
+  HistoMan->CreateHistograms("RA_section4Efficiency_Elastic","NPOL Efficiency after Angle Cut (Elastic)",13,0.25,6.75);
+  HistoMan->CreateHistograms("RA_section1Efficiency_InElastic","NPOL Efficiency after SOI Selection (InElastic)",13,0.25,6.75);
+  HistoMan->CreateHistograms("RA_section2Efficiency_InElastic","#splitline{NPOL Efficiency after EOI Selection}{and Asymmetry Cut} (InElastic)",13,0.25,6.75);
+  HistoMan->CreateHistograms("RA_section3Efficiency_InElastic","#splitline{NPOL Efficiency after Array}{Total Energy Cuts} (InElastic)",13,0.25,6.75);
+  HistoMan->CreateHistograms("RA_section4Efficiency_InElastic","NPOL Efficiency after Angle Cut (InElastic)",13,0.25,6.75);
+  HistoMan->CreateHistograms("RA_section1Efficiency_QuasiElastic","NPOL Efficiency after SOI Selection (QuasiElastic)",13,0.25,6.75);
+  HistoMan->CreateHistograms("RA_section2Efficiency_QuasiElastic","#splitline{NPOL Efficiency after EOI Selection}{and Asymmetry Cut} (QuasiElastic)",13,0.25,6.75);
+  HistoMan->CreateHistograms("RA_section3Efficiency_QuasiElastic","#splitline{NPOL Efficiency after Array}{Total Energy Cuts} (QuasiElastic)",13,0.25,6.75);
+  HistoMan->CreateHistograms("RA_section4Efficiency_QuasiElastic","NPOL Efficiency after Angle Cut (QuasiElastic)",13,0.25,6.75);
+  
+  // Neutron diagnostics histograms which are filled so we can observe the original neutron physics
+  //    1D-Histograms
+  HistoMan->CreateHistograms("ND_InitialNeutronMomentum_Elastic","Initial Neutron Momentum when Generated (Elastic)",100, 1600.0, 3200.0);
+  HistoMan->CreateHistograms("ND_InitialNeutronMomentum_InElastic","Initial Neutron Momentum when Generated (InElastic)",100, 1600.0, 3200.0);
+  HistoMan->CreateHistograms("ND_InitialNeutronMomentum_QuasiElastic","Initial Neutron Momentum when Generated (QuasiElastic)",100, 1600.0, 3200.0);
+  HistoMan->CreateHistograms("ND_InitialNeutronEnergy_Elastic","Initial Neutron Energy when Generated (Elastic)",100, 1000.0, 2400.0); 	
+  HistoMan->CreateHistograms("ND_InitialNeutronEnergy_InElastic","Initial Neutron Energy when Generated (InElastic)",100, 1000.0, 2400.0);
+  HistoMan->CreateHistograms("ND_InitialNeutronEnergy_QuasiElastic","Initial Neutron Energy when Generated (QuasiElastic)",100, 1000.0, 2400.0);
+  
+  HistoMan->CreateHistograms("ND_NeutronThetaAngle_Elastic","Neutron Angle at first tagger (Elastic)", 100, 15.0, 40.0);
+  HistoMan->CreateHistograms("ND_NeutronThetaAngle_InElastic","Neutron Angle at first tagger (InElastic)", 100, 15.0, 40.0);
+  HistoMan->CreateHistograms("ND_NeutronThetaAngle_QuasiElastic","Neutron Angle at first tagger (QuasiElastic)", 100, 15.0, 40.0);
+  HistoMan->CreateHistograms("ND_NeutronMomentum_Elastic","Neutron Momentum at the first tagger (Elastic)",100, 1600.0, 3200.0);
+  HistoMan->CreateHistograms("ND_NeutronMomentum_InElastic","Neutron Momentum at the first tagger (InElastic)",100, 1600.0, 3200.0);
+  HistoMan->CreateHistograms("ND_NeutronMomentum_QuasiElastic","Neutron Momentum at the first tagger (QuasiElastic)",100, 1600.0, 3200.0);
+  HistoMan->CreateHistograms("ND_NeutronEnergy_Elastic","Neutron Energy at NPOL Tagger (Elastic)",100, 1000.0, 2400.0);
+  HistoMan->CreateHistograms("ND_NeutronEnergy_InElastic","Neutron Energy at NPOL Tagger (InElastic)",100, 1000.0, 2400.0);
+  HistoMan->CreateHistograms("ND_NeutronEnergy_QuasiElastic","Neutron Energy at NPOL Tagger (QuasiElastic)",100, 1000.0, 2400.0);
+
   //********************************* End Histogram Definitions ********************************
 
   // ****** BEGIN STATS LOOP ******
@@ -121,7 +170,6 @@ int main(int argc, char *argv[]) {
   }
   std::cout << totalEvents << " neutrons thrown at setup." << std::endl;
   // ****** END STATS LOOP ****** 
-  
   
   
   // ****** BEGIN EVENT LOOP ****** 
@@ -243,83 +291,109 @@ int main(int argc, char *argv[]) {
 	
 	// ******* This section checks/fills histograms for the NP "real" portion ********* //
 	
-	if(inelasticFlag){
-	  // ****** This section computes the (P_leading - P_elastic) ******
-	  // ****** value and saves into histogram                    ******
-	  int leadingTID = PhysVars->findLeadingParticle(vertexMap,physProcess);
-	  if(leadingTID != -1){
-		double computedRecoilAngle = PhysVars->computeRecoilParticleAngle(projNeutron4Vec,vertexMap,leadingTID);
-		Process->fillFourVector(vertexMap.find(leadingTID)->second,recoilParticle4Vec);
-		double leadingParticleMomentum = PhysVars->returnParticleMomentum(recoilParticle4Vec);
-		double elasticMomentum = PhysVars->computeElasticMomentum(projNeutron4Vec, computedRecoilAngle*TMath::DegToRad());
-		double projectileNeutronMom = PhysVars->returnParticleMomentum(projNeutron4Vec);
-		
-		if(elasticFlag) std::cout << "Elastic Event" << std::endl;
-		if(inelasticFlag) std::cout << "Inelastic Event" << std::endl;
-		if(quasielasticFlag) std::cout << "Quasi-elastic Event" << std::endl;
-		std::cout << "  Leading TID: " << leadingTID << std::endl;
-		std::cout << "  Recoil Angle Computed: " << computedRecoilAngle << std::endl;
-		std::cout << "  Neutron Momentum before: " <<  projectileNeutronMom << std::endl;
-		std::cout << "  Leading Particle Momentum: " << leadingParticleMomentum << std::endl;
-		std::cout << "  Elastic Momentum: " << elasticMomentum << std::endl;
-		Process->printVertexMap(vertexMap,i);
-
-		HistoMan->FillHistograms("selectedRecoilMomentum",(leadingParticleMomentum - elasticMomentum));
-	  }
-	  // ****** End (P_leading - P_elastic) code ******
+	// ****** This section computes the (P_leading - P_elastic) ******
+	// ****** value and saves into histogram                    ******
+	int leadingTID = PhysVars->findLeadingParticle(vertexMap,physProcess);
+	if(leadingTID != -1){
+	  double computedRecoilAngle = PhysVars->computeRecoilParticleAngle(projNeutron4Vec,vertexMap,leadingTID);
+	  Process->fillFourVector(vertexMap.find(leadingTID)->second,recoilParticle4Vec);
+	  double leadingParticleMomentum = PhysVars->returnParticleMomentum(recoilParticle4Vec);
+	  double elasticMomentum = PhysVars->computeElasticMomentum(projNeutron4Vec, computedRecoilAngle*TMath::DegToRad());
+	  double projectileNeutronMom = PhysVars->returnParticleMomentum(projNeutron4Vec);
 	  
+	  if(elasticFlag) std::cout << "Elastic Event" << std::endl;
+	  if(inelasticFlag) std::cout << "InElastic Event" << std::endl;
+	  if(quasielasticFlag) std::cout << "Quasi-elastic Event" << std::endl;
+	  std::cout << "  Leading TID: " << leadingTID << std::endl;
+	  std::cout << "  Recoil Angle Computed: " << computedRecoilAngle << std::endl;
+	  std::cout << "  Neutron Momentum before: " <<  projectileNeutronMom << std::endl;
+	  std::cout << "  Leading Particle Momentum: " << leadingParticleMomentum << std::endl;
+	  std::cout << "  Elastic Momentum: " << elasticMomentum << std::endl;
+	  Process->printVertexMap(vertexMap,i);
 	  
-	  // **** After the proton track has been found, this code will compute values, **** //
-	  // fill histograms. Extract out Initial Neutron Information from the vertexMap
-	  int bestProtonTID = PhysVars->findBestProtonTrackID(vertexMap,steps,npSOI);
-	  if(bestProtonTID != 0){
-		
-		std::map<int,NpolVertex *>::iterator mapIt2;
-		int asym = 0;
-		double initialNeutronMomentum = 0.;
-		
-		// fill initial neutron histograms
-		mapIt2 = vertexMap.find(1);
-		Process->fillFourVector(mapIt2->second,initNeutron4Vec);
-		initialNeutronMomentum = PhysVars->returnParticleMomentum(initNeutron4Vec);
-		HistoMan->FillHistograms("NeutronMomentumInitial",initialNeutronMomentum);
-		HistoMan->FillHistograms("NeutronEnergyInitial",(mapIt2->second->energy));
-		
-		// fill selected proton track histograms
-		mapIt2 = vertexMap.find(bestProtonTID);
-		double computedProtonAngle = PhysVars->
-		  computeRecoilParticleAngle(projNeutron4Vec,vertexMap,bestProtonTID);
-		if(computedProtonAngle >= angleLow && computedProtonAngle <= angleHigh) {
-		  HistoMan->FillHistograms("recoilAngleReal",computedProtonAngle);
-		  double protonVertexEnergy = mapIt2->second->energy;
-		  HistoMan->FillHistograms("recoilEnergyReal",protonVertexEnergy);
-		  double sPower = PhysVars->
-			computeBetheBloch(protonVertexEnergy,938.27205,1,1.032,12.929,7,64.7e-6);  
-		  double dEenergyLost = PhysVars->
-			computeEnergyLoss(protonVertexEnergy,TMath::DegToRad()*computedProtonAngle,1./*cm*/);
-		  Double_t dEenergyLost2 = rand->Gaus(dEenergyLost, 0.10*dEenergyLost);
-		  double EenergyLost = PhysVars->
-			computeEnergyLoss(protonVertexEnergy,TMath::DegToRad()*computedProtonAngle,10. /*cm*/);
-		  Double_t EenergyLost2 = rand->Gaus(EenergyLost, 0.10*EenergyLost);
-		  HistoMan->FillHistograms("dEvsEReal",EenergyLost,dEenergyLost);
-		  HistoMan->FillHistograms("dEvsEReal2",EenergyLost2,dEenergyLost2);
-		  // An attempt at "energy" resolution of the scints
-		  std::cout << "Stopping Power = " << sPower
-		  			<< "   Proton Energy Loss in dE-array = " << dEenergyLost
-		  			<< "   Proton Energy Loss in E-array = " << EenergyLost << std::endl;
-		  
-		  // Assign asymmetry in a simple way (for now)
-		  double momY = mapIt2->second->momY;
-		  if(momY < 0) asym = -1;
-		  if(momY > 0) asym = +1;
-		  if(momY == 0) asym = 0;
-		  HistoMan->FillHistograms("asymmetryReal",asym);
-		}
-	  }
+	  if(elasticFlag) HistoMan->FillHistograms("NP_RecoilMomentum_Elastic",(leadingParticleMomentum - elasticMomentum));
+	  if(inelasticFlag) HistoMan->FillHistograms("NP_RecoilMomentum_InElastic",(leadingParticleMomentum - elasticMomentum));
+	  if(quasielasticFlag) HistoMan->FillHistograms("NP_RecoilMomentum_QuasiElastic",(leadingParticleMomentum - elasticMomentum));
+	}
+	// ****** End (P_leading - P_elastic) code ******
 	
-	} // >>>>>>>>>>>>> This ends the "real NP scattering" part of the code <<<<<<<<<<<< //
-
-
+	
+	// **** After the proton track has been found, this code will compute values, **** //
+	// fill histograms. Extract out Initial Neutron Information from the vertexMap
+	int bestProtonTID = PhysVars->findBestProtonTrackID(vertexMap,steps,npSOI);
+	if(bestProtonTID != 0){
+	  
+	  std::map<int,NpolVertex *>::iterator mapIt2;
+	  int asym = 0;
+	  double initialNeutronMomentum = 0.;
+	  
+	  //  Neutron Diagnostics!
+	  mapIt2 = vertexMap.find(1);
+	  Process->fillFourVector(mapIt2->second,initNeutron4Vec);
+	  initialNeutronMomentum = PhysVars->returnParticleMomentum(initNeutron4Vec);
+	  if(elasticFlag){
+		HistoMan->FillHistograms("ND_InitialNeutronMomentum_Elastic",initialNeutronMomentum);
+		HistoMan->FillHistograms("ND_InitialNeutronEnergy_Elastic",(mapIt2->second->energy));
+	  }
+	  if(inelasticFlag){
+		HistoMan->FillHistograms("ND_InitialNeutronMomentum_InElastic",initialNeutronMomentum);
+		HistoMan->FillHistograms("ND_InitialNeutronEnergy_InElastic",(mapIt2->second->energy));
+	  }
+	  if(quasielasticFlag){
+		HistoMan->FillHistograms("ND_InitialNeutronMomentum_QuasiElastic",initialNeutronMomentum);
+		HistoMan->FillHistograms("ND_InitialNeutronEnergy_QuasiElastic",(mapIt2->second->energy));
+	  }
+	  
+	  // fill selected proton track histograms
+	  mapIt2 = vertexMap.find(bestProtonTID);
+	  double computedProtonAngle = PhysVars->
+		computeRecoilParticleAngle(projNeutron4Vec,vertexMap,bestProtonTID);
+	  if(computedProtonAngle >= angleLow && computedProtonAngle <= angleHigh) {
+		double protonVertexEnergy = mapIt2->second->energy;
+		double sPower = PhysVars->
+		  computeBetheBloch(protonVertexEnergy,938.27205,1,1.032,12.929,7,64.7e-6);  
+		double dEenergyLost = PhysVars->
+		  computeEnergyLoss(protonVertexEnergy,TMath::DegToRad()*computedProtonAngle,1./*cm*/);
+		Double_t dEenergyLost2 = rand->Gaus(dEenergyLost, 0.10*dEenergyLost);
+		double EenergyLost = PhysVars->
+		  computeEnergyLoss(protonVertexEnergy,TMath::DegToRad()*computedProtonAngle,10. /*cm*/);
+		Double_t EenergyLost2 = rand->Gaus(EenergyLost, 0.10*EenergyLost);
+		double momY = mapIt2->second->momY; 
+		if(momY < 0) asym = -1;  // Assign asymmetry in a simple way (for now)
+		if(momY > 0) asym = +1;
+		if(momY == 0) asym = 0;
+		
+		if(elasticFlag){
+		  HistoMan->FillHistograms("NP_recoilAngle_Elastic",computedProtonAngle);
+		  HistoMan->FillHistograms("NP_recoilEnergy_Elastic",protonVertexEnergy);
+		  HistoMan->FillHistograms("NP_dEvsE_Elastic",EenergyLost,dEenergyLost);
+		  HistoMan->FillHistograms("NP_dEvsE2_Elastic",EenergyLost2,dEenergyLost2);
+		  HistoMan->FillHistograms("NP_asymmetry_Elastic",asym);
+		}
+		if(inelasticFlag){
+		  HistoMan->FillHistograms("NP_recoilAngle_InElastic",computedProtonAngle);
+		  HistoMan->FillHistograms("NP_recoilEnergy_InElastic",protonVertexEnergy);
+		  HistoMan->FillHistograms("NP_dEvsE_InElastic",EenergyLost,dEenergyLost);
+		  HistoMan->FillHistograms("NP_dEvsE2_InElastic",EenergyLost2,dEenergyLost2);
+		  HistoMan->FillHistograms("NP_asymmetry_InElastic",asym);
+		}
+		if(quasielasticFlag){
+		  HistoMan->FillHistograms("NP_recoilAngle_QuasiElastic",computedProtonAngle);
+		  HistoMan->FillHistograms("NP_recoilEnergy_QuasiElastic",protonVertexEnergy);
+		  HistoMan->FillHistograms("NP_dEvsE_QuasiElastic",EenergyLost,dEenergyLost);
+		  HistoMan->FillHistograms("NP_dEvsE2_QuasiElastic",EenergyLost2,dEenergyLost2);
+		  HistoMan->FillHistograms("NP_asymmetry_QuasiElastic",asym);
+	  }
+		// An attempt at "energy" resolution of the scints
+		std::cout << "Stopping Power = " << sPower
+				  << "   Proton Energy Loss in dE-array = " << dEenergyLost
+				  << "   Proton Energy Loss in E-array = " << EenergyLost << std::endl;
+	  }
+	}
+	
+	// >>>>>>>>>>>>> This ends the "real NP scattering" part of the code <<<<<<<<<<<< //
+  
+  
 	// >>>>>>>>>>>>>>> This begins the "Experimental Processing" part of the code <<<<<<<<<<<<<<<<<<<
     // BEGIN STEPS LOOP: Fills the detEvent map with volumes and total energy, etc.
 	// This allows only events that pass NP real to be run through "our" cuts
@@ -341,7 +415,7 @@ int main(int argc, char *argv[]) {
 		taggedEvents++;
 		eventFlag = true;
 		
-		// Neutron Diagnostics!	
+		// More Neutron Diagnostics!	
 		double xMom = aStep->momX; double yMom = aStep->momY; double zMom = aStep->momZ;
 		double totMom = PhysVars->computeMomentum(xMom,yMom,zMom);
 		
@@ -350,12 +424,22 @@ int main(int argc, char *argv[]) {
 		
 		t_it = tagEvent->begin();
 		NpolTagger *tTemp = *t_it;
-		HistoMan->FillHistograms("NeutronEnergy",(tTemp->energy));
-		
-		HistoMan->FillHistograms("NeutronMomentum",totMom);
-		HistoMan->FillHistograms("NeutronThetaAngle",neutronAngle);	
+		if(elasticFlag){
+		  HistoMan->FillHistograms("ND_NeutronEnergy_Elastic",(tTemp->energy));
+		  HistoMan->FillHistograms("ND_NeutronMomentum_Elastic",totMom);
+		  HistoMan->FillHistograms("ND_NeutronThetaAngle_Elastic",neutronAngle);
+		}
+		if(inelasticFlag){
+		  HistoMan->FillHistograms("ND_NeutronEnergy_InElastic",(tTemp->energy));
+		  HistoMan->FillHistograms("ND_NeutronMomentum_InElastic",totMom);
+		  HistoMan->FillHistograms("ND_NeutronThetaAngle_InElastic",neutronAngle);
+		}
+		if(quasielasticFlag){
+		  HistoMan->FillHistograms("ND_NeutronEnergy_QuasiElastic",(tTemp->energy));
+		  HistoMan->FillHistograms("ND_NeutronMomentum_QuasiElastic",totMom);
+		  HistoMan->FillHistograms("ND_NeutronThetaAngle_QuasiElastic",neutronAngle);
+		}
 	  }
-	  
 	  Process->fillDetectorEventMap(detEvents,aStep);
 	  // ****** End of the hit position computations section ******* //
 	} // END STEPS LOOP
@@ -366,7 +450,9 @@ int main(int argc, char *argv[]) {
 	int sectionOfInterest = Process->getSectionOfInterest(&detEvents); // call method to determine SOI
 	
 	if(sectionOfInterest != -1) {
-	  HistoMan->FillHistograms("sectionEfficiency1",(sectionOfInterest+1)); // Fill first SOI histogram
+	  if(elasticFlag) HistoMan->FillHistograms("RA_section1Efficiency_Elastic",(sectionOfInterest+1)); // Fill first SOI histogram
+	  if(inelasticFlag) HistoMan->FillHistograms("RA_section1Efficiency_InElastic",(sectionOfInterest+1));
+	  if(quasielasticFlag) HistoMan->FillHistograms("RA_section1Efficiency_QuasiElastic",(sectionOfInterest+1));
 	  // Fill the Energy Deposited per array map for the SOI
 	  Process->getEDepArrayTotal(&detEvents, &eDepArrayTotal, sectionOfInterest); 
 	  
@@ -379,7 +465,9 @@ int main(int argc, char *argv[]) {
 	  else if(EArrayOfInterest == botEArray){ dEArrayOfInterest = botdEArray; }
 	  
       if((EArrayOfInterest != unknown) && (dEArrayOfInterest != unknown)) {
-		HistoMan->FillHistograms("sectionEfficiency2",(sectionOfInterest+1)); //Fill
+		if(elasticFlag) HistoMan->FillHistograms("RA_section2Efficiency_Elastic",(sectionOfInterest+1)); //Fill
+		if(inelasticFlag) HistoMan->FillHistograms("RA_section2Efficiency_InElastic",(sectionOfInterest+1));
+		if(quasielasticFlag) HistoMan->FillHistograms("RA_section2Efficiency_QuasiElastic",(sectionOfInterest+1));
 		double eDepAnalyzer = eDepArrayTotal[analyzer]; 
 		double eDepE = eDepArrayTotal[EArrayOfInterest]; 
 		double eDepdE = eDepArrayTotal[dEArrayOfInterest];
@@ -388,17 +476,49 @@ int main(int argc, char *argv[]) {
 		double azAngle = PhysVars->ReturnAngle(verts->at(1),&detEvents,sectionOfInterest,EArrayOfInterest,&dTOF);
 		
 		if(eDepAnalyzer >= 4.0 /*MeV*/ && eDepE >= 5.0 /*MeV */ && eDepTotal >= 50.0 /*MeV*/) { // Req. 3 and 4
-		  HistoMan->FillHistograms("sectionEfficiency3",(sectionOfInterest+1)); //FILL
-		  HistoMan->FillHistograms("recoilAngleRaw",azAngle);
+		  if(elasticFlag){
+			HistoMan->FillHistograms("RA_section3Efficiency_Elastic",(sectionOfInterest+1)); //FILL
+			HistoMan->FillHistograms("RA_recoilAngleRaw_Elastic",azAngle);
+		  }
+		  if(inelasticFlag){
+			HistoMan->FillHistograms("RA_section3Efficiency_InElastic",(sectionOfInterest+1)); //FILL
+			HistoMan->FillHistograms("RA_recoilAngleRaw_InElastic",azAngle);
+		  }
+		  if(quasielasticFlag){
+			HistoMan->FillHistograms("RA_section3Efficiency_QuasiElastic",(sectionOfInterest+1)); //FILL
+			HistoMan->FillHistograms("RA_recoilAngleRaw_QuasiElastic",azAngle);
+		  }
+		  		  
 		  if (azAngle >= angleLow && azAngle <= angleHigh){  // checks Requirement 6 
-			HistoMan->FillHistograms("sectionEfficiency4",(sectionOfInterest+1)); //FILL
-			HistoMan->FillHistograms("totalEnergy",eDepTotal);
-			HistoMan->FillHistograms("dTOF",dTOF); //FILL
-			HistoMan->FillHistograms("recoilAngle",azAngle); // Fill the proton recoil angle histo
+			if(elasticFlag){
+			  HistoMan->FillHistograms("RA_section4Efficiency_Elastic",(sectionOfInterest+1)); //FILL
+			  HistoMan->FillHistograms("RA_totalEnergy_Elastic",eDepTotal);
+			  HistoMan->FillHistograms("RA_dTOF_Elastic",dTOF); //FILL
+			  HistoMan->FillHistograms("RA_recoilAngle_Elastic",azAngle); // Fill the proton recoil angle histo
+			}
+			if(inelasticFlag){
+			  HistoMan->FillHistograms("RA_section4Efficiency_InElastic",(sectionOfInterest+1)); //FILL
+			  HistoMan->FillHistograms("RA_totalEnergy_InElastic",eDepTotal);
+			  HistoMan->FillHistograms("RA_dTOF_InElastic",dTOF); //FILL
+			  HistoMan->FillHistograms("RA_recoilAngle_InElastic",azAngle); // Fill the proton recoil angle histo
+			}
+			if(quasielasticFlag){
+			  HistoMan->FillHistograms("RA_section4Efficiency_QuasiElastic",(sectionOfInterest+1)); //FILL
+			  HistoMan->FillHistograms("RA_totalEnergy_QuasiElastic",eDepTotal);
+			  HistoMan->FillHistograms("RA_dTOF_QuasiElastic",dTOF); //FILL
+			  HistoMan->FillHistograms("RA_recoilAngle_QuasiElastic",azAngle); // Fill the proton recoil angle histo
+			}  
+			
 			if(EArrayOfInterest == topEArray) {// this is where histo for top dE/E gets filled
-			  HistoMan->FillHistograms("dEoverEtop",eDepE,eDepdE); //FILL
+			  if(elasticFlag) HistoMan->FillHistograms("RA_dEoverEtop_Elastic",eDepE,eDepdE); //FILL
+			  if(inelasticFlag) HistoMan->FillHistograms("RA_dEoverEtop_InElastic",eDepE,eDepdE); //FILL
+			  if(quasielasticFlag) HistoMan->FillHistograms("RA_dEoverEtop_QuasiElastic",eDepE,eDepdE); //FILL
+			  
 			} else if(EArrayOfInterest == botEArray) { 
-			  HistoMan->FillHistograms("dEoverEbot",eDepE,eDepdE);//FILL
+			  if(elasticFlag) HistoMan->FillHistograms("RA_dEoverEbot_Elastic",eDepE,eDepdE);//FILL
+			  if(inelasticFlag) HistoMan->FillHistograms("RA_dEoverEbot_InElastic",eDepE,eDepdE);//FILL
+			  if(quasielasticFlag) HistoMan->FillHistograms("RA_dEoverEbot_QuasiElastic",eDepE,eDepdE);//FILL
+			  
 			}
 			eventsPassed++;
 		  } else eventsFailed++;
