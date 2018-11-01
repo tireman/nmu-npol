@@ -126,16 +126,16 @@ int main(int argc, char *argv[]) {
   HistoMan->CreateHistograms("RA_dEoverEbot_QuasiElastic", "dE over E for bottom array (QuasiElastic)", 400,0,120,400,0,20);
    
   HistoMan->CreateHistograms("RA_section1Efficiency_Elastic","NPOL Efficiency after SOI Selection (Elastic)",13,0.25,6.75);
-  HistoMan->CreateHistograms("RA_section2Efficiency_Elastic","#splitline{NPOL Efficiency after EOI Selection}{and Asymmetry Cut} (Elastic)",13,0.25,6.75);
-  HistoMan->CreateHistograms("RA_section3Efficiency_Elastic","#splitline{NPOL Efficiency after Array}{Total Energy Cuts} (Elastic)",13,0.25,6.75);
+  HistoMan->CreateHistograms("RA_section2Efficiency_Elastic","#splitline{NPOL Efficiency after EOI Selection}{and Asymmetry Cut (Elastic)}",13,0.25,6.75);
+  HistoMan->CreateHistograms("RA_section3Efficiency_Elastic","#splitline{NPOL Efficiency after Array}{Total Energy Cuts (Elastic)}",13,0.25,6.75);
   HistoMan->CreateHistograms("RA_section4Efficiency_Elastic","NPOL Efficiency after Angle Cut (Elastic)",13,0.25,6.75);
   HistoMan->CreateHistograms("RA_section1Efficiency_InElastic","NPOL Efficiency after SOI Selection (InElastic)",13,0.25,6.75);
-  HistoMan->CreateHistograms("RA_section2Efficiency_InElastic","#splitline{NPOL Efficiency after EOI Selection}{and Asymmetry Cut} (InElastic)",13,0.25,6.75);
-  HistoMan->CreateHistograms("RA_section3Efficiency_InElastic","#splitline{NPOL Efficiency after Array}{Total Energy Cuts} (InElastic)",13,0.25,6.75);
+  HistoMan->CreateHistograms("RA_section2Efficiency_InElastic","#splitline{NPOL Efficiency after EOI Selection}{and Asymmetry Cut (InElastic)}",13,0.25,6.75);
+  HistoMan->CreateHistograms("RA_section3Efficiency_InElastic","#splitline{NPOL Efficiency after Array}{Total Energy Cuts (InElastic)}",13,0.25,6.75);
   HistoMan->CreateHistograms("RA_section4Efficiency_InElastic","NPOL Efficiency after Angle Cut (InElastic)",13,0.25,6.75);
   HistoMan->CreateHistograms("RA_section1Efficiency_QuasiElastic","NPOL Efficiency after SOI Selection (QuasiElastic)",13,0.25,6.75);
-  HistoMan->CreateHistograms("RA_section2Efficiency_QuasiElastic","#splitline{NPOL Efficiency after EOI Selection}{and Asymmetry Cut} (QuasiElastic)",13,0.25,6.75);
-  HistoMan->CreateHistograms("RA_section3Efficiency_QuasiElastic","#splitline{NPOL Efficiency after Array}{Total Energy Cuts} (QuasiElastic)",13,0.25,6.75);
+  HistoMan->CreateHistograms("RA_section2Efficiency_QuasiElastic","#splitline{NPOL Efficiency after EOI Selection}{and Asymmetry Cut (QuasiElastic)}",13,0.25,6.75);
+  HistoMan->CreateHistograms("RA_section3Efficiency_QuasiElastic","#splitline{NPOL Efficiency after Array}{Total Energy Cuts (QuasiElastic)}",13,0.25,6.75);
   HistoMan->CreateHistograms("RA_section4Efficiency_QuasiElastic","NPOL Efficiency after Angle Cut (QuasiElastic)",13,0.25,6.75);
   
   // Neutron diagnostics histograms which are filled so we can observe the original neutron physics
