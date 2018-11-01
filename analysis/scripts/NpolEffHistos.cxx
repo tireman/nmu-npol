@@ -71,14 +71,14 @@ void NpolEffHistos() {
   TH1F *h_ND_InitialNeutronEnergy_InElastic = (TH1F*)sourceNeutron->Get("ND_InitialNeutronEnergy_InElastic");
   TH1F *h_ND_InitialNeutronEnergy_QuasiElastic = (TH1F*)sourceNeutron->Get("ND_InitialNeutronEnergy_QuasiElastic");
   TH1F *h_ND_InitialNeutronMomentum_Elastic = (TH1F*)sourceNeutron->Get("ND_InitialNeutronMomentum_Elastic");
-  TH1F *h_ND_InitialNeutronMomentum_InElastic = (TH1F*)sourceNeutron->Get("ND_InitialNeutronMomentum_Elastic");
-  TH1F *h_ND_InitialNeutronMomentum_QuasiElastic = (TH1F*)sourceNeutron->Get("ND_InitialNeutronMomentum_Elastic");
+  TH1F *h_ND_InitialNeutronMomentum_InElastic = (TH1F*)sourceNeutron->Get("ND_InitialNeutronMomentum_InElastic");
+  TH1F *h_ND_InitialNeutronMomentum_QuasiElastic = (TH1F*)sourceNeutron->Get("ND_InitialNeutronMomentum_QuasiElastic");
   TH1F *h_ND_NeutronEnergy_Elastic = (TH1F*)sourceNeutron->Get("ND_NeutronEnergy_Elastic");
   TH1F *h_ND_NeutronEnergy_InElastic = (TH1F*)sourceNeutron->Get("ND_NeutronEnergy_InElastic");
   TH1F *h_ND_NeutronEnergy_QuasiElastic = (TH1F*)sourceNeutron->Get("ND_NeutronEnergy_QuasiElastic");
   TH1F *h_ND_NeutronMomentum_Elastic = (TH1F*)sourceNeutron->Get("ND_NeutronMomentum_Elastic");
-  TH1F *h_ND_NeutronMomentum_InElastic = (TH1F*)sourceNeutron->Get("ND_NeutronMomentum_Elastic");
-  TH1F *h_ND_NeutronMomentum_QuasiElastic = (TH1F*)sourceNeutron->Get("ND_NeutronMomentum_Elastic");
+  TH1F *h_ND_NeutronMomentum_InElastic = (TH1F*)sourceNeutron->Get("ND_NeutronMomentum_InElastic");
+  TH1F *h_ND_NeutronMomentum_QuasiElastic = (TH1F*)sourceNeutron->Get("ND_NeutronMomentum_QuasiElastic");
   TH1F *h_ND_NeutronThetaAngle_Elastic = (TH1F*)sourceNeutron->Get("ND_NeutronThetaAngle_Elastic");
   TH1F *h_ND_NeutronThetaAngle_InElastic = (TH1F*)sourceNeutron->Get("ND_NeutronThetaAngle_InElastic");
   TH1F *h_ND_NeutronThetaAngle_QuasiElastic = (TH1F*)sourceNeutron->Get("ND_NeutronThetaAngle_QuasiElastic");
@@ -107,21 +107,33 @@ void NpolEffHistos() {
   TH1F *h_RA_recoilAngle_Elastic = (TH1F*)sourceNeutron->Get("RA_recoilAngle_Elastic");
   TH1F *h_RA_recoilAngle_InElastic = (TH1F*)sourceNeutron->Get("RA_recoilAngle_InElastic");
   TH1F *h_RA_recoilAngle_QuasiElastic = (TH1F*)sourceNeutron->Get("RA_recoilAngle_QuasiElastic");
-  TH1F *h_RA_section1Efficiency_Elastic = (TH1F*)sourceNeutron->Get("RA_section1Efficiency_Elastic");
-  TH1F *h_RA_section1Efficiency_InElastic = (TH1F*)sourceNeutron->Get("RA_section1Efficiency_InElastic");
-  TH1F *h_RA_section1Efficiency_QuasiElastic = (TH1F*)sourceNeutron->Get("RA_section1Efficiency_QuasiElastic");
-  TH1F *h_RA_section2Efficiency_Elastic = (TH1F*)sourceNeutron->Get("RA_section2Efficiency_Elastic");
-  TH1F *h_RA_section2Efficiency_InElastic = (TH1F*)sourceNeutron->Get("RA_section2Efficiency_InElastic");
-  TH1F *h_RA_section2Efficiency_QuasiElastic = (TH1F*)sourceNeutron->Get("RA_section2Efficiency_QuasiElastic");
-  TH1F *h_RA_section3Efficiency_Elastic = (TH1F*)sourceNeutron->Get("RA_section3Efficiency_Elastic");
-  TH1F *h_RA_section3Efficiency_InElastic = (TH1F*)sourceNeutron->Get("RA_section3Efficiency_InElastic");
-  TH1F *h_RA_section3Efficiency_QuasiElastic = (TH1F*)sourceNeutron->Get("RA_section3Efficiency_QuasiElastic");
-  TH1F *h_RA_section4Efficiency_Elastic = (TH1F*)sourceNeutron->Get("RA_section4Efficiency_Elastic");
-  TH1F *h_RA_section4Efficiency_InElastic = (TH1F*)sourceNeutron->Get("RA_section4Efficiency_InElastic");
-  TH1F *h_RA_section4Efficiency_QuasiElastic = (TH1F*)sourceNeutron->Get("RA_section4Efficiency_QuasiElastic");
   TH1F *h_RA_totalEnergy_Elastic = (TH1F*)sourceNeutron->Get("RA_totalEnergy_Elastic");
   TH1F *h_RA_totalEnergy_InElastic = (TH1F*)sourceNeutron->Get("RA_totalEnergy_InElastic");
   TH1F *h_RA_totalEnergy_QuasiElastic = (TH1F*)sourceNeutron->Get("RA_totalEnergy_QuasiElastic");
+  TH1F *h_RA_section1Efficiency_Elastic = (TH1F*)sourceNeutron->Get("RA_section1Efficiency_Elastic");
+  TH1F *h_RA_section1Efficiency_InElastic = (TH1F*)sourceNeutron->Get("RA_section1Efficiency_InElastic");
+  TH1F *h_RA_section1Efficiency_QuasiElastic = (TH1F*)sourceNeutron->Get("RA_section1Efficiency_QuasiElastic");
+  TH1F *h_RA_section1Efficiency_All = new TH1F("RA_section1Efficiency_All","NPOL Efficiency after SOI Selection (All)",13,0.25,6.75);
+  h_RA_section1Efficiency_All->Add(h_RA_section1Efficiency_Elastic,h_RA_section1Efficiency_InElastic);
+  h_RA_section1Efficiency_All->Add(h_RA_section1Efficiency_All,h_RA_section1Efficiency_QuasiElastic);
+  TH1F *h_RA_section2Efficiency_Elastic = (TH1F*)sourceNeutron->Get("RA_section2Efficiency_Elastic");
+  TH1F *h_RA_section2Efficiency_InElastic = (TH1F*)sourceNeutron->Get("RA_section2Efficiency_InElastic");
+  TH1F *h_RA_section2Efficiency_QuasiElastic = (TH1F*)sourceNeutron->Get("RA_section2Efficiency_QuasiElastic");
+  TH1F *h_RA_section2Efficiency_All = new TH1F("RA_section2Efficiency_All","NPOL Efficiency after SOI Selection (All)",13,0.25,6.75);
+  h_RA_section2Efficiency_All->Add(h_RA_section2Efficiency_Elastic,h_RA_section2Efficiency_InElastic);
+  h_RA_section2Efficiency_All->Add(h_RA_section2Efficiency_All,h_RA_section2Efficiency_QuasiElastic);
+  TH1F *h_RA_section3Efficiency_Elastic = (TH1F*)sourceNeutron->Get("RA_section3Efficiency_Elastic");
+  TH1F *h_RA_section3Efficiency_InElastic = (TH1F*)sourceNeutron->Get("RA_section3Efficiency_InElastic");
+  TH1F *h_RA_section3Efficiency_QuasiElastic = (TH1F*)sourceNeutron->Get("RA_section3Efficiency_QuasiElastic");
+  TH1F *h_RA_section3Efficiency_All = new TH1F("RA_section3Efficiency_All","NPOL Efficiency after SOI Selection (All)",13,0.25,6.75);
+  h_RA_section3Efficiency_All->Add(h_RA_section3Efficiency_Elastic,h_RA_section3Efficiency_InElastic);
+  h_RA_section3Efficiency_All->Add(h_RA_section3Efficiency_All,h_RA_section3Efficiency_QuasiElastic);
+  TH1F *h_RA_section4Efficiency_Elastic = (TH1F*)sourceNeutron->Get("RA_section4Efficiency_Elastic");
+  TH1F *h_RA_section4Efficiency_InElastic = (TH1F*)sourceNeutron->Get("RA_section4Efficiency_InElastic");
+  TH1F *h_RA_section4Efficiency_QuasiElastic = (TH1F*)sourceNeutron->Get("RA_section4Efficiency_QuasiElastic");
+  TH1F *h_RA_section4Efficiency_All = new TH1F("RA_section4Efficiency_All","NPOL Efficiency after SOI Selection (All)",13,0.25,6.75);
+  h_RA_section4Efficiency_All->Add(h_RA_section4Efficiency_Elastic,h_RA_section4Efficiency_InElastic);
+  h_RA_section4Efficiency_All->Add(h_RA_section4Efficiency_All,h_RA_section4Efficiency_QuasiElastic);
   
   //   2D Histograms
   TH2F *h_NP_dEvsE_Elastic = (TH2F*)sourceNeutron->Get("NP_dEvsE_Elastic");
@@ -179,7 +191,7 @@ void NpolEffHistos() {
   h_ND_NeutronThetaAngle_Elastic->GetXaxis()->SetNdivisions(9);
   h_ND_NeutronThetaAngle_Elastic->GetXaxis()->SetTitleSize(0.05);
   h_ND_NeutronThetaAngle_Elastic->GetYaxis()->SetTitleSize(0.05);
-  h_ND_NeutronThetaAngle_Elastic->DrawCopy();
+  h_ND_NeutronThetaAngle_Elastic->DrawCopy(); neutronInformationElastic->Update();
   TCanvas *neutronInformationInElastic = new TCanvas("neutronInformationInElastic","InElastic Events Neutron Diagnostics",800,900);
   neutronInformationInElastic->Divide(2,3,0.0001, 0.00001,0);
   neutronInformationInElastic->cd(1);
@@ -216,7 +228,7 @@ void NpolEffHistos() {
   h_ND_NeutronThetaAngle_InElastic->GetXaxis()->SetNdivisions(9);
   h_ND_NeutronThetaAngle_InElastic->GetXaxis()->SetTitleSize(0.05);
   h_ND_NeutronThetaAngle_InElastic->GetYaxis()->SetTitleSize(0.05);
-  h_ND_NeutronThetaAngle_InElastic->DrawCopy();
+  h_ND_NeutronThetaAngle_InElastic->DrawCopy();neutronInformationInElastic->Update();
   TCanvas *neutronInformationQuasiElastic = new TCanvas("neutronInformationQuasiElastic","QuasiElastic Events Neutron Diagnostics",800,900);
   neutronInformationQuasiElastic->Divide(2,3,0.0001, 0.00001,0);
   neutronInformationQuasiElastic->cd(1);
@@ -253,7 +265,7 @@ void NpolEffHistos() {
   h_ND_NeutronThetaAngle_QuasiElastic->GetXaxis()->SetNdivisions(9);
   h_ND_NeutronThetaAngle_QuasiElastic->GetXaxis()->SetTitleSize(0.05);
   h_ND_NeutronThetaAngle_QuasiElastic->GetYaxis()->SetTitleSize(0.05);
-  h_ND_NeutronThetaAngle_QuasiElastic->DrawCopy();
+  h_ND_NeutronThetaAngle_QuasiElastic->DrawCopy();neutronInformationQuasiElastic->Update();
 
   TCanvas *NPeventElastic = new TCanvas("NPeventElastic","Plots for Real NP Elastic Events",1000,1200);
   NPeventElastic->Divide(3,2,0.0001, 0.00001,0);
@@ -292,7 +304,7 @@ void NpolEffHistos() {
   h_NP_dEvsE2_Elastic->GetYaxis()->SetTitleSize(0.05);
   h_NP_dEvsE2_Elastic->GetYaxis()->SetTitle("dE-Array Energy Deposited (MeV)");
   h_NP_dEvsE2_Elastic->Rebin2D(2);
-  h_NP_dEvsE2_Elastic->DrawCopy("cont4");
+  h_NP_dEvsE2_Elastic->DrawCopy("cont4"); NPeventElastic->Update();
   TCanvas *NPeventInElastic = new TCanvas("NPeventInElastic","Plots for Real NP InElastic Events",1000,1200);
   NPeventInElastic->Divide(3,2,0.0001, 0.00001,0);
   NPeventInElastic->cd(1);
@@ -330,7 +342,7 @@ void NpolEffHistos() {
   h_NP_dEvsE2_InElastic->GetYaxis()->SetTitleSize(0.05);
   h_NP_dEvsE2_InElastic->GetYaxis()->SetTitle("dE-Array Energy Deposited (MeV)");
   h_NP_dEvsE2_InElastic->Rebin2D(2);
-  h_NP_dEvsE2_InElastic->DrawCopy("cont4");
+  h_NP_dEvsE2_InElastic->DrawCopy("cont4");  NPeventInElastic->Update();
   TCanvas *NPeventQuasiElastic = new TCanvas("NPeventQuasiElastic","Plots for Real NP QuasiElastic Events",1000,1200);
   NPeventQuasiElastic->Divide(3,2,0.0001, 0.00001,0);
   NPeventQuasiElastic->cd(1);
@@ -368,8 +380,8 @@ void NpolEffHistos() {
   h_NP_dEvsE2_QuasiElastic->GetYaxis()->SetTitleSize(0.05);
   h_NP_dEvsE2_QuasiElastic->GetYaxis()->SetTitle("dE-Array Energy Deposited (MeV)");
   h_NP_dEvsE2_QuasiElastic->Rebin2D(2);
-  h_NP_dEvsE2_QuasiElastic->DrawCopy("cont4");
-
+  h_NP_dEvsE2_QuasiElastic->DrawCopy("cont4"); NPeventQuasiElastic->Update();
+  
   TCanvas *angularPlotsElastic = new TCanvas("angularPlotsElastic","Elastic Events Proton Recoil Angle",800, 600);
   angularPlotsElastic->Divide(2,2,0.0001, 0.00001,0);
   angularPlotsElastic->cd(1);
@@ -392,7 +404,7 @@ void NpolEffHistos() {
   h_RA_totalEnergy_Elastic->GetXaxis()->SetNdivisions(9);
   h_RA_totalEnergy_Elastic->GetXaxis()->SetTitleSize(0.05);
   h_RA_totalEnergy_Elastic->GetYaxis()->SetTitleSize(0.05);
-  h_RA_totalEnergy_Elastic->DrawCopy();
+  h_RA_totalEnergy_Elastic->DrawCopy(); angularPlotsElastic->Update();
   TCanvas *angularPlotsInElastic = new TCanvas("angularPlotsInElastic","InElastic Events Proton Recoil Angle",800, 600);
   angularPlotsInElastic->Divide(2,2,0.0001, 0.00001,0);
   angularPlotsInElastic->cd(1);
@@ -415,7 +427,7 @@ void NpolEffHistos() {
   h_RA_totalEnergy_InElastic->GetXaxis()->SetNdivisions(9);
   h_RA_totalEnergy_InElastic->GetXaxis()->SetTitleSize(0.05);
   h_RA_totalEnergy_InElastic->GetYaxis()->SetTitleSize(0.05);
-  h_RA_totalEnergy_InElastic->DrawCopy();
+  h_RA_totalEnergy_InElastic->DrawCopy(); angularPlotsInElastic->Update();
   TCanvas *angularPlotsQuasiElastic = new TCanvas("angularPlotsQuasiElastic","QuasiElastic Events Proton Recoil Angle",800, 600);
   angularPlotsQuasiElastic->Divide(2,2,0.0001, 0.00001,0);
   angularPlotsQuasiElastic->cd(1);
@@ -438,7 +450,7 @@ void NpolEffHistos() {
   h_RA_totalEnergy_QuasiElastic->GetXaxis()->SetNdivisions(9);
   h_RA_totalEnergy_QuasiElastic->GetXaxis()->SetTitleSize(0.05);
   h_RA_totalEnergy_QuasiElastic->GetYaxis()->SetTitleSize(0.05);
-  h_RA_totalEnergy_QuasiElastic->DrawCopy();
+  h_RA_totalEnergy_QuasiElastic->DrawCopy(); angularPlotsQuasiElastic->Update();
   
   TCanvas *dEvsENPeventElastic = new TCanvas("dEvsENPeventElastic","dE vs. E for Real NP Event (Elastic Events)",1000,1200);
   dEvsENPeventElastic->Divide(1,1,0.0001, 0.00001,0);
@@ -448,7 +460,7 @@ void NpolEffHistos() {
   h_NP_dEvsE_Elastic->GetYaxis()->SetTitleSize(0.03);
   h_NP_dEvsE_Elastic->GetYaxis()->SetTitle("dE-Array Energy Deposited (MeV)");
   //h_NP_dEvsE_InElastic->Rebin2D(2);
-  h_NP_dEvsE_Elastic->DrawCopy("cont4");
+  h_NP_dEvsE_Elastic->DrawCopy("cont4"); dEvsENPeventElastic->Update();
   TCanvas *dEvsENPeventInElastic = new TCanvas("dEvsENPeventInElastic","dE vs. E for Real NP Event (InElastic Events)",1000,1200);
   dEvsENPeventInElastic->Divide(1,1,0.0001, 0.00001,0);
   dEvsENPeventInElastic->cd(1);
@@ -457,7 +469,7 @@ void NpolEffHistos() {
   h_NP_dEvsE_InElastic->GetYaxis()->SetTitleSize(0.03);
   h_NP_dEvsE_InElastic->GetYaxis()->SetTitle("dE-Array Energy Deposited (MeV)");
   //h_NP_dEvsE_InElastic->Rebin2D(2);
-  h_NP_dEvsE_InElastic->DrawCopy("cont4");
+  h_NP_dEvsE_InElastic->DrawCopy("cont4"); dEvsENPeventInElastic->Update();
   TCanvas *dEvsENPeventQuasiElastic = new TCanvas("dEvsENPeventQuasiElastic","dE vs. E for Real NP Event (QuasiElastic Events)",1000,1200);
   dEvsENPeventQuasiElastic->Divide(1,1,0.0001, 0.00001,0);
   dEvsENPeventQuasiElastic->cd(1);
@@ -466,8 +478,8 @@ void NpolEffHistos() {
   h_NP_dEvsE_QuasiElastic->GetYaxis()->SetTitleSize(0.03);
   h_NP_dEvsE_QuasiElastic->GetYaxis()->SetTitle("dE-Array Energy Deposited (MeV)");
   //h_NP_dEvsE_InElastic->Rebin2D(2);
-  h_NP_dEvsE_QuasiElastic->DrawCopy("cont4");
-
+  h_NP_dEvsE_QuasiElastic->DrawCopy("cont4"); dEvsENPeventQuasiElastic->Update();
+  
   TCanvas *dEoverE_Elastic = new TCanvas("dEoverE_Elastic","dE Over E - Elastic Events",1000, 800);
   dEoverE_Elastic->Divide(2,2,0.0001,0.00001,0);
   dEoverE_Elastic->cd(1);
@@ -483,14 +495,14 @@ void NpolEffHistos() {
   h_RA_dEoverEbot_Elastic->GetYaxis()->SetTitleSize(0.05);
   h_RA_dEoverEbot_Elastic->GetYaxis()->SetTitle("dE-Array Energy Deposited (MeV)");
   //h_RA_dEoverEbot_Elastic->Rebin2D(2);
-  h_RA_dEoverEbot_Elastic->DrawCopy("cont4");
+  h_RA_dEoverEbot_Elastic->DrawCopy("cont4"); 
   dEoverE_Elastic->cd(3);
   h_RA_dEoverEBoth_Elastic->GetXaxis()->SetTitle("E-Array Energy Deposited (MeV)");
   h_RA_dEoverEBoth_Elastic->GetXaxis()->SetTitleSize(0.05);
   h_RA_dEoverEBoth_Elastic->GetYaxis()->SetTitleSize(0.05);
   h_RA_dEoverEBoth_Elastic->GetYaxis()->SetTitle("dE-Array Energy Deposited (MeV)");
   h_RA_dEoverEBoth_Elastic->Rebin2D(2);
-  h_RA_dEoverEBoth_Elastic->DrawCopy("cont4");
+  h_RA_dEoverEBoth_Elastic->DrawCopy("cont4"); dEoverE_Elastic->Update();
   TCanvas *dEoverE_InElastic = new TCanvas("dEoverE_InElastic","dE Over E - InElastic Events",1000, 800);
   dEoverE_InElastic->Divide(2,2,0.0001,0.00001,0);
   dEoverE_InElastic->cd(1);
@@ -513,7 +525,7 @@ void NpolEffHistos() {
   h_RA_dEoverEBoth_InElastic->GetYaxis()->SetTitleSize(0.05);
   h_RA_dEoverEBoth_InElastic->GetYaxis()->SetTitle("dE-Array Energy Deposited (MeV)");
   h_RA_dEoverEBoth_InElastic->Rebin2D(2);
-  h_RA_dEoverEBoth_InElastic->DrawCopy("cont4");  
+  h_RA_dEoverEBoth_InElastic->DrawCopy("cont4"); dEoverE_InElastic->Update();
   TCanvas *dEoverE_QuasiElastic = new TCanvas("dEoverE_QuasiElastic","dE Over E - QuasiElastic Events",1000, 800);
   dEoverE_QuasiElastic->Divide(2,2,0.0001,0.00001,0);
   dEoverE_QuasiElastic->cd(1);
@@ -536,7 +548,7 @@ void NpolEffHistos() {
   h_RA_dEoverEBoth_QuasiElastic->GetYaxis()->SetTitleSize(0.05);
   h_RA_dEoverEBoth_QuasiElastic->GetYaxis()->SetTitle("dE-Array Energy Deposited (MeV)");
   h_RA_dEoverEBoth_QuasiElastic->Rebin2D(2);
-  h_RA_dEoverEBoth_QuasiElastic->DrawCopy("cont4");
+  h_RA_dEoverEBoth_QuasiElastic->DrawCopy("cont4"); dEoverE_QuasiElastic->Update();
 
   TCanvas *dToF = new TCanvas("dToF","Delta Time-of-Flight from Analyzer to dE-Array",1000, 800);
   dToF->Divide(2,2,0.0001,0.00001,0);
@@ -573,7 +585,7 @@ void NpolEffHistos() {
   //h_RA_dTOF_Elastic->SetLineColor(kRed);
   h_RA_dTOF_Elastic->DrawCopy("same");
   h_RA_dTOF_QuasiElastic->SetFillColor(kBlue);
-  h_RA_dTOF_QuasiElastic->DrawCopy("same");
+  h_RA_dTOF_QuasiElastic->DrawCopy("same"); dToF->Update();
   
   TCanvas *recoilMomentum = new TCanvas("RecoilMomentumAnalysis","Recoil Momentum (P_leading - P_elastic)", 1000, 1200);
   recoilMomentum->Divide(2,2,0.0001, 0.00001,0);
@@ -609,17 +621,16 @@ void NpolEffHistos() {
   h_NP_RecoilMomentum_InElastic->GetYaxis()->SetTitleSize(0.05);
   h_NP_RecoilMomentum_InElastic->SetTitle("Momentum Difference (All Events)");
   h_NP_RecoilMomentum_InElastic->SetFillColor(kYellow);
+  recoilMomentum->GetPad(4)->SetLogy();
   int yVal = h_NP_RecoilMomentum_Elastic->GetBinContent(h_NP_RecoilMomentum_Elastic->GetMaximumBin());
   yVal = vertScaleVal(yVal);
-  //yVal = (yVal/1000 + 1)*1000;
-  h_NP_RecoilMomentum_InElastic->GetYaxis()->SetRangeUser(0,yVal);
+  h_NP_RecoilMomentum_InElastic->GetYaxis()->SetRangeUser(0.001,yVal);
   h_NP_RecoilMomentum_InElastic->DrawCopy();
   h_NP_RecoilMomentum_QuasiElastic->SetFillColor(kBlue);
   h_NP_RecoilMomentum_QuasiElastic->DrawCopy("same");
   h_NP_RecoilMomentum_Elastic->SetFillColor(kRed);
   h_NP_RecoilMomentum_Elastic->SetLineColor(kRed);
-  h_NP_RecoilMomentum_Elastic->DrawCopy("same");
-  
+  h_NP_RecoilMomentum_Elastic->DrawCopy("same"); recoilMomentum->Update();
 
   std::cout << std::endl << "Elastic Efficiencies" << std::endl;
   TCanvas *sectionEff_ElasticEvents = new TCanvas("sectionEff_ElasticEvents","Section Efficiency - Elastic Events",800, 800);
@@ -671,7 +682,7 @@ void NpolEffHistos() {
   h_RA_section4Efficiency_Elastic->GetYaxis()->SetTitle("Percent Efficiency");
   h_RA_section4Efficiency_Elastic->SetFillColor(kBlue);
   h_RA_section4Efficiency_Elastic->Scale(100/eventInteraction);
-  h_RA_section4Efficiency_Elastic->DrawCopy();
+  h_RA_section4Efficiency_Elastic->DrawCopy(); sectionEff_ElasticEvents->Update();
   std::cout << "The Total " << h_RA_section4Efficiency_Elastic->GetTitle() << " is " << h_RA_section4Efficiency_Elastic->Integral() << "." << std::endl;
   std::cout << std::endl << "InElastic Efficiencies" << std::endl;
   TCanvas *sectionEff_InElasticEvents = new TCanvas("sectionEff_InElasticEvents","Section Efficiency - InElastic Events",800, 800);
@@ -723,7 +734,7 @@ void NpolEffHistos() {
   h_RA_section4Efficiency_InElastic->GetYaxis()->SetTitle("Percent Efficiency");
   h_RA_section4Efficiency_InElastic->SetFillColor(kBlue);
   h_RA_section4Efficiency_InElastic->Scale(100/eventInteraction);
-  h_RA_section4Efficiency_InElastic->DrawCopy();
+  h_RA_section4Efficiency_InElastic->DrawCopy(); sectionEff_InElasticEvents->Update();
   std::cout << "The Total " << h_RA_section4Efficiency_InElastic->GetTitle() << " is " << h_RA_section4Efficiency_InElastic->Integral() << "." << std::endl;
   std::cout << std::endl << "QuasiElastic Efficiencies" << std::endl;
   TCanvas *sectionEff_QuasiElasticEvents = new TCanvas("sectionEff_QuasiElasticEvents","Section Efficiency - QuasiElastic Events",800, 800);
@@ -775,8 +786,60 @@ void NpolEffHistos() {
   h_RA_section4Efficiency_QuasiElastic->GetYaxis()->SetTitle("Percent Efficiency");
   h_RA_section4Efficiency_QuasiElastic->SetFillColor(kBlue);
   h_RA_section4Efficiency_QuasiElastic->Scale(100/eventInteraction);
-  h_RA_section4Efficiency_QuasiElastic->DrawCopy();
+  h_RA_section4Efficiency_QuasiElastic->DrawCopy(); sectionEff_QuasiElasticEvents->Update();
   std::cout << "The Total " << h_RA_section4Efficiency_QuasiElastic->GetTitle() << " is " << h_RA_section4Efficiency_QuasiElastic->Integral() << "." << std::endl;
+ std::cout << std::endl << "All Events Efficiencies" << std::endl;
+  TCanvas *sectionEff_AllEvents = new TCanvas("sectionEff_AllEvents","Section Efficiency - All Events",800, 800);
+  // Section Efficiencies
+  sectionEff_AllEvents->Divide(2,2,0.002,0.01,0);
+  sectionEff_AllEvents->cd(1);
+  h_RA_section1Efficiency_All->SetOption("bar");
+  h_RA_section1Efficiency_All->GetXaxis()->SetTitle("Section of Polarimeter");
+  h_RA_section1Efficiency_All->GetXaxis()->SetRangeUser(0,5);
+  h_RA_section1Efficiency_All->GetXaxis()->SetNdivisions(9);
+  h_RA_section1Efficiency_All->GetXaxis()->SetTitleSize(0.05);
+  h_RA_section1Efficiency_All->GetYaxis()->SetTitleSize(0.05);
+  h_RA_section1Efficiency_All->GetYaxis()->SetTitle("Percent Efficiency");
+  h_RA_section1Efficiency_All->SetFillColor(kBlue);
+  h_RA_section1Efficiency_All->Scale(100/eventInteraction);
+  h_RA_section1Efficiency_All->DrawCopy();
+  std::cout << "The Total " << h_RA_section1Efficiency_All->GetTitle() << " is " << h_RA_section1Efficiency_All->Integral() << "." << std::endl;
+  sectionEff_AllEvents->cd(2);
+  h_RA_section2Efficiency_All->SetOption("bar");
+  h_RA_section2Efficiency_All->GetXaxis()->SetTitle("Section of Polarimeter");
+  h_RA_section2Efficiency_All->GetXaxis()->SetRangeUser(0,5);
+  h_RA_section2Efficiency_All->GetXaxis()->SetNdivisions(9);
+  h_RA_section2Efficiency_All->GetXaxis()->SetTitleSize(0.05);
+  h_RA_section2Efficiency_All->GetYaxis()->SetTitleSize(0.05);
+  h_RA_section2Efficiency_All->GetYaxis()->SetTitle("Percent Efficiency");
+  h_RA_section2Efficiency_All->SetFillColor(kBlue);
+  h_RA_section2Efficiency_All->Scale(100/eventInteraction);
+  h_RA_section2Efficiency_All->DrawCopy();
+  std::cout << "The Total " << h_RA_section2Efficiency_All->GetTitle() << " is " << h_RA_section2Efficiency_All->Integral() << "." << std::endl;
+  sectionEff_AllEvents->cd(3);
+  h_RA_section3Efficiency_All->SetOption("bar");
+  h_RA_section3Efficiency_All->GetXaxis()->SetTitle("Section of Polarimeter");
+  h_RA_section3Efficiency_All->GetXaxis()->SetRangeUser(0,5);
+  h_RA_section3Efficiency_All->GetXaxis()->SetNdivisions(9);
+  h_RA_section3Efficiency_All->GetXaxis()->SetTitleSize(0.05);
+  h_RA_section3Efficiency_All->GetYaxis()->SetTitleSize(0.05);
+  h_RA_section3Efficiency_All->GetYaxis()->SetTitle("Percent Efficiency");
+  h_RA_section3Efficiency_All->SetFillColor(kBlue);
+  h_RA_section3Efficiency_All->Scale(100/eventInteraction);
+  h_RA_section3Efficiency_All->DrawCopy();
+  std::cout << "The Total " << h_RA_section3Efficiency_All->GetTitle() << " is " << h_RA_section3Efficiency_All->Integral() << "." << std::endl;
+  sectionEff_AllEvents->cd(4);
+  h_RA_section4Efficiency_All->SetOption("bar");
+  h_RA_section4Efficiency_All->GetXaxis()->SetTitle("Section of Polarimeter");
+  h_RA_section4Efficiency_All->GetXaxis()->SetRangeUser(0,5);
+  h_RA_section4Efficiency_All->GetXaxis()->SetNdivisions(9);
+  h_RA_section4Efficiency_All->GetXaxis()->SetTitleSize(0.05);
+  h_RA_section4Efficiency_All->GetYaxis()->SetTitleSize(0.05);
+  h_RA_section4Efficiency_All->GetYaxis()->SetTitle("Percent Efficiency");
+  h_RA_section4Efficiency_All->SetFillColor(kBlue);
+  h_RA_section4Efficiency_All->Scale(100/eventInteraction);
+  h_RA_section4Efficiency_All->DrawCopy();  sectionEff_AllEvents->Update();
+  std::cout << "The Total " << h_RA_section4Efficiency_All->GetTitle() << " is " << h_RA_section4Efficiency_All->Integral() << "." << std::endl;
   
   // Write out canvases to file
   neutronInformationElastic->Write();
@@ -799,6 +862,7 @@ void NpolEffHistos() {
   sectionEff_ElasticEvents->Write();
   sectionEff_InElasticEvents->Write();
   sectionEff_QuasiElasticEvents->Write();
+  sectionEff_AllEvents->Write();
   // Close files
   outFile->Close();
   sourceNeutron->Close();
