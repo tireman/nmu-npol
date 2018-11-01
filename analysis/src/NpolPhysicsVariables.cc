@@ -410,7 +410,7 @@ bool NpolPhysicsVariables::checkQuasiElasticScattering(const std::map<int,NpolVe
   currentParticle4Vec.second.clear();
   highestParticle4Vec.second.clear();
   
-  if(final4VecMag >= 0.95*initial4VecMag){
+  if(final4VecMag >= 0.90*initial4VecMag){
 	return QEflag = true;
   } else {
 	return QEflag = false;
