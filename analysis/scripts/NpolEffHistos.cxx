@@ -34,7 +34,7 @@ TString CType = "";
 void RetrieveENVvariables();
 TString FormInputFile(TString InputDir);
 TString FormOutputFile(TString OutputDir);
-
+int vertScaleVal(int yVal);
 
 void NpolEffHistos() {
 
@@ -468,97 +468,113 @@ void NpolEffHistos() {
   //h_NP_dEvsE_InElastic->Rebin2D(2);
   h_NP_dEvsE_QuasiElastic->DrawCopy("cont4");
 
-  TCanvas *dEoverE_dToFElastic = new TCanvas("dEoverE_dTofElastic","dE Over E - Elastic Events",1000, 800);
-  dEoverE_dToFElastic->Divide(2,2,0.0001,0.00001,0);
-  dEoverE_dToFElastic->cd(1);
+  TCanvas *dEoverE_Elastic = new TCanvas("dEoverE_Elastic","dE Over E - Elastic Events",1000, 800);
+  dEoverE_Elastic->Divide(2,2,0.0001,0.00001,0);
+  dEoverE_Elastic->cd(1);
   h_RA_dEoverEtop_Elastic->GetXaxis()->SetTitle("E-Array Energy Deposited (MeV)");
   h_RA_dEoverEtop_Elastic->GetXaxis()->SetTitleSize(0.05);
   h_RA_dEoverEtop_Elastic->GetYaxis()->SetTitleSize(0.05);
   h_RA_dEoverEtop_Elastic->GetYaxis()->SetTitle("dE-Array Energy Deposited (MeV)");
   //h_RA_dEoverEtop_Elastic->Rebin2D(2);
   h_RA_dEoverEtop_Elastic->DrawCopy("cont4");
-  dEoverE_dToFElastic->cd(2);
+  dEoverE_Elastic->cd(2);
   h_RA_dEoverEbot_Elastic->GetXaxis()->SetTitle("E-Array Energy Deposited (MeV)");
   h_RA_dEoverEbot_Elastic->GetXaxis()->SetTitleSize(0.05);
   h_RA_dEoverEbot_Elastic->GetYaxis()->SetTitleSize(0.05);
   h_RA_dEoverEbot_Elastic->GetYaxis()->SetTitle("dE-Array Energy Deposited (MeV)");
   //h_RA_dEoverEbot_Elastic->Rebin2D(2);
   h_RA_dEoverEbot_Elastic->DrawCopy("cont4");
-  dEoverE_dToFElastic->cd(3);
+  dEoverE_Elastic->cd(3);
   h_RA_dEoverEBoth_Elastic->GetXaxis()->SetTitle("E-Array Energy Deposited (MeV)");
   h_RA_dEoverEBoth_Elastic->GetXaxis()->SetTitleSize(0.05);
   h_RA_dEoverEBoth_Elastic->GetYaxis()->SetTitleSize(0.05);
   h_RA_dEoverEBoth_Elastic->GetYaxis()->SetTitle("dE-Array Energy Deposited (MeV)");
   h_RA_dEoverEBoth_Elastic->Rebin2D(2);
   h_RA_dEoverEBoth_Elastic->DrawCopy("cont4");
-  dEoverE_dToFElastic->cd(4);
-  h_RA_dTOF_Elastic->GetXaxis()->SetTitle("Time (ns)");
-  h_RA_dTOF_Elastic->GetXaxis()->SetTitleSize(0.05);
-  h_RA_dTOF_Elastic->GetYaxis()->SetTitleSize(0.05);
-  h_RA_dTOF_Elastic->GetYaxis()->SetTitle("Number of Events");
-  h_RA_dTOF_Elastic->SetFillColor(kBlue);
-  h_RA_dTOF_Elastic->DrawCopy();
-  TCanvas *dEoverE_dToFInElastic = new TCanvas("dEoverE_dTofInElastic","dE Over E - InElastic Events",1000, 800);
-  dEoverE_dToFInElastic->Divide(2,2,0.0001,0.00001,0);
-  dEoverE_dToFInElastic->cd(1);
+  TCanvas *dEoverE_InElastic = new TCanvas("dEoverE_InElastic","dE Over E - InElastic Events",1000, 800);
+  dEoverE_InElastic->Divide(2,2,0.0001,0.00001,0);
+  dEoverE_InElastic->cd(1);
   h_RA_dEoverEtop_InElastic->GetXaxis()->SetTitle("E-Array Energy Deposited (MeV)");
   h_RA_dEoverEtop_InElastic->GetXaxis()->SetTitleSize(0.05);
   h_RA_dEoverEtop_InElastic->GetYaxis()->SetTitleSize(0.05);
   h_RA_dEoverEtop_InElastic->GetYaxis()->SetTitle("dE-Array Energy Deposited (MeV)");
   //h_RA_dEoverEtop_InElastic->Rebin2D(2);
   h_RA_dEoverEtop_InElastic->DrawCopy("cont4");
-  dEoverE_dToFInElastic->cd(2);
+  dEoverE_InElastic->cd(2);
   h_RA_dEoverEbot_InElastic->GetXaxis()->SetTitle("E-Array Energy Deposited (MeV)");
   h_RA_dEoverEbot_InElastic->GetXaxis()->SetTitleSize(0.05);
   h_RA_dEoverEbot_InElastic->GetYaxis()->SetTitleSize(0.05);
   h_RA_dEoverEbot_InElastic->GetYaxis()->SetTitle("dE-Array Energy Deposited (MeV)");
   //h_RA_dEoverEbot_InElastic->Rebin2D(2);
   h_RA_dEoverEbot_InElastic->DrawCopy("cont4");
-  dEoverE_dToFInElastic->cd(3);
+  dEoverE_InElastic->cd(3);
   h_RA_dEoverEBoth_InElastic->GetXaxis()->SetTitle("E-Array Energy Deposited (MeV)");
   h_RA_dEoverEBoth_InElastic->GetXaxis()->SetTitleSize(0.05);
   h_RA_dEoverEBoth_InElastic->GetYaxis()->SetTitleSize(0.05);
   h_RA_dEoverEBoth_InElastic->GetYaxis()->SetTitle("dE-Array Energy Deposited (MeV)");
   h_RA_dEoverEBoth_InElastic->Rebin2D(2);
-  h_RA_dEoverEBoth_InElastic->DrawCopy("cont4");
-  dEoverE_dToFInElastic->cd(4);
-  h_RA_dTOF_InElastic->GetXaxis()->SetTitle("Time (ns)");
-  h_RA_dTOF_InElastic->GetXaxis()->SetTitleSize(0.05);
-  h_RA_dTOF_InElastic->GetYaxis()->SetTitleSize(0.05);
-  h_RA_dTOF_InElastic->GetYaxis()->SetTitle("Number of Events");
-  h_RA_dTOF_InElastic->SetFillColor(kBlue);
-  h_RA_dTOF_InElastic->DrawCopy();
-  TCanvas *dEoverE_dToFQuasiElastic = new TCanvas("dEoverE_dTofQuasiElastic","dE Over E - QuasiElastic Events",1000, 800);
-  dEoverE_dToFQuasiElastic->Divide(2,2,0.0001,0.00001,0);
-  dEoverE_dToFQuasiElastic->cd(1);
+  h_RA_dEoverEBoth_InElastic->DrawCopy("cont4");  
+  TCanvas *dEoverE_QuasiElastic = new TCanvas("dEoverE_QuasiElastic","dE Over E - QuasiElastic Events",1000, 800);
+  dEoverE_QuasiElastic->Divide(2,2,0.0001,0.00001,0);
+  dEoverE_QuasiElastic->cd(1);
   h_RA_dEoverEtop_QuasiElastic->GetXaxis()->SetTitle("E-Array Energy Deposited (MeV)");
   h_RA_dEoverEtop_QuasiElastic->GetXaxis()->SetTitleSize(0.05);
   h_RA_dEoverEtop_QuasiElastic->GetYaxis()->SetTitleSize(0.05);
   h_RA_dEoverEtop_QuasiElastic->GetYaxis()->SetTitle("dE-Array Energy Deposited (MeV)");
   //h_RA_dEoverEtop_QuasiElastic->Rebin2D(2);
   h_RA_dEoverEtop_QuasiElastic->DrawCopy("cont4");
-  dEoverE_dToFQuasiElastic->cd(2);
+  dEoverE_QuasiElastic->cd(2);
   h_RA_dEoverEbot_QuasiElastic->GetXaxis()->SetTitle("E-Array Energy Deposited (MeV)");
   h_RA_dEoverEbot_QuasiElastic->GetXaxis()->SetTitleSize(0.05);
   h_RA_dEoverEbot_QuasiElastic->GetYaxis()->SetTitleSize(0.05);
   h_RA_dEoverEbot_QuasiElastic->GetYaxis()->SetTitle("dE-Array Energy Deposited (MeV)");
   //h_RA_dEoverEbot_QuasiElastic->Rebin2D(2);
   h_RA_dEoverEbot_QuasiElastic->DrawCopy("cont4");
-  dEoverE_dToFQuasiElastic->cd(3);
+  dEoverE_QuasiElastic->cd(3);
   h_RA_dEoverEBoth_QuasiElastic->GetXaxis()->SetTitle("E-Array Energy Deposited (MeV)");
   h_RA_dEoverEBoth_QuasiElastic->GetXaxis()->SetTitleSize(0.05);
   h_RA_dEoverEBoth_QuasiElastic->GetYaxis()->SetTitleSize(0.05);
   h_RA_dEoverEBoth_QuasiElastic->GetYaxis()->SetTitle("dE-Array Energy Deposited (MeV)");
   h_RA_dEoverEBoth_QuasiElastic->Rebin2D(2);
   h_RA_dEoverEBoth_QuasiElastic->DrawCopy("cont4");
-  dEoverE_dToFQuasiElastic->cd(4);
+
+  TCanvas *dToF = new TCanvas("dToF","Delta Time-of-Flight from Analyzer to dE-Array",1000, 800);
+  dToF->Divide(2,2,0.0001,0.00001,0);
+  dToF->cd(1);
+  h_RA_dTOF_Elastic->GetXaxis()->SetTitle("Time (ns)");
+  h_RA_dTOF_Elastic->GetXaxis()->SetTitleSize(0.05);
+  h_RA_dTOF_Elastic->GetYaxis()->SetTitleSize(0.05);
+  h_RA_dTOF_Elastic->GetYaxis()->SetTitle("Number of Events");
+  h_RA_dTOF_Elastic->SetFillColor(kRed);
+  h_RA_dTOF_Elastic->DrawCopy();
+  dToF->cd(2);
+  h_RA_dTOF_InElastic->GetXaxis()->SetTitle("Time (ns)");
+  h_RA_dTOF_InElastic->GetXaxis()->SetTitleSize(0.05);
+  h_RA_dTOF_InElastic->GetYaxis()->SetTitleSize(0.05);
+  h_RA_dTOF_InElastic->GetYaxis()->SetTitle("Number of Events");
+  h_RA_dTOF_InElastic->SetFillColor(kYellow);
+  h_RA_dTOF_InElastic->DrawCopy();
+  dToF->cd(3);
   h_RA_dTOF_QuasiElastic->GetXaxis()->SetTitle("Time (ns)");
   h_RA_dTOF_QuasiElastic->GetXaxis()->SetTitleSize(0.05);
   h_RA_dTOF_QuasiElastic->GetYaxis()->SetTitleSize(0.05);
   h_RA_dTOF_QuasiElastic->GetYaxis()->SetTitle("Number of Events");
   h_RA_dTOF_QuasiElastic->SetFillColor(kBlue);
   h_RA_dTOF_QuasiElastic->DrawCopy();
-
+  dToF->cd(4);
+  h_RA_dTOF_InElastic->GetXaxis()->SetTitle("Time (ns)");
+  h_RA_dTOF_InElastic->GetXaxis()->SetTitleSize(0.05);
+  h_RA_dTOF_InElastic->GetYaxis()->SetTitleSize(0.05);
+  h_RA_dTOF_InElastic->GetYaxis()->SetTitle("Number of Events");
+  h_RA_dTOF_InElastic->SetTitle("Delta Time-of-Flight (All Events)");
+  h_RA_dTOF_InElastic->SetFillColor(kYellow);
+  h_RA_dTOF_InElastic->DrawCopy();
+  h_RA_dTOF_Elastic->SetFillColor(kRed);
+  //h_RA_dTOF_Elastic->SetLineColor(kRed);
+  h_RA_dTOF_Elastic->DrawCopy("same");
+  h_RA_dTOF_QuasiElastic->SetFillColor(kBlue);
+  h_RA_dTOF_QuasiElastic->DrawCopy("same");
+  
   TCanvas *recoilMomentum = new TCanvas("RecoilMomentumAnalysis","Recoil Momentum (P_leading - P_elastic)", 1000, 1200);
   recoilMomentum->Divide(2,2,0.0001, 0.00001,0);
   recoilMomentum->cd(1);
@@ -568,6 +584,7 @@ void NpolEffHistos() {
   h_NP_RecoilMomentum_Elastic->GetYaxis()->SetTitleSize(0.05);
   h_NP_RecoilMomentum_Elastic->SetTitle("Momentum Difference (Elastic Events)");
   h_NP_RecoilMomentum_Elastic->SetFillColor(kRed);
+  h_NP_RecoilMomentum_Elastic->SetLineColor(kRed);
   h_NP_RecoilMomentum_Elastic->DrawCopy();
   recoilMomentum->cd(2);
   h_NP_RecoilMomentum_InElastic->GetXaxis()->SetTitle("(P_leading - P_elastic) (MeV/c)");
@@ -586,18 +603,23 @@ void NpolEffHistos() {
   h_NP_RecoilMomentum_QuasiElastic->SetFillColor(kBlue);
   h_NP_RecoilMomentum_QuasiElastic->DrawCopy();
   recoilMomentum->cd(4);
-  h_NP_RecoilMomentum_Elastic->GetXaxis()->SetTitle("(P_leading - P_elastic) (MeV/c)");
-  h_NP_RecoilMomentum_Elastic->GetYaxis()->SetTitle("Counts");
-  h_NP_RecoilMomentum_Elastic->GetXaxis()->SetTitleSize(0.05);
-  h_NP_RecoilMomentum_Elastic->GetYaxis()->SetTitleSize(0.05);
-  h_NP_RecoilMomentum_Elastic->SetTitle("Momentum Difference (All Events)");
-  h_NP_RecoilMomentum_Elastic->SetFillColor(kRed);
-  h_NP_RecoilMomentum_Elastic->DrawCopy();
+  h_NP_RecoilMomentum_InElastic->GetXaxis()->SetTitle("(P_leading - P_elastic) (MeV/c)");
+  h_NP_RecoilMomentum_InElastic->GetYaxis()->SetTitle("Counts");
+  h_NP_RecoilMomentum_InElastic->GetXaxis()->SetTitleSize(0.05);
+  h_NP_RecoilMomentum_InElastic->GetYaxis()->SetTitleSize(0.05);
+  h_NP_RecoilMomentum_InElastic->SetTitle("Momentum Difference (All Events)");
   h_NP_RecoilMomentum_InElastic->SetFillColor(kYellow);
-  h_NP_RecoilMomentum_InElastic->DrawCopy("same");
+  int yVal = h_NP_RecoilMomentum_Elastic->GetBinContent(h_NP_RecoilMomentum_Elastic->GetMaximumBin());
+  yVal = vertScaleVal(yVal);
+  //yVal = (yVal/1000 + 1)*1000;
+  h_NP_RecoilMomentum_InElastic->GetYaxis()->SetRangeUser(0,yVal);
+  h_NP_RecoilMomentum_InElastic->DrawCopy();
   h_NP_RecoilMomentum_QuasiElastic->SetFillColor(kBlue);
   h_NP_RecoilMomentum_QuasiElastic->DrawCopy("same");
- 
+  h_NP_RecoilMomentum_Elastic->SetFillColor(kRed);
+  h_NP_RecoilMomentum_Elastic->SetLineColor(kRed);
+  h_NP_RecoilMomentum_Elastic->DrawCopy("same");
+  
 
   std::cout << std::endl << "Elastic Efficiencies" << std::endl;
   TCanvas *sectionEff_ElasticEvents = new TCanvas("sectionEff_ElasticEvents","Section Efficiency - Elastic Events",800, 800);
@@ -769,9 +791,10 @@ void NpolEffHistos() {
   dEvsENPeventElastic->Write();
   dEvsENPeventInElastic->Write();
   dEvsENPeventQuasiElastic->Write();
-  dEoverE_dToFElastic->Write();
-  dEoverE_dToFInElastic->Write();
-  dEoverE_dToFQuasiElastic->Write();
+  dEoverE_Elastic->Write();
+  dEoverE_InElastic->Write();
+  dEoverE_QuasiElastic->Write();
+  dToF->Write();
   recoilMomentum->Write();
   sectionEff_ElasticEvents->Write();
   sectionEff_InElasticEvents->Write();
@@ -851,4 +874,31 @@ void RetrieveENVvariables() {
 	std::cout << "Input Directory environmental varilable not set" << std::endl;
 	return;
   }
+}
+
+int vertScaleVal(int yVal){
+  int n = 0;  int p = 0; int newVal = 0;
+  int nTest = pow(10,n);
+  while((yVal % nTest ) != yVal){
+	n++;
+	nTest = pow(10,n);
+  }
+  if(n == 0) return newVal = 1;
+  
+  int firstDig = 0;
+  int secondDig = 0;
+  int thirdDig = 0;
+  if(n >= 1) firstDig= yVal/pow(10,(n-1));
+  if(n >= 2) secondDig = yVal/pow(10,(n-2)) - 10*firstDig;
+  if(n >= 3) thirdDig = yVal/pow(10,(n-3)) - (100*firstDig + 10*secondDig);
+
+  if(n == 1) newVal = yVal + 1;
+  if(n == 2) newVal = firstDig*pow(10,(n-1)) + 1;
+  if(n == 3 || n == 4) newVal = firstDig*pow(10,(n-1)) + (secondDig*pow(10,(n-2)) + 1);
+  if(n >= 5) {
+	if(thirdDig % 5 == thirdDig) thirdDig = 5;
+	if(thirdDig % 5 <= 5) { thirdDig = 5; secondDig += 1;}
+	newVal = firstDig*pow(10,(n-1)) + secondDig*pow(10,(n-2)) + thirdDig*pow(10,(n-3));
+  }
+  return newVal;
 }
