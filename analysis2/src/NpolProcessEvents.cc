@@ -291,8 +291,8 @@ int main(int argc, char *argv[]) {
 	  
 	  if(npolTrackIDs.find(aVertex->trackId) != npolTrackIDs.end()){ 
 		std::string particleName = aVertex->particle;
-		(particleOrigin[particleName])->Fill(aVertex->posZ,aVertex->
-											 posX,aVertex->posY);
+		(particleOrigin[particleName])->Fill(aVertex->gPosZ,aVertex->
+											 gPosX,aVertex->gPosY);
 	  }
 	}
 	
