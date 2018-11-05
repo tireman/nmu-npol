@@ -1,3 +1,7 @@
+#Update: 5-November-2018
+
+Added code to the NpolAnalysis ROOT code to separate out quasi-elastic events from the inelastics.  Also changed the code to be a set of separate classes rather than one large code.  Added a histogram manager class to off load a bunch of the work to another class and save space in the main code.  Fixed a bug in the computation of the hit position in the scintillator detectors.  Also included a randomization of the hit position in the scintillation detectors in the 2 directions that are perpendicular to the long axis of the detector.  Use a flat distribution to spread out the points.  The long axis uses a Gaussian based spread function with cuts on the ends of the detector.  Also fixed error in that random number generator was being called more than once .. well the pointer was being "remade" which reset the generator seed and caused repeated random numbers.
+
 #Update: 24-April-2018
 
 A bug was found and fixed in the analysis manager.  When cutting and pasting, check that the unit selection is the correct one.  We were setting momentum to *cm* when we wanted *MeV*.  Since G4 standard length units are *mm* that meant our momentum are off by a factor of x10 small. -- WT
