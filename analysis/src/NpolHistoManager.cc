@@ -52,7 +52,7 @@ void NpolHistoManager::FillHistograms(std::string hID, double xValue, double yVa
 }
 
 void NpolHistoManager::WriteHistograms(){
-  std::cout << "Writing Histogram to File!" << std::endl;
+  std::cout << "Writing Histograms to File!" << std::endl;
   std::map<std::string,TH1F *>::iterator histoIt2;
   for(histoIt2 = histoMap.begin(); histoIt2 != histoMap.end(); histoIt2++) {
 	if(histoIt2->second == NULL) continue;

@@ -34,16 +34,16 @@ public:
   double computeMomentum(double xMom, double yMom, double zMom);
   double computeScatTheta(double xMom, double yMom);
   double computeScatPhi(double zMom, double totalMom);
-  double computeElasticMomentum(const std::pair<double,std::vector<double>> projNeutron4Vec, double thetaP);
-  bool checkQuasiElasticScattering(std::map<int,NpolVertex *> &theVertexMap, std::pair<double,std::vector<double> > projNeutron4Vec);
-  double compute4VecSquared(std::pair<double,std::vector<double>> aParticle4Vec);
-  double computeLeadingParticleMomentum(std::map<int,NpolVertex *> &theVertexMap,int selectedTID);
-  double computeRecoilParticleAngle(std::pair<double,std::vector<double>> projNeutron4Vec,std::map<int,NpolVertex *> &theVertexMap, int selectedTID);
-  double returnParticleMomentum(std::pair<double,std::vector<double>> aParticle4Vec);
-  double returnParticleEnergy(std::pair<double,std::vector<double> > aParticle4Vec);
-  double returnParticleEnergy(std::map<int,NpolVertex *> &theVertexMap, int TID);
-  int findLeadingParticle(std::map<int,NpolVertex *> &theVertexMap, std::string eventType);
-  int findBestProtonTrackID(std::map<int,NpolVertex *> &theVertexMap, const std::vector<NpolStep *> *steps, int npSOI);
+  double computeElasticMomentum(const std::pair<double,std::vector<double>> &projNeutron4Vec, double thetaP);
+  bool checkQuasiElasticScattering(const std::map<int,NpolVertex *> &theVertexMap, const std::pair<double,std::vector<double> > &projNeutron4Vec);
+  double compute4VecSquared(const std::pair<double,std::vector<double>> &aParticle4Vec);
+  double computeLeadingParticleMomentum(const std::map<int,NpolVertex *> &theVertexMap,int selectedTID);
+  double computeRecoilParticleAngle(const std::pair<double,std::vector<double>> &projNeutron4Vec, const std::map<int,NpolVertex *> &theVertexMap, int selectedTID);
+  double returnParticleMomentum(const std::pair<double,std::vector<double>> &aParticle4Vec);
+  double returnParticleEnergy(const std::pair<double,std::vector<double> > &aParticle4Vec);
+  double returnParticleEnergy(const std::map<int,NpolVertex *> &theVertexMap, int TID);
+  int findLeadingParticle(const std::map<int,NpolVertex *> &theVertexMap, std::string eventType);
+  int findBestProtonTrackID(const std::map<int,NpolVertex *> &theVertexMap, const std::vector<NpolStep *> *steps, int npSOI);
   
 private:
   static NpolPhysicsVariables *PhysVars;
