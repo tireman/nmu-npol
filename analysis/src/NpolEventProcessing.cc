@@ -84,6 +84,7 @@ void NpolEventProcessing::fillVertexMap(std::map<int,NpolVertex *> &theVertexMap
   for(v_it = vertVector->begin(); v_it != vertVector->end(); v_it++){
 	NpolVertex *aVertex = *v_it;
 	if(aVertex == NULL) continue;
+	NpolVertex *copyVertex = new NpolVertex(*aVertex);
 	
 	int PID = aVertex->parentId;
 	int TID = aVertex->trackId;
@@ -98,26 +99,7 @@ void NpolEventProcessing::fillVertexMap(std::map<int,NpolVertex *> &theVertexMap
 	if((PID == DesiredPID && volName == eventVolume && time == eventTime /*&& process == eventProcess*/) || PID == 0){
 	  if(theVertexMap.find(TID) == theVertexMap.end()){
 		theVertexMap[TID] = new NpolVertex();
-		//theVertexMap[TID] = aVertex;
-		theVertexMap[TID]->trackId = aVertex->trackId;
-		theVertexMap[TID]->parentId = aVertex->parentId;
-		theVertexMap[TID]->gPosX = aVertex->gPosX;
-		theVertexMap[TID]->gPosY = aVertex->gPosY;
-		theVertexMap[TID]->gPosZ = aVertex->gPosZ;
-		theVertexMap[TID]->lPosX = aVertex->lPosX;
-		theVertexMap[TID]->lPosY = aVertex->lPosY;
-		theVertexMap[TID]->lPosZ = aVertex->lPosZ;
-		theVertexMap[TID]->momX = aVertex->momX;
-		theVertexMap[TID]->momY = aVertex->momY;
-		theVertexMap[TID]->momZ = aVertex->momZ;
-		theVertexMap[TID]->time = aVertex->time;
-		theVertexMap[TID]->energy = aVertex->energy;
-		theVertexMap[TID]->eMiss = aVertex->eMiss;
-		theVertexMap[TID]->particleId = aVertex->particleId;
-		theVertexMap[TID]->particle = aVertex->particle;
-		theVertexMap[TID]->process = aVertex->process;
-		theVertexMap[TID]->volume = aVertex->volume;
-		theVertexMap[TID]->daughterIds = aVertex->daughterIds;
+		theVertexMap[TID] = copyVertex;
 	  }
 	}	
   }
