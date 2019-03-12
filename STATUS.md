@@ -1,3 +1,9 @@
+#Update: 12-March-2019
+
+Not a lot has been done as focus has swtiched to the Hall A recoil polarimetry (elastic and charge exchange) needs.  However, with that development, changes and additions have been made that cross over into this code.  First, a single ENV setup script was created for both simulation and analysis codes.  Currently, it only works on the NMU physics machines but will be added to the JLAB machines in the future.  Work on the NMU Math & CS cluster has been ended as they can't maintain their machines worth a hoot or holler.
+
+ROOT macros and ENV scripts have been moved to the base directory in their own sub-directories.  This is more in line with their general use and other simulation codes in physics land.
+
 #Update: 5-November-2018
 
 Added code to the NpolAnalysis ROOT code to separate out quasi-elastic events from the inelastics.  Also changed the code to be a set of separate classes rather than one large code.  Added a histogram manager class to off load a bunch of the work to another class and save space in the main code.  Fixed a bug in the computation of the hit position in the scintillator detectors.  Also included a randomization of the hit position in the scintillation detectors in the 2 directions that are perpendicular to the long axis of the detector.  Use a flat distribution to spread out the points.  The long axis uses a Gaussian based spread function with cuts on the ends of the detector.  Also fixed error in that random number generator was being called more than once .. well the pointer was being "remade" which reset the generator seed and caused repeated random numbers.
