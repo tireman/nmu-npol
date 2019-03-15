@@ -68,8 +68,9 @@ void NpolShieldHut::ConstructNPOLTagger(){
   G4Box *NPOLTagger = new G4Box("NPOLTagger",xlen/2,ylen/2,zlen/2);
   NPOLTaggerLV = 
 	new G4LogicalVolume(NPOLTagger,NpolMaterials::GetInstance()->GetMaterial("HardVacuum"),"NPOLTaggerLV",0,0,0);
-  G4VisAttributes *TaggerVisAtt = new G4VisAttributes(G4Colour(0.2, 0.2, 0.2));
-  NPOLTaggerLV->SetVisAttributes(TaggerVisAtt);
+  //G4VisAttributes *TaggerVisAtt = new G4VisAttributes(G4Colour(0.2, 0.2, 0.2));
+  //NPOLTaggerLV->SetVisAttributes(TaggerVisAtt);
+  NPOLTaggerLV->SetVisAttributes(G4VisAttributes::GetInvisible());
 }
 
 // Construct the front wall of the shield hut from 4 ft by 4 ft by 3 ft blocks

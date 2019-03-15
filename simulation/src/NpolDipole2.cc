@@ -150,9 +150,9 @@ void NpolDipole2::ConstructDipole2Field(){
   G4Box *Dipole2Field = new G4Box("Dipole2Field",gapWidth/2, gapHeight/2, gapLength/2);
   Dipole2FieldLV = 
 	new G4LogicalVolume(Dipole2Field, NpolMaterials::GetInstance()->GetMaterial("Vacuum"),"Dipole2FieldLV", 0,0,0);
-  G4VisAttributes *Field = new G4VisAttributes(G4Colour(0.5,0.7,0.2));
-  Dipole2FieldLV->SetVisAttributes(Field);
-
+  //G4VisAttributes *Field = new G4VisAttributes(G4Colour(0.5,0.7,0.2));
+  //Dipole2FieldLV->SetVisAttributes(Field);
+  Dipole2FieldLV->SetVisAttributes(G4VisAttributes::GetInvisible());
 }
 
 void NpolDipole2::Place(G4LogicalVolume *motherLV) {
