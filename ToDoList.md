@@ -1,8 +1,8 @@
 # Major Issues and/or needs
 
-1. Reworking or modification of the NPOL efficency ROOT script progressing slowly.  WT found the "factor of 7" which was in a mistake made in the Section of Interest (SOI) section.  With this bug corrected, work has progressed on the proton track ID which still needs a lot of work/testing.
+1. Implementation of QE neutron generator.  Tongtong (Post-Doc with Dr. Michael Kohl) has written up and tested a C++ (compiled against ROOT) program to generate QE neutron events.  This has yet to be implemented into our code.  In the future, this will prove useful and more compact than the current method. 
 
-2. Implementation of QE neutron generator.  Tongtong (Post-Doc with Dr. Michael Kohl) has written up and tested a C++ (compiled against ROOT) program to generate QE neutron events.  This has yet to be implemented into our code.  In the future, this will prove useful and more compact than the current method. 
+2. Down strem beamline crashes during simulation startup (but code compiles). There must be an overlap in the volumes.  The Code needs reworked and possible a different model used in the future.  It is currently commented out of the DetectorConstruction class and isn't necessary when performing simulations only on the polarimeter.
 
 # Minor Issues and/or needs
 

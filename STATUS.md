@@ -1,3 +1,9 @@
+#Update: 15-March-2019
+
+Updated the NpolPolarimeter.cc and got rid of the NpolBox volume.  All assembly volumes are now properly placed without having to use a secondary "mother volume".  This will clean up a bit of the code and running time.
+
+The down stream beamline crashes the simulation at run time. There must be a volume overlap that isn't showing up during compiling.  Currently, it is commented out of the detector constructor class and isn't necessary for the simulation runs tht only depend on the biasing technique for supplied particle flux to the polarimeter.  However, if we plan to run "beam on target" simulations in the future, it will need to be updated and fixed.  A new beamline model would be nice.
+
 #Update: 12-March-2019
 
 Not a lot has been done as focus has swtiched to the Hall A recoil polarimetry (elastic and charge exchange) needs.  However, with that development, changes and additions have been made that cross over into this code.  First, a single ENV setup script was created for both simulation and analysis codes.  Currently, it only works on the NMU physics machines but will be added to the JLAB machines in the future.  Work on the NMU Math & CS cluster has been ended as they can't maintain their machines worth a hoot or holler.
