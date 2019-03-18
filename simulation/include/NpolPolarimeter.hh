@@ -30,22 +30,17 @@ public:
   ~NpolPolarimeter();
 
   static G4double NpolAng;
-  static G4double NpolBoxPos;
   static G4double NDetThickness;
   static G4double NVetoThickness;
   static G4double NDetHeight;
   static G4double NDetStandardLength;
-  static G4double EArrayVertOffset;
   static G4double dEArrayVertOffset;
   static G4double EarrayRotAngle;
-  static G4double EArrayHoriOffset;
-  static G4double dEArrayHoriOffset;
+  static G4double FirstAnalyzerLayerPos;
   static G4double FrontDetSpacing;
-  static G4double FrontDetOffset;
   static G4double FrontVetoOffset;
   static G4double BackTaggerzPos;
-  static G4double Array1zPos; static G4double Array2zPos;
-  
+   
   void ConstructTopDetArray(G4LogicalVolume *motherLV);
   void ConstructTopVetoArray(G4LogicalVolume *motherLV);
   void ConstructBottomDetArray(G4LogicalVolume *motherLV);
@@ -58,13 +53,12 @@ public:
   virtual void Place(G4LogicalVolume *motherLV);
   void TranslateRotateAndPlace(G4LogicalVolume *polarimeterLV, G4LogicalVolume *motherLV,G4double rho, G4double phi, G4double z);
   
-  G4AssemblyVolume *MakePlate(G4LogicalVolume *detLV, G4int numDets, 
-			      G4double TmX, G4double TmY, G4double TmZ,
-			      G4double TmdX, G4double TmdY, G4double TmdZ);
+  G4AssemblyVolume *MakePlate(G4LogicalVolume *detLV, G4int numDets, G4double TmX, G4double TmY, G4double TmZ, G4double TmdX, G4double TmdY, G4double TmdZ);
+  G4AssemblyVolume *MakePlate(G4LogicalVolume *detLV, G4int numDets, G4double TmX, G4double TmY, G4double TmZ, G4double TmdX, G4double TmdY, G4double TmdZ,G4RotationMatrix Rm);
   
-  void ImprintPlate(G4AssemblyVolume *plate, G4LogicalVolume *motherLV,
-		    G4double TmX, G4double TmY, G4double TmZ, G4double RmZ);
-  
+  void ImprintPlate(G4AssemblyVolume *plate, G4LogicalVolume *motherLV, G4double TmX, G4double TmY, G4double TmZ, G4double RmZ);
+  void ImprintPlate(G4AssemblyVolume *plate, G4LogicalVolume *motherLV,	G4ThreeVector Tm, G4RotationMatrix Rm);
+
 private:
   G4LogicalVolume *PolarimeterLV;
 };

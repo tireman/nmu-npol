@@ -1,7 +1,5 @@
 #!/bin/bash
 
-source /home/tireman/simulation/jlab/nmu-npol/build/simulation/scripts/NMUPhysics/NMUsetuprun.sh
-
 if [ $# -eq 0 ]
 then
 	START=1
@@ -18,7 +16,7 @@ fi
 for ((i=$START; i<=$FINISH; i++))
 do
     export JOBNUMBER=$i
-
+	source /home/tireman/simulation/jlab/nmu-npol/analysis/envscripts/NMUnpolVariables.sh
     if [ -f "$NPOLDIR/${NPOLBASENAME}_$i.out" ]
     then
 		rm $NPOLDIR/${NPOLBASENAME}_$i.out
