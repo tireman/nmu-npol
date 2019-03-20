@@ -12,20 +12,25 @@
 #define Npol_PrimaryGeneratorAction_h
 
 #include "G4VUserPrimaryGeneratorAction.hh"
+#include "G4Types.hh"
+#include "G4ParticleGun.hh"
 
 class G4GeneralParticleSource;
 class G4Event;
 
 class NpolPrimaryGeneratorAction : public G4VUserPrimaryGeneratorAction
 {
-	public:
-		NpolPrimaryGeneratorAction();
-		virtual ~NpolPrimaryGeneratorAction();
-
-		virtual void GeneratePrimaries(G4Event*);
-
-	private:
-  G4GeneralParticleSource* fParticleGun;
+public:
+  NpolPrimaryGeneratorAction();
+  virtual ~NpolPrimaryGeneratorAction();
+  
+  virtual void GeneratePrimaries(G4Event*);
+  void GenerateNeutronEvent(G4double nMom, G4double nTheta, G4double nPhi);
+  double genCalc(double q2);
+  double gmnCalc(double q2);
+private:
+  //G4GeneralParticleSource* fParticleGun;
+  G4ParticleGun* fParticleGun;
 };
 
 #endif
