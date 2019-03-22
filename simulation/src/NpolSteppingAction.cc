@@ -51,12 +51,12 @@ void NpolSteppingAction::UserSteppingAction(const G4Step *aStep) {
 	 || volName == "HallShellWall" 
 	 || volName == "HutBackWall"
 	 || volName == "HutSideWall")
-	//	 || volName == "HutRoof"
-	// || volName == "HutFrontWall" 
-	// || volName == "Dipole1"
-	// || volName == "Dipole2"
-	// || volName == "Dipole1CuBar"
-	// || volName == "Dipole1CuEnd")
+   	 //|| volName == "HutRoof"
+	 //|| volName == "HutFrontWall" 
+	 //|| volName == "Dipole1"
+	 //|| volName == "Dipole2"
+	 //|| volName == "Dipole1CuBar"
+	 //|| volName == "Dipole1CuEnd")
  	{
 	  analysisMan->TrackKilled(aTrack->GetTrackID());
 	  aTrack->SetTrackStatus(fStopAndKill);
