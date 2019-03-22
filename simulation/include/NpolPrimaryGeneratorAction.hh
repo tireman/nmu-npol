@@ -14,6 +14,7 @@
 #include "G4VUserPrimaryGeneratorAction.hh"
 #include "G4Types.hh"
 #include "G4ParticleGun.hh"
+#include "TLorentzVector.h"
 
 class G4GeneralParticleSource;
 class G4Event;
@@ -25,9 +26,11 @@ public:
   virtual ~NpolPrimaryGeneratorAction();
   
   virtual void GeneratePrimaries(G4Event*);
-  void GenerateNeutronEvent(G4double nMom, G4double nTheta, G4double nPhi);
+  TLorentzVector GenerateNeutronEvent();
   double genCalc(double q2);
   double gmnCalc(double q2);
+
+  static G4double NpolAng;
 private:
   //G4GeneralParticleSource* fParticleGun;
   G4ParticleGun* fParticleGun;

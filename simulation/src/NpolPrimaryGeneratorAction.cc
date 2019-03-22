@@ -28,6 +28,7 @@
 #include "JGenFermiMomentum.h"
 
 #include "NpolPrimaryGeneratorAction.hh"
+#include "NpolPolarimeter.hh"
 
 /* ----------- constants ----------- */ 
 #define massElectron 0.000510998956 // GeV
@@ -38,13 +39,19 @@
 #define dcsConversion 2.56819e-6 // const for conversion from 1ub to 1GeV^-2
 /* ----------- constants ----------- */
 
+G4double NpolPrimaryGeneratorAction::NpolAng = (NpolPolarimeter::NpolAng)*180./TMath::Pi();
+
 NpolPrimaryGeneratorAction::NpolPrimaryGeneratorAction()
   : G4VUserPrimaryGeneratorAction(), fParticleGun(0)
 {
   
   //fParticleGun = new G4GeneralParticleSource();
+
   G4int n_particle = 1;
   fParticleGun = new G4ParticleGun(n_particle);
+  G4ParticleTable* particleTable = G4ParticleTable::GetParticleTable();
+  G4ParticleDefinition* pType = particleTable->FindParticle("geantino");
+  fParticleGun->SetParticleDefinition(pType);
 }
 
 NpolPrimaryGeneratorAction::~NpolPrimaryGeneratorAction()
@@ -56,33 +63,42 @@ NpolPrimaryGeneratorAction::~NpolPrimaryGeneratorAction()
 // This function is called at the beginning of each event.
 void NpolPrimaryGeneratorAction::GeneratePrimaries(G4Event* anEvent)
 {
-  G4double nMom=0; G4double nTheta=0; G4double nPhi=0;
-  GenerateNeutronEvent(nMom, nTheta, nPhi);
-
+  G4double NpolAng = -NpolPolarimeter::NpolAng;
+  TLorentzVector Vector = GenerateNeutronEvent();
+  G4double nMom = Vector.P();
+  G4double nTheta = Vector.Theta();
+  G4double nPhi = Vector.Phi();
+   
   G4double xDir = sin(nTheta)*cos(nPhi);
   G4double yDir = sin(nTheta)*sin(nPhi);
-  G4double zDir = cos(nPhi);
-  
-  G4ParticleTable* particleTable = G4ParticleTable::GetParticleTable();
-  G4ParticleDefinition* pType = particleTable->FindParticle("neutron");
-  fParticleGun->SetParticleDefinition(pType);
+  G4double zDir = cos(nTheta);
+     
+  G4double xPrimeDir = xDir*cos(NpolAng) + zDir*sin(NpolAng);
+  G4double yPrimeDir = 1*yDir;
+  G4double zPrimeDir = -xDir*sin(NpolAng) + zDir*cos(NpolAng);
  
-  fParticleGun->SetParticleMomentum(nMom); //205.*MeV);
-  fParticleGun->SetParticleMomentumDirection(G4ThreeVector(xDir,yDir,zDir));
+  fParticleGun->SetParticleMomentum(nMom);
+  fParticleGun->SetParticleMomentumDirection(G4ThreeVector(xPrimeDir,yPrimeDir,zPrimeDir));
   fParticleGun->SetParticlePosition(G4ThreeVector(0., 0., 0.));
+  fParticleGun->SetParticlePolarization(G4ThreeVector(1.,0.,0.));
   fParticleGun->GeneratePrimaryVertex(anEvent); 
 
 }
 
-void NpolPrimaryGeneratorAction::GenerateNeutronEvent(G4double nMom, G4double nTheta, G4double nPhi){
+//  Generator from Tongtong Cao (post-doc, Hampton U.) for computation of a Neutron Lorentz 4-vector
+//  using the differential cross sections for polarized and unpolarized (e,e'n) reaction.  See
+//  document for more details in nmu-npol/simulation/npol-doc folder. 
+TLorentzVector NpolPrimaryGeneratorAction::GenerateNeutronEvent(){
+
+  bool evtFlag = false;
   int channel = 3; // channel
   char filter='p';  // Choose which filter is used to select events: n - no filter; u - unpolarized differential cross section; p - polarized differential cross section
   double maxDCS=0.0438455; // maximum of differential cross section (Q^2=3.95)
-  double beamEnergy=4.40; // beam energy (GeV) (for Q^2=3.95)
+  double beamEnergy=4.40*GeV; // beam energy (GeV) (for Q^2=3.95)
   double helicityRatio=1; // ratio of events with helicity + to with helicity - for the electron beam
   double polBeam=0.8; // polarization of beam
   double openAngle=5; // opening angle of the detector for scattered electrons (deg)
-  double thetaNeutronFree=28.0; // polar angle of neutron polarimeter (deg)
+  double thetaNeutronFree=NpolAng;// polar angle of neutron polarimeter (deg)
   double gen=0; // electronic form factor of neutron
   double gmn=0; // magnetic form factor of neutron
 
@@ -144,8 +160,164 @@ void NpolPrimaryGeneratorAction::GenerateNeutronEvent(G4double nMom, G4double nT
   if(gen==0) gen = genCalc(q2Free);  // If gen is not assigned, gen is calculated by the formula.
   if(gmn==0) gmn = gmnCalc(q2Free);  // If gem is not assigned, gen is calculated by the formula.
 
-/* channel 3 */
-  bool evtFlag = false;
+  /* channel 1 */
+  if(channel == 1){
+	do {
+      // Print out a message every 100 events 
+      if (event % 100 == 0){
+		fprintf (stderr, "%d\r", event);
+		fflush (stderr);
+      }
+	  
+      // Set Lorentz vectors for beam and target
+      beam.SetXYZT (0.0, 0.0, sqrt(beamEnergy*beamEnergy - massElectron*massElectron), beamEnergy);
+      target.SetXYZT(0, 0, 0, massNeutron);
+      w = beam + target;
+	  
+      if (eventEN.SetDecay (w, 2, masses)){
+		eventEN.Generate ();
+		pP1 = eventEN.GetDecay (0);
+		pP2 = eventEN.GetDecay (1);
+	    
+		energySElectron=pP1->E();
+		thetaSElectronRad=pP1->Theta();
+		thetaSElectron=thetaSElectronRad/TMath::Pi()*180;
+		pRNeutron=pP2->P();
+		thetaRNeutron=pP2->Theta()/TMath::Pi()*180;
+		
+		q2=pow((beam-*pP1).P(),2)-pow((beam-*pP1).E(),2);
+		tau=q2/(4*massNeutron*massNeutron);
+		epsilon=pow(1+2*(1+tau)*pow(tan(thetaSElectronRad/2),2),-1);
+		
+		// Do not filter events by DCS
+		if(filter=='n'){
+		  if(thetaSElectron>thetaSElectronFree-openAngle/2 && thetaSElectron <thetaSElectronFree+openAngle/2){
+			evtFlag = true;
+			event++;
+		  }	event++;
+		} 
+		
+		// Filter events by polarized DCS
+		if(filter=='u'){
+		  ran3 = maxDCS*randomNum.Rndm(); 
+		  if(thetaSElectron>thetaSElectronFree-openAngle/2 && thetaSElectron <thetaSElectronFree+openAngle/2){
+			mottDCS=pow(alpha,2)/(4*pow(beamEnergy,2)*pow(sin(thetaSElectronRad/2),4))*pow(cos(thetaSElectronRad/2),2);
+			unpolDCS=mottDCS*energySElectron/beamEnergy/((1+tau)*epsilon)*(tau*pow(gmn,2)+epsilon*pow(gen,2))/dcsConversion;
+			if(unpolDCS>ran3){
+			  evtFlag = true;
+			  event++;
+			} event++;
+		  }
+		}
+		
+		if(filter=='p'){
+		  ran3 = maxDCS*randomNum.Rndm(); 
+		  if(thetaSElectron>thetaSElectronFree-openAngle/2 && thetaSElectron <thetaSElectronFree+openAngle/2){
+			mottDCS=pow(alpha,2)/(4*pow(beamEnergy,2)*pow(sin(thetaSElectronRad/2),4))*pow(cos(thetaSElectronRad/2),2);
+			unpolDCS=mottDCS*energySElectron/beamEnergy/((1+tau)*epsilon)*(tau*pow(gmn,2)+epsilon*pow(gen,2))/dcsConversion;
+			if(gRandom->Rndm()<percentPosHeli) helicity=1;
+			else helicity=-1;
+			polTrans=polBeam*(-2*gen*gmn*sqrt(tau*(1+tau))*tan(thetaSElectronRad/2))/(pow(gen,2)+(tau+2*tau*(1+tau)*pow(tan(thetaSElectronRad/2),2))*pow(gmn,2));
+			polLongi=polBeam*(2*pow(gmn,2)*tau*sqrt((1+tau)*(1+tau*pow(sin(thetaSElectronRad/2),2)))*(1/cos(thetaSElectronRad/2))*tan(thetaSElectronRad/2))/(pow(gen,2)+(tau+2*tau*(1+tau)*pow(tan(thetaSElectronRad/2),2))*pow(gmn,2));
+			phaseShift=atan(polTrans/polLongi)/TMath::Pi()*180;
+			polDCS=unpolDCS*(polTrans+polLongi);
+			if(polDCS>ran3){
+			  evtFlag = true;
+			  event++;
+			} event++;
+		  }
+		}
+      }
+    } while(!(evtFlag)); 
+  } 
+  /* End channel 1 */
+
+  /* channel 2 */
+  if(channel == 2){
+	do {
+      // Print out a message every 100 events 
+      if (event % 100 == 0){
+		fprintf (stderr, "%d\r", event);
+		fflush (stderr);
+      }
+	  
+      // Use reject-accept method to select a value of Fermi Momentum
+      ran1 = 0.5*randomNum.Rndm();
+      ran2 = 11.0*randomNum.Rndm();
+      if (JGenFermiMomentum::Instance().Spectral(ran1)<ran2) continue;
+      fcos = (2*randomNum.Rndm())-1;
+      fphi = 2*3.141592653*randomNum.Rndm();
+      fpx = ran1*sqrt(1-fcos*fcos)*cos(fphi);
+      fpy = ran1*sqrt(1-fcos*fcos)*sin(fphi);
+      fpz = ran1*fcos;
+      fEn = sqrt(fpx*fpx+fpy*fpy+fpz*fpz+massNeutron*massNeutron);
+	  
+      // Set Lorentz vectors for beam and target
+      beam.SetXYZT (0.0, 0.0, sqrt(beamEnergy*beamEnergy - massElectron*massElectron), beamEnergy);
+      target.SetXYZT(fpx, fpy, fpz, fEn);
+      spectator=deuteron-target;
+      w = beam + target;
+	  
+      if (eventEN.SetDecay (w, 2, masses)){
+		eventEN.Generate ();
+		pP1 = eventEN.GetDecay (0);
+		pP2 = eventEN.GetDecay (1);
+	    
+		energySElectron=pP1->E();
+		thetaSElectronRad=pP1->Theta();
+		thetaSElectron=thetaSElectronRad/TMath::Pi()*180;
+		pRNeutron=pP2->P();
+		thetaRNeutron=pP2->Theta()/TMath::Pi()*180;
+		
+		q2=pow((beam-*pP1).P(),2)-pow((beam-*pP1).E(),2);
+		tau=q2/(4*massNeutron*massNeutron);
+		epsilon=pow(1+2*(1+tau)*pow(tan(thetaSElectronRad/2),2),-1);
+		
+		// Do not filter events by DCS
+		if(filter=='n'){
+		  if(thetaSElectron>thetaSElectronFree-openAngle/2 && thetaSElectron <thetaSElectronFree+openAngle/2){
+			evtFlag = true;
+			event++;
+		  }	event++;
+		} 
+		
+		// Filter events by polarized DCS
+		if(filter=='u'){
+		  ran3 = maxDCS*randomNum.Rndm(); 
+		  if(thetaSElectron>thetaSElectronFree-openAngle/2 && thetaSElectron <thetaSElectronFree+openAngle/2){
+			mottDCS=pow(alpha,2)/(4*pow(beamEnergy,2)*pow(sin(thetaSElectronRad/2),4))*pow(cos(thetaSElectronRad/2),2);
+			unpolDCS=mottDCS*energySElectron/beamEnergy/((1+tau)*epsilon)*(tau*pow(gmn,2)+epsilon*pow(gen,2))/dcsConversion;
+			
+			if(unpolDCS>ran3){
+			  evtFlag = true;
+			  event++;
+			} event++;
+		  }
+		}
+		
+		if(filter=='p'){
+		  ran3 = maxDCS*randomNum.Rndm(); 
+		  if(thetaSElectron>thetaSElectronFree-openAngle/2 && thetaSElectron <thetaSElectronFree+openAngle/2){
+			mottDCS=pow(alpha,2)/(4*pow(beamEnergy,2)*pow(sin(thetaSElectronRad/2),4))*pow(cos(thetaSElectronRad/2),2);
+			unpolDCS=mottDCS*energySElectron/beamEnergy/((1+tau)*epsilon)*(tau*pow(gmn,2)+epsilon*pow(gen,2))/dcsConversion;
+			if(gRandom->Rndm()<percentPosHeli) helicity=1;
+			else helicity=-1;
+			polTrans=polBeam*(-2*gen*gmn*sqrt(tau*(1+tau))*tan(thetaSElectronRad/2))/(pow(gen,2)+(tau+2*tau*(1+tau)*pow(tan(thetaSElectronRad/2),2))*pow(gmn,2));
+			polLongi=polBeam*(2*pow(gmn,2)*tau*sqrt((1+tau)*(1+tau*pow(sin(thetaSElectronRad/2),2)))*(1/cos(thetaSElectronRad/2))*tan(thetaSElectronRad/2))/(pow(gen,2)+(tau+2*tau*(1+tau)*pow(tan(thetaSElectronRad/2),2))*pow(gmn,2));
+			phaseShift=atan(polTrans/polLongi)/TMath::Pi()*180;
+			polDCS=unpolDCS*(polTrans+polLongi);
+			if(polDCS>ran3){
+			  evtFlag = true;
+			  event++;
+			} event++;
+		  }
+		}
+      }
+    } while(!(evtFlag)); 
+  }
+  /* End channel 2 */
+  
+  /* channel 3 */
   if(channel == 3){
     do {
       // Print out a message every 100 events 
@@ -193,8 +365,7 @@ void NpolPrimaryGeneratorAction::GenerateNeutronEvent(G4double nMom, G4double nT
 		  if(thetaSElectron>thetaSElectronFree-openAngle/2 && thetaSElectron <thetaSElectronFree+openAngle/2){	
 			evtFlag = true;
 			event++;
-			//if (WillBeRootOutput) mytree->Fill ();
-		  }
+		  }	event++;
 		} 
 		
 		// Filter events by polarized DCS
@@ -210,13 +381,12 @@ void NpolPrimaryGeneratorAction::GenerateNeutronEvent(G4double nMom, G4double nT
 			if(unpolDCS>ran3){
 			  evtFlag = true;
 			  event++;
-			  //if (WillBeRootOutput) mytree->Fill ();
-			}
+			} event++;
 		  }
 		}
 		
 		if(filter=='p'){
-		  ran3 = maxDCS*randomNum.Rndm(); 
+		  ran3 = maxDCS*randomNum.Rndm();
 		  if(thetaSElectron>thetaSElectronFree-openAngle/2 && thetaSElectron <thetaSElectronFree+openAngle/2){
 			double k1=q2*pow(gmn,2);
 			double k2=pow(2*massNeutron,2)*(pow(gen,2)+tau*pow(gmn,2))/(1+tau);
@@ -230,23 +400,60 @@ void NpolPrimaryGeneratorAction::GenerateNeutronEvent(G4double nMom, G4double nT
 			polLongi=polBeam*(2*pow(gmn,2)*tau*sqrt((1+tau)*(1+tau*pow(sin(thetaSElectronRad/2),2)))*(1/cos(thetaSElectronRad/2))*tan(thetaSElectronRad/2))/(pow(gen,2)+(tau+2*tau*(1+tau)*pow(tan(thetaSElectronRad/2),2))*pow(gmn,2));
 			phaseShift=atan(polTrans/polLongi)/TMath::Pi()*180;
 			polDCS=unpolDCS*(polTrans+polLongi);
-			if(polDCS>ran3 && abs(pP2->Phi()) <= 0.060){
+			if(polDCS>ran3){
 			  evtFlag = true;
 			  event++;
-			  //if (WillBeRootOutput) mytree->Fill ();
-			}
+			} event++;
 		  }
 		}
-      }
-    } while(!(evtFlag));  
+	  }
+	} while(!(evtFlag));  
   }
-
-  nMom = pP2->P()*GeV;
-  nTheta = pP2->Theta();
-  nPhi = pP2->P();
+  /* End channel 3 */
   
-  /* channel 3 */
-  return;
+ /* channel 4 */
+  if(channel == 4){
+    do {
+      // Print out a message every 100 events 
+      if (event % 100 == 0){
+		fprintf (stderr, "%d\r", event);
+		fflush (stderr);
+      }
+	  
+      beam.SetXYZT (0.0, 0.0, sqrt(beamEnergy*beamEnergy - massElectron*massElectron), beamEnergy);
+      target=deuteron;
+      w = beam + target;
+	  
+      if (eventED.SetDecay (w, 3, massesENP)){
+		eventED.Generate ();
+		pP1 = eventED.GetDecay (0);
+		pP2 = eventED.GetDecay (1);
+		pP3 = eventED.GetDecay (2);
+		
+		energySElectron=pP1->E();
+		thetaSElectronRad=pP1->Theta();
+		thetaSElectron=thetaSElectronRad/TMath::Pi()*180;
+		pRNeutron=pP2->P();
+		thetaRNeutron=pP2->Theta()/TMath::Pi()*180;
+		
+		q2=pow((beam-*pP1).P(),2)-pow((beam-*pP1).E(),2);
+		tau=q2/(4*massNeutron*massNeutron);
+		epsilon=pow(1+2*(1+tau)*pow(tan(thetaSElectronRad/2),2),-1);
+		
+		// Do not filter events by DCS
+		if(filter=='n'){
+		  if(thetaSElectron>thetaSElectronFree-openAngle/2 && thetaSElectron <thetaSElectronFree+openAngle/2){	
+			evtFlag = true;
+			event++;
+		  }	event++;
+		}
+      }
+    } while(!(evtFlag)); 
+  }
+  /* End channel 4 */
+
+  TLorentzVector Vector = *pP2;
+  return Vector;
 }
 
 
