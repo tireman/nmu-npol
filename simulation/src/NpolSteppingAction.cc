@@ -45,14 +45,22 @@ void NpolSteppingAction::UserSteppingAction(const G4Step *aStep) {
   G4String volName = preStepVolume->GetName();
    
   // Kill/stop tracks that will just waste precious CPU time
-  if(volName == "Cap" || postStepVolume == NULL || 
-     volName == "HallShellRoof" ||volName == "HallShellFloor" || volName == "HallShellWall" 
-	 || volName == "HutBackWall" || volName == "HutSideWall" || volName == "HutRoof" ){
-	//|| volName == "HutFrontWall"){ 
-	//|| volName == "Dipole1" || volName =="Dipole2" || volName == "Dipole1CuBar" || volName == "Dipole1CuEnd"){
- 	analysisMan->TrackKilled(aTrack->GetTrackID());
-	aTrack->SetTrackStatus(fStopAndKill);
-  }
+  if(volName == "Cap" || postStepVolume == NULL
+	 || volName == "HallShellRoof"
+	 || volName == "HallShellFloor"
+	 || volName == "HallShellWall" 
+	 || volName == "HutBackWall"
+	 || volName == "HutSideWall")
+	//	 || volName == "HutRoof"
+	// || volName == "HutFrontWall" 
+	// || volName == "Dipole1"
+	// || volName == "Dipole2"
+	// || volName == "Dipole1CuBar"
+	// || volName == "Dipole1CuEnd")
+ 	{
+	  analysisMan->TrackKilled(aTrack->GetTrackID());
+	  aTrack->SetTrackStatus(fStopAndKill);
+	}
   
   // All Stepping information is saved to a vector for analysis later
   analysisMan->RecordStep(aStep);
