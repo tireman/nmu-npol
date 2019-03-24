@@ -50,8 +50,8 @@ void NpolSteppingAction::UserSteppingAction(const G4Step *aStep) {
 	 || volName == "HallShellFloor"
 	 || volName == "HallShellWall" 
 	 || volName == "HutBackWall"
-	 || volName == "HutSideWall")
-   	 //|| volName == "HutRoof"
+	 || volName == "HutSideWall"
+   	 || volName == "HutRoof")
 	 //|| volName == "HutFrontWall" 
 	 //|| volName == "Dipole1"
 	 //|| volName == "Dipole2"
