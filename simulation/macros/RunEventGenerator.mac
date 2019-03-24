@@ -1,0 +1,35 @@
+### Test Test Test Test
+
+# $Id: npol.mac,v1.1 For running with or without visualization
+# on the nmu-Npol simulation 6/24/2016 $
+# 
+# This macro feeds commands to the primary event generator and allows 
+# for changing of beam parameters within the macro. 
+#
+# can be run in batch, without graphic
+# or interactively: Idle> /control/execute RunEventGenerator.mac
+
+#/vis/viewer/set/viewpointThetaPhi -45 180 deg
+#/vis/viewer/zoom 1.5
+
+/run/initialize
+/run/verbose 0
+/event/verbose 0
+/material/verbose 0
+/cuts/verbose 0
+/process/verbose 0
+
+/tracking/verbose 0
+/tracking/storeTrajectory 1
+
+### Particle Gun Commands ####
+# Particle type
+/gun/particle neutron
+
+#
+# Commands below are independent of gps
+#
+
+/vis/scene/endOfEventAction accumulate 2000
+/run/printProgress 100
+/run/beamOn 200
