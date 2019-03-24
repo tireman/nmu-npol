@@ -39,6 +39,9 @@
 #define dcsConversion 2.56819e-6 // const for conversion from 1ub to 1GeV^-2
 /* ----------- constants ----------- */
 
+struct EventInfo { TLorentzVector electronVector; TLorentzVector neutronVector;
+  TLorentzVector thirdParticleVector; G4double polLong; G4double polTran; } primeEvent;
+
 G4double NpolPrimaryGeneratorAction::NpolAng = (NpolPolarimeter::NpolAng)*180./TMath::Pi();
 
 NpolPrimaryGeneratorAction::NpolPrimaryGeneratorAction()
@@ -64,10 +67,14 @@ NpolPrimaryGeneratorAction::~NpolPrimaryGeneratorAction()
 void NpolPrimaryGeneratorAction::GeneratePrimaries(G4Event* anEvent)
 {
   G4double NpolAng = -NpolPolarimeter::NpolAng;
-  TLorentzVector Vector = GenerateNeutronEvent();
-  G4double nMom = Vector.P();
-  G4double nTheta = Vector.Theta();
-  G4double nPhi = Vector.Phi();
+  GenerateNeutronEvent();
+  TLorentzVector Vector = primeEvent.neutronVector;
+  G4double nMom = primeEvent.neutronVector.P();
+  G4double nTheta = primeEvent.neutronVector.Theta();
+  G4double nPhi = primeEvent.neutronVector.Phi();
+  G4double polX = primeEvent.polTran;
+  G4double polY = 0.;
+  G4double polZ = primeEvent.polLong;
    
   G4double xDir = sin(nTheta)*cos(nPhi);
   G4double yDir = sin(nTheta)*sin(nPhi);
@@ -80,7 +87,8 @@ void NpolPrimaryGeneratorAction::GeneratePrimaries(G4Event* anEvent)
   fParticleGun->SetParticleMomentum(nMom);
   fParticleGun->SetParticleMomentumDirection(G4ThreeVector(xPrimeDir,yPrimeDir,zPrimeDir));
   fParticleGun->SetParticlePosition(G4ThreeVector(0., 0., 0.));
-  fParticleGun->SetParticlePolarization(G4ThreeVector(1.,0.,0.));
+  fParticleGun->SetParticlePolarization(G4ThreeVector(polX,polY,polZ));
+  fParticleGun->SetParticlePolarization(G4ThreeVector(1., 0., 0.));
   fParticleGun->GeneratePrimaryVertex(anEvent); 
 
 }
@@ -88,9 +96,8 @@ void NpolPrimaryGeneratorAction::GeneratePrimaries(G4Event* anEvent)
 //  Generator from Tongtong Cao (post-doc, Hampton U.) for computation of a Neutron Lorentz 4-vector
 //  using the differential cross sections for polarized and unpolarized (e,e'n) reaction.  See
 //  document for more details in nmu-npol/simulation/npol-doc folder. 
-TLorentzVector NpolPrimaryGeneratorAction::GenerateNeutronEvent(){
+void NpolPrimaryGeneratorAction::GenerateNeutronEvent(){
 
-  bool evtFlag = false;
   int channel = 3; // channel
   char filter='p';  // Choose which filter is used to select events: n - no filter; u - unpolarized differential cross section; p - polarized differential cross section
   double maxDCS=0.0438455; // maximum of differential cross section (Q^2=3.95)
@@ -102,6 +109,7 @@ TLorentzVector NpolPrimaryGeneratorAction::GenerateNeutronEvent(){
   double gen=0; // electronic form factor of neutron
   double gmn=0; // magnetic form factor of neutron
 
+  bool evtFlag = false;
   double thetaNeutronFreeRad=thetaNeutronFree/180.*TMath::Pi();
   double pSNeutronFree=2*massNeutron*beamEnergy*(massNeutron+beamEnergy)*cos(thetaNeutronFreeRad)/((2*beamEnergy*massNeutron+massNeutron*massNeutron+beamEnergy*beamEnergy*sin(thetaNeutronFreeRad)*sin(thetaNeutronFreeRad)));
   double pSElectronFree=sqrt(pow(pSNeutronFree*sin(thetaNeutronFreeRad),2)+pow(beamEnergy-pSNeutronFree*cos(thetaNeutronFreeRad),2));
@@ -452,8 +460,13 @@ TLorentzVector NpolPrimaryGeneratorAction::GenerateNeutronEvent(){
   }
   /* End channel 4 */
 
-  TLorentzVector Vector = *pP2;
-  return Vector;
+  primeEvent.electronVector = *pP1;
+  primeEvent.neutronVector = *pP2;
+  primeEvent.thirdParticleVector = *pP3;
+  primeEvent.polLong = polLongi;
+  primeEvent.polTran = polTrans;
+  
+  return;
 }
 
 
