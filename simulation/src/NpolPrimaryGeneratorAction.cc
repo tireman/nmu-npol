@@ -13,6 +13,10 @@
 // Generates the primary particle for each event
 // Created: William Tireman
 // Modified: 26-June-2016  Changed to General Particle Source -- W.T.
+// Modified: 23-March-2019 Just updated the code to include a (e,e'n)
+//         generator created by Tongtong Cao (Hampton U.). This method
+//         needs more work so it can be more versitile but its on the
+//         right track.
 
 #include "G4Event.hh"
 #include "G4GeneralParticleSource.hh"
@@ -48,7 +52,7 @@ NpolPrimaryGeneratorAction::NpolPrimaryGeneratorAction()
   : G4VUserPrimaryGeneratorAction(), fParticleGun(0)
 {
   
-  //fParticleGun = new G4GeneralParticleSource();
+  fParticleGun2 = new G4GeneralParticleSource();
 
   G4int n_particle = 1;
   fParticleGun = new G4ParticleGun(n_particle);
@@ -61,6 +65,7 @@ NpolPrimaryGeneratorAction::~NpolPrimaryGeneratorAction()
 {
   std::cout << "Deleting Particle Gun" << std::endl;
   delete fParticleGun;
+  delete fParticleGun2;
 }
 
 // This function is called at the beginning of each event.

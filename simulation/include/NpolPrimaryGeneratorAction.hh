@@ -33,7 +33,7 @@ public:
 
   static G4double NpolAng;
 private:
-  //G4GeneralParticleSource* fParticleGun;
+  G4GeneralParticleSource* fParticleGun2;
   G4ParticleGun* fParticleGun;
 };
 
