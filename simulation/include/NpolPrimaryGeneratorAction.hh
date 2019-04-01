@@ -11,13 +11,15 @@
 #ifndef Npol_PrimaryGeneratorAction_h
 #define Npol_PrimaryGeneratorAction_h
 
+#include "NpolPrimaryGeneratorMessenger.hh"
 #include "G4VUserPrimaryGeneratorAction.hh"
 #include "G4Types.hh"
 #include "G4ParticleGun.hh"
-#include "G4ParticleGunMessenger.hh"
+//#include "G4ParticleGunMessenger.hh"
 #include "TLorentzVector.h"
 
 class G4GeneralParticleSource;
+class G4ParticleGun;
 class G4Event;
 
 class NpolPrimaryGeneratorAction : public G4VUserPrimaryGeneratorAction
@@ -33,8 +35,10 @@ public:
 
   static G4double NpolAng;
 private:
-  G4GeneralParticleSource* fParticleGun2;
+  //NpolPrimaryGeneratorMessenger* gunMessenger;
   G4ParticleGun* fParticleGun;
+  G4GeneralParticleSource* fParticleGun2;
+  
 };
 
 #endif

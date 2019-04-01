@@ -1,6 +1,6 @@
 //********************************************************************
 //* License and Disclaimer: From GEANT Collaboration                 *
-//*                                                                  *
+//*                                                                      *
 //* The  Geant4 software  is  copyright of the Copyright Holders  of *
 //* the Geant4 Collaboration.  It is provided  under  the terms  and *
 //* conditions of the Geant4 Software License,  included in the file *
@@ -59,11 +59,13 @@ NpolPrimaryGeneratorAction::NpolPrimaryGeneratorAction()
   G4ParticleTable* particleTable = G4ParticleTable::GetParticleTable();
   G4ParticleDefinition* pType = particleTable->FindParticle("geantino");
   fParticleGun->SetParticleDefinition(pType);
+  //gunMessenger = new NpolPrimaryGeneratorMessenger(this);
 }
 
 NpolPrimaryGeneratorAction::~NpolPrimaryGeneratorAction()
 {
   std::cout << "Deleting Particle Gun" << std::endl;
+  //delete gunMessenger;
   delete fParticleGun;
   delete fParticleGun2;
 }
@@ -104,7 +106,7 @@ void NpolPrimaryGeneratorAction::GeneratePrimaries(G4Event* anEvent)
 void NpolPrimaryGeneratorAction::GenerateNeutronEvent(){
 
   int channel = 3; // channel
-  char filter='p';  // Choose which filter is used to select events: n - no filter; u - unpolarized differential cross section; p - polarized differential cross section
+  std::string filter="polarized";  // Choose which filter is used to select events: n - no filter; u - unpolarized differential cross section; p - polarized differential cross section
   double maxDCS=0.0438455; // maximum of differential cross section (Q^2=3.95)
   double beamEnergy=4.40*GeV; // beam energy (GeV) (for Q^2=3.95)
   double helicityRatio=1; // ratio of events with helicity + to with helicity - for the electron beam
@@ -203,7 +205,7 @@ void NpolPrimaryGeneratorAction::GenerateNeutronEvent(){
 		epsilon=pow(1+2*(1+tau)*pow(tan(thetaSElectronRad/2),2),-1);
 		
 		// Do not filter events by DCS
-		if(filter=='n'){
+		if(filter=="none"){
 		  if(thetaSElectron>thetaSElectronFree-openAngle/2 && thetaSElectron <thetaSElectronFree+openAngle/2){
 			evtFlag = true;
 			event++;
@@ -211,7 +213,7 @@ void NpolPrimaryGeneratorAction::GenerateNeutronEvent(){
 		} 
 		
 		// Filter events by polarized DCS
-		if(filter=='u'){
+		if(filter=="unpolarized"){
 		  ran3 = maxDCS*randomNum.Rndm(); 
 		  if(thetaSElectron>thetaSElectronFree-openAngle/2 && thetaSElectron <thetaSElectronFree+openAngle/2){
 			mottDCS=pow(alpha,2)/(4*pow(beamEnergy,2)*pow(sin(thetaSElectronRad/2),4))*pow(cos(thetaSElectronRad/2),2);
@@ -223,7 +225,7 @@ void NpolPrimaryGeneratorAction::GenerateNeutronEvent(){
 		  }
 		}
 		
-		if(filter=='p'){
+		if(filter=="polarized"){
 		  ran3 = maxDCS*randomNum.Rndm(); 
 		  if(thetaSElectron>thetaSElectronFree-openAngle/2 && thetaSElectron <thetaSElectronFree+openAngle/2){
 			mottDCS=pow(alpha,2)/(4*pow(beamEnergy,2)*pow(sin(thetaSElectronRad/2),4))*pow(cos(thetaSElectronRad/2),2);
@@ -287,7 +289,7 @@ void NpolPrimaryGeneratorAction::GenerateNeutronEvent(){
 		epsilon=pow(1+2*(1+tau)*pow(tan(thetaSElectronRad/2),2),-1);
 		
 		// Do not filter events by DCS
-		if(filter=='n'){
+		if(filter=="none"){
 		  if(thetaSElectron>thetaSElectronFree-openAngle/2 && thetaSElectron <thetaSElectronFree+openAngle/2){
 			evtFlag = true;
 			event++;
@@ -295,7 +297,7 @@ void NpolPrimaryGeneratorAction::GenerateNeutronEvent(){
 		} 
 		
 		// Filter events by polarized DCS
-		if(filter=='u'){
+		if(filter=="unpolarized"){
 		  ran3 = maxDCS*randomNum.Rndm(); 
 		  if(thetaSElectron>thetaSElectronFree-openAngle/2 && thetaSElectron <thetaSElectronFree+openAngle/2){
 			mottDCS=pow(alpha,2)/(4*pow(beamEnergy,2)*pow(sin(thetaSElectronRad/2),4))*pow(cos(thetaSElectronRad/2),2);
@@ -308,7 +310,7 @@ void NpolPrimaryGeneratorAction::GenerateNeutronEvent(){
 		  }
 		}
 		
-		if(filter=='p'){
+		if(filter=="polarized"){
 		  ran3 = maxDCS*randomNum.Rndm(); 
 		  if(thetaSElectron>thetaSElectronFree-openAngle/2 && thetaSElectron <thetaSElectronFree+openAngle/2){
 			mottDCS=pow(alpha,2)/(4*pow(beamEnergy,2)*pow(sin(thetaSElectronRad/2),4))*pow(cos(thetaSElectronRad/2),2);
@@ -374,7 +376,7 @@ void NpolPrimaryGeneratorAction::GenerateNeutronEvent(){
 		epsilon=pow(1+2*(1+tau)*pow(tan(thetaSElectronRad/2),2),-1);
 		
 		// Do not filter events by DCS
-		if(filter=='n'){
+		if(filter=="none"){
 		  if(thetaSElectron>thetaSElectronFree-openAngle/2 && thetaSElectron <thetaSElectronFree+openAngle/2){	
 			evtFlag = true;
 			event++;
@@ -382,7 +384,7 @@ void NpolPrimaryGeneratorAction::GenerateNeutronEvent(){
 		} 
 		
 		// Filter events by polarized DCS
-		if(filter=='u'){
+		if(filter=="unpolarized"){
 		  ran3 = maxDCS*randomNum.Rndm(); 
 		  if(thetaSElectron>thetaSElectronFree-openAngle/2 && thetaSElectron <thetaSElectronFree+openAngle/2){
 			double k1=q2*pow(gmn,2);
@@ -398,7 +400,7 @@ void NpolPrimaryGeneratorAction::GenerateNeutronEvent(){
 		  }
 		}
 		
-		if(filter=='p'){
+		if(filter=="polarized"){
 		  ran3 = maxDCS*randomNum.Rndm();
 		  if(thetaSElectron>thetaSElectronFree-openAngle/2 && thetaSElectron <thetaSElectronFree+openAngle/2){
 			double k1=q2*pow(gmn,2);
@@ -454,7 +456,7 @@ void NpolPrimaryGeneratorAction::GenerateNeutronEvent(){
 		epsilon=pow(1+2*(1+tau)*pow(tan(thetaSElectronRad/2),2),-1);
 		
 		// Do not filter events by DCS
-		if(filter=='n'){
+		if(filter=="none"){
 		  if(thetaSElectron>thetaSElectronFree-openAngle/2 && thetaSElectron <thetaSElectronFree+openAngle/2){	
 			evtFlag = true;
 			event++;
