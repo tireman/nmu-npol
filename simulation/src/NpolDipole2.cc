@@ -33,6 +33,7 @@
 
 #include "NpolMaterials.hh"
 #include "NpolDipole2.hh"
+#include "NpolPolarimeter.hh"
 
 // Field multiplier; if 2 mags, use value corresponding to desired integrated
 // field strength; example: for 1 Tm use FM = 1.0 and for 4.3 Tm use FM = 4.3
@@ -41,7 +42,7 @@
 G4double NpolDipole2::FM = 4.3; 
 G4double NpolDipole2::dipole2FieldY = FM*0.40984*tesla; 
 
-G4double NpolDipole2::NpolAng = 28.0*deg;
+G4double NpolDipole2::NpolAng =  NpolPolarimeter::NpolAng;
 G4double NpolDipole2::yokeLength = 48.0*2.54*cm; // 1.22*m;
 G4double NpolDipole2::gapWidth = 48.0*2.54*cm; //1.22*m;
 G4double NpolDipole2::gapLength = 48.0*2.54*cm; //1.22*m;

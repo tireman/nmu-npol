@@ -17,6 +17,8 @@
 #endif
 #include <time.h>
 #include "G4UImanager.hh"
+#include "G4UIterminal.hh"
+
 #include "Randomize.hh"
 
 #include "QGSP_BERT.hh"

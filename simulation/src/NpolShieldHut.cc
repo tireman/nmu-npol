@@ -24,11 +24,12 @@
 
 #include "NpolMaterials.hh"
 #include "NpolShieldHut.hh"
+#include "NpolPolarimeter.hh"
 
 G4double NpolShieldHut::PosFront = 6.35*m; //-2.0*m; // position of front wall (center)
 G4double NpolShieldHut::vertAngle = 0.1000*rad; // 0.100 rad nominal 0.120 rad for 10.25/14.75in gap// vertical acceptance angle
 G4double NpolShieldHut::horAngle = 0.160*rad;  // 0.160 rad nomial 0.200 rad for 10in gap horizontal acceptance angle // the max for 56cm wide gap is +/- 100 mrad
-G4double NpolShieldHut::NpolAng = 28.0*deg; // Polarimeter central angle
+G4double NpolShieldHut::NpolAng =  NpolPolarimeter::NpolAng; // Polarimeter central angle
 G4double NpolShieldHut::wallThickness = 0.900*m;  // Thickness of the concrete walls (nominal)
 G4double NpolShieldHut::wallHeight = 7.0*m; // Nominal height of the shield hut walls
 G4double NpolShieldHut::frontWallWidth = 4.8768*m;  // Width of the front and back walls
